@@ -27,4 +27,5 @@
 $string['pluginname'] = 'Extensions';
 
 # subplugins
-$string['subplugintype_extension_quiz'] = 'Extension adapter mod_quiz';
+$string['subplugintype_extension'] = 'Extension adapter';
+$string['subplugintype_extension_plural'] = 'Extension adapters';

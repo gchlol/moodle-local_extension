@@ -23,5 +23,5 @@
  */
 
 $subplugins = array(
-    'extension_quiz'       => 'local/mod/quiz',
+    'extension'       => 'local/extension/mod',
 );

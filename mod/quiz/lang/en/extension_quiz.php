@@ -25,5 +25,3 @@
  */
 
 $string['pluginname'] = 'Extension Quiz Adapter';
-
-

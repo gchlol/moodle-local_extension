@@ -26,7 +26,7 @@
 
 defined('MOODLE_INTERNAL') || die();
 
-$plugin->version   = 2016062101;        // The current plugin version (Date: YYYYMMDDXX)
+$plugin->version   = 2016062103;        // The current plugin version (Date: YYYYMMDDXX)
 $plugin->requires  = 2014050800;        // Requires this Moodle version.
 $plugin->component = 'local_extension'; // To check on upgrade, that module sits in correct place.
 
