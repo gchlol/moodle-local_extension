@@ -1,0 +1,46 @@
+Testing extension_assign
+==============================================================================
+
+Click Add a new course on, course/index.php
+Provide any course fullname and shortname.
+Save the changes.
+
+Navigate to the new course created.
+Enable editing on via the 'Turn editing on' button.
+
+The following steps related to adding an assignment activity will need to be completed three times.
+
+In the first region select 'Add an activity or resource'
+Select the Assignment type.
+
+Provide it a name and description.
+
+Set 1:
+Name: Expired Assignment
+Description: Expired Assignment
+
+Check the boxes next to all three Availability options and set these dates,
+
+Allow submissions from: Get todays date and subtract a week from the days in the list.
+Due date: Get todays date and subtract a week from the days in the list.
+Cut-off date: Set it to 1 hour after the due date that has been set.
+
+Set 2:
+Name: Current Assignment
+Description: Current Assignment
+
+Check the boxes next to all three Availability options and set these dates,
+
+Allow submissions from: The current day, 00h 00m.
+Due date: One week from today, 00h, 00m.
+Cut-off date: Set it to 1 hour after the due date that has been set.
+
+Set 3:
+Name: Future Assignment
+Description: Future Assignment
+
+Check the boxes next to all three Availability options and set these dates,
+
+Allow submissions from: Add one month to the current day, 00h 00m
+Due date: One month and one week from today, 00h, 00m.
+Cut-off date: Set it to 1 hour after the due date that has been set.
