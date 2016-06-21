@@ -16,7 +16,7 @@
 
 
 /**
- * Requests local_extension
+ * Requests page in local_extension 
  *
  * @package    local_extension
  * @author     Nicholas Hoobin <nicholashoobin@catalyst-au.net>
@@ -24,11 +24,16 @@
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
-/**
- * Requests local_extension
- *
- * @package    local_extension
- * @author     Nicholas Hoobin <nicholashoobin@catalyst-au.net>
- * @copyright  Catalyst IT
- * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
- */
+require_once('../../config.php');
+global $CFG, $PAGE;
+
+$PAGE->set_url(new moodle_url('/local/extension/request.php'));
+
+$PAGE->set_context(context_system::instance());
+$PAGE->set_pagelayout('standard');
+
+$PAGE->set_title(get_string('pluginname', 'local_extension'));
+$PAGE->set_heading(get_string('request_page_heading', 'local_extension'));
+
+echo $OUTPUT->header();
+echo $OUTPUT->footer();

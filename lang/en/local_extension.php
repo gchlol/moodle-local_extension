@@ -26,6 +26,9 @@
 
 $string['pluginname'] = 'Extensions';
 
+# request.php
+$string['request_page_heading'] = 'Extension Request';
+
 # subplugins
 $string['subplugintype_extension'] = 'Extension adapter';
 $string['subplugintype_extension_plural'] = 'Extension adapters';
