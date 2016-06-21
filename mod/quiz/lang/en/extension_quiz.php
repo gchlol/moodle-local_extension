@@ -16,15 +16,14 @@
 
 
 /**
- *  local_extension plugin lang string library
+ *  extension_quiz plugin lang string library
  *
- * @package    local_extension
+ * @package    extension_quiz
  * @author     Nicholas Hoobin <nicholashoobin@catalyst-au.net>
  * @copyright  Catalyst IT
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
-$string['pluginname'] = 'Extensions';
+$string['pluginname'] = 'Extension Quiz Adapter';
 
-# subplugins
-$string['subplugintype_extension_quiz'] = 'Extension adapter mod_quiz';
+

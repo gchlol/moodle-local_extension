@@ -14,17 +14,14 @@
 // You should have received a copy of the GNU General Public License
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
-
 /**
- *  local_extension plugin lang string library
+ * Version details.
  *
  * @package    local_extension
- * @author     Nicholas Hoobin <nicholashoobin@catalyst-au.net>
- * @copyright  Catalyst IT
+ * @copyright  Nicholas Hoobin <nicholashoobin@catalyst-au.net>
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
-$string['pluginname'] = 'Extensions';
-
-# subplugins
-$string['subplugintype_extension_quiz'] = 'Extension adapter mod_quiz';
+$subplugins = array(
+    'extension_quiz'       => 'local/mod/quiz',
+);

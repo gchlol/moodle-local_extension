@@ -16,15 +16,18 @@
 
 
 /**
- *  local_extension plugin lang string library
+ * Version details.
  *
- * @package    local_extension
+ * @package    extension_quiz
  * @author     Nicholas Hoobin <nicholashoobin@catalyst-au.net>
  * @copyright  Catalyst IT
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
-$string['pluginname'] = 'Extensions';
+defined('MOODLE_INTERNAL') || die();
 
-# subplugins
-$string['subplugintype_extension_quiz'] = 'Extension adapter mod_quiz';
+$plugin->version   = 2016062100;        // The current plugin version (Date: YYYYMMDDXX)
+$plugin->requires  = 2014050800;        // Requires this Moodle version.
+$plugin->component = 'extension_quiz';  // To check on upgrade, that module sits in correct place.
+
+
