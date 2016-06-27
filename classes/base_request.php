@@ -15,25 +15,25 @@
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
 /**
- * Extension quiz request class.
+ * Extension base request class.
  *
- * @package    extension_quiz
- * @author     Nicholas Hoobin <nicholashoobin@catalyst-au.net>
+ * @package    local_extension
+ * @author     Brendan Heywood <brendan@catalyst-au.net>
  * @copyright  Catalyst IT
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
-namespace extension_quiz;
+namespace local_extension;
 
 /**
- * Extension quiz request class.
+ * Extension base request class.
  *
- * @package    extension_quiz
- * @author     Nicholas Hoobin <nicholashoobin@catalyst-au.net>
+ * @package    local_extension
+ * @author     Brendan Heywood <brendan@catalyst-au.net>
  * @copyright  Catalyst IT
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
-class request extends \local_extension\base_request {
+abstract class base_request {
 
     /**
      * Is a calendar event something we can handle?
@@ -41,9 +41,7 @@ class request extends \local_extension\base_request {
      * @param event $event A calendar event object
      * @return boolean True if should be handled
      */
-    public function is_candidate($event) {
-        return true;
-    }
+    abstract public function is_candidate($event);
 
 }
 

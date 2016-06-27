@@ -15,6 +15,8 @@
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
 /**
+ * Plugin class for extension handlers
+ *
  * @package    local_extension
  * @author     Nicholas Hoobin <nicholashoobin@catalyst-au.net>
  * @copyright  Catalyst IT
@@ -27,5 +29,42 @@ use core\plugininfo\base;
 
 defined('MOODLE_INTERNAL') || die();
 
+/**
+ * Plugin class for extension handlers
+ *
+ * @author     Nicholas Hoobin <nicholashoobin@catalyst-au.net>
+ * @copyright  Catalyst IT
+ * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
+ */
 class extension extends base {
+
+    /**
+     * Return an array of instances each module request
+     * @return array map of modules types to a handler object.
+     */
+    public static function get_enabled_request() {
+
+        static $mods;
+
+        if ($mods) {
+            return $mods;
+        }
+
+        $plugins = \core_plugin_manager::instance()->get_plugins_of_type('extension');
+
+        $mods = array();
+        foreach ($plugins as $plugin) {
+            $classname = '\extension_' . $plugin->name . '\request';
+
+            if (class_exists($classname)) {
+                $instance = new $classname();
+                $mods[$plugin->name] = $instance;
+            }
+        }
+
+        return $mods;
+
+    }
+
 }
+

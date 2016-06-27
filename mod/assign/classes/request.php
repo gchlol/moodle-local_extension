@@ -14,7 +14,6 @@
 // You should have received a copy of the GNU General Public License
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
-
 /**
  * Extension assignment request class.
  *
@@ -26,6 +25,25 @@
 
 namespace extension_assign;
 
-class request {
+/**
+ * Extension assignment request class.
+ *
+ * @package    extension_assign
+ * @author     Nicholas Hoobin <nicholashoobin@catalyst-au.net>
+ * @copyright  Catalyst IT
+ * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
+ */
+class request extends \local_extension\base_request {
+
+    /**
+     * Is a calendar event something we can handle?
+     *
+     * @param event $event A calendar event object
+     * @return boolean True if should be handled
+     */
+    public function is_candidate($event) {
+        return true;
+    }
 
 }
+
