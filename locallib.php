@@ -36,6 +36,8 @@
  */
 function local_extension_get_activities($user, $start, $end, $course = 0) {
 
+    global $DB;
+
     $dates = array();
 
     $mods = \local_extension\plugininfo\extension::get_enabled_request();
@@ -53,6 +55,9 @@ function local_extension_get_activities($user, $start, $end, $course = 0) {
 
     $events = array();
 
+    $courses = array();
+
+
     foreach ($allevents as $id => $event) {
 
         $modtype = $event->modulename;
@@ -64,13 +69,6 @@ function local_extension_get_activities($user, $start, $end, $course = 0) {
 
         $handler = $mods[$modtype];
 
-        // Now give the handler a chance to filter, for instance an activity
-        // could have a open, due and close, but it may only really care about
-        // the due date.
-        if (!$handler->is_candidate($event)) {
-            continue;
-        }
-
         if (!$cm = get_coursemodule_from_instance($event->modulename, $event->instance)) {
             continue;
         }
@@ -79,13 +77,30 @@ function local_extension_get_activities($user, $start, $end, $course = 0) {
             continue;
         }
 
-        $events[$id] = array(
+        // Now give the handler a chance to filter, for instance an activity
+        // could have a open, due and close, but it may only really care about
+        // the due date.
+        if (!$handler->is_candidate($event, $cm)) {
+            continue;
+        }
+
+        $courseid = $cm->course;
+        if (!isset($courses[$courseid])) {
+            $courses[$courseid] = $DB->get_record('course', array('id' => $courseid));
+        }
+
+        // TODO if an activity already has a extension request associated with it
+        // then handle this in some way. Possibly filter, or perhaps show it but
+        // direct the student to their previous request.
+
+        $events[$cm->id] = array(
             'event' => $event,
             'cm' => $cm,
+            'course' => $courses[$courseid],
+            'handler' => $handler,
         );
     }
 
-    e($events);
     return array($mods, $events);
 }
 

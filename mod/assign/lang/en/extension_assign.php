@@ -25,3 +25,6 @@
  */
 
 $string['pluginname'] = 'Extension Assignment Adapter';
+$string['dueon'] = 'Due on {$a}';
+$string['requestdue'] = 'Request extension until';
+

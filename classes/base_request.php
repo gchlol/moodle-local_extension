@@ -38,10 +38,20 @@ abstract class base_request {
     /**
      * Is a calendar event something we can handle?
      *
+     * Only one calendar event for a given course module should ever return true.
+     *
      * @param event $event A calendar event object
+     * @param coursemodule $cm A course module
      * @return boolean True if should be handled
      */
-    abstract public function is_candidate($event);
+    abstract public function is_candidate($event, $cm);
 
+    /**
+     * Define parts of the request for for an event object
+     *
+     * @param moodleform $mform A moodle form object
+     * @param array $mod An array of event details
+     */
+    abstract public function request_definition($mform, $mod);
 }
 

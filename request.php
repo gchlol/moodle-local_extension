@@ -32,29 +32,42 @@ require_login(false);
 $PAGE->set_url(new moodle_url('/local/extension/request.php'));
 
 $PAGE->set_context(context_system::instance());
-$PAGE->set_pagelayout('standard');
+// $PAGE->set_pagelayout('standard');
+$PAGE->set_pagelayout('base');
 
 $PAGE->set_title(get_string('pluginname', 'local_extension'));
 $PAGE->set_heading(get_string('request_page_heading', 'local_extension'));
+$PAGE->requires->css('/local/extension/styles.css');
 
 echo $OUTPUT->header();
 
-
 $user = $USER->id;
+// TODO get this from params
 $start = time() - 7 * 24 * 60 * 60;
 $end = time() + 7 * 24 * 60 * 60;
 $course = 0;
 
 list($handlers, $mods) = local_extension_get_activities($user, $start, $end, $course);
 
-foreach ($mods as $id => $mod) {
+$mform = new \local_extension\form\request(null, array('mods' => $mods));
 
-    echo "<div>";
-    echo html_writer::tag('h4', $mod['event']->name);
-    echo '<p>Can be handled in some way';
-    echo "</div>";
+if ($mform->is_cancelled()) {
+
+    // TODO Do what?
+    redirect($returnurl);
+
+} else if ($form = $mform->get_data()) {
+    $id = $form->id;
+
+    // TODO create the request record.
+    // TODO create the sub-extend records
+    // TODO create the first comment record
+
+    // redirect to status page.
 }
 
-var_dump($mods);
+$mform->display();
+
+// var_dump($mods);
 echo $OUTPUT->footer();
 

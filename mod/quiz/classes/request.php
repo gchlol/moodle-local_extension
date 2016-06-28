@@ -39,10 +39,23 @@ class request extends \local_extension\base_request {
      * Is a calendar event something we can handle?
      *
      * @param event $event A calendar event object
+     * @param coursemodule $cm A course module
      * @return boolean True if should be handled
      */
-    public function is_candidate($event) {
-        return true;
+    public function is_candidate($event, $cm) {
+        return false; // TODO
+    }
+
+    /**
+     * Define parts of the request for for an event object
+     *
+     * @param moodleform $mform A moodle form object
+     * @param array $mod An array of event details
+     */
+    public function request_definition($mform, $mod) {
+
+        // $mform->addElement('d:w', \html_writer::tag('blockquote', $html));
+
     }
 
 }

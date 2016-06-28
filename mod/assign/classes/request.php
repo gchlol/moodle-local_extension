@@ -39,10 +39,36 @@ class request extends \local_extension\base_request {
      * Is a calendar event something we can handle?
      *
      * @param event $event A calendar event object
+     * @param coursemodule $cm A course module
      * @return boolean True if should be handled
      */
-    public function is_candidate($event) {
+    public function is_candidate($event, $cm) {
         return true;
+    }
+
+    /**
+     * Define parts of the request for for an event object
+     *
+     * @param moodleform $mform A moodle form object
+     * @param array $mod An array of event details
+     */
+    public function request_definition($mform, $mod) {
+
+        $cm = $mod['cm'];
+        $event = $mod['event'];
+        $course = $mod['course'];
+
+        $html = \html_writer::tag('b', $course->fullname . ' > ' . $event->name, array('class' => 'mod'));
+        $html = \html_writer::tag('p', $html . ' ' . get_string('dueon', 'extension_assign', \userdate($event->timestart)));
+        $mform->addElement('html', \html_writer::tag('p', $html));
+
+
+        $formid = 'due' . $cm->id;
+        $mform->addElement('date_time_selector', $formid, get_string('requestdue', 'extension_assign'),
+                array('optional' => true, 'step' => 1));
+
+        // set data not set default
+        $mform->setDefault($formid, $event->timestart);
     }
 
 }

@@ -25,11 +25,14 @@
  */
 
 $string['pluginname'] = 'Extensions';
+$string['attachments'] = 'Attachments';
+$string['comment'] = 'General comments';
 $string['request_page_heading'] = 'Extension Request';
 $string['searchback'] = 'Search backward';
 $string['searchbackhelp'] = 'How many days to search back from today when requesting an exception.';
 $string['searchforward'] = 'Search forward';
 $string['searchforwardhelp'] = 'How many days to search forward from today when requesting an exception.';
+$string['submit_request'] = 'Submit request';
 $string['subplugintype_extension'] = 'Extension adapter';
 $string['subplugintype_extension_plural'] = 'Extension adapters';
 
