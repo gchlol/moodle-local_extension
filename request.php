@@ -32,13 +32,12 @@ require_login(false);
 
 $PAGE->set_url(new moodle_url('/local/extension/request.php'));
 
+// TODO context could be user, course or module.
 $PAGE->set_context(context_system::instance());
-$PAGE->set_pagelayout('base');
-
+// $PAGE->set_context(context_user::instance($USER->id));
+$PAGE->set_pagelayout('standard');
 $PAGE->set_title(get_string('pluginname', 'local_extension'));
-$PAGE->set_heading(get_string('request_page_heading', 'local_extension'));
 $PAGE->requires->css('/local/extension/styles.css');
-
 
 $config = get_config('local_extension');
 
@@ -115,6 +114,7 @@ if ($mform->is_cancelled()) {
 }
 
 echo $OUTPUT->header();
+echo html_writer::tag('h2', get_string('request_page_heading', 'local_extension'));
 $mform->display();
 echo $OUTPUT->footer();
 

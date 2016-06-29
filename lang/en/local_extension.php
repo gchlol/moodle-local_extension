@@ -27,6 +27,7 @@
 $string['pluginname'] = 'Extensions';
 $string['attachments'] = 'Attachments';
 $string['comment'] = 'General comments';
+$string['requestextension'] = 'Request an extension';
 $string['request_page_heading'] = 'Extension Request';
 $string['searchback'] = 'Search backward';
 $string['searchbackhelp'] = 'How many days to search back from today when requesting an exception.';

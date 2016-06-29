@@ -43,6 +43,7 @@ class request extends \local_extension\base_request {
      * @return boolean True if should be handled
      */
     public function is_candidate($event, $cm) {
+        // TODO should only be true for due dates, not for other calendar events.
         return true;
     }
 

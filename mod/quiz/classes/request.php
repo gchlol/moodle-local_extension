@@ -43,7 +43,7 @@ class request extends \local_extension\base_request {
      * @return boolean True if should be handled
      */
     public function is_candidate($event, $cm) {
-        return false; // TODO.
+        return true; // TODO.
     }
 
     /**
