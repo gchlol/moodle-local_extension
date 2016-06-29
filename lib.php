@@ -32,7 +32,7 @@ function local_extension_extend_navigation(global_navigation $nav) {
 
     $sitecontext = context_system::instance();
 
-    if (isloggedin() and !isguestuser() and has_capability('local/extension:request', $sitecontext)) {
+    if (isloggedin() and !isguestuser()) {
         $url = new moodle_url('/local/extension/request.php');
         $nav->add(get_string('requestextension', 'local_extension'), $url->out(), null, null, 'local_extension');
     }
