@@ -53,8 +53,6 @@ class local_extension_renderer extends plugin_renderer_base {
      * @return string $out The html output.
      */
     public function render_extension_comment(\local_extension\request $req) {
-        $avatar = new user_picture($req->$user);
-
         return var_dump($req);
     }
 

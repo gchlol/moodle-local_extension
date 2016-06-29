@@ -34,6 +34,11 @@ namespace local_extension;
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 class request {
+
+    public $cms = array();
+    public $comments = array();
+    public $users = array();
+
     /**
      * Obtain request data for the renderer.
      *
@@ -44,9 +49,25 @@ class request {
         global $DB;
 
         $req = new request();
+        $userids = array();
+        $userrecords = array();
+
         $req->request  = $DB->get_records('local_extension_request', array('id' => $reqid));
         $req->cms      = $DB->get_records('local_extension_cm', array('request' => $reqid));
         $req->comments = $DB->get_records('local_extension_comment', array('request' => $reqid));
+
+        // Obtain a unique list of userids that have been commenting.
+        foreach ($req->comments as $comment) {
+            $userids[] = $comment->userid;
+        }
+        $userids = \array_unique($userids);
+
+        // Fetch the users
+        foreach ($userids as $uid) {
+            $userrecords[] = $DB->get_record('user', array('id' => $uid), \user_picture::fields());
+        }
+
+        $req->users = $userrecords;
 
         return $req;
     }
