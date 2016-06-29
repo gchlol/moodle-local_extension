@@ -14,26 +14,28 @@
 // You should have received a copy of the GNU General Public License
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
-
 /**
- *  local_extension plugin lang string library
+ * Capability definitions for this module.
  *
  * @package    local_extension
- * @author     Nicholas Hoobin <nicholashoobin@catalyst-au.net>
+ * @author     Brendan Heywood <brendan@catalyst-au.net>
  * @copyright  Catalyst IT
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
-$string['pluginname'] = 'Activity extensions';
-$string['attachments'] = 'Attachments';
-$string['comment'] = 'General comments';
-$string['requestextension'] = 'Request an extension';
-$string['request_page_heading'] = 'Extension Request';
-$string['searchback'] = 'Search backward';
-$string['searchbackhelp'] = 'How many days to search back from today when requesting an exception.';
-$string['searchforward'] = 'Search forward';
-$string['searchforwardhelp'] = 'How many days to search forward from today when requesting an exception.';
-$string['submit_request'] = 'Submit request';
-$string['subplugintype_extension'] = 'Extension adapter';
-$string['subplugintype_extension_plural'] = 'Extension adapters';
+$capabilities = array(
+
+    'local/extension:request' => array(
+
+        'captype' => 'write',
+        'contextlevel' => CONTEXT_MODULE,
+        'archetypes' => array(
+            'guest' => CAP_ALLOW,
+            'student' => CAP_ALLOW,
+            'teacher' => CAP_ALLOW,
+            'editingteacher' => CAP_ALLOW,
+            'manager' => CAP_ALLOW
+        )
+    ),
+);
 
