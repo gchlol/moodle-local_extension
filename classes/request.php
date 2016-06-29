@@ -14,9 +14,8 @@
 // You should have received a copy of the GNU General Public License
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
-
 /**
- *  local_extension plugin lang string library
+ * Request class
  *
  * @package    local_extension
  * @author     Nicholas Hoobin <nicholashoobin@catalyst-au.net>
@@ -24,17 +23,32 @@
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
-$string['pluginname'] = 'Activity extensions';
-$string['attachments'] = 'Attachments';
-$string['comment'] = 'General comments';
-$string['requestextension'] = 'Request an extension';
-$string['request_page_heading'] = 'Extension Request';
-$string['searchback'] = 'Search backward';
-$string['searchbackhelp'] = 'How many days to search back from today when requesting an exception.';
-$string['searchforward'] = 'Search forward';
-$string['searchforwardhelp'] = 'How many days to search forward from today when requesting an exception.';
-$string['status_page_heading'] = 'Extension Status';
-$string['submit_request'] = 'Submit request';
-$string['subplugintype_extension'] = 'Extension adapter';
-$string['subplugintype_extension_plural'] = 'Extension adapters';
+namespace local_extension;
 
+/**
+ * Request class.
+ *
+ * @package    local_extension
+ * @author     Nicholas Hoobin <nicholashoobin@catalyst-au.net>
+ * @copyright  Catalyst IT
+ * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
+ */
+class request {
+    /**
+     * Obtain request data for the renderer.
+     *
+     * @param int $reqid An id for a request.
+     * @return request $req A request data object.
+     */
+    public static function from_id($reqid) {
+        global $DB;
+
+        $req = new request();
+
+        $req->cms      = $DB->get_records('local_extension_cm', array('request' => $reqid));
+        $req->comments = $DB->get_records('local_extension_comment', array('request' => $reqid));
+
+        return $req;
+    }
+
+}

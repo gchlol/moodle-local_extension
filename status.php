@@ -14,9 +14,8 @@
 // You should have received a copy of the GNU General Public License
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
-
 /**
- *  local_extension plugin lang string library
+ * Stats page in local_extension
  *
  * @package    local_extension
  * @author     Nicholas Hoobin <nicholashoobin@catalyst-au.net>
@@ -24,17 +23,29 @@
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
-$string['pluginname'] = 'Activity extensions';
-$string['attachments'] = 'Attachments';
-$string['comment'] = 'General comments';
-$string['requestextension'] = 'Request an extension';
-$string['request_page_heading'] = 'Extension Request';
-$string['searchback'] = 'Search backward';
-$string['searchbackhelp'] = 'How many days to search back from today when requesting an exception.';
-$string['searchforward'] = 'Search forward';
-$string['searchforwardhelp'] = 'How many days to search forward from today when requesting an exception.';
-$string['status_page_heading'] = 'Extension Status';
-$string['submit_request'] = 'Submit request';
-$string['subplugintype_extension'] = 'Extension adapter';
-$string['subplugintype_extension_plural'] = 'Extension adapters';
+require_once('../../config.php');
+require_once('locallib.php');
+global $CFG, $PAGE;
 
+$PAGE->set_url(new moodle_url('/local/extension/status.php'));
+
+$PAGE->set_context(context_system::instance());
+$PAGE->set_pagelayout('base');
+
+$PAGE->set_title(get_string('pluginname', 'local_extension'));
+$PAGE->set_heading(get_string('status_page_heading', 'local_extension'));
+$PAGE->requires->css('/local/extension/styles.css');
+
+$config = get_config('local_extension');
+
+$requestid = optional_param('id', $config->searchback, PARAM_INTEGER);
+
+$user = $USER->id;
+
+$renderer = $PAGE->get_renderer('local_extension');
+
+$req = new \local_extension\request();
+
+echo $OUTPUT->header();
+echo $renderer->render_extension_comment($req::from_id($requestid));
+echo $OUTPUT->footer();

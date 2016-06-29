@@ -16,7 +16,7 @@
 
 
 /**
- *  local_extension plugin lang string library
+ *  local_extension plugin renderer
  *
  * @package    local_extension
  * @author     Nicholas Hoobin <nicholashoobin@catalyst-au.net>
@@ -24,17 +24,25 @@
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
-$string['pluginname'] = 'Activity extensions';
-$string['attachments'] = 'Attachments';
-$string['comment'] = 'General comments';
-$string['requestextension'] = 'Request an extension';
-$string['request_page_heading'] = 'Extension Request';
-$string['searchback'] = 'Search backward';
-$string['searchbackhelp'] = 'How many days to search back from today when requesting an exception.';
-$string['searchforward'] = 'Search forward';
-$string['searchforwardhelp'] = 'How many days to search forward from today when requesting an exception.';
-$string['status_page_heading'] = 'Extension Status';
-$string['submit_request'] = 'Submit request';
-$string['subplugintype_extension'] = 'Extension adapter';
-$string['subplugintype_extension_plural'] = 'Extension adapters';
 
+/**
+ * Extension renderer class.
+ *
+ * @package    local_extension
+ * @author     Nicholas Hoobin <nicholashoobin@catalyst-au.net>
+ * @copyright  Catalyst IT
+ * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
+ */
+class local_extension_renderer extends plugin_renderer_base {
+    /**
+     * Extension comment renderer.
+     *
+     * @param request $req The extension comment object.
+     * @return string $out The html output.
+     */
+    public function render_extension_comment(\local_extension\request $req) {
+        $avatar = new user_picture($req->$user);
+
+        return var_dump($req);
+    }
+}
