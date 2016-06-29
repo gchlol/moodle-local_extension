@@ -15,7 +15,7 @@
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
 /**
- * Stats page in local_extension
+ * Status page in local_extension
  *
  * @package    local_extension
  * @author     Nicholas Hoobin <nicholashoobin@catalyst-au.net>
@@ -30,7 +30,7 @@ global $CFG, $PAGE;
 $PAGE->set_url(new moodle_url('/local/extension/status.php'));
 
 $PAGE->set_context(context_system::instance());
-$PAGE->set_pagelayout('base');
+$PAGE->set_pagelayout('standard');
 
 $PAGE->set_title(get_string('pluginname', 'local_extension'));
 $PAGE->set_heading(get_string('status_page_heading', 'local_extension'));

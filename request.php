@@ -34,7 +34,6 @@ $PAGE->set_url(new moodle_url('/local/extension/request.php'));
 
 // TODO context could be user, course or module.
 $PAGE->set_context(context_system::instance());
-// $PAGE->set_context(context_user::instance($USER->id));
 $PAGE->set_pagelayout('standard');
 $PAGE->set_title(get_string('pluginname', 'local_extension'));
 $PAGE->requires->css('/local/extension/styles.css');
@@ -108,7 +107,7 @@ if ($mform->is_cancelled()) {
         );
         $cm['id'] = $DB->insert_record('local_extension_cm', $cm);
     }
-    $url = new moodle_url('/local/extention/status.php', array('id' => $request['id']));
+    $url = new moodle_url('/local/extension/status.php', array('id' => $request['id']));
     redirect($url);
     die;
 }

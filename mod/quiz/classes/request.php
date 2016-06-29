@@ -56,5 +56,33 @@ class request extends \local_extension\base_request {
 
     }
 
+    /**
+     * Validate the parts of the request form for this module
+     *
+     * @param moodleform $mform A moodle form object
+     * @param array $mod An array of event details
+     * @param array $data An array of form data
+     * @return array of error messages
+     */
+    public function request_validation($mform, $mod, $data) {
+
+        $errors = array();
+
+        return $errors;
+
+    }
+
+    /**
+     * Return data to be stored for the request
+     *
+     * @param moodleform $mform A moodle form object
+     * @param array $mod An array of event details
+     * @param array $data An array of form data
+     * @return string The data to be stored
+     */
+    public function request_data($mform, $mod, $data) {
+        return '';
+    }
+
 }
 
