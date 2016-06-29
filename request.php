@@ -25,6 +25,7 @@
 
 require_once('../../config.php');
 require_once('locallib.php');
+require_once($CFG->dirroot . '/calendar/lib.php');
 global $CFG, $PAGE;
 
 require_login(false);
@@ -38,7 +39,6 @@ $PAGE->set_title(get_string('pluginname', 'local_extension'));
 $PAGE->set_heading(get_string('request_page_heading', 'local_extension'));
 $PAGE->requires->css('/local/extension/styles.css');
 
-echo $OUTPUT->header();
 
 $config = get_config('local_extension');
 
@@ -60,7 +60,6 @@ if (count($mods) == 0) {
     exit;
 }
 
-
 $mform = new \local_extension\form\request(null, array('mods' => $mods));
 
 if ($mform->is_cancelled()) {
@@ -69,15 +68,53 @@ if ($mform->is_cancelled()) {
     redirect($returnurl);
 
 } else if ($form = $mform->get_data()) {
-    $id = $form->id;
 
-    // TODO create the request record.
-    // TODO create the sub-extend records.
-    // TODO create the first comment record.
-    // redirect to status page.
+    $now = time();
+
+    $request = array(
+        'userid' => $USER->id,
+        'searchstart' => $start,
+        'searchend' => $end,
+        'timestamp' => $now,
+    );
+
+    $request['id'] = $DB->insert_record('local_extension_request', $request);
+
+    $comment = array(
+        'request' => $request['id'],
+        'userid' => $USER->id,
+        'timestamp' => $now,
+        'message' => $form->comment['text'],
+        'messageformat' => $form->comment['format'],
+    );
+    $comment['id'] = $DB->insert_record('local_extension_comment', $comment);
+
+    foreach ($mods as $id => $mod) {
+
+        $course = $mod['course'];
+        $handler = $mod['handler'];
+
+        $data = $handler->request_data($mform, $mod, $form);
+        if ($data == '') {
+            continue;
+        }
+        $cm = array(
+            'request' => $request['id'],
+            'userid' => $USER->id,
+            'course' => $course->id,
+            'timestamp' => $now,
+            'cmid' => $id,
+            'status' => 0,
+            'data' => $data,
+        );
+        $cm['id'] = $DB->insert_record('local_extension_cm', $cm);
+    }
+    $url = new moodle_url('/local/extention/status.php', array('id' => $request['id']));
+    redirect($url);
+    die;
 }
 
+echo $OUTPUT->header();
 $mform->display();
-
 echo $OUTPUT->footer();
 

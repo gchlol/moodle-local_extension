@@ -104,5 +104,20 @@ class request extends \local_extension\base_request {
 
     }
 
+    /**
+     * Return data to be stored for the request
+     *
+     * @param moodleform $mform A moodle form object
+     * @param array $mod An array of event details
+     * @param array $data An array of form data
+     * @return string The data to be stored
+     */
+    public function request_data($mform, $mod, $data) {
+        $cm = $mod['cm'];
+        $formid = 'due' . $cm->id;
+        $request = $data->$formid;
+        return $request;
+    }
+
 }
 

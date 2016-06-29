@@ -66,6 +66,7 @@ class request extends \moodleform {
             'trusttext' => 0,
             'enable_filemanagement' => false,
         ));
+        $mform->addRule('comment', 'Required', 'required', null, 'client');
 
         $mform->addElement('filemanager', 'attachments', get_string('attachments', 'local_extension'), null, array(
             'subdirs' => 0,
