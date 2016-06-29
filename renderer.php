@@ -34,6 +34,18 @@
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 class local_extension_renderer extends plugin_renderer_base {
+
+    /**
+     * Extension status renderer.
+     *
+     * @param request $req The extension comment object.
+     * @return string $out The html output.
+     */
+    public function render_extension_status(\local_extension\request $req) {
+
+        return var_dump($req);
+    }
+
     /**
      * Extension comment renderer.
      *
@@ -45,4 +57,6 @@ class local_extension_renderer extends plugin_renderer_base {
 
         return var_dump($req);
     }
+
 }
+

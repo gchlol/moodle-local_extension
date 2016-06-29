@@ -47,5 +47,5 @@ $renderer = $PAGE->get_renderer('local_extension');
 $req = new \local_extension\request();
 
 echo $OUTPUT->header();
-echo $renderer->render_extension_comment($req::from_id($requestid));
+echo $renderer->render_extension_status($req::from_id($requestid));
 echo $OUTPUT->footer();

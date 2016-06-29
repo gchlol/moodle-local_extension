@@ -44,7 +44,7 @@ class request {
         global $DB;
 
         $req = new request();
-
+        $req->request  = $DB->get_records('local_extension_request', array('id' => $reqid));
         $req->cms      = $DB->get_records('local_extension_cm', array('request' => $reqid));
         $req->comments = $DB->get_records('local_extension_comment', array('request' => $reqid));
 
