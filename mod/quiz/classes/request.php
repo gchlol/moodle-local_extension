@@ -43,7 +43,7 @@ class request extends \local_extension\base_request {
      * @return boolean True if should be handled
      */
     public function is_candidate($event, $cm) {
-        return false; // TODO
+        return false; // TODO.
     }
 
     /**
@@ -53,8 +53,6 @@ class request extends \local_extension\base_request {
      * @param array $mod An array of event details
      */
     public function request_definition($mform, $mod) {
-
-        // $mform->addElement('d:w', \html_writer::tag('blockquote', $html));
 
     }
 

@@ -62,13 +62,46 @@ class request extends \local_extension\base_request {
         $html = \html_writer::tag('p', $html . ' ' . get_string('dueon', 'extension_assign', \userdate($event->timestart)));
         $mform->addElement('html', \html_writer::tag('p', $html));
 
-
         $formid = 'due' . $cm->id;
         $mform->addElement('date_time_selector', $formid, get_string('requestdue', 'extension_assign'),
                 array('optional' => true, 'step' => 1));
 
-        // set data not set default
         $mform->setDefault($formid, $event->timestart);
+    }
+
+    /**
+     * Validate the parts of the request form for this module
+     *
+     * @param moodleform $mform A moodle form object
+     * @param array $mod An array of event details
+     * @param array $data An array of form data
+     * @return array of error messages
+     */
+    public function request_validation($mform, $mod, $data) {
+
+        $errors = array();
+        $event = $mod['event'];
+        $cm = $mod['cm'];
+        $formid = 'due' . $cm->id;
+        $now = time();
+
+        $due = $event->timestart;
+        $request = $data[$formid];
+        if ($request == 0) {
+            // Didn't ask for extension.
+            return $errors;
+        }
+
+        $toosoon = 24;
+
+        if ($request <= $due + $toosoon * 60 * 6) {
+            $errors[$formid] = get_string('dueerrortoosoon', 'extension_assign', $toosoon);
+        } else if ($request <= $now) {
+            $errors[$formid] = get_string('dueerrorinpast', 'extension_assign');
+        }
+
+        return $errors;
+
     }
 
 }

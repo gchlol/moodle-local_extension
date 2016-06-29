@@ -32,7 +32,6 @@ require_login(false);
 $PAGE->set_url(new moodle_url('/local/extension/request.php'));
 
 $PAGE->set_context(context_system::instance());
-// $PAGE->set_pagelayout('standard');
 $PAGE->set_pagelayout('base');
 
 $PAGE->set_title(get_string('pluginname', 'local_extension'));
@@ -41,13 +40,26 @@ $PAGE->requires->css('/local/extension/styles.css');
 
 echo $OUTPUT->header();
 
+$config = get_config('local_extension');
+
+$searchback = optional_param('back', $config->searchback, PARAM_INTEGER);
+$searchforward = optional_param('forward', $config->searchforward, PARAM_INTEGER);
+
 $user = $USER->id;
-// TODO get this from params
-$start = time() - 7 * 24 * 60 * 60;
-$end = time() + 7 * 24 * 60 * 60;
+$start = time() - $searchback * 24 * 60 * 60;
+$end = time() + $searchforward * 24 * 60 * 60;
 $course = 0;
 
 list($handlers, $mods) = local_extension_get_activities($user, $start, $end, $course);
+
+if (count($mods) == 0) {
+
+    echo "no mods!"; // TODO add ui to extend search.
+
+    echo $OUTPUT->footer();
+    exit;
+}
+
 
 $mform = new \local_extension\form\request(null, array('mods' => $mods));
 
@@ -60,14 +72,12 @@ if ($mform->is_cancelled()) {
     $id = $form->id;
 
     // TODO create the request record.
-    // TODO create the sub-extend records
-    // TODO create the first comment record
-
+    // TODO create the sub-extend records.
+    // TODO create the first comment record.
     // redirect to status page.
 }
 
 $mform->display();
 
-// var_dump($mods);
 echo $OUTPUT->footer();
 

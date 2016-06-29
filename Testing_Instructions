@@ -44,3 +44,18 @@ Check the boxes next to all three Availability options and set these dates,
 Allow submissions from: Add one month to the current day, 00h 00m
 Due date: One month and one week from today, 00h, 00m.
 Cut-off date: Set it to 1 hour after the due date that has been set.
+
+
+Requesting an extension
+=======================
+
+Date validation:
+
+Test requesting for dates (should all fail):
+* before the existing due date
+* the same as the new date
+* within 24 hours of the existing due date
+* before the current time
+
+
+

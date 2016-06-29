@@ -54,9 +54,7 @@ function local_extension_get_activities($user, $start, $end, $course = 0) {
     $allevents = calendar_get_events($start, $end, array($user), $groups, true);
 
     $events = array();
-
     $courses = array();
-
 
     foreach ($allevents as $id => $event) {
 

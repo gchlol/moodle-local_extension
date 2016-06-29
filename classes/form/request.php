@@ -50,33 +50,10 @@ class request extends \moodleform {
 
         $mods = $this->_customdata['mods'];
 
-        $course = '';
-        $lastcourse = '';
-
         foreach ($mods as $id => $mod) {
-
-            $course = $mod['course'];
-
-            // Print grouped course header.
-            if ($course !== $lastcourse) {
-                $html = \html_writer::tag('h4', $course->fullname);
-                // TODO add the default reviewer name / role here.
-                $name = 'course' . $course->id;
-                // $mform->addElement('header', $name, $course->fullname);
-                // $mform->setExpanded($name);
-
-                // $mform->addElement('html', $html);
-            }
-
             $handler = $mod['handler'];
             $handler->request_definition($mform, $mod);
-
-            $lastcourse = $course;
-
         }
-
-        // $mform->addElement('header', 'general', 'Comments and files');
-        // $mform->setExpanded('general');
 
         $mform->addElement('editor', 'comment', get_string('comment', 'local_extension'), array(
             'rows' => '3',
@@ -99,11 +76,21 @@ class request extends \moodleform {
     }
 
     /**
-     * {@inheritDoc}
-     * @see moodleform::validation()
+     * Validate the parts of the request form for this module
+     *
+     * @param array $data An array of form data
+     * @param array $files An array of form files
+     * @return array of error messages
      */
     public function validation($data, $files) {
         $errors = parent::validation($data, $files);
+        $mform = $this->_form;
+        $mods = $this->_customdata['mods'];
+
+        foreach ($mods as $id => $mod) {
+            $handler = $mod['handler'];
+            $errors += $handler->request_validation($mform, $mod, $data);
+        }
 
         return $errors;
     }
