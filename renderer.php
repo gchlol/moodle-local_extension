@@ -56,14 +56,27 @@ class local_extension_renderer extends plugin_renderer_base {
     public function render_extension_comments(\local_extension\request $req) {
         $out = '';
 
+        $out .= html_writer::start_tag('div', array('class' => 'comments'));
         foreach ($req->comments as $comment) {
             $user = $req->users[$comment->userid];
 
-            $out .= html_writer::start_tag('div');
-            $out .= $this->output->user_picture($user);
-            $out .= html_writer::div($comment->message, 'comment');
-            $out .= html_writer::end_div();
+            $out .= html_writer::start_tag('div', array('class' => 'comment'));
+
+            $out .= html_writer::start_tag('div', array('class' => 'avatar'));
+            $out .= $this->output->user_picture($user, array(
+                'size' => 50,
+            ));
+            $out .= html_writer::end_div(); // End .avatar.
+
+            $out .= html_writer::start_tag('div', array('class' => 'content'));
+            $out .= html_writer::tag('div', fullname($user), array('class' => 'name'));
+            $out .= html_writer::start_tag('div', array('class' => 'message'));
+            $out .= html_writer::div($comment->message, 'comment'); // TODO proper escape.
+            $out .= html_writer::end_div(); // End .message.
+            $out .= html_writer::end_div(); // End .content.
+            $out .= html_writer::end_div(); // End .comment.
         }
+        $out .= html_writer::end_div();
 
         return $out;
     }

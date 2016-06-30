@@ -1,3 +1,18 @@
 .mod {
     font-size: 150%;
 }
+.comment {
+    position: relative;
+}
+
+.comment .avatar {
+    width: 100px;
+    position: absolute;
+    left: 0;
+}
+.comment .content {
+    padding-left: 60px;
+}
+.comment .name {
+    font-weight: bold;
+}
