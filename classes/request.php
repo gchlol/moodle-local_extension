@@ -64,7 +64,7 @@ class request {
 
         // Fetch the users
         foreach ($userids as $uid) {
-            $userrecords[] = $DB->get_record('user', array('id' => $uid), \user_picture::fields());
+            $userrecords[$uid] = $DB->get_record('user', array('id' => $uid), \user_picture::fields());
         }
 
         $req->users = $userrecords;
