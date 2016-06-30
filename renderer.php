@@ -42,9 +42,9 @@ class local_extension_renderer extends plugin_renderer_base {
      * @return string $out The html output.
      */
     public function render_extension_status(\local_extension\request $req) {
-        var_dump($req);
+        $out = $this->render_extension_comments($req);
 
-        return $this->render_extension_comment($req);
+        return $out;
     }
 
     /**
@@ -53,12 +53,15 @@ class local_extension_renderer extends plugin_renderer_base {
      * @param request $req The extension comment object.
      * @return string $out The html output.
      */
-    public function render_extension_comment(\local_extension\request $req) {
+    public function render_extension_comments(\local_extension\request $req) {
         $out = '';
 
-        foreach ($req->comments as $com) {
-            $out .= html_writer::div($com->message, 'comment');
+        foreach ($req->comments as $comment) {
+            $user = $req->users[$comment->userid];
+            $out .= $this->output->user_picture($user);
+            $out .= html_writer::div($comment->message, 'comment');
         }
+
         return $out;
     }
 
