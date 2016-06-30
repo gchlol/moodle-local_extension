@@ -42,7 +42,8 @@ class local_extension_renderer extends plugin_renderer_base {
      * @return string $out The html output.
      */
     public function render_extension_status(\local_extension\request $req) {
-        $out = $this->render_extension_comments($req);
+        $out  = $this->render_extension_comments($req);
+        $out .= $this->render_extension_attachments($req);
 
         return $out;
     }
@@ -81,5 +82,50 @@ class local_extension_renderer extends plugin_renderer_base {
         return $out;
     }
 
-}
+    /**
+     * Extension attached file renderer.
+     *
+     * @param request $req The extension comment object.
+     * @return string $out The html output.
+     */
+    public function render_extension_attachments(\local_extension\request $req) {
+        $fs = get_file_storage();
 
+        $out = '';
+
+        foreach ($req->files as $file) {
+            $path = '/' .
+                    $file->get_contextid() .
+                    '/' .
+                    $file->get_component() .
+                    '/' .
+                    $file->get_filearea() .
+                    '/' .
+                    $file->get_itemid() .
+                    $file->get_filepath() .
+                    $file->get_filename();
+
+            if (!($file = $fs->get_file_by_hash(sha1($path))) || $file->is_directory()) {
+                continue;
+            }
+
+            var_dump($file);
+
+            $fileurl = moodle_url::make_pluginfile_url(
+                $file->get_contextid(),
+                $file->get_component(),
+                $file->get_filearea(),
+                $file->get_itemid(),
+                $file->get_filepath(),
+                $file->get_filename()
+            );
+
+            $out .= html_writer::start_tag('div');
+            $out .= html_writer::link($fileurl, $file->get_filename());
+            $out .= html_writer::end_div();
+        }
+
+        return $out;
+    }
+
+}

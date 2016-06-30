@@ -43,4 +43,3 @@ if ($hassiteconfig) {
             new lang_string('searchforwardhelp',  'local_extension'), 14, $days));
 
 }
-

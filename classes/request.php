@@ -47,6 +47,9 @@ class request {
     /** @var $users An array of user objects with the available fields user_picture::fields  */
     public $users;
 
+    /** @var $files An array of attached files that exist for this request id */
+    public $files;
+
     /**
      * Request object constructor.
      * @param int $reqid An optional variable to initialise the request object.
@@ -59,6 +62,7 @@ class request {
             $this->cms      = array();
             $this->comments = array();
             $this->users    = array();
+            $this->files    = array();
         } else {
             $this->request  = $DB->get_records('local_extension_request', array('id' => $reqid));
             $this->cms      = $DB->get_records('local_extension_cm', array('request' => $reqid));
@@ -81,6 +85,8 @@ class request {
             }
 
             $this->users = $userrecords;
+
+            $this->files = $this->fetch_attachments($reqid);
         }
     }
 
@@ -94,4 +100,20 @@ class request {
         return new request($reqid);
     }
 
+    /**
+     * Fetch the list of attached files for the request id.
+     *
+     * @param int $reqid An id for a request.
+     * @return
+     */
+    public function fetch_attachments($reqid) {
+        global $USER;
+
+        $context = \context_user::instance($USER->id);
+
+        $fs = get_file_storage();
+        $files = $fs->get_area_files($context->id, 'local_extension', 'attachments', $reqid);
+
+        return $files;
+    }
 }

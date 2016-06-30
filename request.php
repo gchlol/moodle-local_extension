@@ -33,7 +33,9 @@ require_login(false);
 $PAGE->set_url(new moodle_url('/local/extension/request.php'));
 
 // TODO context could be user, course or module.
-$PAGE->set_context(context_system::instance());
+$context = context_user::instance($USER->id);
+
+$PAGE->set_context($context);
 $PAGE->set_pagelayout('standard');
 $PAGE->set_title(get_string('pluginname', 'local_extension'));
 $PAGE->requires->css('/local/extension/styles.css');
@@ -74,7 +76,6 @@ if ($mform->is_cancelled()) {
         'searchend' => $end,
         'timestamp' => $now,
     );
-
     $request['id'] = $DB->insert_record('local_extension_request', $request);
 
     $comment = array(
@@ -85,6 +86,10 @@ if ($mform->is_cancelled()) {
         'messageformat' => $form->comment['format'],
     );
     $comment['id'] = $DB->insert_record('local_extension_comment', $comment);
+
+    $draftitemid = file_get_submitted_draft_itemid('attachments');
+    file_prepare_draft_area($draftitemid, $context->id, 'local_extension', 'attachments', $request['id']);
+    file_save_draft_area_files($draftitemid, $context->id, 'local_extension', 'attachments', $request['id']);
 
     foreach ($mods as $id => $mod) {
 
