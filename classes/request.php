@@ -35,9 +35,53 @@ namespace local_extension;
  */
 class request {
 
-    public $cms = array();
-    public $comments = array();
-    public $users = array();
+    /** @var $request The local_extension_request database object */
+    public $request;
+
+    /** @var $cms */
+    public $cms;
+
+    /** @var $comments An array of comment objects from the request id */
+    public $comments;
+
+    /** @var $users An array of user objects with the available fields user_picture::fields  */
+    public $users;
+
+    /**
+     * Request object constructor.
+     * @param int $reqid An optional variable to initialise the request object.
+     */
+    public function __construct($reqid = null) {
+        global $DB;
+
+        if (empty($reqid)) {
+            $this->request  = array();
+            $this->cms      = array();
+            $this->comments = array();
+            $this->users    = array();
+        } else {
+            $this->request  = $DB->get_records('local_extension_request', array('id' => $reqid));
+            $this->cms      = $DB->get_records('local_extension_cm', array('request' => $reqid));
+            $this->comments = $DB->get_records('local_extension_comment', array('request' => $reqid));
+            $this->users    = array();
+
+            $userids     = array();
+            $userrecords = array();
+
+            // Obtain a unique list of userids that have been commenting.
+            foreach ($this->comments as $comment) {
+                $userids[] = $comment->userid;
+            }
+            $userids = \array_unique($userids);
+
+            // Fetch the users.
+            foreach ($userids as $uid) {
+                $userrecords[$uid] = $DB->get_record('user', array('id' => $uid), \user_picture::fields());
+            }
+
+            $this->users = $userrecords;
+        }
+    }
 
     /**
      * Obtain request data for the renderer.
@@ -46,30 +90,7 @@ class request {
      * @return request $req A request data object.
      */
     public static function from_id($reqid) {
-        global $DB;
-
-        $req = new request();
-        $userids = array();
-        $userrecords = array();
-
-        $req->request  = $DB->get_records('local_extension_request', array('id' => $reqid));
-        $req->cms      = $DB->get_records('local_extension_cm', array('request' => $reqid));
-        $req->comments = $DB->get_records('local_extension_comment', array('request' => $reqid));
-
-        // Obtain a unique list of userids that have been commenting.
-        foreach ($req->comments as $comment) {
-            $userids[] = $comment->userid;
-        }
-        $userids = \array_unique($userids);
-
-        // Fetch the users
-        foreach ($userids as $uid) {
-            $userrecords[$uid] = $DB->get_record('user', array('id' => $uid), \user_picture::fields());
-        }
-
-        $req->users = $userrecords;
-
-        return $req;
+        return new request($reqid);
     }
 
 }
