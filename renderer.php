@@ -45,6 +45,9 @@ class local_extension_renderer extends plugin_renderer_base {
         $out  = $this->render_extension_comments($req);
         $out .= $this->render_extension_attachments($req);
 
+        $out .= '<pre>';
+        $out .= print_r($req, 1);
+        $out .= '</pre>';
         return $out;
     }
 
@@ -109,7 +112,6 @@ class local_extension_renderer extends plugin_renderer_base {
                 continue;
             }
 
-            var_dump($file);
 
             $fileurl = moodle_url::make_pluginfile_url(
                 $file->get_contextid(),
@@ -129,3 +131,4 @@ class local_extension_renderer extends plugin_renderer_base {
     }
 
 }
+

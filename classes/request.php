@@ -64,10 +64,9 @@ class request {
             $this->users    = array();
             $this->files    = array();
         } else {
-            $this->request  = $DB->get_records('local_extension_request', array('id' => $reqid));
+            $this->request  = $DB->get_record('local_extension_request', array('id' => $reqid));
             $this->cms      = $DB->get_records('local_extension_cm', array('request' => $reqid));
             $this->comments = $DB->get_records('local_extension_comment', array('request' => $reqid));
-            $this->users    = array();
 
             $userids     = array();
             $userrecords = array();

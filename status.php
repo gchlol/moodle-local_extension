@@ -27,23 +27,26 @@ require_once('../../config.php');
 require_once('locallib.php');
 global $CFG, $PAGE;
 
+require_login(false);
+
+$requestid = required_param('id', PARAM_INTEGER);
+$request = \local_extension\request::from_id($requestid);
+
+// TODO add perms checks here.
+
+$user = $request->request->userid;
+$context = context_user::instance($user);
+
 $PAGE->set_url(new moodle_url('/local/extension/status.php'));
-
-$PAGE->set_context(context_system::instance());
+$PAGE->set_context($context);
 $PAGE->set_pagelayout('standard');
-
 $PAGE->set_title(get_string('pluginname', 'local_extension'));
 $PAGE->set_heading(get_string('status_page_heading', 'local_extension'));
 $PAGE->requires->css('/local/extension/styles.css');
 
-$config = get_config('local_extension');
-
-$requestid = optional_param('id', $config->searchback, PARAM_INTEGER);
-
-$user = $USER->id;
-
 $renderer = $PAGE->get_renderer('local_extension');
 
 echo $OUTPUT->header();
-echo $renderer->render_extension_status(\local_extension\request::from_id($requestid));
+echo $renderer->render_extension_status($request);
 echo $OUTPUT->footer();
+
