@@ -42,8 +42,10 @@ class local_extension_renderer extends plugin_renderer_base {
      * @return string $out The html output.
      */
     public function render_extension_status(\local_extension\request $req) {
-        $out  = $this->render_extension_comments($req);
+        $out = '';
+
         $out .= $this->render_extension_attachments($req);
+        $out .= $this->render_extension_comments($req);
 
         $out .= '<pre>';
         $out .= print_r($req, 1);
@@ -73,7 +75,13 @@ class local_extension_renderer extends plugin_renderer_base {
             $out .= html_writer::end_div(); // End .avatar.
 
             $out .= html_writer::start_tag('div', array('class' => 'content'));
-            $out .= html_writer::tag('div', fullname($user), array('class' => 'name'));
+            $out .= html_writer::tag('span', fullname($user), array('class' => 'name'));
+
+            $context = 1; // TODO what context is this in relation to? Usually one a cm.
+            $role = 'Course coordinator'; // TODO look this up.
+            $out .= html_writer::tag('span', ' - ' . $role, array('class' => 'role'));
+            $out .= html_writer::tag('span', ' - ' . get_string('ago', 'message', format_time(time() - $comment->timestamp)), array('class' => 'time'));
+
             $out .= html_writer::start_tag('div', array('class' => 'message'));
             $out .= html_writer::div($comment->message, 'comment'); // TODO proper escape.
             $out .= html_writer::end_div(); // End .message.
