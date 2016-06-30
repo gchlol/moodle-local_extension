@@ -58,8 +58,11 @@ class local_extension_renderer extends plugin_renderer_base {
 
         foreach ($req->comments as $comment) {
             $user = $req->users[$comment->userid];
+
+            $out .= html_writer::start_tag('div');
             $out .= $this->output->user_picture($user);
             $out .= html_writer::div($comment->message, 'comment');
+            $out .= html_writer::end_div();
         }
 
         return $out;

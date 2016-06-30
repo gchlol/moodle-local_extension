@@ -68,13 +68,14 @@ class request {
             $userids     = array();
             $userrecords = array();
 
+            // TODO need to sort cms by date and comments by date.
             // Obtain a unique list of userids that have been commenting.
             foreach ($this->comments as $comment) {
-                $userids[] = $comment->userid;
+                $userids[$comment->userid] = $comment->userid;
             }
-            $userids = \array_unique($userids);
 
             // Fetch the users.
+            // TODO change this to single call using get_in_or_equal .
             foreach ($userids as $uid) {
                 $userrecords[$uid] = $DB->get_record('user', array('id' => $uid), \user_picture::fields());
             }

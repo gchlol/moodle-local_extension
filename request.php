@@ -62,8 +62,7 @@ $mform = new \local_extension\form\request(null, array('mods' => $mods));
 
 if ($mform->is_cancelled()) {
 
-    // TODO Do what?
-    redirect($returnurl);
+    redirect(new moodle_url('/'));
 
 } else if ($form = $mform->get_data()) {
 
