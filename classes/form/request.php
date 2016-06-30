@@ -70,7 +70,6 @@ class request extends \moodleform {
 
         $mform->addElement('filemanager', 'attachments', get_string('attachments', 'local_extension'), null, array(
             'subdirs' => 0,
-            'accepted_types' => array('document'),
         ));
 
         $this->add_action_buttons(true, get_string('submit_request', 'local_extension'));
