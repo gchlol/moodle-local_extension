@@ -36,57 +36,65 @@ namespace local_extension;
 class request {
 
     /** @var $request The local_extension_request database object */
-    public $request;
+    public $requestid = null;
+
+    /** @var $request The local_extension_request database object */
+    public $request = array();
 
     /** @var $cms */
-    public $cms;
+    public $cms = array();
 
     /** @var $comments An array of comment objects from the request id */
-    public $comments;
+    public $comments = array();
 
     /** @var $users An array of user objects with the available fields user_picture::fields  */
-    public $users;
+    public $users = array();
 
     /** @var $files An array of attached files that exist for this request id */
-    public $files;
+    public $files = array();
 
     /**
      * Request object constructor.
-     * @param int $reqid An optional variable to initialise the request object.
+     * @param int $reqid An optional variable to identify the request.
      */
-    public function __construct($reqid = null) {
+    public function __construct($requestid = null) {
+        $this->requestid = $requestid;
+    }
+
+    /**
+     * Loads data into the object
+     */
+    public function load() {
         global $DB;
 
-        if (empty($reqid)) {
-            $this->request  = array();
-            $this->cms      = array();
-            $this->comments = array();
-            $this->users    = array();
-            $this->files    = array();
-        } else {
-            $this->request  = $DB->get_record('local_extension_request', array('id' => $reqid));
-            $this->cms      = $DB->get_records('local_extension_cm', array('request' => $reqid));
-            $this->comments = $DB->get_records('local_extension_comment', array('request' => $reqid));
-
-            $userids     = array();
-            $userrecords = array();
-
-            // TODO need to sort cms by date and comments by date.
-            // Obtain a unique list of userids that have been commenting.
-            foreach ($this->comments as $comment) {
-                $userids[$comment->userid] = $comment->userid;
-            }
-
-            // Fetch the users.
-            // TODO change this to single call using get_in_or_equal .
-            foreach ($userids as $uid) {
-                $userrecords[$uid] = $DB->get_record('user', array('id' => $uid), \user_picture::fields());
-            }
-
-            $this->users = $userrecords;
-
-            $this->files = $this->fetch_attachments($reqid);
+        if (empty($this->requestid)) {
+            throw coding_exception('No request id');
         }
+
+        $reqid = $this->requestid;
+
+        $this->request  = $DB->get_record('local_extension_request', array('id' => $reqid));
+        $this->cms      = $DB->get_records('local_extension_cm', array('request' => $reqid));
+        $this->comments = $DB->get_records('local_extension_comment', array('request' => $reqid));
+
+        $userids     = array();
+        $userrecords = array();
+
+        // TODO need to sort cms by date and comments by date.
+        // Obtain a unique list of userids that have been commenting.
+        foreach ($this->comments as $comment) {
+            $userids[$comment->userid] = $comment->userid;
+        }
+
+        // Fetch the users.
+        // TODO change this to single call using get_in_or_equal .
+        foreach ($userids as $uid) {
+            $userrecords[$uid] = $DB->get_record('user', array('id' => $uid), \user_picture::fields());
+        }
+
+        $this->users = $userrecords;
+
+        $this->files = $this->fetch_attachments($reqid);
     }
 
     /**
@@ -96,7 +104,9 @@ class request {
      * @return request $req A request data object.
      */
     public static function from_id($reqid) {
-        return new request($reqid);
+        $request = new request($reqid);
+        $request->load();
+        return $request;
     }
 
     /**
@@ -115,4 +125,9 @@ class request {
 
         return $files;
     }
+
+    public function add_comment($from, $comment, $format) {
+
+    }
+
 }
