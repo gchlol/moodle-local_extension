@@ -39,3 +39,33 @@ function local_extension_extend_navigation(global_navigation $nav) {
 
 }
 
+function local_extension_pluginfile($course, $cm, $context, $filearea, $args, $forcedownload, array $options=array()) {
+    global $CFG, $DB;
+
+    if ($context->contextlevel != CONTEXT_USER) {
+        return false;
+    }
+
+    // Ensure the filearea is the one used by this plugin.
+    if ($filearea !== 'attachments') {
+        return false;
+    }
+
+    require_login($course, $true, $cm);
+
+    $itemid = array_shift($args);
+    $filename = array_pop($args);
+    if (!$args) {
+        $filepath = '/';
+    } else {
+        $filepath = '/' . implode('/', $args) . '/';
+    }
+
+    $fs = get_file_storage();
+    $file = $fs->get_file($context->id, 'local_extension', $filearea, $itemid, $filepath, $filename);
+    if (!$file || $file->is_directory()) {
+        return false;
+    }
+
+    send_stored_file($file, 0, 0, true);
+}
