@@ -120,5 +120,17 @@ class request extends \local_extension\base_request {
         return $request;
     }
 
+    /**
+     * Render output for the status page.
+     *
+     * @param int $cm Course Module ID.
+     * @param stdClass $student Student.
+     * @param stdClass $user User.
+     * @return string $out The html output.
+     */
+    public function render_status($cm, $student, $user) {
+
+    }
+
 }
 

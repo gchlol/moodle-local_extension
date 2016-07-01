@@ -38,7 +38,7 @@ class local_extension_renderer extends plugin_renderer_base {
     /**
      * Extension status renderer.
      *
-     * @param request $req The extension comment object.
+     * @param request $req The extension request object.
      * @return string $out The html output.
      */
     public function render_extension_status(\local_extension\request $req) {
@@ -56,7 +56,7 @@ class local_extension_renderer extends plugin_renderer_base {
     /**
      * Extension comment renderer.
      *
-     * @param request $req The extension comment object.
+     * @param request $req The extension request object.
      * @return string $out The html output.
      */
     public function render_extension_comments(\local_extension\request $req) {
@@ -94,9 +94,9 @@ class local_extension_renderer extends plugin_renderer_base {
     }
 
     /**
-     * Extension attached file renderer.
+     * Extension attachment file renderer.
      *
-     * @param request $req The extension comment object.
+     * @param request $req The extension request object.
      * @return string $out The html output.
      */
     public function render_extension_attachments(\local_extension\request $req) {
@@ -105,21 +105,19 @@ class local_extension_renderer extends plugin_renderer_base {
         $out = '';
 
         foreach ($req->files as $file) {
-            $path = '/' .
-                    $file->get_contextid() .
-                    '/' .
-                    $file->get_component() .
-                    '/' .
-                    $file->get_filearea() .
-                    '/' .
-                    $file->get_itemid() .
-                    $file->get_filepath() .
-                    $file->get_filename();
 
-            if (!($file = $fs->get_file_by_hash(sha1($path))) || $file->is_directory()) {
+            $file = $fs->get_file(
+                $file->get_contextid(),
+                $file->get_component(),
+                $file->get_filearea(),
+                $file->get_itemid(),
+                $file->get_filepath(),
+                $file->get_filename()
+            );
+
+            if (!$file || $file->is_directory()) {
                 continue;
             }
-
 
             $fileurl = moodle_url::make_pluginfile_url(
                 $file->get_contextid(),
@@ -130,12 +128,24 @@ class local_extension_renderer extends plugin_renderer_base {
                 $file->get_filename()
             );
 
-            $out .= html_writer::start_tag('div');
+            $out .= html_writer::start_tag('div', array('class' => 'attachments'));
+            $out .= html_writer::div('Attachment: ', 'file');
             $out .= html_writer::link($fileurl, $file->get_filename());
-            $out .= html_writer::end_div();
+            $out .= html_writer::end_div(); // End .file.
+            $out .= html_writer::end_div(); // End .attachments.
         }
 
         return $out;
+    }
+
+    /**
+     * Extension status email renderer.
+     *
+     * @param request $req The extension request object.
+     * @return string $out The html output.
+     */
+    public function render_extension_email(\local_extension\request $req) {
+
     }
 
 }

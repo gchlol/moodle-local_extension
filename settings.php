@@ -42,4 +42,12 @@ if ($hassiteconfig) {
             new lang_string('searchforward',      'local_extension'),
             new lang_string('searchforwardhelp',  'local_extension'), 14, $days));
 
+    $rolechoices = role_get_names(context_system::instance(), ROLENAME_ALIAS, true);
+    $settings->add(new admin_setting_configmulticheckbox('local_extension/notifyroles',
+            new lang_string('rolelist',                  'local_extension'),
+            new lang_string('rolehelp',                  'local_extension'), null, $rolechoices));
+
+    $settings->add(new admin_setting_configtextarea('local_extension/emailtemplate',
+            new lang_string('emailtemplate',                  'local_extension'),
+            new lang_string('emailtemplatehelp',              'local_extension'), null));
 }
