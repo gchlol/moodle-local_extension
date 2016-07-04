@@ -53,6 +53,9 @@ class request {
     /** @var integer An array of attached files that exist for this request id */
     public $files = array();
 
+    /** @var array An array of mods that are used */
+    public $mods = array();
+
     /** @var integer The request state. */
     private $state = 0;
 
@@ -230,11 +233,20 @@ class request {
     public function get_cms_by_course() {
         $cms = array();
 
-        foreach ($this->mods as $id => $mod) {
-            $course = $mod['course'];
-            $cms[$course->id][] = $mod;
+        foreach ($this->cms as $id => $cm) {
+            $cms[$cm->course][] = $cm;
         }
 
         return $cms;
+    }
+
+    /**
+     * Returns a handler class for the given cmid.
+     *
+     * @param integer cmid
+     * @return class handler
+     */
+    public function get_handler($cmid) {
+        return $this->mods[$cmid]['handler'];
     }
 }

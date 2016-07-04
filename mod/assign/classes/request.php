@@ -125,14 +125,16 @@ class request extends \local_extension\base_request {
      * Render output for the status page.
      *
      * @param stdClass $cm Extension cm data.
-     * @param stdClass $course Course data.
      * @param request $request Request data.
      * @return string $out The html output.
      */
-    public function render_status($cm, $course, $request) {
+    public function render_status($cm, $request) {
+        $course = $request->mods[$cm->cmid]['course'];
+        $reqcm = $request->mods[$cm->cmid]['cm'];
+
         $out = '';
         $out .= \html_writer::div($course->fullname, 'assigncm');
-        $out .= \html_writer::div($cm->name, 'assigncm');
+        $out .= \html_writer::div($reqcm->name, 'assigncm');
         return $out;
     }
 

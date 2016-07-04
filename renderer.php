@@ -150,16 +150,12 @@ class local_extension_renderer extends plugin_renderer_base {
         $out = '';
 
         // Returns an associated array of $cms with the $courseid as the key.
-        $data = $req->get_cms_by_course();
+        $cms = $req->get_cms_by_course();
 
-        foreach ($data as $courseid => $cms) {
-            foreach ($cms as $mod) {
-                $course = $mod['course'];
-                $handler = $mod['handler'];
-                $cm = $mod['cm'];
-
-                // Custom renderer for each type of mod.
-                $out .= $handler->render_status($cm, $course, $req);
+        foreach ($cms as $courseid => $cmarray) {
+            foreach ($cmarray as $cm) {
+                $handler = $req->get_handler($cm->cmid);
+                $out .= $handler->render_status($cm, $req);
             }
         }
 
