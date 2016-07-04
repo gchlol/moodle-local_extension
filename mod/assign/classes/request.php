@@ -47,6 +47,8 @@ class request extends \local_extension\base_request {
         return true;
     }
 
+    // TODO set the state of the cm
+
     /**
      * Define parts of the request for for an event object
      *
@@ -102,7 +104,6 @@ class request extends \local_extension\base_request {
         }
 
         return $errors;
-
     }
 
     /**
@@ -123,13 +124,16 @@ class request extends \local_extension\base_request {
     /**
      * Render output for the status page.
      *
-     * @param int $cm Course Module ID.
-     * @param stdClass $student Student.
-     * @param stdClass $user User.
+     * @param stdClass $cm Extension cm data.
+     * @param stdClass $course Course data.
+     * @param request $request Request data.
      * @return string $out The html output.
      */
-    public function render_status($cm, $student, $user) {
-
+    public function render_status($cm, $course, $request) {
+        $out = '';
+        $out .= \html_writer::div($course->fullname, 'assigncm');
+        $out .= \html_writer::div($cm->name, 'assigncm');
+        return $out;
     }
 
 }

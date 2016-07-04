@@ -57,10 +57,10 @@ class request {
     private $state = 0;
 
     /** @var integer New request. */
-    const STATUS_NEW      = 0;
+    const STATUS_NEW = 0;
 
     /** @var integer Denied request. */
-    const STATUS_DENIED   = 1;
+    const STATUS_DENIED = 1;
 
     /** @var integer Approved request. */
     const STATUS_APPROVED = 2;
@@ -69,11 +69,11 @@ class request {
     const STATUS_REOPENED = 3;
 
     /** @var integer Cancelled request. */
-    const STATUS_CANCEL   = 4;
+    const STATUS_CANCEL = 4;
 
     /**
      * Request object constructor.
-     * @param integer $reqid An optional variable to identify the request.
+     * @param integer $requestid An optional variable to identify the request.
      */
     public function __construct($requestid = null) {
         $this->requestid = $requestid;
@@ -81,6 +81,7 @@ class request {
 
     /**
      * Loads data into the object
+     * @throws coding_exception
      */
     public function load() {
         global $DB;
@@ -89,14 +90,16 @@ class request {
             throw coding_exception('No request id');
         }
 
-        $reqid = $this->requestid;
+        $requestid = $this->requestid;
 
-        $this->request  = $DB->get_record('local_extension_request', array('id' => $reqid));
-        $this->cms      = $DB->get_records('local_extension_cm', array('request' => $reqid));
-        $this->comments = $DB->get_records('local_extension_comment', array('request' => $reqid));
+        $this->request  = $DB->get_record('local_extension_request', array('id' => $requestid));
+        $this->cms      = $DB->get_records('local_extension_cm', array('request' => $requestid));
+        $this->comments = $DB->get_records('local_extension_comment', array('request' => $requestid));
 
-        $userids     = array();
-        $userrecords = array();
+        list($handlers, $mods) = local_extension_get_activities($this->request->userid, $this->request->searchstart, $this->request->searchend);
+        $this->mods = $mods;
+
+        $userids = array();
 
         // TODO need to sort cms by date and comments by date.
         // Obtain a unique list of userids that have been commenting.
@@ -105,24 +108,24 @@ class request {
         }
 
         // Fetch the users.
-        // TODO change this to single call using get_in_or_equal .
-        foreach ($userids as $uid) {
-            $userrecords[$uid] = $DB->get_record('user', array('id' => $uid), \user_picture::fields());
-        }
+        list($uids, $params) = $DB->get_in_or_equal($userids);
+        $userfields = \user_picture::fields();
+        $sql = "SELECT $userfields
+                  FROM {user}
+                 WHERE id $uids";
+        $this->users = $DB->get_records_sql($sql, $params);
 
-        $this->users = $userrecords;
-
-        $this->files = $this->fetch_attachments($reqid);
+        $this->files = $this->fetch_attachments($requestid);
     }
 
     /**
      * Obtain request data for the renderer.
      *
-     * @param integer $reqid An id for a request.
+     * @param integer $requestid An id for a request.
      * @return request $req A request data object.
      */
-    public static function from_id($reqid) {
-        $request = new request($reqid);
+    public static function from_id($requestid) {
+        $request = new request($requestid);
         $request->load();
         return $request;
     }
@@ -130,16 +133,16 @@ class request {
     /**
      * Fetch the list of attached files for the request id.
      *
-     * @param integer $reqid An id for a request.
+     * @param integer $requestid An id for a request.
      * @return array An array of file objects.
      */
-    public function fetch_attachments($reqid) {
+    public function fetch_attachments($requestid) {
         global $USER;
 
         $context = \context_user::instance($USER->id);
 
         $fs = get_file_storage();
-        $files = $fs->get_area_files($context->id, 'local_extension', 'attachments', $reqid);
+        $files = $fs->get_area_files($context->id, 'local_extension', 'attachments', $requestid);
 
         return $files;
     }
@@ -164,20 +167,35 @@ class request {
         return $this->state;
     }
 
-    public function get_state_next() {
+    /**
+     * Sets the state of this request.
+     *
+     * @param integer $state The state.
+     */
+    public function set_state($state) {
+        $this->state = $state;
+    }
+
+
+    /**
+     * Query the request and get the next available states.
+     *
+     * @return array An array of available states.
+     */
+    public function get_next_states() {
         switch ($this->state) {
             case self::STATUS_NEW:
-                return [];
+                return array(self::STATUS_APPROVED, self::STATUS_DENIED, self::STATUS_CANCEL);
             case self::STATUS_DENIED:
-                return [];
+                return array(self::STATUS_REOPENED, self::STATUS_CANCEL);
             case self::STATUS_APPROVED:
-                return [];
+                return array(self::STATUS_CANCEL);
             case self::STATUS_REOPENED:
-                return [];
-            case self::STATUS_REOPENED:
-                return [];
+                return array(self::STATUS_APPROVED, self::STATUS_CANCEL, self::STATUS_DENIED);
+            case self::STATUS_CANCEL:
+                return array();
             default:
-                self::STATUS_DENIED;
+                return array();
         }
     }
 
@@ -203,5 +221,20 @@ class request {
             default:
                 throw new coding_exception('Unknown request attempt state.');
         }
+    }
+
+    /**
+     * Returns cms grouped by the course they are associated with.
+     * @return array An array of courses and their mods.
+     */
+    public function get_cms_by_course() {
+        $cms = array();
+
+        foreach ($this->mods as $id => $mod) {
+            $course = $mod['course'];
+            $cms[$course->id][] = $mod;
+        }
+
+        return $cms;
     }
 }

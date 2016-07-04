@@ -46,6 +46,8 @@ class request extends \local_extension\base_request {
         return true; // TODO.
     }
 
+    // TODO set the state of the cm
+
     /**
      * Define parts of the request for for an event object
      *
@@ -69,7 +71,6 @@ class request extends \local_extension\base_request {
         $errors = array();
 
         return $errors;
-
     }
 
     /**
