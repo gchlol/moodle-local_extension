@@ -49,8 +49,8 @@ class comment extends \moodleform {
 
         $user = $this->_customdata['user'];
 
-        $mform->addElement('hidden', 'requestid');
-        $mform->setType('requestid', PARAM_INT);
+        $mform->addElement('hidden', 'id');
+        $mform->setType('id', PARAM_INT);
 
         $mform->addElement('html', $user);
         $mform->addElement('textarea', 'commentarea', '', '');

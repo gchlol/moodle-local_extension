@@ -31,9 +31,10 @@ require_login(false);
 
 // TODO add perms checks here.
 
-$context = context_user::instance($USER->id);
+$requestid = required_param('id', PARAM_INTEGER);
 
-$PAGE->set_url(new moodle_url('/local/extension/status.php'));
+$PAGE->set_url(new moodle_url('/local/extension/status.php', array('id' => $requestid)));
+$context = context_user::instance($USER->id);
 $PAGE->set_context($context);
 $PAGE->set_pagelayout('standard');
 $PAGE->set_title(get_string('pluginname', 'local_extension'));
@@ -43,20 +44,18 @@ $PAGE->requires->css('/local/extension/styles.css');
 $mform = new \local_extension\form\comment(null, array('user' => $OUTPUT->user_picture($USER)));
 
 if ($form = $mform->get_data()) {
-    $requestid = $form->requestid;
+    $requestid = $form->id;
     $comment = $form->commentarea;
     $format = FORMAT_PLAIN;
 
     \local_extension\request::add_comment($requestid, $USER, $comment, $format);
+
+    // We load the request data after adding a comment to see it!
     $request = \local_extension\request::from_id($requestid);
 } else {
-    $requestid = required_param('id', PARAM_INTEGER);
     $request = \local_extension\request::from_id($requestid);
-
     $mform->set_data(array('requestid' => $requestid));
 }
-
-
 
 echo $OUTPUT->header();
 $renderer = $PAGE->get_renderer('local_extension');
