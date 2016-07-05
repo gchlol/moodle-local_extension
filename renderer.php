@@ -42,7 +42,29 @@ class local_extension_renderer extends plugin_renderer_base {
      * @return string $out The html output.
      */
     public function render_extension_status(\local_extension\request $req) {
-        return $this->render_extension_html($req);
+        $out = '';
+
+        $out .= html_writer::start_tag('div', array('class' => 'extensionstatus'));
+
+        // TODO refactor for best way to iterate for course as the top level object.
+        // see $handler->render_status()
+
+        // Returns an associated array of $cms with the $courseid as the key.
+        $cms = $req->get_cms_by_course();
+
+        foreach ($cms as $courseid => $cmarray) {
+            foreach ($cmarray as $cm) {
+                $handler = $req->get_handler($cm->cmid);
+                $out .= $handler->render_status($cm, $req);
+            }
+        }
+
+        $out .= $this->render_extension_attachments($req);
+        $out .= $this->render_extension_comments($req);
+
+        $out .= html_writer::end_div(); // End .extensionstatus.
+
+        return $out;
     }
 
     /**
@@ -138,34 +160,6 @@ class local_extension_renderer extends plugin_renderer_base {
      */
     public function render_extension_email(\local_extension\request $req) {
 
-    }
-
-    /**
-     * Extension status html renderer.
-     *
-     * @param request $req The extension request object.
-     * @return string $out The html output.
-     */
-    public function render_extension_html(\local_extension\request $req) {
-        $out = '';
-
-        // Returns an associated array of $cms with the $courseid as the key.
-        $cms = $req->get_cms_by_course();
-
-        foreach ($cms as $courseid => $cmarray) {
-            foreach ($cmarray as $cm) {
-                $handler = $req->get_handler($cm->cmid);
-                $out .= $handler->render_status($cm, $req);
-            }
-        }
-
-        $out .= $this->render_extension_attachments($req);
-        $out .= $this->render_extension_comments($req);
-
-        $out .= '<pre>';
-        $out .= print_r($req, 1);
-        $out .= '</pre>';
-        return $out;
     }
 
 }

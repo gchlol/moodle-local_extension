@@ -124,17 +124,31 @@ class request extends \local_extension\base_request {
     /**
      * Render output for the status page.
      *
-     * @param stdClass $cm Extension cm data.
+     * @param stdClass $localcm Extension cm data.
      * @param request $request Request data.
      * @return string $out The html output.
      */
-    public function render_status($cm, $request) {
-        $course = $request->mods[$cm->cmid]['course'];
-        $reqcm = $request->mods[$cm->cmid]['cm'];
+    public function render_status($localcm, $request) {
+        $cm = $request->mods[$localcm->cmid]['cm'];
+        $event = $request->mods[$localcm->cmid]['event'];
+        $course = $request->mods[$localcm->cmid]['course'];
+
+        // TODO refactor for best way to iterate for course as the top level object.
 
         $out = '';
+
         $out .= \html_writer::div($course->fullname, 'assigncm');
-        $out .= \html_writer::div($reqcm->name, 'assigncm');
+        $out .= \html_writer::div($cm->name, 'assigncm');
+
+        // Mod due date.
+        $out .= \html_writer::div(\userdate($event->timestart), 'time');
+
+        $status = $request->get_status_name($localcm->status);
+        $out .= \html_writer::div($status, 'assigncm');
+
+        // Extened until.
+        $out .= \html_writer::div(\userdate($localcm->data), 'time');
+
         return $out;
     }
 

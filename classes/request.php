@@ -56,9 +56,6 @@ class request {
     /** @var array An array of mods that are used */
     public $mods = array();
 
-    /** @var integer The request state. */
-    private $state = 0;
-
     /** @var integer New request. */
     const STATUS_NEW = 0;
 
@@ -164,29 +161,32 @@ class request {
     /**
      * Returns the state of this request.
      *
+     * @param stdClass $cm The request cm object.
      * @return integer $state The state.
      */
-    public function get_state() {
-        return $this->state;
+    public function get_status($cm) {
+        return $cm->status;
     }
 
     /**
      * Sets the state of this request.
      *
+     * @param stdClass $cm The request cm object.
      * @param integer $state The state.
      */
-    public function set_state($state) {
-        $this->state = $state;
+    public function set_status($cm, $status) {
+        $cm->status = $status;
     }
 
 
     /**
-     * Query the request and get the next available states.
+     * Query the $cm and get the next available states.
      *
+     * @param stdClass $cm The request cm object.
      * @return array An array of available states.
      */
-    public function get_next_states() {
-        switch ($this->state) {
+    public function get_next_status($cm) {
+        switch ($cm->status) {
             case self::STATUS_NEW:
                 return array(self::STATUS_APPROVED, self::STATUS_DENIED, self::STATUS_CANCEL);
             case self::STATUS_DENIED:
@@ -207,10 +207,10 @@ class request {
      *
      * @param string $state one of the state constants like STATUS_NEW.
      * @throws coding_exception
-     * @return string the human-readable state name.
+     * @return string the human-readable status name.
      */
-    public function get_state_name($state) {
-        switch ($state) {
+    public function get_status_name($status) {
+        switch ($status) {
             case self::STATUS_NEW:
                 return \get_string('state_statusnew',      'local_extension');
             case self::STATUS_DENIED:
