@@ -131,13 +131,8 @@ class request extends \local_extension\base_request {
     public function render_status($localcm, $request) {
         $cm = $request->mods[$localcm->cmid]['cm'];
         $event = $request->mods[$localcm->cmid]['event'];
-        $course = $request->mods[$localcm->cmid]['course'];
-
-        // TODO refactor for best way to iterate for course as the top level object.
 
         $out = '';
-
-        $out .= \html_writer::div($course->fullname, 'assigncm');
         $out .= \html_writer::div($cm->name, 'assigncm');
 
         // Mod due date.
@@ -151,6 +146,4 @@ class request extends \local_extension\base_request {
 
         return $out;
     }
-
 }
-

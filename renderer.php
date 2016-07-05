@@ -46,14 +46,17 @@ class local_extension_renderer extends plugin_renderer_base {
 
         $out .= html_writer::start_tag('div', array('class' => 'extensionstatus'));
 
-        // TODO refactor for best way to iterate for course as the top level object.
-        // see $handler->render_status()
-
         // Returns an associated array of $cms with the $courseid as the key.
         $cms = $req->get_cms_by_course();
 
         foreach ($cms as $courseid => $cmarray) {
-            foreach ($cmarray as $cm) {
+            foreach ($cmarray as $index => $cm) {
+                // Print the course title for each new set of cms.
+                if ($index == 0) {
+                    $course = $req->mods[$cm->cmid]['course'];
+                    $out .= \html_writer::div($course->fullname, 'assigncm');
+                }
+
                 $handler = new $cm->handler();
                 $out .= $handler->render_status($cm, $req);
             }
