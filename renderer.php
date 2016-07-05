@@ -64,7 +64,6 @@ class local_extension_renderer extends plugin_renderer_base {
             }
         }
 
-
         // TODO replace <br /> with css padding/margins, or does that impact the html->text email output.
         $out .= $this->render_extension_attachments($req);
         $out .= html_writer::start_tag('br');

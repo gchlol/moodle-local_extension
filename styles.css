@@ -17,12 +17,12 @@
     font-weight: bold;
 }
 span.statusnew {
-	background-color: #FFE047;
+    background-color: #FFE047;
 }
 span.statusdenied {
 }
 span.statusapproved {
-	background-color: #AFFF44
+    background-color: #AFFF44
 }
 span.statusreopened {
 }

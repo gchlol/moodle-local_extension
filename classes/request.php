@@ -92,7 +92,7 @@ class request {
 
         $requestid = $this->requestid;
 
-        $this->request  = $DB->get_record('local_extension_request', array('id' => $requestid) ,'*', MUST_EXIST);
+        $this->request  = $DB->get_record('local_extension_request', array('id' => $requestid), '*', MUST_EXIST);
         $this->cms      = $DB->get_records('local_extension_cm', array('request' => $requestid));
         $this->comments = $DB->get_records('local_extension_comment', array('request' => $requestid));
 
@@ -162,7 +162,7 @@ class request {
      * Sets the state of this request.
      *
      * @param stdClass $cm The request local cm object.
-     * @param integer $state The state.
+     * @param integer $status The status.
      */
     public function set_status($cm, $status) {
         global $DB;
@@ -197,7 +197,7 @@ class request {
     /**
      * Returns a human readable state name.
      *
-     * @param string $state one of the state constants like STATUS_NEW.
+     * @param string $status one of the state constants like STATUS_NEW.
      * @throws coding_exception
      * @return string the human-readable status name.
      */
