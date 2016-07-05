@@ -25,7 +25,7 @@
 
 require_once('../../config.php');
 require_once('locallib.php');
-global $CFG, $PAGE;
+global $CFG, $PAGE, $USER;
 
 require_login(false);
 
@@ -34,8 +34,7 @@ $request = \local_extension\request::from_id($requestid);
 
 // TODO add perms checks here.
 
-$user = $request->request->userid;
-$context = context_user::instance($user);
+$context = context_user::instance($USER->id);
 
 $PAGE->set_url(new moodle_url('/local/extension/status.php'));
 $PAGE->set_context($context);
@@ -44,8 +43,10 @@ $PAGE->set_title(get_string('pluginname', 'local_extension'));
 $PAGE->set_heading(get_string('status_page_heading', 'local_extension'));
 $PAGE->requires->css('/local/extension/styles.css');
 
-$renderer = $PAGE->get_renderer('local_extension');
-
 echo $OUTPUT->header();
+$renderer = $PAGE->get_renderer('local_extension');
 echo $renderer->render_extension_status($request);
 echo $OUTPUT->footer();
+
+// Just for testing.
+//send_status_email($requestid);

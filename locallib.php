@@ -24,6 +24,7 @@
  */
 
 require_once($CFG->dirroot . '/calendar/lib.php');
+require_once($CFG->dirroot . '/user/lib.php');
 
 /**
  * Returns a list of candidate dates for activities
@@ -113,6 +114,7 @@ function send_status_email($requestid) {
     global $DB, $USER, $PAGE;
 
     $request = \local_extension\request::from_id($requestid);
+
     $user = $DB->get_record('user', array('id' => $request->request->userid));
 
     $renderer = $PAGE->get_renderer('local_extension');
@@ -123,7 +125,7 @@ function send_status_email($requestid) {
     $message->name              = 'status';
     $message->userfrom          = $USER;
     $message->userto            = $user;
-    $message->subject           = 'Status Update';
+    $message->subject           = "Extension request for " . \fullname($user);
     $message->fullmessage       = $text;
     $message->fullmessageformat = FORMAT_PLAIN;
     $message->fullmessagehtml   = '';

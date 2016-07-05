@@ -143,7 +143,7 @@ class request extends \local_extension\base_request {
         // TODO case on type of request, ie. exemption, extension, etc.
         // print extension type colour like the scoping document
         $out .= \html_writer::start_tag('div', array('class' => 'content'));
-        $out .= \html_writer::tag('span', $status, array('class' => 'todo'));
+        $out .= \html_writer::tag('span', $status, array('class' => 'status'));
         $out .= \html_writer::tag('span', ' extension until ' . \userdate($localcm->data), array('class' => 'time'));
         $out .= \html_writer::end_div(); // End .content.
 

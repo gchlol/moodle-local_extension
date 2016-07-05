@@ -92,7 +92,7 @@ class request {
 
         $requestid = $this->requestid;
 
-        $this->request  = $DB->get_record('local_extension_request', array('id' => $requestid));
+        $this->request  = $DB->get_record('local_extension_request', array('id' => $requestid) ,'*', MUST_EXIST);
         $this->cms      = $DB->get_records('local_extension_cm', array('request' => $requestid));
         $this->comments = $DB->get_records('local_extension_comment', array('request' => $requestid));
 

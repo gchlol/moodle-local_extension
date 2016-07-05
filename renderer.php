@@ -56,7 +56,7 @@ class local_extension_renderer extends plugin_renderer_base {
                 if ($index == 0) {
                     $course = $req->mods[$cm->cmid]['course'];
                     $coursename = $course->fullname . ": " . $course->shortname;
-                    $out .= html_writer::div($coursename, 'assigncm');
+                    $out .= html_writer::tag('span', $coursename, array('class' => 'todo'));
                 }
 
                 $handler = new $cm->handler();
@@ -64,13 +64,14 @@ class local_extension_renderer extends plugin_renderer_base {
             }
         }
 
-        $out .= html_writer::start_tag('br');
+
+        // TODO replace <br /> with css padding/margins, or does that impact the html->text email output.
         $out .= $this->render_extension_attachments($req);
         $out .= html_writer::start_tag('br');
         $out .= $this->render_extension_comments($req);
         $out .= html_writer::start_tag('br');
 
-        $out .= html_writer::end_div(); // End .extensionstatus.
+        $out .= html_writer::end_div(); // End .summary.
 
         return $out;
     }

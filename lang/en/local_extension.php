@@ -38,11 +38,11 @@ $string['searchbackhelp'] = 'How many days to search back from today when reques
 $string['searchforward'] = 'Search forward';
 $string['searchforwardhelp'] = 'How many days to search forward from today when requesting an exception.';
 $string['status_page_heading'] = 'Extension Status';
-$string['state_statusnew'] = 'Requested';
-$string['state_statusdenied'] = 'Denied';
-$string['state_statusapproved'] = 'Granted';
-$string['state_statusreopened'] = 'Reopened Request';
-$string['state_statuscancel'] = 'Cancelled';
+$string['state_statusnew'] = '<span class="statusnew">Requested</span>';
+$string['state_statusdenied'] = '<span class="statusdenied">Denied</span>';
+$string['state_statusapproved'] = '<span class="statusapproved">Granted</span>';
+$string['state_statusreopened'] = '<span class="statusreopened">Reopened Request</span>';
+$string['state_statuscancel'] = '<span class="statuscancel">Cancelled</span>';
 $string['submit_request'] = 'Submit request';
 $string['subplugintype_extension'] = 'Extension adapter';
 $string['subplugintype_extension_plural'] = 'Extension adapters';
