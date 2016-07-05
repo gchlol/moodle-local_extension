@@ -27,6 +27,7 @@
 $string['pluginname'] = 'Activity extensions';
 $string['attachments'] = 'Attachments';
 $string['comment'] = 'General comments';
+$string['commentbutton'] = 'Comment';
 $string['emailtemplate'] = 'Email Template';
 $string['emailtemplatehelp'] = '';
 $string['requestextension'] = 'Request an extension';
