@@ -42,19 +42,21 @@ class local_extension_renderer extends plugin_renderer_base {
      * @return string $out The html output.
      */
     public function render_extension_status(\local_extension\request $req) {
-        $out = '';
-
-        $out .= html_writer::start_tag('div', array('class' => 'extensionstatus'));
-
         // Returns an associated array of $cms with the $courseid as the key.
         $cms = $req->get_cms_by_course();
+
+        $out = '';
+
+        $out .= html_writer::start_tag('div', array('class' => 'summary'));
+        $out .= html_writer::tag('span', 'Summary<br /><br />Request sent for review:<br /><br />', array('class' => 'statusheader'));
 
         foreach ($cms as $courseid => $cmarray) {
             foreach ($cmarray as $index => $cm) {
                 // Print the course title for each new set of cms.
                 if ($index == 0) {
                     $course = $req->mods[$cm->cmid]['course'];
-                    $out .= \html_writer::div($course->fullname, 'assigncm');
+                    $coursename = $course->fullname . ": " . $course->shortname;
+                    $out .= html_writer::div($coursename, 'assigncm');
                 }
 
                 $handler = new $cm->handler();
@@ -62,8 +64,11 @@ class local_extension_renderer extends plugin_renderer_base {
             }
         }
 
+        $out .= html_writer::start_tag('br');
         $out .= $this->render_extension_attachments($req);
+        $out .= html_writer::start_tag('br');
         $out .= $this->render_extension_comments($req);
+        $out .= html_writer::start_tag('br');
 
         $out .= html_writer::end_div(); // End .extensionstatus.
 

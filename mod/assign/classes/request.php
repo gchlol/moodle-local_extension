@@ -131,18 +131,23 @@ class request extends \local_extension\base_request {
     public function render_status($localcm, $request) {
         $cm = $request->mods[$localcm->cmid]['cm'];
         $event = $request->mods[$localcm->cmid]['event'];
+        $status = $request->get_status_name($localcm->status);
 
         $out = '';
-        $out .= \html_writer::div($cm->name, 'assigncm');
 
-        // Mod due date.
-        $out .= \html_writer::div(\userdate($event->timestart), 'time');
+        $out .= \html_writer::start_tag('div', array('class' => 'content'));
+        $out .= \html_writer::tag('span', $cm->name, array('class' => 'todo'));
+        $out .= \html_writer::tag('span', ', due ' .\userdate($event->timestart), array('class' => 'time'));
+        $out .= \html_writer::end_div(); // End .content.
 
-        $status = $request->get_status_name($localcm->status);
-        $out .= \html_writer::div($status, 'assigncm');
+        // TODO case on type of request, ie. exemption, extension, etc.
+        // print extension type colour like the scoping document
+        $out .= \html_writer::start_tag('div', array('class' => 'content'));
+        $out .= \html_writer::tag('span', $status, array('class' => 'todo'));
+        $out .= \html_writer::tag('span', ' extension until ' . \userdate($localcm->data), array('class' => 'time'));
+        $out .= \html_writer::end_div(); // End .content.
 
-        // Extended until date.
-        $out .= \html_writer::div(\userdate($localcm->data), 'time');
+        $out .= \html_writer::start_tag('br');
 
         return $out;
     }
