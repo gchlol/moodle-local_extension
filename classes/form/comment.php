@@ -56,7 +56,6 @@ class comment extends \moodleform {
         $mform->addElement('textarea', 'commentarea', '', '');
 
         $mform->addElement('submit', 'submitcomment', get_string('submit_comment', 'local_extension'));
-        //$this->add_action_buttons(false, get_string('submit_comment', 'local_extension'));
     }
 
     /**

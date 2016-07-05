@@ -163,7 +163,6 @@ class request {
             'userid'        => $from->id,
             'timestamp'     => \time(),
             'message'       => $comment,
-            'messageformat' => $format,
         );
         $DB->insert_record('local_extension_comment', $comment);
     }
