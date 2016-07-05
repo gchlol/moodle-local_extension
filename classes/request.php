@@ -155,7 +155,7 @@ class request {
      * @param string $comment The comment itself.
      * @param integer $format
      */
-    public static function add_comment($requestid, $from, $comment, $format) {
+    public static function add_comment($requestid, $from, $comment) {
         global $DB;
 
         $comment = (object)array(
@@ -163,9 +163,19 @@ class request {
             'userid'        => $from->id,
             'timestamp'     => \time(),
             'message'       => $comment,
-            'messageformat' => $format,
         );
         $DB->insert_record('local_extension_comment', $comment);
+    }
+
+    /**
+     * Loads comments from the database into the request object.
+     */
+    public function load_comments() {
+        global $DB;
+
+        if (!empty($this->requestid)) {
+            $this->comments = $DB->get_records('local_extension_comment', array('request' => $this->requestid));
+        }
     }
 
     /**

@@ -48,6 +48,12 @@ class comment extends \moodleform {
         $mform = $this->_form;
 
         $user = $this->_customdata['user'];
+        $mods = $this->_customdata['mods'];
+
+        foreach ($mods as $id => $mod) {
+            $handler = $mod['handler'];
+            $handler->status_definition($mform, $mod);
+        }
 
         $mform->addElement('hidden', 'id');
         $mform->setType('id', PARAM_INT);
@@ -56,7 +62,6 @@ class comment extends \moodleform {
         $mform->addElement('textarea', 'commentarea', '', '');
 
         $mform->addElement('submit', 'submitcomment', get_string('submit_comment', 'local_extension'));
-        //$this->add_action_buttons(false, get_string('submit_comment', 'local_extension'));
     }
 
     /**

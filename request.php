@@ -82,8 +82,7 @@ if ($mform->is_cancelled()) {
         'request' => $request['id'],
         'userid' => $USER->id,
         'timestamp' => $now,
-        'message' => $form->comment['text'],
-        'messageformat' => $form->comment['format'],
+        'message' => $form->comment,
     );
     $comment['id'] = $DB->insert_record('local_extension_comment', $comment);
 

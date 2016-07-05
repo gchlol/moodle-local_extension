@@ -55,17 +55,8 @@ class request extends \moodleform {
             $handler->request_definition($mform, $mod);
         }
 
-        $mform->addElement('editor', 'comment', get_string('comment', 'local_extension'), array(
-            'rows' => '3',
-            'subdirs' => 0,
-            'maxbytes' => 0,
-            'maxfiles' => 0,
-            'changeformat' => 0,
-            'context' => null,
-            'noclean' => 0,
-            'trusttext' => 0,
-            'enable_filemanagement' => false,
-        ));
+        // TODO style the width of this textarea
+        $mform->addElement('textarea', 'comment', get_string('comment', 'local_extension'), '');
         $mform->addRule('comment', 'Required', 'required', null, 'client');
 
         $mform->addElement('filemanager', 'attachments', get_string('attachments', 'local_extension'), null, array(
