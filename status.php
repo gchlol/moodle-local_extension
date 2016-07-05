@@ -49,4 +49,3 @@ $renderer = $PAGE->get_renderer('local_extension');
 echo $OUTPUT->header();
 echo $renderer->render_extension_status($request);
 echo $OUTPUT->footer();
-

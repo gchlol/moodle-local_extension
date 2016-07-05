@@ -111,6 +111,10 @@ if ($mform->is_cancelled()) {
         );
         $cm['id'] = $DB->insert_record('local_extension_cm', $cm);
     }
+
+    // Requres the $PAGE context to be set.
+    send_status_email($request['id']);
+
     $url = new moodle_url('/local/extension/status.php', array('id' => $request['id']));
     redirect($url);
     die;

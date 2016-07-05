@@ -103,5 +103,34 @@ function local_extension_get_activities($user, $start, $end, $course = 0) {
     return array($mods, $events);
 }
 
+/**
+ * Sends a status email to the student.
+ * TODO Implement sending to course coordinators with the capabilitiy and role to grant extensions.
+ *
+ * @param integer $requestid
+ */
+function send_status_email($requestid) {
+    global $DB, $USER, $PAGE;
+
+    $request = \local_extension\request::from_id($requestid);
+    $user = $DB->get_record('user', array('id' => $request->request->userid));
+
+    $renderer = $PAGE->get_renderer('local_extension');
+    $text = $renderer->render_extension_email($request);
+
+    $message = new stdClass();
+    $message->component         = 'local_extension';
+    $message->name              = 'status';
+    $message->userfrom          = $USER;
+    $message->userto            = $user;
+    $message->subject           = 'Status Update';
+    $message->fullmessage       = $text;
+    $message->fullmessageformat = FORMAT_PLAIN;
+    $message->fullmessagehtml   = '';
+    $message->smallmessage      = '';
+    $message->notification      = 1;
+    message_send($message);
+}
+
 
 

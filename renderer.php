@@ -159,7 +159,10 @@ class local_extension_renderer extends plugin_renderer_base {
      * @return string $out The html output.
      */
     public function render_extension_email(\local_extension\request $req) {
+        $html = $this->render_extension_status($req);
+        $out = \format_text_email($html, FORMAT_HTML);
 
+        return $out;
     }
 
 }
