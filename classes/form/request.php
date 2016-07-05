@@ -87,6 +87,8 @@ class request extends \moodleform {
         $mform = $this->_form;
         $mods = $this->_customdata['mods'];
 
+        // TODO make this fail validation if no handlers data is set.
+
         foreach ($mods as $id => $mod) {
             $handler = $mod['handler'];
             $errors += $handler->request_validation($mform, $mod, $data);
