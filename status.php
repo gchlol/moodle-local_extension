@@ -54,7 +54,7 @@ if ($form = $mform->get_data()) {
     $request = \local_extension\request::from_id($requestid);
 } else {
     $request = \local_extension\request::from_id($requestid);
-    $mform->set_data(array('requestid' => $requestid));
+    $mform->set_data(array('id' => $requestid));
 }
 
 echo $OUTPUT->header();
