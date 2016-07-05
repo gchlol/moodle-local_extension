@@ -148,14 +148,24 @@ class request {
     }
 
     /**
-     * Adds a comment to the request.
+     * Adds a comment to the request
      *
-     * @param unknown $from
-     * @param unknown $comment
-     * @param unknown $format
+     * @param interger $requestid Request id.
+     * @param stdClass $from The user that has commented.
+     * @param string $comment The comment itself.
+     * @param integer $format
      */
-    public function add_comment($from, $comment, $format) {
+    public static function add_comment($requestid, $from, $comment, $format) {
+        global $DB;
 
+        $comment = (object)array(
+            'request'       => $requestid,
+            'userid'        => $from->id,
+            'timestamp'     => \time(),
+            'message'       => $comment,
+            'messageformat' => $format,
+        );
+        $DB->insert_record('local_extension_comment', $comment);
     }
 
     /**

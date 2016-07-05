@@ -27,7 +27,6 @@
 $string['pluginname'] = 'Activity extensions';
 $string['attachments'] = 'Attachments';
 $string['comment'] = 'General comments';
-$string['commentbutton'] = 'Comment';
 $string['emailtemplate'] = 'Email Template';
 $string['emailtemplatehelp'] = '';
 $string['requestextension'] = 'Request an extension';
@@ -45,6 +44,7 @@ $string['state_statusapproved'] = '<span class="statusapproved">Granted</span>';
 $string['state_statusreopened'] = '<span class="statusreopened">Reopened Request</span>';
 $string['state_statuscancel'] = '<span class="statuscancel">Cancelled</span>';
 $string['submit_request'] = 'Submit request';
+$string['submit_comment'] = 'Submit comment';
 $string['subplugintype_extension'] = 'Extension adapter';
 $string['subplugintype_extension_plural'] = 'Extension adapters';
 

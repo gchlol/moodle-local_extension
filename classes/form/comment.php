@@ -49,10 +49,14 @@ class comment extends \moodleform {
 
         $user = $this->_customdata['user'];
 
-        $mform->addElement('html', $user);
-        $mform->addElement('textarea', 'comment', '', '');
+        $mform->addElement('hidden', 'requestid');
+        $mform->setType('requestid', PARAM_INT);
 
-        $mform->addElement('button', 'submit', get_string('commentbutton', 'local_extension'));
+        $mform->addElement('html', $user);
+        $mform->addElement('textarea', 'commentarea', '', '');
+
+        $mform->addElement('submit', 'submitcomment', get_string('submit_comment', 'local_extension'));
+        //$this->add_action_buttons(false, get_string('submit_comment', 'local_extension'));
     }
 
     /**

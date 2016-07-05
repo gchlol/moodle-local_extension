@@ -29,9 +29,6 @@ global $CFG, $PAGE, $USER;
 
 require_login(false);
 
-$requestid = required_param('id', PARAM_INTEGER);
-$request = \local_extension\request::from_id($requestid);
-
 // TODO add perms checks here.
 
 $context = context_user::instance($USER->id);
@@ -46,7 +43,20 @@ $PAGE->requires->css('/local/extension/styles.css');
 $mform = new \local_extension\form\comment(null, array('user' => $OUTPUT->user_picture($USER)));
 
 if ($form = $mform->get_data()) {
+    $requestid = $form->requestid;
+    $comment = $form->commentarea;
+    $format = FORMAT_PLAIN;
+
+    \local_extension\request::add_comment($requestid, $USER, $comment, $format);
+    $request = \local_extension\request::from_id($requestid);
+} else {
+    $requestid = required_param('id', PARAM_INTEGER);
+    $request = \local_extension\request::from_id($requestid);
+
+    $mform->set_data(array('requestid' => $requestid));
 }
+
+
 
 echo $OUTPUT->header();
 $renderer = $PAGE->get_renderer('local_extension');
