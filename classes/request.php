@@ -92,7 +92,7 @@ class request {
 
         $requestid = $this->requestid;
 
-        $this->request  = $DB->get_record('local_extension_request', array('id' => $requestid));
+        $this->request  = $DB->get_record('local_extension_request', array('id' => $requestid), '*', MUST_EXIST);
         $this->cms      = $DB->get_records('local_extension_cm', array('request' => $requestid));
         $this->comments = $DB->get_records('local_extension_comment', array('request' => $requestid));
 
@@ -148,21 +148,31 @@ class request {
     }
 
     /**
-     * Adds a comment to the request.
+     * Adds a comment to the request
      *
-     * @param unknown $from
-     * @param unknown $comment
-     * @param unknown $format
+     * @param interger $requestid Request id.
+     * @param stdClass $from The user that has commented.
+     * @param string $comment The comment itself.
+     * @param integer $format
      */
-    public function add_comment($from, $comment, $format) {
+    public static function add_comment($requestid, $from, $comment, $format) {
+        global $DB;
 
+        $comment = (object)array(
+            'request'       => $requestid,
+            'userid'        => $from->id,
+            'timestamp'     => \time(),
+            'message'       => $comment,
+            'messageformat' => $format,
+        );
+        $DB->insert_record('local_extension_comment', $comment);
     }
 
     /**
      * Sets the state of this request.
      *
      * @param stdClass $cm The request local cm object.
-     * @param integer $state The state.
+     * @param integer $status The status.
      */
     public function set_status($cm, $status) {
         global $DB;
@@ -197,7 +207,7 @@ class request {
     /**
      * Returns a human readable state name.
      *
-     * @param string $state one of the state constants like STATUS_NEW.
+     * @param string $status one of the state constants like STATUS_NEW.
      * @throws coding_exception
      * @return string the human-readable status name.
      */
