@@ -73,6 +73,17 @@ class request extends \local_extension\base_request {
     }
 
     /**
+     * Define parts of the request for for an event object
+     *
+     * @param moodleform $mform A moodle form object
+     * @param array $mod An array of event details
+     */
+    public function status_definition($mform, $mod) {
+        echo 'test';
+
+    }
+
+    /**
      * Validate the parts of the request form for this module
      *
      * @param moodleform $mform A moodle form object
