@@ -108,6 +108,7 @@ if ($mform->is_cancelled()) {
             'cmid' => $id,
             'status' => 0,
             'data' => $data,
+            'handler' => get_class($handler),
         );
         $cm['id'] = $DB->insert_record('local_extension_cm', $cm);
     }

@@ -54,7 +54,7 @@ class local_extension_renderer extends plugin_renderer_base {
 
         foreach ($cms as $courseid => $cmarray) {
             foreach ($cmarray as $cm) {
-                $handler = $req->get_handler($cm->cmid);
+                $handler = new $cm->handler();
                 $out .= $handler->render_status($cm, $req);
             }
         }

@@ -159,25 +159,17 @@ class request {
     }
 
     /**
-     * Returns the state of this request.
-     *
-     * @param stdClass $cm The request cm object.
-     * @return integer $state The state.
-     */
-    public function get_status($cm) {
-        return $cm->status;
-    }
-
-    /**
      * Sets the state of this request.
      *
-     * @param stdClass $cm The request cm object.
+     * @param stdClass $cm The request local cm object.
      * @param integer $state The state.
      */
     public function set_status($cm, $status) {
-        $cm->status = $status;
-    }
+        global $DB;
 
+        $cm->status = $status;
+        $DB->update_record('local_extension_cm', $cm);
+    }
 
     /**
      * Query the $cm and get the next available states.
@@ -240,13 +232,4 @@ class request {
         return $cms;
     }
 
-    /**
-     * Returns a handler class for the given cmid.
-     *
-     * @param integer cmid
-     * @return class handler
-     */
-    public function get_handler($cmid) {
-        return $this->mods[$cmid]['handler'];
-    }
 }

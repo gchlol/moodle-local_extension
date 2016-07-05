@@ -146,7 +146,7 @@ class request extends \local_extension\base_request {
         $status = $request->get_status_name($localcm->status);
         $out .= \html_writer::div($status, 'assigncm');
 
-        // Extened until.
+        // Extended until date.
         $out .= \html_writer::div(\userdate($localcm->data), 'time');
 
         return $out;
