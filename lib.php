@@ -28,15 +28,16 @@
  *
  * @param global_navigation $nav Navigation
  */
-function local_extension_extend_navigation(global_navigation $nav) {
+function local_extension_extends_navigation(global_navigation $nav) {
 
     $sitecontext = context_system::instance();
 
     // TODO add perms checks here. Maybe.
 
     if (isloggedin() and !isguestuser()) {
-        $url = new moodle_url('/local/extension/request.php');
-        $nav->add(get_string('requestextension', 'local_extension'), $url->out(), null, null, 'local_extension');
+        $url = new moodle_url('/local/extension/index.php');
+        $node = $nav->add(get_string('requestextension', 'local_extension'), $url->out(), null, null, 'local_extension');
+        $node->make_active();
     }
 
 }

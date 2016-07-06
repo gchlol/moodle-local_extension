@@ -24,6 +24,9 @@
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
+if (!defined('MOODLE_INTERNAL')) {
+    die('Direct access to this script is forbidden.'); // It must be included from a Moodle page.
+}
 
 /**
  * Extension renderer class.
@@ -110,7 +113,7 @@ class local_extension_renderer extends plugin_renderer_base {
             $out .= html_writer::end_div(); // End .content.
             $out .= html_writer::end_div(); // End .comment.
         }
-        $out .= html_writer::end_div();
+        $out .= html_writer::end_div(); // End .comments.
 
         return $out;
     }
@@ -171,6 +174,15 @@ class local_extension_renderer extends plugin_renderer_base {
         //$html = $this->render_extension_status($req);
         //$out = \format_text_email($html, FORMAT_HTML);
         //return $out;
+    }
+
+    /**
+     * Render a summary of all requests.
+     *
+     * @param array $requests
+     */
+    public function render_extension_summary($requests) {
+
     }
 
 }

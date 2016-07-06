@@ -42,6 +42,9 @@ $PAGE->set_title(get_string('pluginname', 'local_extension'));
 $PAGE->set_heading(get_string('status_page_heading', 'local_extension'));
 $PAGE->requires->css('/local/extension/styles.css');
 
+$node = $PAGE->navigation->add(get_string('navigation_side', 'local_extension'), new moodle_url('/local/extension/index.php'));
+$node->make_active();
+
 $request = \local_extension\request::from_id($requestid);
 $renderer = $PAGE->get_renderer('local_extension');
 $mform = new \local_extension\form\update(null, array('user' => $OUTPUT->user_picture($USER), 'request' => $request, 'renderer' => $renderer));
