@@ -96,7 +96,9 @@ class request {
         $this->cms      = $DB->get_records('local_extension_cm', array('request' => $requestid), 'id ASC', 'cmid,course,data,handler,id,request,status,userid');
         $this->comments = $DB->get_records('local_extension_comment', array('request' => $requestid), 'timestamp ASC');
 
-        list($handlers, $mods) = local_extension_get_activities($this->request->userid, $this->request->searchstart, $this->request->searchend);
+        $request = $this->request;
+
+        list($handlers, $mods) = local_extension_get_activities($request->userid, $request->searchstart, $request->searchend);
         $this->mods = $mods;
 
         $userids = array($request->userid => $request->userid);
