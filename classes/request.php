@@ -99,7 +99,7 @@ class request {
         list($handlers, $mods) = local_extension_get_activities($this->request->userid, $this->request->searchstart, $this->request->searchend);
         $this->mods = $mods;
 
-        $userids = array();
+        $userids = array($request->userid => $request->userid);
 
         // TODO need to sort cms by date and comments by date.
         // Obtain a unique list of userids that have been commenting.

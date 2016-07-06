@@ -108,7 +108,7 @@ class local_extension_renderer extends plugin_renderer_base {
             $out .= html_writer::tag('span', ' - ' . get_string('ago', 'message', format_time(time() - $comment->timestamp)), array('class' => 'time'));
 
             $out .= html_writer::start_tag('div', array('class' => 'message'));
-            $out .= html_writer::div($comment->message, 'comment'); // TODO proper escape.
+            $out .= html_writer::div(format_text($comment->message, FORMAT_MARKDOWN), 'comment'); // TODO proper escape.
             $out .= html_writer::end_div(); // End .message.
             $out .= html_writer::end_div(); // End .content.
             $out .= html_writer::end_div(); // End .comment.
