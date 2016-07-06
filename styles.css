@@ -3,6 +3,8 @@
 }
 .comment {
     position: relative;
+    margin-bottom: 8px;
+    min-height: 30px;
 }
 
 .comment .avatar {

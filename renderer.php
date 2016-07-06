@@ -105,10 +105,10 @@ class local_extension_renderer extends plugin_renderer_base {
             $context = 1; // TODO what context is this in relation to? Usually one a cm.
             $role = 'Course coordinator'; // TODO look this up.
             $out .= html_writer::tag('span', ' - ' . $role, array('class' => 'role'));
-            $out .= html_writer::tag('span', ' - ' . get_string('ago', 'message', format_time(time() - $comment->timestamp)), array('class' => 'time'));
+            $out .= html_writer::tag('span', ' - ' . $this->render_time($comment->timestamp), array('class' => 'time'));
 
             $out .= html_writer::start_tag('div', array('class' => 'message'));
-            $out .= html_writer::div(format_text($comment->message, FORMAT_MARKDOWN), 'comment'); // TODO proper escape.
+            $out .= html_writer::div(format_text(trim($comment->message), FORMAT_MOODLE), 'comment');
             $out .= html_writer::end_div(); // End .message.
             $out .= html_writer::end_div(); // End .content.
             $out .= html_writer::end_div(); // End .comment.
@@ -116,6 +116,29 @@ class local_extension_renderer extends plugin_renderer_base {
         $out .= html_writer::end_div(); // End .comments.
 
         return $out;
+    }
+
+    /**
+     * Render nice times
+     *
+     * @param integer $time The time to show
+     * @return string $out The html output.
+     */
+    public function render_time($time) {
+        $delta = time() - $time;
+
+        // The nice delta.
+
+        // Just show the biggest time unit instead of 2.
+        $show = format_time($delta);
+        $num = strtok($show, ' ');
+        $unit = strtok(' ');
+        $show = "$num $unit";
+        $show = get_string('ago', 'message', $show);
+
+        // The full date.
+        $fulldate = userdate($time, '%d %h %Y %l:%M%P');
+        return html_writer::tag('abbr', $show, array('title' => $fulldate) );
     }
 
     /**
