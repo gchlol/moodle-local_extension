@@ -78,9 +78,19 @@ class request extends \local_extension\base_request {
      * @param moodleform $mform A moodle form object
      * @param array $mod An array of event details
      */
-    public function status_definition($mform, $mod) {
-        echo 'test';
+    public function status_definition($mform, $mod, $req) {
 
+        $cm = $mod['cm'];
+        $event = $mod['event'];
+        $course = $mod['course'];
+        $handler = $mod['handler'];
+
+        $html = \html_writer::tag('b', $course->fullname . ' > ' . $event->name, array('class' => 'mod'));
+        $html = \html_writer::tag('p', $html . ' ' . get_string('dueon', 'extension_assign', \userdate($event->timestart)));
+        $mform->addElement('html', \html_writer::tag('p', $html));
+
+        $html = $handler->render_status($cm, $req);
+        $mform->addElement('html', \html_writer::tag('p', $html));
     }
 
     /**
@@ -135,27 +145,21 @@ class request extends \local_extension\base_request {
     /**
      * Render output for the status page.
      *
-     * @param stdClass $localcm Extension cm data.
+     * @param stdClass $cm General cm data..
      * @param request $request Request data.
      * @return string $out The html output.
      */
-    public function render_status($localcm, $request) {
-        $cm = $request->mods[$localcm->cmid]['cm'];
-        $event = $request->mods[$localcm->cmid]['event'];
-        $status = $request->get_status_name($localcm->status);
+    public function render_status($cm, $request) {
+        $extensioncm = $request->get_local_cm($cm->id);
+        $status = $request->get_status_name($extensioncm->status);
 
         $out = '';
-
-        $out .= \html_writer::start_tag('div', array('class' => 'content'));
-        $out .= \html_writer::tag('span', $cm->name, array('class' => 'todo'));
-        $out .= \html_writer::tag('span', ', due ' .\userdate($event->timestart), array('class' => 'time'));
-        $out .= \html_writer::end_div(); // End .content.
 
         // TODO case on type of request, ie. exemption, extension, etc.
         // print extension type colour like the scoping document
         $out .= \html_writer::start_tag('div', array('class' => 'content'));
         $out .= \html_writer::tag('span', $status, array('class' => 'status'));
-        $out .= \html_writer::tag('span', ' extension until ' . \userdate($localcm->data), array('class' => 'time'));
+        $out .= \html_writer::tag('span', ' extension until ' . \userdate($extensioncm->data), array('class' => 'time'));
         $out .= \html_writer::end_div(); // End .content.
 
         $out .= \html_writer::start_tag('br');

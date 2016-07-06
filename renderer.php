@@ -151,9 +151,10 @@ class local_extension_renderer extends plugin_renderer_base {
             );
 
             $out .= html_writer::start_tag('div', array('class' => 'attachments'));
+
+            // TODO plural attachments
             $out .= html_writer::div('Attachment: ', 'file');
             $out .= html_writer::link($fileurl, $file->get_filename());
-            $out .= html_writer::end_div(); // End .file.
             $out .= html_writer::end_div(); // End .attachments.
         }
 
@@ -167,10 +168,9 @@ class local_extension_renderer extends plugin_renderer_base {
      * @return string $out The html output.
      */
     public function render_extension_email(\local_extension\request $req) {
-        $html = $this->render_extension_status($req);
-        $out = \format_text_email($html, FORMAT_HTML);
-
-        return $out;
+        //$html = $this->render_extension_status($req);
+        //$out = \format_text_email($html, FORMAT_HTML);
+        //return $out;
     }
 
 }
