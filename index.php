@@ -22,3 +22,29 @@
  * @copyright  Catalyst IT
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
+
+require_once('../../config.php');
+require_once('locallib.php');
+global $CFG, $PAGE;
+
+require_login(false);
+
+$PAGE->set_url(new moodle_url('/local/extension/index.php'));
+
+// TODO context could be user, course or module.
+$context = context_user::instance($USER->id);
+
+$PAGE->set_context($context);
+$PAGE->set_pagelayout('standard');
+$PAGE->set_title(get_string('pluginname', 'local_extension'));
+$PAGE->requires->css('/local/extension/styles.css');
+
+$table = generate_table();
+$data = generate_table_data($table);
+
+$renderer = $PAGE->get_renderer('local_extension');
+
+echo $OUTPUT->header();
+echo html_writer::tag('h2', get_string('summary_page_heading', 'local_extension'));
+echo $renderer->render_extension_summary_table($table, $data);
+echo $OUTPUT->footer();

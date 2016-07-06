@@ -25,6 +25,7 @@
 
 require_once($CFG->dirroot . '/calendar/lib.php');
 require_once($CFG->dirroot . '/user/lib.php');
+require_once($CFG->libdir . '/tablelib.php');
 
 /**
  * Returns a list of candidate dates for activities
@@ -134,5 +135,42 @@ function send_status_email($requestid) {
     message_send($message);
 }
 
+function generate_table() {
+    global $PAGE;
 
+    $headers = array(
+        get_string('table_header_course', 'local_extension'),
+        get_string('table_header_module', 'local_extension'),
+        get_string('table_header_datedue', 'local_extension'),
+        get_string('table_header_dateextension', 'local_extension'),
+        get_string('table_header_status', 'local_extension'),
+    );
 
+    $columns = array('course', 'module', 'datedue', 'dateextension', 'status');
+
+    $table = new flexible_table('local_extension_summary');
+    $table->define_columns($columns);
+    $table->define_headers($headers);
+
+    $table->define_baseurl($PAGE->url);
+    $table->set_attribute('id', 'local_extension_table');
+    $table->set_attribute('class', 'generaltable admintable');
+    $table->setup();
+
+    return $table;
+}
+
+function generate_table_data($table) {
+    global $DB, $USER;
+
+    $data = array();
+
+    $requestids = $DB->get_records('local_extension_request', array('userid' => $USER->id), null, 'id');
+
+    foreach ($requestids as $id) {
+        // TODO overkill, we don't need all of the information loaded in each request
+        $data[$id->id] = \local_extension\request::from_id($id->id);
+    }
+
+    return $data;
+}
