@@ -15,7 +15,7 @@
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
 /**
- * Status page in local_extension
+ * Requests page in local_extension
  *
  * @package    local_extension
  * @author     Nicholas Hoobin <nicholashoobin@catalyst-au.net>
@@ -25,37 +25,26 @@
 
 require_once('../../config.php');
 require_once('locallib.php');
-global $CFG, $PAGE, $USER;
+global $CFG, $PAGE;
 
 require_login(false);
 
-// TODO add perms checks here.
+$PAGE->set_url(new moodle_url('/local/extension/index.php'));
 
-$requestid = required_param('id', PARAM_INTEGER);
-
-$url = new moodle_url('/local/extension/status.php', array('id' => $requestid));
-$PAGE->set_url($url);
+// TODO context could be user, course or module.
 $context = context_user::instance($USER->id);
+
 $PAGE->set_context($context);
 $PAGE->set_pagelayout('standard');
 $PAGE->set_title(get_string('pluginname', 'local_extension'));
-$PAGE->set_heading(get_string('status_page_heading', 'local_extension'));
 $PAGE->requires->css('/local/extension/styles.css');
 
-$request = \local_extension\request::from_id($requestid);
-$renderer = $PAGE->get_renderer('local_extension');
-$mform = new \local_extension\form\update(null, array('user' => $OUTPUT->user_picture($USER), 'request' => $request, 'renderer' => $renderer));
+$table = generate_table();
+$data = generate_table_data($table);
 
-if ($form = $mform->get_data()) {
-    $requestid = $form->id;
-    $comment = $form->commentarea;
-    $request->add_comment($USER, $comment);
-    //$mform->update_comments();
-    redirect($url);
-} else {
-    $mform->set_data(array('id' => $requestid));
-}
+$renderer = $PAGE->get_renderer('local_extension');
 
 echo $OUTPUT->header();
-$mform->display();
+echo html_writer::tag('h2', get_string('summary_page_heading', 'local_extension'));
+echo $renderer->render_extension_summary_table($table, $data);
 echo $OUTPUT->footer();

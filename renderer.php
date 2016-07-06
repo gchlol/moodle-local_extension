@@ -24,6 +24,9 @@
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
+if (!defined('MOODLE_INTERNAL')) {
+    die('Direct access to this script is forbidden.'); // It must be included from a Moodle page.
+}
 
 /**
  * Extension renderer class.
@@ -110,7 +113,7 @@ class local_extension_renderer extends plugin_renderer_base {
             $out .= html_writer::end_div(); // End .content.
             $out .= html_writer::end_div(); // End .comment.
         }
-        $out .= html_writer::end_div();
+        $out .= html_writer::end_div(); // End .comments.
 
         return $out;
     }
@@ -173,5 +176,44 @@ class local_extension_renderer extends plugin_renderer_base {
         //return $out;
     }
 
+    /**
+     * Render a summary of all requests.
+     *
+     * @param array $requests
+     */
+    public function render_extension_summary_table($table, $requests) {
+
+        if (empty($requests)) {
+            return;
+        }
+
+        foreach ($requests as $request) {
+
+            // $columns = array('course', 'module', 'datedue', 'dateextension', 'status');
+
+            $mods = $request->mods;
+
+            foreach ($mods as $mod) {
+                $cm     = $mod['cm'];
+                $course = $mod['course'];
+                $event  = $mod['event'];
+
+                // TODO what happens with the request object when cms are deleted from the system?
+                // should we be storing more of the cm details in our local_extension_cm?
+
+                if (!empty($request->cms && array_key_exists($cm->id, $request->cms))) {
+                    $status = $request->cms[$cm->id]->status;
+                    $due = $request->cms[$cm->id]->data;
+
+                    $status = $request->get_status_name($status);
+                }
+
+                $values = array($course->fullname, $cm->name, userdate($event->timestart), userdate($due), $status);
+                $table->add_data($values);
+            }
+        }
+
+        return $table->finish_output();
+    }
 }
 
