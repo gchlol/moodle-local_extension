@@ -45,19 +45,32 @@ class comment extends \moodleform {
      * @see moodleform::definition()
      */
     public function definition() {
-        $mform = $this->_form;
+        $mform    = $this->_form;
+        $user     = $this->_customdata['user'];
+        $request  = $this->_customdata['request'];
+        $renderer = $this->_customdata['renderer'];
+        $mods     = $request->mods;
 
-        $user = $this->_customdata['user'];
-        $mods = $this->_customdata['mods'];
+        // TODO determine type of view on this page to show a different header depending on user / context
 
         foreach ($mods as $id => $mod) {
             $handler = $mod['handler'];
-            $handler->status_definition($mform, $mod);
+            $handler->status_definition($mform, $mod, $request, $renderer);
         }
+
+        // TODO replace <br /> with css padding/margins, or does that impact the html->text email output.
+        $html  = $renderer->render_extension_attachments($request);
+        $html .= \html_writer::start_tag('br');
+
+        $request->load_comments();
+        $html .= $renderer->render_extension_comments($request);
+        $html .= \html_writer::start_tag('br');
+        $mform->addElement('html', $html);
 
         $mform->addElement('hidden', 'id');
         $mform->setType('id', PARAM_INT);
 
+        // To identify the current user, $user equals $OUTPUT->user_picture($USER)
         $mform->addElement('html', $user);
         $mform->addElement('textarea', 'commentarea', '', '');
 

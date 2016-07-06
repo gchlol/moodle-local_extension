@@ -239,6 +239,21 @@ class request {
     }
 
     /**
+     * Gets the local extension cm data.
+     *
+     * @param integer $cmid
+     * @return stdClass $cm local extension cm data.
+     */
+    public function get_local_cm($cmid) {
+        foreach ($this->cms as $localid => $cm) {
+            if ($cm->cmid == $cmid) {
+                return $cm;
+            }
+        }
+        return null;
+    }
+
+    /**
      * Returns cms grouped by the course they are associated with.
      * @return array An array of courses and their mods.
      */
@@ -252,4 +267,18 @@ class request {
         return $cms;
     }
 
+    /**
+     * Returns mods grouped by the course they are associated with.
+     * @return array An array of courses and their mods.
+     */
+    public function get_mods_by_course() {
+        $mods = array();
+
+        foreach ($this->mods as $id => $mod) {
+            $course = $mod['course'];
+            $mods[$course->id][] = $mod;
+        }
+
+        return $mods;
+    }
 }

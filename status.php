@@ -42,7 +42,8 @@ $PAGE->set_title(get_string('pluginname', 'local_extension'));
 $PAGE->set_heading(get_string('status_page_heading', 'local_extension'));
 $PAGE->requires->css('/local/extension/styles.css');
 
-$mform = new \local_extension\form\comment(null, array('user' => $OUTPUT->user_picture($USER), 'mods' => $request->mods));
+$renderer = $PAGE->get_renderer('local_extension');
+$mform = new \local_extension\form\comment(null, array('user' => $OUTPUT->user_picture($USER), 'request' => $request, 'renderer' => $renderer));
 
 if ($form = $mform->get_data()) {
     $requestid = $form->id;
@@ -55,8 +56,8 @@ if ($form = $mform->get_data()) {
 }
 
 echo $OUTPUT->header();
-$renderer = $PAGE->get_renderer('local_extension');
-echo $renderer->render_extension_status($request);
+//$renderer = $PAGE->get_renderer('local_extension');
+//echo $renderer->render_extension_status($request);
 $mform->display();
 echo $OUTPUT->footer();
 
