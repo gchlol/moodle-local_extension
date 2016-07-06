@@ -150,16 +150,15 @@ class request {
     /**
      * Adds a comment to the request
      *
-     * @param interger $requestid Request id.
      * @param stdClass $from The user that has commented.
      * @param string $comment The comment itself.
      * @param integer $format
      */
-    public static function add_comment($requestid, $from, $comment) {
+    public function add_comment($from, $comment) {
         global $DB;
 
         $comment = (object)array(
-            'request'       => $requestid,
+            'request'       => $this->requestid,
             'userid'        => $from->id,
             'timestamp'     => \time(),
             'message'       => $comment,

@@ -39,7 +39,7 @@ require_once($CFG->libdir . '/formslib.php');
  * @copyright  Catalyst IT
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
-class comment extends \moodleform {
+class update extends \moodleform {
     /**
      * {@inheritDoc}
      * @see moodleform::definition()
@@ -61,11 +61,11 @@ class comment extends \moodleform {
         // TODO replace <br /> with css padding/margins, or does that impact the html->text email output.
         $html  = $renderer->render_extension_attachments($request);
         $html .= \html_writer::start_tag('br');
-
-        $request->load_comments();
-        $html .= $renderer->render_extension_comments($request);
-        $html .= \html_writer::start_tag('br');
         $mform->addElement('html', $html);
+
+        $html = $renderer->render_extension_comments($request);
+        $html .= \html_writer::start_tag('br');
+        $mform->addElement('html', $html, 'comments');
 
         $mform->addElement('hidden', 'id');
         $mform->setType('id', PARAM_INT);
@@ -75,6 +75,25 @@ class comment extends \moodleform {
         $mform->addElement('textarea', 'commentarea', '', '');
 
         $mform->addElement('submit', 'submitcomment', get_string('submit_comment', 'local_extension'));
+    }
+
+    /**
+     * This is used to update the $mform comment list after a post.
+     * definition_after_data() is not suitable for this.
+     *
+     * $mform->_definition_finalized is set to true on the first page load.
+     * After $mform->get_data() the definition_after_data() function will not be called.
+     */
+    public function update_comments() {
+        $mform    = $this->_form;
+        $request  = $this->_customdata['request'];
+        $renderer = $this->_customdata['renderer'];
+
+        // Don't forget to update the comment stream.
+        //$request->load_comments();
+
+        // TODO find how to query for the comment element id.
+        $mform->_elements[6]->_text = $renderer->render_extension_comments($request) . \html_writer::start_tag('br');
     }
 
     /**
