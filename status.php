@@ -33,7 +33,8 @@ require_login(false);
 
 $requestid = required_param('id', PARAM_INTEGER);
 
-$PAGE->set_url(new moodle_url('/local/extension/status.php', array('id' => $requestid)));
+$url = new moodle_url('/local/extension/status.php', array('id' => $requestid));
+$PAGE->set_url($url);
 $context = context_user::instance($USER->id);
 $PAGE->set_context($context);
 $PAGE->set_pagelayout('standard');
@@ -49,7 +50,8 @@ if ($form = $mform->get_data()) {
     $requestid = $form->id;
     $comment = $form->commentarea;
     $request->add_comment($USER, $comment);
-    $mform->update_comments();
+    //$mform->update_comments();
+    redirect($url);
 } else {
     $mform->set_data(array('id' => $requestid));
 }

@@ -65,7 +65,8 @@ class update extends \moodleform {
 
         $html = $renderer->render_extension_comments($request);
         $html .= \html_writer::start_tag('br');
-        $mform->addElement('static', 'comments', '', $html);
+        //$mform->addElement('static', 'comments', '', $html);
+        $mform->addElement('html', $html);
 
         $mform->addElement('hidden', 'id');
         $mform->setType('id', PARAM_INT);
