@@ -94,7 +94,7 @@ class request {
 
         $this->request  = $DB->get_record('local_extension_request', array('id' => $requestid), '*', MUST_EXIST);
         $this->cms      = $DB->get_records('local_extension_cm', array('request' => $requestid), 'id ASC', 'cmid,course,data,handler,id,request,status,userid');
-        $this->comments = $DB->get_records('local_extension_comment', array('request' => $requestid), 'id ASC');
+        $this->comments = $DB->get_records('local_extension_comment', array('request' => $requestid), 'timestamp ASC');
 
         list($handlers, $mods) = local_extension_get_activities($this->request->userid, $this->request->searchstart, $this->request->searchend);
         $this->mods = $mods;
@@ -102,6 +102,7 @@ class request {
         $userids = array($request->userid => $request->userid);
 
         // TODO need to sort cms by date and comments by date.
+
         // Obtain a unique list of userids that have been commenting.
         foreach ($this->comments as $comment) {
             $userids[$comment->userid] = $comment->userid;
@@ -152,7 +153,6 @@ class request {
      *
      * @param stdClass $from The user that has commented.
      * @param string $comment The comment itself.
-     * @param integer $format
      */
     public function add_comment($from, $comment) {
         global $DB;

@@ -135,6 +135,11 @@ function send_status_email($requestid) {
     message_send($message);
 }
 
+/**
+ * Generates the basic requirements the status page table.
+ *
+ * @return flexible_table
+ */
 function generate_table() {
     global $PAGE;
 
@@ -160,6 +165,11 @@ function generate_table() {
     return $table;
 }
 
+/**
+ * Generates the data required for the status page table.
+ * @param flexible_table $table
+ * @return request[] An array of request objects
+ */
 function generate_table_data($table) {
     global $DB, $USER;
 

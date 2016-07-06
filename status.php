@@ -50,7 +50,7 @@ if ($form = $mform->get_data()) {
     $requestid = $form->id;
     $comment = $form->commentarea;
     $request->add_comment($USER, $comment);
-    //$mform->update_comments();
+    // $mform->update_comments();
     redirect($url);
 } else {
     $mform->set_data(array('id' => $requestid));
