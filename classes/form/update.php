@@ -65,7 +65,7 @@ class update extends \moodleform {
 
         $html = $renderer->render_extension_comments($request);
         $html .= \html_writer::start_tag('br');
-        $mform->addElement('html', $html, 'comments');
+        $mform->addElement('static', 'comments', '', $html);
 
         $mform->addElement('hidden', 'id');
         $mform->setType('id', PARAM_INT);
@@ -92,8 +92,8 @@ class update extends \moodleform {
         // Don't forget to update the comment stream.
         $request->load_comments();
 
-        // TODO find how to query for the comment element id.
-        $mform->_elements[6]->_text = $renderer->render_extension_comments($request) . \html_writer::start_tag('br');
+        $commentidx = $mform->_elementIndex['comments'];
+        $mform->_elements[$commentidx]->_text = $renderer->render_extension_comments($request) . \html_writer::start_tag('br');
     }
 
     /**
