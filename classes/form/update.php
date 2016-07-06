@@ -90,7 +90,7 @@ class update extends \moodleform {
         $renderer = $this->_customdata['renderer'];
 
         // Don't forget to update the comment stream.
-        //$request->load_comments();
+        $request->load_comments();
 
         // TODO find how to query for the comment element id.
         $mform->_elements[6]->_text = $renderer->render_extension_comments($request) . \html_writer::start_tag('br');
