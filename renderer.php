@@ -211,6 +211,7 @@ class local_extension_renderer extends plugin_renderer_base {
             return;
         }
 
+        /*
         foreach ($requests as $request) {
             $mods = $request->mods;
 
@@ -234,6 +235,17 @@ class local_extension_renderer extends plugin_renderer_base {
             }
         }
 
+        return $table->finish_output();
+        */
+
+        foreach ($requests as $request) {
+            $statusurl = new moodle_url("/local/extension/status.php", array('id' => $request->id));
+            $status = get_string("table_header_statusrow", "local_extension", $statusurl->out());
+
+            $values = array($request->id, userdate($request->timestamp), $status);
+            $table->add_data($values);
+
+        }
         return $table->finish_output();
     }
 }

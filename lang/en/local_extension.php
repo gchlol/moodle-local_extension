@@ -52,4 +52,7 @@ $string['table_header_course'] = 'Course';
 $string['table_header_datedue'] = 'Due date';
 $string['table_header_dateextension'] = 'Extended until';
 $string['table_header_module'] = 'Module';
-$string['table_header_status'] = 'Status';
+$string['table_header_request'] = 'Request';
+$string['table_header_requestdate'] = 'Date of request';
+$string['table_header_statushead'] = 'Status';
+$string['table_header_statusrow'] = '<a href="{$a}">Click to view request status</a>';
