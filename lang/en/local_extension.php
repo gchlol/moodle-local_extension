@@ -51,6 +51,7 @@ $string['summary_page_heading'] = 'Extension summary';
 $string['table_header_course'] = 'Course';
 $string['table_header_datedue'] = 'Due date';
 $string['table_header_dateextension'] = 'Extended until';
+$string['table_header_items'] = 'Number of request items';
 $string['table_header_module'] = 'Module';
 $string['table_header_request'] = 'Request';
 $string['table_header_requestdate'] = 'Date of request';

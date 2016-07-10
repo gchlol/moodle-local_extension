@@ -211,38 +211,11 @@ class local_extension_renderer extends plugin_renderer_base {
             return;
         }
 
-        /*
-        foreach ($requests as $request) {
-            $mods = $request->mods;
-
-            foreach ($mods as $mod) {
-                $cm     = $mod['cm'];
-                $course = $mod['course'];
-                $event  = $mod['event'];
-
-                // TODO what happens with the request object when cms are deleted from the system?
-                // should we be storing more of the cm details in our local_extension_cm?
-
-                if (!empty($request->cms && array_key_exists($cm->id, $request->cms))) {
-                    $status = $request->cms[$cm->id]->status;
-                    $due = $request->cms[$cm->id]->data;
-
-                    $status = $request->get_status_name($status);
-                }
-
-                $values = array($course->fullname, $cm->name, userdate($event->timestart), userdate($due), $status);
-                $table->add_data($values);
-            }
-        }
-
-        return $table->finish_output();
-        */
-
         foreach ($requests as $request) {
             $statusurl = new moodle_url("/local/extension/status.php", array('id' => $request->id));
             $status = get_string("table_header_statusrow", "local_extension", $statusurl->out());
 
-            $values = array($request->id, userdate($request->timestamp), $status);
+            $values = array($request->id, $request->count, userdate($request->timestamp), $status);
             $table->add_data($values);
 
         }
