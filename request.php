@@ -30,16 +30,16 @@ global $CFG, $PAGE;
 
 $PAGE->set_url(new moodle_url('/local/extension/request.php'));
 
-$cid  = optional_param('cid', 0, PARAM_INTEGER);
+$courseid  = optional_param('course', 0, PARAM_INTEGER);
 $cmid = optional_param('cmid', 0, PARAM_INTEGER);
 
 if (!empty($cmid)) {
     $context = context_module::instance($cmid);
-    $cm = get_fast_modinfo($cid)->get_cm($cmid);
-    require_login($cid, null, $cm);
-} else if (!empty($cid)) {
-    $context = context_course::instance($cid);
-    require_login($cid);
+    $cm = get_fast_modinfo($courseid)->get_cm($cmid);
+    require_login($courseid, null, $cm);
+} else if (!empty($courseid)) {
+    $context = context_course::instance($courseid);
+    require_login($courseid);
 } else {
     $context = context_user::instance($USER->id);
     require_login(false);
@@ -60,7 +60,7 @@ $start = time() - $searchback * 24 * 60 * 60;
 $end = time() + $searchforward * 24 * 60 * 60;
 
 $options = array(
-    'courseid' => $cid,
+    'courseid' => $courseid,
     'moduleid' => $cmid,
     'requestid' => 0
 );
