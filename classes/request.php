@@ -56,21 +56,6 @@ class request {
     /** @var array An array of mods that are used */
     public $mods = array();
 
-    /** @var integer New request. */
-    const STATUS_NEW = 0;
-
-    /** @var integer Denied request. */
-    const STATUS_DENIED = 1;
-
-    /** @var integer Approved request. */
-    const STATUS_APPROVED = 2;
-
-    /** @var integer Reopened request. */
-    const STATUS_REOPENED = 3;
-
-    /** @var integer Cancelled request. */
-    const STATUS_CANCEL = 4;
-
     /**
      * Request object constructor.
      * @param integer $requestid An optional variable to identify the request.
@@ -175,67 +160,7 @@ class request {
         global $DB;
 
         if (!empty($this->requestid)) {
-            $this->comments = $DB->get_records('local_extension_comment', array('request' => $this->requestid));
-        }
-    }
-
-    /**
-     * Sets the state of this request.
-     *
-     * @param stdClass $cm The request local cm object.
-     * @param integer $status The status.
-     */
-    public function set_status($cm, $status) {
-        global $DB;
-
-        $cm->status = $status;
-        $DB->update_record('local_extension_cm', $cm);
-    }
-
-    /**
-     * Query the $cm and get the next available states.
-     *
-     * @param stdClass $cm The request cm object.
-     * @return array An array of available states.
-     */
-    public function get_next_status($cm) {
-        switch ($cm->status) {
-            case self::STATUS_NEW:
-                return array(self::STATUS_APPROVED, self::STATUS_DENIED, self::STATUS_CANCEL);
-            case self::STATUS_DENIED:
-                return array(self::STATUS_REOPENED, self::STATUS_CANCEL);
-            case self::STATUS_APPROVED:
-                return array(self::STATUS_CANCEL);
-            case self::STATUS_REOPENED:
-                return array(self::STATUS_APPROVED, self::STATUS_CANCEL, self::STATUS_DENIED);
-            case self::STATUS_CANCEL:
-                return array();
-            default:
-                return array();
-        }
-    }
-
-    /**
-     * Returns a human readable state name.
-     *
-     * @param string $status one of the state constants like STATUS_NEW.
-     * @throws coding_exception
-     * @return string the human-readable status name.
-     */
-    public function get_status_name($status) {
-        switch ($status) {
-            case self::STATUS_NEW:
-                return \get_string('state_statusnew',      'local_extension');
-            case self::STATUS_DENIED:
-                return \get_string('state_statusdenied',   'local_extension');
-            case self::STATUS_APPROVED:
-                return \get_string('state_statusapproved', 'local_extension');
-            case self::STATUS_REOPENED:
-                return \get_string('state_statusreopened', 'local_extension');
-            case self::STATUS_REOPENED:
-                return \get_string('state_statuscancel',   'local_extension');
-            default:
-                throw new coding_exception('Unknown request attempt state.');
+            $this->comments = $DB->get_records('local_extension_comment', array('request' => $this->requestid), 'timestamp ASC');
         }
     }
 

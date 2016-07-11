@@ -174,13 +174,16 @@ function generate_table_data($table) {
 
     $data = array();
 
+    // TODO tablelib orderby column options? should we enable this?
+
     $sql = "SELECT r.id,
                    r.timestamp,
                    COUNT(cm.request)
               FROM {local_extension_request} r
          LEFT JOIN {local_extension_cm} cm
                 ON cm.request = r.id
-          GROUP BY r.id";
+          GROUP BY r.id
+          ORDER BY r.timestamp ASC";
 
     $requests = $DB->get_records_sql($sql);
 

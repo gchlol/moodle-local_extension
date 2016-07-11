@@ -47,7 +47,15 @@ class request extends \local_extension\base_request {
         return true;
     }
 
-    // TODO set the state of the cm
+    /**
+     * Sets the state of this request.
+     *
+     * @param stdClass $cm
+     * @param integer $state
+     */
+    public function set_state($cm, $state) {
+        parent::set_state($cm, $state);
+    }
 
     /**
      * Define parts of the request for for an event object
@@ -90,7 +98,7 @@ class request extends \local_extension\base_request {
         $html = \html_writer::tag('p', $html . ' ' . get_string('dueon', 'extension_assign', \userdate($event->timestart)));
         $mform->addElement('html', \html_writer::tag('p', $html));
 
-        $html = $handler->render_status($cm, $req);
+        $html = $this->render_status($cm, $req);
         $mform->addElement('html', \html_writer::tag('p', $html));
     }
 
@@ -152,7 +160,7 @@ class request extends \local_extension\base_request {
      */
     public function render_status($cm, $request) {
         $extensioncm = $request->get_local_cm($cm->id);
-        $status = $request->get_status_name($extensioncm->status);
+        $status = $this->get_status_name($extensioncm->status);
 
         $out = '';
 
