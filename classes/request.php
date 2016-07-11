@@ -84,7 +84,6 @@ class request {
         $request = $this->request;
 
         $options = array(
-            'courseid' => 0,
             'requestid' => $request->id
         );
 

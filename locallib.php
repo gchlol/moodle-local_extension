@@ -111,6 +111,11 @@ function local_extension_get_activities($user, $start, $end, $options = null) {
         $localcm = null;
         if (!empty($requestid)) {
             $localcm = $DB->get_record('local_extension_cm', array('request' => $requestid, 'cmid' => $cm->id));
+
+            // No local_extension_cm found, we won't need to provide an event.
+            if (empty($localcm)) {
+                continue;
+            }
         }
 
         // TODO if an activity already has a extension request associated with it
