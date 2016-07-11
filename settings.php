@@ -48,6 +48,6 @@ if ($hassiteconfig) {
             new lang_string('rolehelp',                  'local_extension'), null, $rolechoices));
 
     $settings->add(new admin_setting_configtextarea('local_extension/emailtemplate',
-            new lang_string('emailtemplate',                  'local_extension'),
-            new lang_string('emailtemplatehelp',              'local_extension'), null));
+            new lang_string('emailtemplate',        'local_extension'),
+            new lang_string('emailtemplatehelp',    'local_extension'), null));
 }
