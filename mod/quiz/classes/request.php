@@ -64,7 +64,7 @@ class request extends \local_extension\base_request {
      * @param moodleform $mform A moodle form object
      * @param array $mod An array of event details
      */
-    public function status_definition($mform, $mod) {
+    public function status_definition($mform, $mod, $user) {
 
     }
 

@@ -85,8 +85,9 @@ class request extends \local_extension\base_request {
      *
      * @param moodleform $mform A moodle form object
      * @param array $mod An array of event details
+     * @param user $user The user that is viewing the status.
      */
-    public function status_definition($mform, $mod) {
+    public function status_definition($mform, $mod, $user) {
 
         // TODO pass user to this function, display approve/deny buttons based on capability, role and status
 
