@@ -40,13 +40,9 @@ require_once($CFG->libdir . '/tablelib.php');
 function local_extension_get_activities($user, $start, $end, $options = null) {
     global $DB;
 
-    if (!empty($options)) {
-        $courseid = $options['courseid'];
-        $requestid = $options['requestid'];
-    } else {
-        $courseid = 0;
-        $requestid = 0;
-    }
+    $cid = !empty($options['courseid']) ? $options['courseid'] : 0;
+    $cmid = !empty($options['moduleid']) ? $options['moduleid'] : 0;
+    $requestid = !empty($options['requestid']) ? $options['requestid'] : 0;
 
     $dates = array();
 
@@ -90,6 +86,20 @@ function local_extension_get_activities($user, $start, $end, $options = null) {
         // the due date.
         if (!$handler->is_candidate($event, $cm)) {
             continue;
+        }
+
+        // Filter based on moduleid.
+        if (!empty($cmid)) {
+            if ($cm->id != $cmid) {
+                continue;
+            }
+        }
+
+        // Filter based on courseid.
+        if (!empty($cid)) {
+            if ($cm->course != $cid) {
+                continue;
+            }
         }
 
         $courseid = $cm->course;

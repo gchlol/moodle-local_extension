@@ -29,15 +29,48 @@
  * @param global_navigation $nav Navigation
  */
 function local_extension_extends_navigation(global_navigation $nav) {
+    global $PAGE;
 
+    $context = $PAGE->context;
+    $contextlevel = $context->contextlevel;
     $sitecontext = context_system::instance();
 
     // TODO add perms checks here. Maybe.
 
     if (isloggedin() and !isguestuser()) {
+        // General link in the navigation menu.
         $url = new moodle_url('/local/extension/index.php');
         $node = $nav->add(get_string('requestextension', 'local_extension'), $url->out(), null, null, 'local_extension');
-        $node->make_active();
+
+        if ($contextlevel == CONTEXT_COURSE) {
+            $id = optional_param('id', 0, PARAM_INT);
+
+            $url = new moodle_url('/local/extension/request.php', array('cid' => $id));
+
+            $coursenode = $nav->find($id, navigation_node::TYPE_COURSE);
+            if (!empty($coursenode)) {
+                $node = $coursenode->add(get_string('requestextension_course', 'local_extension'), $url);
+            }
+
+        } else if ($contextlevel == CONTEXT_MODULE) {
+            $id = optional_param('id', 0, PARAM_INT);
+            $cid = optional_param('cid', 0, PARAM_INT);
+            $cmid = optional_param('cmid', 0, PARAM_INT);
+
+            if (empty($cmid)) {
+                $cid = $PAGE->course->id;
+                $cmid = $id;
+            }
+
+            $url = new moodle_url('/local/extension/request.php', array('cid' => $cid, 'cmid' => $cmid));
+
+            $coursenode = $nav->find($cmid, navigation_node::TYPE_ACTIVITY);
+            if (!empty($coursenode)) {
+                $node = $coursenode->add(get_string('requestextension_module', 'local_extension'), $url);
+            }
+
+        }
+
     }
 
 }

@@ -28,12 +28,22 @@ require_once('locallib.php');
 require_once($CFG->dirroot . '/calendar/lib.php');
 global $CFG, $PAGE;
 
-require_login(false);
-
 $PAGE->set_url(new moodle_url('/local/extension/request.php'));
 
-// TODO context could be user, course or module.
-$context = context_user::instance($USER->id);
+$cid  = optional_param('cid', 0, PARAM_INTEGER);
+$cmid = optional_param('cmid', 0, PARAM_INTEGER);
+
+if (!empty($cmid)) {
+    $context = context_module::instance($cmid);
+    $cm = get_fast_modinfo($cid)->get_cm($cmid);
+    require_login($cid, null, $cm);
+} else if (!empty($cid)) {
+    $context = context_course::instance($cid);
+    require_login($cid);
+} else {
+    $context = context_user::instance($USER->id);
+    require_login(false);
+}
 
 $PAGE->set_context($context);
 $PAGE->set_pagelayout('standard');
@@ -50,16 +60,16 @@ $start = time() - $searchback * 24 * 60 * 60;
 $end = time() + $searchforward * 24 * 60 * 60;
 
 $options = array(
-    'courseid' => 0,
+    'courseid' => $cid,
+    'moduleid' => $cmid,
     'requestid' => 0
 );
 
 list($handlers, $mods) = local_extension_get_activities($user, $start, $end, $options);
 
 if (count($mods) == 0) {
-
+    echo $OUTPUT->header();
     echo "no mods!"; // TODO add ui to extend search.
-
     echo $OUTPUT->footer();
     exit;
 }
