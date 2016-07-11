@@ -83,7 +83,12 @@ class request {
 
         $request = $this->request;
 
-        list($handlers, $mods) = local_extension_get_activities($request->userid, $request->searchstart, $request->searchend);
+        $options = array(
+            'courseid' => 0,
+            'requestid' => $request->id
+        );
+
+        list($handlers, $mods) = local_extension_get_activities($request->userid, $request->searchstart, $request->searchend, $options);
         $this->mods = $mods;
 
         $userids = array($request->userid => $request->userid);

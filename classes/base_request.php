@@ -128,5 +128,13 @@ abstract class base_request {
      * @param array $mod An array of event details
      */
     abstract public function request_definition($mform, $mod);
+
+    /**
+     * Define parts of the request for for an event object
+     *
+     * @param moodleform $mform A moodle form object
+     * @param array $mod An array of event details
+     */
+    abstract public function status_definition($mform, $mod);
 }
 

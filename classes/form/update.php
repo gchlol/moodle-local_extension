@@ -55,7 +55,7 @@ class update extends \moodleform {
 
         foreach ($mods as $id => $mod) {
             $handler = $mod['handler'];
-            $handler->status_definition($mform, $mod, $request, $renderer);
+            $handler->status_definition($mform, $mod);
         }
 
         // TODO replace <br /> with css padding/margins, or does that impact the html->text email output.

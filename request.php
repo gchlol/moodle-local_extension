@@ -48,9 +48,13 @@ $searchforward = optional_param('forward', $config->searchforward, PARAM_INTEGER
 $user = $USER->id;
 $start = time() - $searchback * 24 * 60 * 60;
 $end = time() + $searchforward * 24 * 60 * 60;
-$course = 0;
 
-list($handlers, $mods) = local_extension_get_activities($user, $start, $end, $course);
+$options = array(
+    'courseid' => 0,
+    'requestid' => 0
+);
+
+list($handlers, $mods) = local_extension_get_activities($user, $start, $end, $options);
 
 if (count($mods) == 0) {
 

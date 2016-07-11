@@ -85,20 +85,32 @@ class request extends \local_extension\base_request {
      *
      * @param moodleform $mform A moodle form object
      * @param array $mod An array of event details
-     * @param request $req A request object.
      */
-    public function status_definition($mform, $mod, $req) {
+    public function status_definition($mform, $mod) {
+
+        // TODO pass user to this function, display approve/deny buttons based on capability, role and status
 
         $cm = $mod['cm'];
         $event = $mod['event'];
         $course = $mod['course'];
         $handler = $mod['handler'];
+        $extensioncm = $mod['localcm'];
 
         $html = \html_writer::tag('b', $course->fullname . ' > ' . $event->name, array('class' => 'mod'));
         $html = \html_writer::tag('p', $html . ' ' . get_string('dueon', 'extension_assign', \userdate($event->timestart)));
         $mform->addElement('html', \html_writer::tag('p', $html));
 
-        $html = $this->render_status($cm, $req);
+        $status = $this->get_status_name($extensioncm->status);
+
+        // TODO case on type of request, ie. exemption, extension, etc.
+        // print extension type colour like the scoping document
+        $html  = \html_writer::start_tag('div', array('class' => 'content'));
+        $html .= \html_writer::tag('span', $status, array('class' => 'status'));
+        $html .= \html_writer::tag('span', ' extension until ' . \userdate($extensioncm->data), array('class' => 'time'));
+        $html .= \html_writer::end_div(); // End .content.
+
+        $html .= \html_writer::start_tag('br');
+
         $mform->addElement('html', \html_writer::tag('p', $html));
     }
 
@@ -151,28 +163,4 @@ class request extends \local_extension\base_request {
         return $request;
     }
 
-    /**
-     * Render output for the status page.
-     *
-     * @param stdClass $cm General cm data..
-     * @param request $request Request data.
-     * @return string $out The html output.
-     */
-    public function render_status($cm, $request) {
-        $extensioncm = $request->get_local_cm($cm->id);
-        $status = $this->get_status_name($extensioncm->status);
-
-        $out = '';
-
-        // TODO case on type of request, ie. exemption, extension, etc.
-        // print extension type colour like the scoping document
-        $out .= \html_writer::start_tag('div', array('class' => 'content'));
-        $out .= \html_writer::tag('span', $status, array('class' => 'status'));
-        $out .= \html_writer::tag('span', ' extension until ' . \userdate($extensioncm->data), array('class' => 'time'));
-        $out .= \html_writer::end_div(); // End .content.
-
-        $out .= \html_writer::start_tag('br');
-
-        return $out;
-    }
 }

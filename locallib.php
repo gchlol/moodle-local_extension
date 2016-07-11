@@ -33,13 +33,20 @@ require_once($CFG->libdir . '/tablelib.php');
  * @param user $user Userid or user object
  * @param timestamp $start  Start of search period
  * @param timestamp $end End of search period
- * @param course $course Optional courseid
+ * @param array $options Optional arguments.
  * @return An array of candidates.
  *
  */
-function local_extension_get_activities($user, $start, $end, $course = 0) {
-
+function local_extension_get_activities($user, $start, $end, $options = null) {
     global $DB;
+
+    if (!empty($options)) {
+        $courseid = $options['courseid'];
+        $requestid = $options['requestid'];
+    } else {
+        $courseid = 0;
+        $requestid = 0;
+    }
 
     $dates = array();
 
@@ -90,6 +97,12 @@ function local_extension_get_activities($user, $start, $end, $course = 0) {
             $courses[$courseid] = $DB->get_record('course', array('id' => $courseid));
         }
 
+        // If a requestid has been provided, obtain the local cm data for this mod.
+        $localcm = null;
+        if (!empty($requestid)) {
+            $localcm = $DB->get_record('local_extension_cm', array('request' => $requestid, 'cmid' => $cm->id));
+        }
+
         // TODO if an activity already has a extension request associated with it
         // then handle this in some way. Possibly filter, or perhaps show it but
         // direct the student to their previous request.
@@ -97,6 +110,7 @@ function local_extension_get_activities($user, $start, $end, $course = 0) {
         $events[$cm->id] = array(
             'event' => $event,
             'cm' => $cm,
+            'localcm' => $localcm,
             'course' => $courses[$courseid],
             'handler' => $handler,
         );
