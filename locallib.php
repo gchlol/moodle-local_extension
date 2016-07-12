@@ -116,6 +116,8 @@ function local_extension_get_activities($user, $start, $end, $options = null) {
             if (empty($localcm)) {
                 continue;
             }
+        } else {
+            $localcm = $DB->get_record('local_extension_cm', array('userid' => $user, 'cmid' => $cm->id));
         }
 
         // TODO if an activity already has a extension request associated with it

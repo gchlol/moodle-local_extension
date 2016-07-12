@@ -58,7 +58,7 @@ class request extends \local_extension\base_request {
     }
 
     /**
-     * Define parts of the request for for an event object
+     * Renders the request details in a form with a date selector.
      *
      * @param moodleform $mform A moodle form object
      * @param array $mod An array of event details
@@ -68,6 +68,7 @@ class request extends \local_extension\base_request {
         $cm = $mod['cm'];
         $event = $mod['event'];
         $course = $mod['course'];
+        $handler = $mod['handler'];
 
         $html = \html_writer::tag('b', $course->fullname . ' > ' . $event->name, array('class' => 'mod'));
         $html = \html_writer::tag('p', $html . ' ' . get_string('dueon', 'extension_assign', \userdate($event->timestart)));
@@ -78,18 +79,19 @@ class request extends \local_extension\base_request {
                 array('optional' => true, 'step' => 1));
 
         $mform->setDefault($formid, $event->timestart);
+
     }
 
     /**
-     * Define parts of the request for for an event object
+     * Renders the request status in a form with indicators of the request state.
      *
      * @param moodleform $mform A moodle form object
      * @param array $mod An array of event details
      * @param user $user The user that is viewing the status.
      */
-    public function status_definition($mform, $mod, $user) {
+    public function status_definition($mform, $mod, $user = 0) {
 
-        // TODO pass user to this function, display approve/deny buttons based on capability, role and status
+        // TODO display approve/deny buttons based on capability, role and status
 
         $cm = $mod['cm'];
         $event = $mod['event'];
@@ -101,12 +103,16 @@ class request extends \local_extension\base_request {
         $html = \html_writer::tag('p', $html . ' ' . get_string('dueon', 'extension_assign', \userdate($event->timestart)));
         $mform->addElement('html', \html_writer::tag('p', $html));
 
+        // TODO depending on the url, status.php/request.php, provide a link back to the status.php page in the request status string.
+
         $status = $this->get_status_name($extensioncm->status);
+        $url = new \moodle_url("/local/extension/status.php", array('id' => $extensioncm->request));
+        $requeststatus = \html_writer::link($url, $status);
 
         // TODO case on type of request, ie. exemption, extension, etc.
         // print extension type colour like the scoping document
         $html  = \html_writer::start_tag('div', array('class' => 'content'));
-        $html .= \html_writer::tag('span', $status, array('class' => 'status'));
+        $html .= \html_writer::tag('span', $requeststatus, array('class' => 'status'));
         $html .= \html_writer::tag('span', ' extension until ' . \userdate($extensioncm->data), array('class' => 'time'));
         $html .= \html_writer::end_div(); // End .content.
 
@@ -132,6 +138,11 @@ class request extends \local_extension\base_request {
         $now = time();
 
         $due = $event->timestart;
+
+        if (!array_key_exists($formid, $data)) {
+            // Data not set.
+            return $errors;
+        }
         $request = $data[$formid];
         if ($request == 0) {
             // Didn't ask for extension.
@@ -160,8 +171,12 @@ class request extends \local_extension\base_request {
     public function request_data($mform, $mod, $data) {
         $cm = $mod['cm'];
         $formid = 'due' . $cm->id;
-        $request = $data->$formid;
-        return $request;
+        if (!empty($data->$formid)) {
+            $request = $data->$formid;
+            return $request;
+        } else {
+            return '' ;
+        }
     }
 
 }

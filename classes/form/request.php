@@ -50,20 +50,36 @@ class request extends \moodleform {
 
         $mods = $this->_customdata['mods'];
 
+        $displaysubmit = false;
+
         foreach ($mods as $id => $mod) {
             $handler = $mod['handler'];
-            $handler->request_definition($mform, $mod);
+            $localcm = $mod['localcm'];
+
+            if (empty($localcm)) {
+                $handler->request_definition($mform, $mod);
+
+                // There is a request available. Display submit.
+                $displaysubmit = true;
+            } else {
+                $handler->status_definition($mform, $mod);
+            }
         }
 
-        // TODO style the width of this textarea
-        $mform->addElement('textarea', 'comment', get_string('comment', 'local_extension'), '');
-        $mform->addRule('comment', 'Required', 'required', null, 'client');
+        if (!empty($displaysubmit)) {
 
-        $mform->addElement('filemanager', 'attachments', get_string('attachments', 'local_extension'), null, array(
-            'subdirs' => 0,
-        ));
+            // TODO style the width of this textarea
+            $mform->addElement('textarea', 'comment', get_string('comment', 'local_extension'), '');
+            $mform->addRule('comment', 'Required', 'required', null, 'client');
 
-        $this->add_action_buttons(true, get_string('submit_request', 'local_extension'));
+            $mform->addElement('filemanager', 'attachments', get_string('attachments', 'local_extension'), null, array(
+                'subdirs' => 0,
+            ));
+
+            $this->add_action_buttons(true, get_string('submit_request', 'local_extension'));
+        } else {
+            // TODO display indication that there are no requests available.
+        }
     }
 
     /**

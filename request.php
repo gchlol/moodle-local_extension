@@ -48,6 +48,7 @@ if (!empty($cmid)) {
 $PAGE->set_context($context);
 $PAGE->set_pagelayout('standard');
 $PAGE->set_title(get_string('pluginname', 'local_extension'));
+$PAGE->set_heading(get_string('request_page_heading', 'local_extension'));
 $PAGE->requires->css('/local/extension/styles.css');
 
 $config = get_config('local_extension');
@@ -135,7 +136,6 @@ if ($mform->is_cancelled()) {
 }
 
 echo $OUTPUT->header();
-echo html_writer::tag('h2', get_string('request_page_heading', 'local_extension'));
 $mform->display();
 echo $OUTPUT->footer();
 
