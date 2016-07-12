@@ -183,7 +183,10 @@ class local_extension_renderer extends plugin_renderer_base {
         }
         $out .= html_writer::end_div(); // End .attachments.
 
-        return $out;
+
+        if (!empty($req->files)) {
+            return $out;
+        }
     }
 
     /**

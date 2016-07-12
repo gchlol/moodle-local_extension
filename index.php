@@ -41,10 +41,13 @@ $PAGE->requires->css('/local/extension/styles.css');
 
 $table = generate_table();
 $data = generate_table_data($table);
+$url = new moodle_url("/local/extension/request.php");
 
 $renderer = $PAGE->get_renderer('local_extension');
 
 echo $OUTPUT->header();
 echo html_writer::tag('h2', get_string('summary_page_heading', 'local_extension'));
 echo $renderer->render_extension_summary_table($table, $data);
+echo html_writer::empty_tag('br');
+echo $OUTPUT->single_button($url, get_string('requestextension', 'local_extension'));
 echo $OUTPUT->footer();

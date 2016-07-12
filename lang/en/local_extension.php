@@ -29,6 +29,7 @@ $string['attachments'] = 'Attachments';
 $string['comment'] = 'General comments';
 $string['emailtemplate'] = 'Email Template';
 $string['emailtemplatehelp'] = '';
+$string['error_none_selected'] = 'Please select at least one item';
 $string['requestextension'] = 'Request an extension';
 $string['requestextension_course'] = 'Request an extension for this course';
 $string['requestextension_module'] = 'Request an extension for this module';

@@ -117,12 +117,9 @@ function local_extension_get_activities($user, $start, $end, $options = null) {
                 continue;
             }
         } else {
+            // Try and obtain a request associated to this user for a course module.
             $localcm = $DB->get_record('local_extension_cm', array('userid' => $user, 'cmid' => $cm->id));
         }
-
-        // TODO if an activity already has a extension request associated with it
-        // then handle this in some way. Possibly filter, or perhaps show it but
-        // direct the student to their previous request.
 
         $events[$cm->id] = array(
             'event' => $event,

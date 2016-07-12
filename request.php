@@ -75,7 +75,20 @@ if (count($mods) == 0) {
     exit;
 }
 
-$mform = new \local_extension\form\request(null, array('mods' => $mods));
+$available = array();
+$inprogress = array();
+
+foreach ($mods as $mod) {
+
+    // If a local cm object does not exist, then we can make a request for this module.
+    if (empty($mod['localcm'])) {
+        $available[] = $mod;
+    } else {
+        $inprogress[] = $mod;
+    }
+}
+
+$mform = new \local_extension\form\request(null, array('available' => $available, 'inprogress' => $inprogress));
 
 if ($mform->is_cancelled()) {
 

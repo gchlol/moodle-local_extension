@@ -59,9 +59,10 @@ class update extends \moodleform {
         }
 
         // TODO replace <br /> with css padding/margins, or does that impact the html->text email output.
-        $html  = $renderer->render_extension_attachments($request);
-        $html .= \html_writer::start_tag('br');
-        $mform->addElement('html', $html);
+        if ($html = $renderer->render_extension_attachments($request)) {
+            $html .= \html_writer::start_tag('br');
+            $mform->addElement('html', $html);
+        }
 
         $html = $renderer->render_extension_comments($request);
         $html .= \html_writer::start_tag('br');

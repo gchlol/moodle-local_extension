@@ -48,25 +48,37 @@ class request extends \moodleform {
     public function definition() {
         $mform = $this->_form;
 
-        $mods = $this->_customdata['mods'];
+        $inprogress = $this->_customdata['inprogress'];
+        $available = $this->_customdata['available'];
 
-        $displaysubmit = false;
+        if (!empty($inprogress)) {
+            $inprogressh = 'Requests in progress';
+            $mform->addElement('html', $inprogressh);
 
-        foreach ($mods as $id => $mod) {
-            $handler = $mod['handler'];
-            $localcm = $mod['localcm'];
+            // Iterate over the current request items.
+            foreach ($inprogress as $id => $mod) {
+                $handler = $mod['handler'];
+                $localcm = $mod['localcm'];
 
-            if (empty($localcm)) {
-                $handler->request_definition($mform, $mod);
-
-                // There is a request available. Display submit.
-                $displaysubmit = true;
-            } else {
                 $handler->status_definition($mform, $mod);
+            }
+
+            if (!empty($available)) {
+                $mform->addElement('html', '<hr />');
             }
         }
 
-        if (!empty($displaysubmit)) {
+        if (!empty($available)) {
+            $availableh = 'Available Requests';
+            $mform->addElement('html', $availableh);
+
+            // Iterate over remaining available request items.
+            foreach ($available as $id => $mod) {
+                $handler = $mod['handler'];
+                $localcm = $mod['localcm'];
+
+                $handler->request_definition($mform, $mod);
+            }
 
             // TODO style the width of this textarea
             $mform->addElement('textarea', 'comment', get_string('comment', 'local_extension'), '');
@@ -77,9 +89,8 @@ class request extends \moodleform {
             ));
 
             $this->add_action_buttons(true, get_string('submit_request', 'local_extension'));
-        } else {
-            // TODO display indication that there are no requests available.
         }
+
     }
 
     /**
@@ -92,13 +103,35 @@ class request extends \moodleform {
     public function validation($data, $files) {
         $errors = parent::validation($data, $files);
         $mform = $this->_form;
-        $mods = $this->_customdata['mods'];
+        $mods = $this->_customdata['available'];
 
-        // TODO make this fail validation if no handlers data is set.
+        $due = array();
 
         foreach ($mods as $id => $mod) {
             $handler = $mod['handler'];
+            $cm = $mod['cm'];
+            $formid = 'due' . $cm->id;
+
+            $due[$formid] = $data[$formid];
+
             $errors += $handler->request_validation($mform, $mod, $data);
+        }
+
+        // The array $due contains the form ids and data (request until date).
+        // If each of these items is not set then return an error asking to pick at least one item.
+        $hasdata = false;
+        $dueerrors = array();
+        foreach ($due as $formid => $data) {
+            if (!empty($data)) {
+                $hasdata = true;
+            } else {
+                $dueerrors[$formid] = get_string('error_none_selected', 'local_extension');
+            }
+
+        }
+
+        if (!$hasdata) {
+            $errors = array_merge($errors, $dueerrors);
         }
 
         return $errors;

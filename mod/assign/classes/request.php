@@ -116,8 +116,6 @@ class request extends \local_extension\base_request {
         $html .= \html_writer::tag('span', ' extension until ' . \userdate($extensioncm->data), array('class' => 'time'));
         $html .= \html_writer::end_div(); // End .content.
 
-        $html .= \html_writer::start_tag('br');
-
         $mform->addElement('html', \html_writer::tag('p', $html));
     }
 
@@ -143,6 +141,7 @@ class request extends \local_extension\base_request {
             // Data not set.
             return $errors;
         }
+
         $request = $data[$formid];
         if ($request == 0) {
             // Didn't ask for extension.
