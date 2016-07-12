@@ -40,7 +40,7 @@ function local_extension_extends_navigation(global_navigation $nav) {
     if (isloggedin() and !isguestuser()) {
         // General link in the navigation menu.
         $url = new moodle_url('/local/extension/index.php');
-        $node = $nav->add(get_string('requestextension', 'local_extension'), $url->out(), null, null, 'local_extension');
+        $node = $nav->add(get_string('requestextension_status', 'local_extension'), $url->out(), null, null, 'local_extension');
 
         if ($contextlevel == CONTEXT_COURSE) {
             $courseid = optional_param('id', 0, PARAM_INT);
@@ -49,7 +49,7 @@ function local_extension_extends_navigation(global_navigation $nav) {
 
             $coursenode = $nav->find($courseid, navigation_node::TYPE_COURSE);
             if (!empty($coursenode)) {
-                $node = $coursenode->add(get_string('requestextension_course', 'local_extension'), $url);
+                $node = $coursenode->add(get_string('requestextension', 'local_extension'), $url);
             }
 
         } else if ($contextlevel == CONTEXT_MODULE) {
@@ -66,7 +66,7 @@ function local_extension_extends_navigation(global_navigation $nav) {
 
             $coursenode = $nav->find($cmid, navigation_node::TYPE_ACTIVITY);
             if (!empty($coursenode)) {
-                $node = $coursenode->add(get_string('requestextension_module', 'local_extension'), $url);
+                $node = $coursenode->add(get_string('requestextension', 'local_extension'), $url);
             }
 
         }

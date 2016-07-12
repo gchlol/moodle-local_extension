@@ -26,6 +26,7 @@
 
 $string['pluginname'] = 'Activity extensions';
 $string['attachments'] = 'Attachments';
+$string['cachedef_requests'] = 'A cache of the requests data';
 $string['comment'] = 'General comments';
 $string['emailtemplate'] = 'Email Template';
 $string['emailtemplatehelp'] = '';
@@ -33,6 +34,7 @@ $string['error_none_selected'] = 'Please select at least one item';
 $string['requestextension'] = 'Request an extension';
 $string['requestextension_course'] = 'Request an extension for this course';
 $string['requestextension_module'] = 'Request an extension for this module';
+$string['requestextension_status'] = 'Extension Status';
 $string['request_page_heading'] = 'Extension Request';
 $string['rolelist'] = 'Roles to notify';
 $string['rolehelp'] = '';

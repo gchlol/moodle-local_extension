@@ -76,7 +76,7 @@ abstract class base_request {
             case self::STATUS_DENIED:
                 return array(self::STATUS_REOPENED, self::STATUS_CANCEL);
             case self::STATUS_APPROVED:
-                return array(self::STATUS_CANCEL);
+                return array(self::STATUS_CANCEL, self::STATUS_REOPENED);
             case self::STATUS_REOPENED:
                 return array(self::STATUS_APPROVED, self::STATUS_CANCEL, self::STATUS_DENIED);
             case self::STATUS_CANCEL:

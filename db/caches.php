@@ -14,8 +14,9 @@
 // You should have received a copy of the GNU General Public License
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
+
 /**
- * Defines the version of local_extension
+ *  local_extension caches.php
  *
  * @package    local_extension
  * @author     Nicholas Hoobin <nicholashoobin@catalyst-au.net>
@@ -23,8 +24,10 @@
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
-defined('MOODLE_INTERNAL') || die();
-
-$plugin->version   = 2016062110;        // The current plugin version (Date: YYYYMMDDXX)
-$plugin->requires  = 2014050800;        // Requires this Moodle version.
-$plugin->component = 'local_extension'; // To check on upgrade, that module sits in correct place.
+$definitions = array(
+    'requests' => array(
+        'mode' => cache_store::MODE_APPLICATION,
+        //'datasource' => '\local_extension\request',
+        //'datasourcefile' => 'local_extension/classes/request.php',
+    )
+);

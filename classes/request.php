@@ -33,7 +33,7 @@ namespace local_extension;
  * @copyright  Catalyst IT
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
-class request {
+class request extends \cache_data_source {
 
     /** @var integer The local_extension_request database object */
     public $requestid = null;

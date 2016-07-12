@@ -217,3 +217,25 @@ function generate_table_data($table) {
 
     return $requests;
 }
+
+function cache_get_requests() {
+
+}
+
+function cache_make_cache() {
+    global $DB;
+
+    try {
+        $cache = cache::make('local_extension', 'requests');
+    } catch (Exception $e) {
+        throw $e;
+    }
+
+    if (!$result = $cache->get('requests')) {
+        $results = $DB->get_records('local_extension_request');
+
+        foreach ($results as $record) {
+            print_r($record);
+        }
+    }
+}
