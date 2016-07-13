@@ -215,16 +215,33 @@ class request implements \cache_data_source {
         return $mods;
     }
 
+    /**
+     * Returns the request cache.
+     *
+     * @return cache_application|cache_session|cache_store
+     */
     public function get_data_cache() {
         return \cache::make('local_extension', 'requests');
     }
 
-    /* See cache_data_source::load_for_cache. */
+    /**
+     * See cache_data_source::load_for_cache.
+     *
+     * {@inheritDoc}
+     * @see cache_data_source::load_for_cache()
+     * @return \local_extension\request
+     */
     public function load_for_cache($requestid) {
         return self::from_id($requestid);
     }
 
-    /* See cache_data_source::load_many_for_cache. */
+    /**
+     * See cache_data_source::load_many_for_cache.
+     *
+     * {@inheritDoc}
+     * @see cache_data_source::load_many_for_cache()
+     * @return \local_extension\request[]
+     */
     public function load_many_for_cache(array $requestids) {
         $requests = array();
 
@@ -235,7 +252,12 @@ class request implements \cache_data_source {
         return $requests;
     }
 
-    /* See cache_data_source::get_instance_for_cache. */
+    /**
+     * See cache_data_source::get_instance_for_cache.
+     *
+     * @param \cache_definition $definition
+     * @return \local_extension\request
+     */
     public static function get_instance_for_cache(\cache_definition $definition) {
         return new request();
     }

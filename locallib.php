@@ -241,6 +241,8 @@ function cache_invalidate_request($requestid) {
 
 /**
  * Returns an array of all requests from the cache.
+ *
+ * @return request[] An array of requests.
  */
 function cache_get_requests() {
     global $DB;
