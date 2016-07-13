@@ -53,7 +53,7 @@ abstract class base_request {
     /**
      * Sets the state of this request.
      *
-     * @param stdClass $cm
+     * @param stdClass $cm local_extension_cm
      * @param integer $state
      */
     public function set_state($cm, $state) {
@@ -61,6 +61,8 @@ abstract class base_request {
 
         $cm->status = $state;
         $DB->update_record('local_extension_cm', $cm);
+
+        \cache_invalidate_request($cm->request);
     }
 
     /**
@@ -103,10 +105,10 @@ abstract class base_request {
                 return \get_string('state_statusapproved', 'local_extension');
             case self::STATUS_REOPENED:
                 return \get_string('state_statusreopened', 'local_extension');
-            case self::STATUS_REOPENED:
+            case self::STATUS_CANCEL:
                 return \get_string('state_statuscancel',   'local_extension');
             default:
-                throw new coding_exception('Unknown request attempt state.');
+                throw new \coding_exception('Unknown request attempt state.');
         }
     }
 

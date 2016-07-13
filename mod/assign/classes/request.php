@@ -90,7 +90,6 @@ class request extends \local_extension\base_request {
      * @param user $user The user that is viewing the status.
      */
     public function status_definition($mform, $mod, $user = 0) {
-
         // TODO display approve/deny buttons based on capability, role and status
 
         $cm = $mod['cm'];

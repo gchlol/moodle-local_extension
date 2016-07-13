@@ -29,7 +29,7 @@
  * @param global_navigation $nav Navigation
  */
 function local_extension_extends_navigation(global_navigation $nav) {
-    global $PAGE;
+    global $PAGE, $USER;
 
     $context = $PAGE->context;
     $contextlevel = $context->contextlevel;
@@ -43,13 +43,25 @@ function local_extension_extends_navigation(global_navigation $nav) {
         $node = $nav->add(get_string('requestextension_status', 'local_extension'), $url->out(), null, null, 'local_extension');
 
         if ($contextlevel == CONTEXT_COURSE) {
+
             $courseid = optional_param('id', 0, PARAM_INT);
 
             $url = new moodle_url('/local/extension/request.php', array('course' => $courseid));
 
             $coursenode = $nav->find($courseid, navigation_node::TYPE_COURSE);
             if (!empty($coursenode)) {
-                $node = $coursenode->add(get_string('requestextension', 'local_extension'), $url);
+                $requests = local_extension_find_request($courseid, $USER->id);
+
+                if (empty($requests)) {
+                    // Display the request extension link.
+                    $node = $coursenode->add(get_string('requestextension', 'local_extension'), $url);
+                } else {
+                    // Display the request status for this module.
+                    foreach ($requests as $request) {
+                        $url = new moodle_url('/local/extension/status.php', array('id' => $request->requestid));
+                        $node = $coursenode->add('sdfgs', $url);
+                    }
+                }
             }
 
         } else if ($contextlevel == CONTEXT_MODULE) {
@@ -62,11 +74,21 @@ function local_extension_extends_navigation(global_navigation $nav) {
                 $cmid = $id;
             }
 
-            $url = new moodle_url('/local/extension/request.php', array('course' => $courseid, 'cmid' => $cmid));
-
             $coursenode = $nav->find($cmid, navigation_node::TYPE_ACTIVITY);
             if (!empty($coursenode)) {
-                $node = $coursenode->add(get_string('requestextension', 'local_extension'), $url);
+                list($request, $cm) = local_extension_find_request($courseid, $USER->id, $cmid);
+
+                if (empty($cm)) {
+                    // Display the request extension link.
+                    $url = new moodle_url('/local/extension/request.php', array('course' => $courseid, 'cmid' => $cmid));
+                    $node = $coursenode->add(get_string('requestextension', 'local_extension'), $url);
+                } else {
+                    // Display the request status for this module.
+                    $url = new moodle_url('/local/extension/status.php', array('id' => $request->requestid));
+                    $handler = $request->mods[$cmid]['handler'];
+                    $status = $handler->get_status_name($cm->status);
+                    $node = $coursenode->add('Extension: ' . $status, $url);
+                }
             }
 
         }
@@ -118,4 +140,52 @@ function local_extension_pluginfile($course, $cm, $context, $filearea, $args, $f
     }
 
     send_stored_file($file, 0, 0, true);
+}
+
+/**
+ * Returns an array of all requests from the cache.
+ *
+ * @return request[] An array of requests.
+ */
+
+function local_extension_cache_get_requests() {
+    global $DB;
+
+    $sql = "SELECT r.id
+              FROM {local_extension_request} r";
+
+    $requestids = $DB->get_fieldset_sql($sql);
+
+    $cache = cache::make('local_extension', 'requests');
+    return $cache->get_many($requestids);
+}
+
+function local_extension_find_request($courseid, $userid, $moduleid = 0) {
+    global $USER;
+
+    $requests = local_extension_cache_get_requests();
+
+    if (empty($moduleid)) {
+        $matchedrequests = array();
+        // Return matching requests for a course.
+        foreach ($requests as $request) {
+            foreach ($request->cms as $cm) {
+                if ($courseid == $cm->course && $userid == $USER->id) {
+                    $matchedrequests[$cm->request] = $request;
+                    break;
+                }
+            }
+        }
+        return $matchedrequests;
+
+    } else {
+        // Return a matching course module, eg. assignment, quiz.
+        foreach ($requests as $request) {
+            foreach ($request->cms as $cm) {
+                if ($courseid == $cm->course && $moduleid == $cm->cmid && $userid == $USER->id) {
+                    return array($request, $cm);
+                }
+            }
+        }
+    }
 }
