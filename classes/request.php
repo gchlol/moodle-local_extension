@@ -157,7 +157,7 @@ class request implements \cache_data_source {
         $DB->insert_record('local_extension_comment', $comment);
 
         // Invalidate the cache for this request. The content has changed.
-        self::get_data_cache()->delete($from->id);
+        self::get_data_cache()->delete($this->requestid);
     }
 
     /**
