@@ -142,7 +142,7 @@ function local_extension_get_activities($user, $start, $end, $options = null) {
 function send_status_email($requestid) {
     global $DB, $USER, $PAGE;
 
-    $request = \local_extension\request::from_id($requestid);
+    $request = cache_get_request($requestid);
 
     $user = $DB->get_record('user', array('id' => $request->request->userid));
 
@@ -218,24 +218,38 @@ function generate_table_data($table) {
     return $requests;
 }
 
-function cache_get_requests() {
-
+/**
+ * Obtains a request from the cache.
+ *
+ * @param integer $requestid
+ * @return request A request object.
+ */
+function cache_get_request($requestid) {
+    $cache = cache::make('local_extension', 'requests');
+    return $cache->get($requestid);
 }
 
-function cache_make_cache() {
+/**
+ * When a request has been modified this will invalidate the cache for that requestid.
+ *
+ * @param integer $requestid
+ */
+function cache_invalidate_request($requestid) {
+    $cache = cache::make('local_extension', 'requests');
+    $cache->delete($requestid);
+}
+
+/**
+ * Returns an array of all requests from the cache.
+ */
+function cache_get_requests() {
     global $DB;
 
-    try {
-        $cache = cache::make('local_extension', 'requests');
-    } catch (Exception $e) {
-        throw $e;
-    }
+    $sql = "SELECT r.id
+              FROM {local_extension_request} r";
 
-    if (!$result = $cache->get('requests')) {
-        $results = $DB->get_records('local_extension_request');
+    $requestids = $DB->get_fieldset_sql($sql);
 
-        foreach ($results as $record) {
-            print_r($record);
-        }
-    }
+    $cache = cache::make('local_extension', 'requests');
+    return $cache->get_many($requestids);
 }

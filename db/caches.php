@@ -27,7 +27,7 @@
 $definitions = array(
     'requests' => array(
         'mode' => cache_store::MODE_APPLICATION,
-        //'datasource' => '\local_extension\request',
-        //'datasourcefile' => 'local_extension/classes/request.php',
+        'datasource' => '\local_extension\request',
+        'datasourcefile' => 'local/extension/classes/request.php',
     )
 );

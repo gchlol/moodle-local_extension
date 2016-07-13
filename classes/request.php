@@ -33,7 +33,7 @@ namespace local_extension;
  * @copyright  Catalyst IT
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
-class request extends \cache_data_source {
+class request implements \cache_data_source {
 
     /** @var integer The local_extension_request database object */
     public $requestid = null;
@@ -155,6 +155,9 @@ class request extends \cache_data_source {
             'message'       => $comment,
         );
         $DB->insert_record('local_extension_comment', $comment);
+
+        // Invalidate the cache for this request. The content has changed.
+        self::get_data_cache()->delete($from->id);
     }
 
     /**
@@ -211,4 +214,30 @@ class request extends \cache_data_source {
 
         return $mods;
     }
+
+    public function get_data_cache() {
+        return \cache::make('local_extension', 'requests');
+    }
+
+    /* See cache_data_source::load_for_cache. */
+    public function load_for_cache($requestid) {
+        return self::from_id($requestid);
+    }
+
+    /* See cache_data_source::load_many_for_cache. */
+    public function load_many_for_cache(array $requestids) {
+        $requests = array();
+
+        foreach ($requestids as $requestid) {
+            $requests[$requestid] = self::from_id($requestid);
+        }
+
+        return $requests;
+    }
+
+    /* See cache_data_source::get_instance_for_cache. */
+    public static function get_instance_for_cache(\cache_definition $definition) {
+        return new request();
+    }
+
 }
