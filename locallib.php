@@ -195,14 +195,21 @@ function generate_table() {
 /**
  * Generates the data required for the status page table.
  * @param flexible_table $table
+ * @param integer $userid
  * @return request[] An array of request objects
  */
-function generate_table_data($table) {
-    global $DB, $USER;
-
-    $data = array();
+function generate_table_data($table, $userid = 0) {
+    global $DB;
 
     // TODO tablelib orderby column options? should we enable this?
+
+    if (!empty($userid)) {
+        $where = " WHERE cm.userid = ? ";
+        $params = array('userid' => $userid);
+    } else {
+        $where = '';
+        $params = array();
+    }
 
     $sql = "SELECT r.id,
                    r.timestamp,
@@ -210,12 +217,38 @@ function generate_table_data($table) {
               FROM {local_extension_request} r
          LEFT JOIN {local_extension_cm} cm
                 ON cm.request = r.id
+            $where
           GROUP BY r.id
           ORDER BY r.timestamp ASC";
 
-    $requests = $DB->get_records_sql($sql);
+    $requests = $DB->get_records_sql($sql, $params);
 
     return $requests;
+}
+
+/**
+ * Returns the number of requests the user has for a specific course.
+ * @param interger $courseid
+ * @param interger $userid
+ * @return integer count
+ */
+function request_count($courseid, $userid) {
+    global $DB;
+
+    $sql = "SELECT count(cm.request)
+              FROM {local_extension_cm} cm
+             WHERE userid = :userid
+               AND course = :courseid";
+
+    $params = array('userid' => $userid, 'courseid' => $courseid);
+
+    $record = $DB->get_record_sql($sql, $params);
+
+    if (!empty($record)) {
+        return $record->count;
+    } else {
+        return 0;
+    }
 }
 
 /**
@@ -240,17 +273,26 @@ function cache_invalidate_request($requestid) {
 }
 
 /**
- * Returns an array of all requests from the cache.
+ * Returns an array of all requests from the cache for the user specified.
  *
  * @return request[] An array of requests.
  */
-function cache_get_requests() {
+function cache_get_requests($userid = 0) {
     global $DB;
 
-    $sql = "SELECT r.id
-              FROM {local_extension_request} r";
+    if (!empty($userid)) {
+        $where = " WHERE r.userid = ? ";
+        $params = array('userid' => $userid);
+    } else {
+        $where = '';
+        $params = array();
+    }
 
-    $requestids = $DB->get_fieldset_sql($sql);
+    $sql = "SELECT r.id
+              FROM {local_extension_request} r
+            $where";
+
+    $requestids = $DB->get_fieldset_sql($sql, $params);
 
     $cache = cache::make('local_extension', 'requests');
     return $cache->get_many($requestids);

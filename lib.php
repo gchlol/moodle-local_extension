@@ -50,16 +50,20 @@ function local_extension_extends_navigation(global_navigation $nav) {
 
             $coursenode = $nav->find($courseid, navigation_node::TYPE_COURSE);
             if (!empty($coursenode)) {
-                $requests = local_extension_find_request($courseid, $USER->id);
+                $requests = local_extension_find_request($courseid);
 
                 if (empty($requests)) {
                     // Display the request extension link.
                     $node = $coursenode->add(get_string('requestextension', 'local_extension'), $url);
                 } else {
+
+                    $requestcount = request_count($courseid, $USER->id);
+
+
                     // Display the request status for this module.
                     foreach ($requests as $request) {
                         $url = new moodle_url('/local/extension/status.php', array('id' => $request->requestid));
-                        $node = $coursenode->add('sdfgs', $url);
+                        //$node = $coursenode->add('An Extension request.', $url);
                     }
                 }
             }
@@ -74,20 +78,33 @@ function local_extension_extends_navigation(global_navigation $nav) {
                 $cmid = $id;
             }
 
-            $coursenode = $nav->find($cmid, navigation_node::TYPE_ACTIVITY);
-            if (!empty($coursenode)) {
-                list($request, $cm) = local_extension_find_request($courseid, $USER->id, $cmid);
+            $modulenode = $nav->find($cmid, navigation_node::TYPE_ACTIVITY);
+            if (!empty($modulenode)) {
+                list($request, $cm) = local_extension_find_request($courseid, $cmid);
 
                 if (empty($cm)) {
                     // Display the request extension link.
                     $url = new moodle_url('/local/extension/request.php', array('course' => $courseid, 'cmid' => $cmid));
-                    $node = $coursenode->add(get_string('requestextension', 'local_extension'), $url);
+                    $node = $modulenode->add(get_string('requestextension', 'local_extension'), $url);
                 } else {
                     // Display the request status for this module.
                     $url = new moodle_url('/local/extension/status.php', array('id' => $request->requestid));
+
+                    $event = $request->mods[$cmid]['event'];
+
                     $handler = $request->mods[$cmid]['handler'];
                     $status = $handler->get_status_name($cm->status);
-                    $node = $coursenode->add('Extension: ' . $status, $url);
+                    $result = $handler->get_status_result($cm->status);
+
+                    $delta = $cm->data - $event->timestart;
+
+                    // Just show the biggest time unit instead of 2.
+                    $extensionlength = format_time($delta);
+
+                    // block_nagivation->trim will truncate the navagation item to 25 characters.
+
+                    //$node = $coursenode->add($status . $result . $extensionlength, $url);
+                    $node = $modulenode->add($result . ' ' .$extensionlength . ' extension', $url);
                 }
             }
 
@@ -143,34 +160,24 @@ function local_extension_pluginfile($course, $cm, $context, $filearea, $args, $f
 }
 
 /**
- * Returns an array of all requests from the cache.
+ * Obtains the requests for the current user. Filterable by courseid and moduleid.
  *
- * @return request[] An array of requests.
+ * @param integer $courseid
+ * @param integer $moduleid
+ * @return request[]|request[]|unknown[]
  */
+function local_extension_find_request($courseid, $moduleid = 0) {
+    global $USER, $CFG;
+    require_once($CFG->dirroot . '/local/extension/locallib.php');
 
-function local_extension_cache_get_requests() {
-    global $DB;
-
-    $sql = "SELECT r.id
-              FROM {local_extension_request} r";
-
-    $requestids = $DB->get_fieldset_sql($sql);
-
-    $cache = cache::make('local_extension', 'requests');
-    return $cache->get_many($requestids);
-}
-
-function local_extension_find_request($courseid, $userid, $moduleid = 0) {
-    global $USER;
-
-    $requests = local_extension_cache_get_requests();
+    $requests = cache_get_requests($USER->id);
 
     if (empty($moduleid)) {
         $matchedrequests = array();
         // Return matching requests for a course.
         foreach ($requests as $request) {
             foreach ($request->cms as $cm) {
-                if ($courseid == $cm->course && $userid == $USER->id) {
+                if ($courseid == $cm->course) {
                     $matchedrequests[$cm->request] = $request;
                     break;
                 }
@@ -182,7 +189,7 @@ function local_extension_find_request($courseid, $userid, $moduleid = 0) {
         // Return a matching course module, eg. assignment, quiz.
         foreach ($requests as $request) {
             foreach ($request->cms as $cm) {
-                if ($courseid == $cm->course && $moduleid == $cm->cmid && $userid == $USER->id) {
+                if ($courseid == $cm->course && $moduleid == $cm->cmid) {
                     return array($request, $cm);
                 }
             }

@@ -112,6 +112,22 @@ abstract class base_request {
         }
     }
 
+    public function get_status_result($status) {
+        switch ($status) {
+            case self::STATUS_NEW:
+            case self::STATUS_REOPENED:
+                return \get_string('state_status_result_pending',   'local_extension');
+            case self::STATUS_DENIED:
+                return \get_string('state_status_result_denied',    'local_extension');
+            case self::STATUS_APPROVED:
+                return \get_string('state_status_result_approved',  'local_extension');
+            case self::STATUS_CANCEL:
+                return \get_string('state_status_result_cancelled', 'local_extension');
+            default:
+                throw new \coding_exception('Unknown request attempt state.');
+        }
+    }
+
     /**
      * Is a calendar event something we can handle?
      *
