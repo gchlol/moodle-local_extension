@@ -24,7 +24,6 @@
  */
 
 require_once('../../config.php');
-require_once('locallib.php');
 global $CFG, $PAGE, $USER;
 
 require_login(false);
@@ -42,7 +41,7 @@ $PAGE->set_title(get_string('pluginname', 'local_extension'));
 $PAGE->set_heading(get_string('status_page_heading', 'local_extension'));
 $PAGE->requires->css('/local/extension/styles.css');
 
-$request = cache_get_request($requestid);
+$request = \local_extension\utility::cache_get_request($requestid);
 $renderer = $PAGE->get_renderer('local_extension');
 $mform = new \local_extension\form\update(null, array('user' => $OUTPUT->user_picture($USER), 'request' => $request, 'renderer' => $renderer));
 

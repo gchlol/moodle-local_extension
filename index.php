@@ -24,7 +24,6 @@
  */
 
 require_once('../../config.php');
-require_once('locallib.php');
 global $CFG, $PAGE;
 
 require_login(false);
@@ -39,8 +38,8 @@ $PAGE->set_pagelayout('standard');
 $PAGE->set_title(get_string('pluginname', 'local_extension'));
 $PAGE->requires->css('/local/extension/styles.css');
 
-$table = generate_table();
-$data = generate_table_data($table);
+$table = \local_extension\utility::generate_table();
+$data = \local_extension\utility::generate_table_data($table);
 $url = new moodle_url("/local/extension/request.php");
 
 $renderer = $PAGE->get_renderer('local_extension');

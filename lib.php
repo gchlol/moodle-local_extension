@@ -50,21 +50,25 @@ function local_extension_extends_navigation(global_navigation $nav) {
 
             $coursenode = $nav->find($courseid, navigation_node::TYPE_COURSE);
             if (!empty($coursenode)) {
-                $requests = local_extension_find_request($courseid);
+                $requests = \local_extension\utility::find_request($courseid);
 
                 if (empty($requests)) {
                     // Display the request extension link.
                     $node = $coursenode->add(get_string('requestextension', 'local_extension'), $url);
                 } else {
 
-                    $requestcount = request_count($courseid, $USER->id);
+                    $requestcount = \local_extension\utility::count_requests($courseid, $USER->id);
 
-
-                    // Display the request status for this module.
-                    foreach ($requests as $request) {
-                        $url = new moodle_url('/local/extension/status.php', array('id' => $request->requestid));
-                        //$node = $coursenode->add('An Extension request.', $url);
+                    if ($requestcount > 1) {
+                        $string = get_string('nav_course_request_plural', 'local_extension');
+                    } else {
+                        $string = get_string('nav_course_request', 'local_extension');
                     }
+
+                    $requeststatus = \local_extension\utility::course_request_status($courseid, $USER->id);
+
+                    $url = new moodle_url('/local/extension/index.php');
+                    $node = $coursenode->add($requestcount . ' ' . $string . ' ' . $requeststatus, $url);
                 }
             }
 
@@ -80,7 +84,7 @@ function local_extension_extends_navigation(global_navigation $nav) {
 
             $modulenode = $nav->find($cmid, navigation_node::TYPE_ACTIVITY);
             if (!empty($modulenode)) {
-                list($request, $cm) = local_extension_find_request($courseid, $cmid);
+                list($request, $cm) = \local_extension\utility::find_request($courseid, $cmid);
 
                 if (empty($cm)) {
                     // Display the request extension link.
@@ -98,12 +102,9 @@ function local_extension_extends_navigation(global_navigation $nav) {
 
                     $delta = $cm->data - $event->timestart;
 
-                    // Just show the biggest time unit instead of 2.
                     $extensionlength = format_time($delta);
 
-                    // block_nagivation->trim will truncate the navagation item to 25 characters.
-
-                    //$node = $coursenode->add($status . $result . $extensionlength, $url);
+                    // block_nagivation->trim will truncate the navagation item to 25/50 characters.
                     $node = $modulenode->add($result . ' ' .$extensionlength . ' extension', $url);
                 }
             }
@@ -157,42 +158,4 @@ function local_extension_pluginfile($course, $cm, $context, $filearea, $args, $f
     }
 
     send_stored_file($file, 0, 0, true);
-}
-
-/**
- * Obtains the requests for the current user. Filterable by courseid and moduleid.
- *
- * @param integer $courseid
- * @param integer $moduleid
- * @return request[]|request[]|unknown[]
- */
-function local_extension_find_request($courseid, $moduleid = 0) {
-    global $USER, $CFG;
-    require_once($CFG->dirroot . '/local/extension/locallib.php');
-
-    $requests = cache_get_requests($USER->id);
-
-    if (empty($moduleid)) {
-        $matchedrequests = array();
-        // Return matching requests for a course.
-        foreach ($requests as $request) {
-            foreach ($request->cms as $cm) {
-                if ($courseid == $cm->course) {
-                    $matchedrequests[$cm->request] = $request;
-                    break;
-                }
-            }
-        }
-        return $matchedrequests;
-
-    } else {
-        // Return a matching course module, eg. assignment, quiz.
-        foreach ($requests as $request) {
-            foreach ($request->cms as $cm) {
-                if ($courseid == $cm->course && $moduleid == $cm->cmid) {
-                    return array($request, $cm);
-                }
-            }
-        }
-    }
 }
