@@ -106,8 +106,6 @@ class request implements \cache_data_source {
                   FROM {user}
                  WHERE id $uids";
         $this->users = $DB->get_records_sql($sql, $params);
-
-        $this->files = $this->fetch_attachments($requestid);
     }
 
     /**
@@ -123,20 +121,19 @@ class request implements \cache_data_source {
     }
 
     /**
-     * Fetch the list of attached files for the request id.
+     * Fetches the attachments for this request.
      *
-     * @param integer $requestid An id for a request.
-     * @return array An array of file objects.
+     * @return file_storage[]|stored_file[][]
      */
-    public function fetch_attachments($requestid) {
+    public function fetch_attachments() {
         global $USER;
 
         $context = \context_user::instance($USER->id);
 
         $fs = get_file_storage();
-        $files = $fs->get_area_files($context->id, 'local_extension', 'attachments', $requestid);
+        $files = $fs->get_area_files($context->id, 'local_extension', 'attachments', $this->requestid);
 
-        return $files;
+        return array($fs, $files);
     }
 
     /**

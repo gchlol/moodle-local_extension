@@ -148,14 +148,14 @@ class local_extension_renderer extends plugin_renderer_base {
      * @return string $out The html output.
      */
     public function render_extension_attachments(\local_extension\request $req) {
-        $fs = get_file_storage();
+        list($fs, $files) = $req->fetch_attachments();
 
         $out  = html_writer::start_tag('div', array('class' => 'attachments'));
         $out .= html_writer::tag('p', get_string('attachments', 'local_extension'));
 
-        foreach ($req->files as $file) {
+        foreach ($files as $file) {
 
-            $file = $fs->get_file(
+            $f = $fs->get_file(
                 $file->get_contextid(),
                 $file->get_component(),
                 $file->get_filearea(),
@@ -164,7 +164,7 @@ class local_extension_renderer extends plugin_renderer_base {
                 $file->get_filename()
             );
 
-            if (!$file || $file->is_directory()) {
+            if (!$f || $f->is_directory()) {
                 continue;
             }
 
@@ -177,7 +177,7 @@ class local_extension_renderer extends plugin_renderer_base {
                 $file->get_filename()
             );
 
-            $filelink = html_writer::link($fileurl, $file->get_filename());
+            $filelink = html_writer::link($fileurl, $f->get_filename());
             $out .= html_writer::tag('p', $filelink);
 
         }
