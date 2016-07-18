@@ -26,6 +26,8 @@
 namespace local_extension;
 
 require_once($CFG->libdir . '/tablelib.php');
+require_once($CFG->dirroot . '/calendar/lib.php');
+require_once($CFG->dirroot . '/user/lib.php');
 
 /**
  * Utility class.
@@ -36,6 +38,142 @@ require_once($CFG->libdir . '/tablelib.php');
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 class utility {
+    /**
+     * Returns a list of candidate dates for activities
+     *
+     * @param user $user Userid or user object
+     * @param timestamp $start  Start of search period
+     * @param timestamp $end End of search period
+     * @param array $options Optional arguments.
+     * @return An array of candidates.
+     *
+     */
+    public static function get_activities($user, $start, $end, $options = null) {
+        global $DB;
+
+        $cid = !empty($options['courseid']) ? $options['courseid'] : 0;
+        $cmid = !empty($options['moduleid']) ? $options['moduleid'] : 0;
+        $requestid = !empty($options['requestid']) ? $options['requestid'] : 0;
+
+        $dates = array();
+
+        $mods = \local_extension\plugininfo\extension::get_enabled_request();
+
+        // To be efficient we do a single search through the calendar and then
+        // filter these events down to one's that can handle extensions.
+
+        $groups = null;
+        $courses = null;
+
+        // Get the events matching our criteria.
+        list($courses, $group, $user2) = calendar_set_filters(array());
+
+        $allevents = calendar_get_events($start, $end, array($user), $groups, true);
+
+        $events = array();
+        $courses = array();
+
+        foreach ($allevents as $id => $event) {
+
+            $modtype = $event->modulename;
+
+            // First filter to only activities that have an extension plugin.
+            if (!isset($mods[$modtype])) {
+                continue;
+            }
+
+            $handler = $mods[$modtype];
+
+            if (!$cm = get_coursemodule_from_instance($event->modulename, $event->instance)) {
+                continue;
+            }
+
+            if (!\core_availability\info_module::is_user_visible($cm, 0, false)) {
+                continue;
+            }
+
+            // Now give the handler a chance to filter, for instance an activity
+            // could have a open, due and close, but it may only really care about
+            // the due date.
+            if (!$handler->is_candidate($event, $cm)) {
+                continue;
+            }
+
+            // Filter based on moduleid.
+            if (!empty($cmid)) {
+                if ($cm->id != $cmid) {
+                    continue;
+                }
+            }
+
+            // Filter based on courseid.
+            if (!empty($cid)) {
+                if ($cm->course != $cid) {
+                    continue;
+                }
+            }
+
+            $courseid = $cm->course;
+            if (!isset($courses[$courseid])) {
+                $courses[$courseid] = $DB->get_record('course', array('id' => $courseid));
+            }
+
+            // If a requestid has been provided, obtain the local cm data for this mod.
+            $localcm = null;
+            if (!empty($requestid)) {
+                $localcm = $DB->get_record('local_extension_cm', array('request' => $requestid, 'cmid' => $cm->id));
+
+                // No local_extension_cm found, we won't need to provide an event.
+                if (empty($localcm)) {
+                    continue;
+                }
+            } else {
+                // Try and obtain a request associated to this user for a course module.
+                $localcm = $DB->get_record('local_extension_cm', array('userid' => $user, 'cmid' => $cm->id));
+            }
+
+            $events[$cm->id] = array(
+                    'event' => $event,
+                    'cm' => $cm,
+                    'localcm' => $localcm,
+                    'course' => $courses[$courseid],
+                    'handler' => $handler,
+            );
+        }
+
+        return array($mods, $events);
+    }
+
+    /**
+     * Sends a status email to the student.
+     * TODO Implement sending to course coordinators with the capabilitiy and role to grant extensions.
+     *
+     * @param integer $requestid
+     */
+    public static function send_status_email($requestid) {
+        global $DB, $USER, $PAGE;
+
+        $request = cache_get_request($requestid);
+
+        $user = $DB->get_record('user', array('id' => $request->request->userid));
+
+        $renderer = $PAGE->get_renderer('local_extension');
+        $text = $renderer->render_extension_email($request);
+
+        $message = new stdClass();
+        $message->component         = 'local_extension';
+        $message->name              = 'status';
+        $message->userfrom          = $USER;
+        $message->userto            = $user;
+        $message->subject           = "Extension request for " . \fullname($user);
+        $message->fullmessage       = $text;
+        $message->fullmessageformat = FORMAT_PLAIN;
+        $message->fullmessagehtml   = '';
+        $message->smallmessage      = '';
+        $message->notification      = 1;
+        message_send($message);
+    }
+
     /**
      * Generates the basic requirements the status page table.
      *

@@ -15,7 +15,7 @@
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
 /**
- * Requests page in local_extension
+ * Manage the adapter triggers
  *
  * @package    local_extension
  * @author     Nicholas Hoobin <nicholashoobin@catalyst-au.net>
@@ -26,27 +26,30 @@
 require_once('../../config.php');
 global $CFG, $PAGE;
 
+$PAGE->set_url(new moodle_url('/local/extension/manage.php'));
+
+$context = \context_system::instance();
 require_login(false);
-
-$PAGE->set_url(new moodle_url('/local/extension/index.php'));
-
-// TODO context could be user, course or module.
-$context = context_user::instance($USER->id);
 
 $PAGE->set_context($context);
 $PAGE->set_pagelayout('standard');
 $PAGE->set_title(get_string('pluginname', 'local_extension'));
+$PAGE->set_heading(get_string('rules_page_heading', 'local_extension'));
 $PAGE->requires->css('/local/extension/styles.css');
 
-$table = \local_extension\utility::generate_table();
-$data = \local_extension\utility::generate_table_data($table, $USER->id);
-$url = new moodle_url("/local/extension/request.php");
+$mform = new \local_extension\form\rule(null, null);
 
-$renderer = $PAGE->get_renderer('local_extension');
+if ($mform->is_cancelled()) {
+
+    //redirect(new moodle_url('/'));
+
+} else if ($form = $mform->get_data()) {
+
+    $url = new moodle_url('/local/extension/manage.php');
+    redirect($url);
+    die;
+}
 
 echo $OUTPUT->header();
-echo html_writer::tag('h2', get_string('summary_page_heading', 'local_extension'));
-echo $renderer->render_extension_summary_table($table, $data);
-echo html_writer::empty_tag('br');
-echo $OUTPUT->single_button($url, get_string('requestextension', 'local_extension'));
+$mform->display();
 echo $OUTPUT->footer();

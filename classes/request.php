@@ -87,7 +87,7 @@ class request implements \cache_data_source {
             'requestid' => $request->id
         );
 
-        list($handlers, $mods) = local_extension_get_activities($request->userid, $request->searchstart, $request->searchend, $options);
+        list($handlers, $mods) = \local_extension\utility::get_activities($request->userid, $request->searchstart, $request->searchend, $options);
         $this->mods = $mods;
 
         $userids = array($request->userid => $request->userid);

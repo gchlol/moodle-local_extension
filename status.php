@@ -24,7 +24,7 @@
  */
 
 require_once('../../config.php');
-global $CFG, $PAGE, $USER;
+global $PAGE, $USER;
 
 require_login(false);
 

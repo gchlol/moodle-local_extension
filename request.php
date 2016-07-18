@@ -24,7 +24,6 @@
  */
 
 require_once('../../config.php');
-require_once('locallib.php');
 require_once($CFG->dirroot . '/calendar/lib.php');
 global $CFG, $PAGE;
 
@@ -66,7 +65,7 @@ $options = array(
     'requestid' => 0
 );
 
-list($handlers, $mods) = local_extension_get_activities($user, $start, $end, $options);
+list($handlers, $mods) = \local_extension\utility::get_activities($user, $start, $end, $options);
 
 if (count($mods) == 0) {
     echo $OUTPUT->header();
