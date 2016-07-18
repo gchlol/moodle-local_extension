@@ -25,6 +25,7 @@
  */
 
 $string['pluginname'] = 'Activity extensions';
+$string['adminsettings'] = 'Extension settings';
 $string['attachments'] = 'Attachments';
 $string['cachedef_requests'] = 'A cache of the requests data';
 $string['comment'] = 'General comments';
@@ -36,13 +37,13 @@ $string['form_rule_continue'] = 'Continue';
 $string['form_rule_extensionlength'] = 'Extension Length';
 $string['form_rule_roles'] = 'Actioned by';
 $string['form_rule_select_approve'] = 'Approve';
-$string['form_rule_select_threedaysless'] = '< 3 Days';
-$string['form_rule_select_threedaysgreater'] = '> 3 Days';
-$string['form_rule_select_sixdaysgreater'] = '> 6 Days';
+$string['form_rule_select_daysless'] = '< {$a} Days';
+$string['form_rule_select_daysgreater'] = '> {$a} Days';
 $string['form_rule_select_approve'] = 'Approve';
 $string['form_rule_select_subscribe'] = 'Subscribe';
 $string['form_rule_timeelapsed'] = 'Time Elapsed';
 $string['error_none_selected'] = 'Please select at least one item';
+$string['externalrules'] = 'Manage Adapter Triggers';
 $string['messageprovider:status'] = 'Activity extension notifications';
 $string['nav_course_request'] = 'extension request';
 $string['nav_course_request_plural'] = 'extension requests';

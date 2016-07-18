@@ -25,9 +25,13 @@
 defined('MOODLE_INTERNAL') || die;
 
 if ($hassiteconfig) {
-    $settings = new admin_settingpage('local_extension', get_string('pluginname', 'local_extension'));
+    $ADMIN->add('localplugins', new admin_category('local_extension', get_string('pluginname', 'local_extension')));
 
-    $ADMIN->add('localplugins', $settings);
+    $settings = new admin_settingpage('local_extension_settings', get_string('adminsettings', 'local_extension'));
+    $ADMIN->add('local_extension', $settings);
+
+    $managerules = new admin_externalpage('local_extension_rules', get_string('externalrules', 'local_extension'), new moodle_url("$CFG->wwwroot/local/extension/manage.php"));
+    $ADMIN->add('local_extension', $managerules);
 
     $days = array();
     for ($c = 1; $c <= 21; $c++) {

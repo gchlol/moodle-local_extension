@@ -223,5 +223,20 @@ class local_extension_renderer extends plugin_renderer_base {
         }
         return $table->finish_output();
     }
+
+    /**
+     * Adapter trigger renderer for status management page.
+     *
+     * @param integer $triggerid
+     * @return string $html The html output.
+     */
+    public function render_trigger_item($triggerid) {
+        $html  = html_writer::start_tag('div');
+        // TODO trigger content.
+        $html .= html_writer::tag('p', 'Trigger');
+        $html .= html_writer::end_div();
+
+        return $html;
+    }
 }
 

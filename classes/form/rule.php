@@ -47,6 +47,9 @@ class rule extends \moodleform {
     public function definition() {
         $mform = $this->_form;
 
+        // Heading
+        //$mform->addElement('header', 'header', get_string('externalrules', 'local_extension'), null, null);
+
         // ID
         $mform->addElement('hidden', 'id');
         $mform->setType('id', PARAM_INT);
@@ -57,16 +60,17 @@ class rule extends \moodleform {
 
         // Extension Length
         $options = array(
-                get_string('form_rule_select_threedaysless', 'local_extension'),
-                get_string('form_rule_select_threedaysgreater', 'local_extension'),
+                get_string('form_rule_select_daysless', 'local_extension', 3),
+                get_string('form_rule_select_daysgreater', 'local_extension', 3),
+                get_string('form_rule_select_daysgreater', 'local_extension', 6),
         );
         $mform->addElement('select', 'extension_length', get_string('form_rule_extensionlength', 'local_extension'), $options);
 
         // Time elpased
         $options = array(
                 '-', // TODO lang string for n/a ?
-                get_string('form_rule_select_threedaysgreater', 'local_extension'),
-                get_string('form_rule_select_sixdaysgreater', 'local_extension'),
+                get_string('form_rule_select_daysgreater', 'local_extension', 3),
+                get_string('form_rule_select_daysgreater', 'local_extension', 6),
         );
         $mform->addElement('select', 'time_exlapsed', get_string('form_rule_timeelapsed', 'local_extension'), $options);
 

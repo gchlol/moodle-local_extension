@@ -24,12 +24,14 @@
  */
 
 require_once('../../config.php');
-global $CFG, $PAGE;
+require_once($CFG->libdir . '/adminlib.php');
 
 $PAGE->set_url(new moodle_url('/local/extension/manage.php'));
 
 $context = \context_system::instance();
-require_login(false);
+require_login();
+
+\admin_externalpage_setup('local_extension_rules');
 
 $PAGE->set_context($context);
 $PAGE->set_pagelayout('standard');
@@ -49,6 +51,14 @@ if ($mform->is_cancelled()) {
     redirect($url);
     die;
 }
+
+/*
+ * Roadmap.
+ *
+ * - Table(s) with a list of the rules, based on context? adpater? overall?.
+ * - Ability to re-order them, group them?
+ *
+ */
 
 echo $OUTPUT->header();
 $mform->display();
