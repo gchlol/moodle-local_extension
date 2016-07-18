@@ -62,7 +62,7 @@ abstract class base_request {
         $cm->status = $state;
         $DB->update_record('local_extension_cm', $cm);
 
-        \cache_invalidate_request($cm->request);
+        \local_extension\utility::cache_invalidate_request($cm->request);
     }
 
     /**
@@ -155,5 +155,15 @@ abstract class base_request {
      * @param user $user The user that is viewing the status.
      */
     abstract public function status_definition($mform, $mod, $user);
+
+    /**
+     * Return data to be stored for the request
+     *
+     * @param moodleform $mform A moodle form object
+     * @param array $mod An array of event details
+     * @param array $data An array of form data
+     * @return string The data to be stored
+     */
+    abstract public function request_data($mform, $mod, $data);
 }
 

@@ -169,6 +169,37 @@ class request implements \cache_data_source {
     }
 
     /**
+     * @param unknown $mform
+     */
+    public function update_cm_status($user, $data) {
+
+        foreach ($this->mods as $id => $mod) {
+            $handler = $mod['handler'];
+            $localcm = $mod['localcm'];
+            $event   = $mod['event'];
+            $course  = $mod['course'];
+
+            $approve = 'approve' . $id;
+            $deny = 'deny' . $id;
+            if (!empty($data->$approve)) {
+                $handler->set_state($localcm, $handler::STATUS_APPROVED);
+                $status = $handler->get_status_name($handler::STATUS_APPROVED);
+                $text = "$status extension for {$course->fullname}, {$event->name}";
+                $this->add_comment($user, $text);
+            }
+
+            if (!empty($data->$deny)) {
+                $handler->set_state($localcm, $handler::STATUS_DENIED);
+                $status = $handler->get_status_name($handler::STATUS_DENIED);
+                $text = "$status extension for {$course->fullname}, {$event->name}";
+                $this->add_comment($user, $text);
+            }
+
+        }
+
+    }
+
+    /**
      * Gets the local extension cm data.
      *
      * @param integer $cmid

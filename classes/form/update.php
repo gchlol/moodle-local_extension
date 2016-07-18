@@ -56,6 +56,15 @@ class update extends \moodleform {
         foreach ($mods as $id => $mod) {
             $handler = $mod['handler'];
             $handler->status_definition($mform, $mod, $user);
+
+            // TODO if $USER has the capabilities / roles to view
+            // TODO based on the cm status, present different buttons. (disable the the ones that cannot be clicked?)
+
+            $buttonarray=array();
+            $buttonarray[] = &$mform->createElement('submit', 'approve' . $id, 'Approve');
+            $buttonarray[] = &$mform->createElement('submit', 'deny' . $id, 'Deny');
+            $mform->addGroup($buttonarray, '', '', array(' '), false);
+            $mform->closeHeaderBefore('');
         }
 
         // TODO replace <br /> with css padding/margins, or does that impact the html->text email output.
@@ -66,7 +75,6 @@ class update extends \moodleform {
 
         $html = $renderer->render_extension_comments($request);
         $html .= \html_writer::start_tag('br');
-        // $mform->addElement('static', 'comments', '', $html);
         $mform->addElement('html', $html);
 
         $mform->addElement('hidden', 'id');

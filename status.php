@@ -46,9 +46,14 @@ $renderer = $PAGE->get_renderer('local_extension');
 $mform = new \local_extension\form\update(null, array('user' => $OUTPUT->user_picture($USER), 'request' => $request, 'renderer' => $renderer));
 
 if ($form = $mform->get_data()) {
-    $requestid = $form->id;
     $comment = $form->commentarea;
-    $request->add_comment($USER, $comment);
+
+    $request->update_cm_status($USER, $form);
+
+    if (!empty($comment)) {
+        $request->add_comment($USER, $comment);
+    }
+
     redirect($url);
 } else {
     $mform->set_data(array('id' => $requestid));
