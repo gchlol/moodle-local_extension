@@ -209,17 +209,16 @@ class local_extension_renderer extends plugin_renderer_base {
      */
     public function render_extension_summary_table($table, $requests) {
 
-        if (empty($requests)) {
-            return;
-        }
+        if (!empty($requests)) {
 
-        foreach ($requests as $request) {
-            $statusurl = new moodle_url("/local/extension/status.php", array('id' => $request->id));
-            $status = get_string("table_header_statusrow", "local_extension", $statusurl->out());
+            foreach ($requests as $request) {
+                $statusurl = new moodle_url("/local/extension/status.php", array('id' => $request->id));
+                $status = get_string("table_header_statusrow", "local_extension", $statusurl->out());
 
-            $values = array($request->id, $request->count, userdate($request->timestamp), $status);
-            $table->add_data($values);
+                $values = array($request->id, $request->count, userdate($request->timestamp), $status);
+                $table->add_data($values);
 
+            }
         }
 
         return $table->finish_output();
@@ -232,32 +231,31 @@ class local_extension_renderer extends plugin_renderer_base {
      * @param array $triggers
      */
     public function render_extension_trigger_table($table, $triggers) {
-        if (empty($triggers)) {
-            return;
-        }
+        if (!empty($triggers)) {
 
-        foreach ($triggers as $trigger) {
+            foreach ($triggers as $trigger) {
 
-            $data = '';
-            foreach ($trigger->data as $key => $value) {
+                $data = null;
+                foreach ($trigger->data as $key => $value) {
 
-                if (strpos($key, "button") !== false) {
-                    continue;
+                    if (strpos($key, "button") !== false) {
+                        continue;
+                    }
                 }
+
+                //table columns 'name', 'action', 'role', 'parent', 'continue', 'priority', 'data'
+                $values = array(
+                        $trigger->name,
+                        $trigger->get_action_name(),
+                        $trigger->get_role_name(),
+                        $trigger->parent,
+                        $trigger->get_continue_name(),
+                        $trigger->priority,
+                        $data
+                );
+
+                $table->add_data($values);
             }
-
-            //table columns 'name', 'action', 'role', 'parent', 'continue', 'priority', 'data'
-            $values = array(
-                    $trigger->name,
-                    $trigger->action,
-                    $trigger->role,
-                    $trigger->parent,
-                    $trigger->continue,
-                    $trigger->priority,
-                    $data
-            );
-
-            $table->add_data($values);
         }
 
         return $table->finish_output();

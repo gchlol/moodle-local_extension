@@ -35,6 +35,10 @@ namespace local_extension;
  */
 class rule {
 
+    const RULE_ACTION_APPROVE = 0;
+
+    const RULE_ACTION_SUBSCRIBE = 1;
+
     public $id = null;
 
     public $context = null;
@@ -42,6 +46,8 @@ class rule {
     public $name = null;
 
     public $role = null;
+
+    public $rolenames = null;
 
     public $action = null;
 
@@ -55,6 +61,7 @@ class rule {
 
     public function __construct($ruleid = null) {
         $this->id = $ruleid;
+        $this->rolenames = \role_get_names(\context_system::instance(), ROLENAME_ALIAS, true);
     }
 
     public function load_from_form($form) {
@@ -86,6 +93,8 @@ class rule {
     public function load() {
         global $DB;
 
+        $rule->rolename = $roles[$rule->role];
+
         if (empty($this->id)) {
             throw \coding_exception('No rule id');
         }
@@ -112,6 +121,25 @@ class rule {
         $rule->data = $rule->data_unserialise();
 
         return $rule;
+    }
+
+    public function get_role_name() {
+        return $this->rolenames[$this->role];
+    }
+
+    public function get_action_name() {
+        switch($this->action) {
+            case self::RULE_ACTION_APPROVE:
+                return get_string('form_rule_select_approve', 'local_extension');
+            case self::RULE_ACTION_SUBSCRIBE:
+                return get_string('form_rule_select_subscribe', 'local_extension');
+            default:
+                return '';
+        }
+    }
+
+    public function get_continue_name() {
+        return $this->continue == 1 ? get_string('yes') : get_string('no');
     }
 
 }

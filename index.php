@@ -26,27 +26,30 @@
 require_once('../../config.php');
 global $CFG, $PAGE;
 
-require_login(false);
-
 $PAGE->set_url(new moodle_url('/local/extension/index.php'));
 
 // TODO context could be user, course or module.
-$context = context_user::instance($USER->id);
+$context = \context_user::instance($USER->id);
+require_login();
 
 $PAGE->set_context($context);
 $PAGE->set_pagelayout('standard');
 $PAGE->set_title(get_string('pluginname', 'local_extension'));
 $PAGE->requires->css('/local/extension/styles.css');
 
-$table = \local_extension\table::generate_index_table();
-$data = \local_extension\table::generate_index_data($table, $USER->id);
-$url = new moodle_url("/local/extension/request.php");
-
 $renderer = $PAGE->get_renderer('local_extension');
 
 echo $OUTPUT->header();
-echo html_writer::tag('h2', get_string('summary_page_heading', 'local_extension'));
+
+echo html_writer::tag('h2', get_string('page_heading_summary', 'local_extension'));
+
+$table = \local_extension\table::generate_index_table();
+$data = \local_extension\table::generate_index_data($table, $USER->id);
 echo $renderer->render_extension_summary_table($table, $data);
+
 echo html_writer::empty_tag('br');
-echo $OUTPUT->single_button($url, get_string('requestextension', 'local_extension'));
+
+$url = new moodle_url("/local/extension/request.php");
+echo $OUTPUT->single_button($url, get_string('button_request_extension', 'local_extension'));
+
 echo $OUTPUT->footer();

@@ -83,6 +83,17 @@ class rule extends \moodleform {
         $mform->addElement('header', 'extension_length_set', get_string('form_rule_header_extension_length_options', 'local_extension'), null, null);
         $mform->setExpanded('extension_length_set');
 
+        $radioarray   = array();
+        $radioarray[] = $mform->createElement('radio', 'extension_length_radio', '', get_string('radio_less', 'local_extension'), 1);
+        $radioarray[] = $mform->createElement('radio', 'extension_length_radio', '', get_string('radio_equal', 'local_extension'), 0);
+        $radioarray[] = $mform->createElement('radio', 'extension_length_radio', '', get_string('radio_greater', 'local_extension'), 0);
+        $mform->addGroup($radioarray, 'radioar', '', array(' '), false);
+
+        $mform->addElement('select', 'extension_length', get_string('form_rule_extension_length', 'local_extension'), $optionsless);
+        //$mform->addRule('extension_length', get_string('required'), 'required');
+        $mform->addHelpButton('extension_length', 'form_rule_extension_length', 'local_extension');
+
+        /*
         $mform->addElement('select', 'extension_length_less', get_string('form_rule_extension_length_less', 'local_extension'), $optionsless);
         $mform->addRule('extension_length_less', get_string('required'), 'required');
         $mform->addHelpButton('extension_length_less', 'form_rule_extension_length_less', 'local_extension');
@@ -92,7 +103,7 @@ class rule extends \moodleform {
         $mform->addElement('select', 'extension_length_greater', get_string('form_rule_extension_length_greater', 'local_extension'), $optionsgreater);
         $mform->addRule('extension_length_greater', get_string('required'), 'required');
         $mform->addHelpButton('extension_length_greater', 'form_rule_extension_length_greater', 'local_extension');
-
+        */
 
         $mform->addElement('header', 'general_set', get_string('form_rule_header_general_options', 'local_extension'), null, null);
         $mform->setExpanded('general_set');
