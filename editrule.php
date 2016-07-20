@@ -43,6 +43,7 @@ $PAGE->requires->css('/local/extension/styles.css');
 
 $renderer = $PAGE->get_renderer('local_extension');
 
+$data = null;
 if (!empty($triggerid)) {
     $data = $DB->get_record('local_extension_triggers', array('id' => $triggerid), '*', MUST_EXIST);
 }
@@ -50,6 +51,7 @@ if (!empty($triggerid)) {
 // TODO add parent rules to form.
 
 $mform = new \local_extension\form\rule(null, null);
+$mform->set_data($data);
 
 if ($mform->is_cancelled()) {
 

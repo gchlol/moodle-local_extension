@@ -133,7 +133,8 @@ class rule extends \moodleform {
         // Email template
         // TODO email subsystem templates
 
-        $mform->addElement('select', 'parent', get_string('form_rule_parent', 'local_extension'), $parentrules);
+        $optionsparent = array();
+        $mform->addElement('select', 'parent', get_string('form_rule_parent', 'local_extension'), $optionsparent);
         $mform->addHelpButton('parent', 'form_rule_parent', 'local_extension');
 
         // Continue

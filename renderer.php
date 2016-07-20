@@ -231,17 +231,14 @@ class local_extension_renderer extends plugin_renderer_base {
      * @param array $triggers
      */
     public function render_extension_trigger_table($table, $triggers) {
+        global $OUTPUT;
         if (!empty($triggers)) {
 
             foreach ($triggers as $trigger) {
 
-                $data = null;
-                foreach ($trigger->data as $key => $value) {
-
-                    if (strpos($key, "button") !== false) {
-                        continue;
-                    }
-                }
+                $url = new moodle_url('/local/extension/editrule.php', array_merge(array('id' => $trigger->id)));
+                $html = html_writer::empty_tag('img', array('src' => $OUTPUT->pix_url('i/edit'), 'alt' => get_string('edit'), 'class' => 'iconsmall'));
+                $button = html_writer::link($url, $html, array('title' => get_string('edit')));
 
                 //table columns 'name', 'action', 'role', 'parent', 'continue', 'priority', 'data'
                 $values = array(
@@ -251,7 +248,8 @@ class local_extension_renderer extends plugin_renderer_base {
                         $trigger->parent,
                         $trigger->get_continue_name(),
                         $trigger->priority,
-                        $data
+                        var_export($trigger->data, true),
+                        $button
                 );
 
                 $table->add_data($values);
@@ -274,6 +272,10 @@ class local_extension_renderer extends plugin_renderer_base {
         $html .= html_writer::end_div();
 
         return $html;
+    }
+
+    public function render_rules($rules) {
+
     }
 }
 

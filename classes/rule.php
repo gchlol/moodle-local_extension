@@ -39,6 +39,16 @@ class rule {
 
     const RULE_ACTION_SUBSCRIBE = 1;
 
+    const RULE_CONDITION_LT = 0;
+
+    const RULE_CONDITION_GE = 1;
+
+    const RULE_CONDITION_EQ = 2;
+
+    const RULE_CONDITION_ELAPSED = 3;
+
+    const RULE_CONDITION_SPECIAL = 4;
+
     public $id = null;
 
     public $context = null;

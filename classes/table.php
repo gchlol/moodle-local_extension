@@ -116,9 +116,10 @@ class table {
                 get_string('table_header_rule_continue', 'local_extension'),
                 get_string('table_header_rule_priority', 'local_extension'),
                 get_string('table_header_rule_data', 'local_extension'),
+                '',
         );
 
-        $columns = array('name', 'action', 'role', 'parent', 'continue', 'priority', 'data');
+        $columns = array('name', 'action', 'role', 'parent', 'continue', 'priority', 'data', '');
 
         $table = new \flexible_table('local_extension_triggers');
         $table->define_columns($columns);
@@ -144,7 +145,10 @@ class table {
         $params = array();
 
         $sql = "SELECT id, context, name, role, action, priority, parent, data, continue
-                  FROM {local_extension_triggers}";
+                  FROM {local_extension_triggers}
+              ORDER BY id ASC,
+                       parent ASC,
+                       priority ASC";
 
         $records = $DB->get_records_sql($sql, $params);
         $triggers = array();
