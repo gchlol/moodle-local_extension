@@ -82,8 +82,10 @@ class rule {
                 $this->$key = $form->$key;
 
             } else {
-                // Add items that are not part of the basic object to the data.
-                $this->data[$key] = $form->$key;
+                if (preg_match("/^ruledata_/", $key)) {
+                    // Add items that are not part of the basic object to the data.
+                    $this->data[$key] = $form->$key;
+                }
             }
 
         }

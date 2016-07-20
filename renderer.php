@@ -236,9 +236,15 @@ class local_extension_renderer extends plugin_renderer_base {
 
             foreach ($triggers as $trigger) {
 
-                $url = new moodle_url('/local/extension/editrule.php', array_merge(array('id' => $trigger->id)));
+                $buttons = array();
+
+                $url = new moodle_url('/local/extension/editrule.php', array_merge(array('id' => $trigger->id, 'sesskey' => sesskey())));
                 $html = html_writer::empty_tag('img', array('src' => $OUTPUT->pix_url('i/edit'), 'alt' => get_string('edit'), 'class' => 'iconsmall'));
-                $button = html_writer::link($url, $html, array('title' => get_string('edit')));
+                $buttons[] = html_writer::link($url, $html, array('title' => get_string('edit')));
+
+                $url = new moodle_url('', array_merge(array('delete' => $trigger->id, 'sesskey' => sesskey())));
+                $html = html_writer::empty_tag('img', array('src' => $OUTPUT->pix_url('i/delete'), 'alt' => get_string('delete'), 'class' => 'iconsmall'));
+                $buttons[] = html_writer::link($url, $html, array('title' => get_string('delete')));
 
                 //table columns 'name', 'action', 'role', 'parent', 'continue', 'priority', 'data'
                 $values = array(
@@ -248,8 +254,8 @@ class local_extension_renderer extends plugin_renderer_base {
                         $trigger->parent,
                         $trigger->get_continue_name(),
                         $trigger->priority,
-                        var_export($trigger->data, true),
-                        $button
+                        var_export($trigger, true),
+                        implode(' ', $buttons)
                 );
 
                 $table->add_data($values);

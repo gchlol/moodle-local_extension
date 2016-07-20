@@ -44,8 +44,14 @@ $PAGE->requires->css('/local/extension/styles.css');
 $renderer = $PAGE->get_renderer('local_extension');
 
 $data = null;
-if (!empty($triggerid)) {
-    $data = $DB->get_record('local_extension_triggers', array('id' => $triggerid), '*', MUST_EXIST);
+if (!empty($triggerid) && confirm_sesskey()) {
+    $record = $DB->get_record('local_extension_triggers', array('id' => $triggerid), '*', MUST_EXIST);
+    $data = \local_extension\rule::from_db($record);
+
+    // Set the saved serialised data as object properties, which will be loaded as default form values.
+    foreach ($data->data as $key => $value) {
+        $data->$key = $value;
+    }
 }
 
 // TODO add parent rules to form.

@@ -66,6 +66,7 @@ $string['nav_course_request'] = 'extension request';
 $string['nav_course_request_plural'] = 'extension requests';
 $string['page_heading_summary'] = 'Extension summary list';
 $string['page_heading_manage'] = 'Extension trigger list';
+$string['page_heading_manage_delete'] = 'Remove rule';
 $string['pluginname'] = 'Activity extensions';
 $string['radio_equal'] = 'Equal to';
 $string['radio_greater'] = 'Greater than';

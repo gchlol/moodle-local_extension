@@ -26,7 +26,11 @@
 require_once('../../config.php');
 require_once($CFG->libdir . '/adminlib.php');
 
-$PAGE->set_url(new moodle_url('/local/extension/manage.php'));
+$delete   = optional_param('delete', 0, PARAM_INT);
+$confirm  = optional_param('confirm', '', PARAM_ALPHANUM);   // MD5 confirmation hash.
+
+$pageurl = new moodle_url('/local/extension/manage.php');
+$PAGE->set_url($pageurl);
 
 $context = \context_system::instance();
 require_login();
@@ -40,6 +44,40 @@ $PAGE->set_heading(get_string('rules_page_heading', 'local_extension'));
 $PAGE->requires->css('/local/extension/styles.css');
 
 $renderer = $PAGE->get_renderer('local_extension');
+
+if ($delete && confirm_sesskey()) {
+
+    if ($confirm != md5($delete)) {
+        $query = "SELECT id, context, name, role, action, priority, parent, data, continue
+                    FROM {local_extension_triggers}
+                   WHERE id = ?";
+
+        $params = array('id' => $delete);
+
+        $result = $DB->get_record_sql($query, $params);
+
+        echo $OUTPUT->header();
+        echo html_writer::tag('h2', get_string('page_heading_manage_delete', 'local_extension'));
+
+        $optionsyes = array('delete' => $delete, 'confirm' => md5($delete), 'sesskey' => sesskey());
+        $deleteurl = new moodle_url($pageurl, $optionsyes);
+        $deletebutton = new single_button($deleteurl, get_string('delete'), 'post');
+
+        echo $OUTPUT->confirm('', $deletebutton, $pageurl);
+        echo $OUTPUT->footer();
+
+        exit;
+
+    } else if (data_submitted()) {
+
+        $DB->delete_records('local_extension_triggers', array('id' => $delete));
+        redirect($pageurl);
+
+    } else {
+
+        redirect($pageurl);
+    }
+}
 
 echo $OUTPUT->header();
 
