@@ -63,8 +63,8 @@ class update extends \moodleform {
             $buttonarray=array();
             $buttonarray[] = &$mform->createElement('submit', 'approve' . $id, 'Approve');
             $buttonarray[] = &$mform->createElement('submit', 'deny' . $id, 'Deny');
-            $mform->addGroup($buttonarray, '', '', array(' '), false);
-            $mform->closeHeaderBefore('');
+            //$mform->addGroup($buttonarray, '', '', array(' '), false);
+            //$mform->closeHeaderBefore('');
         }
 
         // TODO replace <br /> with css padding/margins, or does that impact the html->text email output.
