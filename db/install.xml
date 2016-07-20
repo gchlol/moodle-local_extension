@@ -64,14 +64,15 @@
         <INDEX NAME="userid" UNIQUE="false" FIELDS="userid"/>
       </INDEXES>
     </TABLE>
-    <TABLE NAME="local_extension_config" COMMENT="Trigger configuration">
+    <TABLE NAME="local_extension_triggers" COMMENT="Trigger configuration">
       <FIELDS>
         <FIELD NAME="id" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="true"/>
         <FIELD NAME="context" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="false"/>
         <FIELD NAME="name" TYPE="text" NOTNULL="true" SEQUENCE="false" COMMENT="Trigger name"/>
         <FIELD NAME="role" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="false" COMMENT="Actionable by this role."/>
         <FIELD NAME="action" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="false" COMMENT="The role action"/>
-        <FIELD NAME="order" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="false"/>
+        <FIELD NAME="priority" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="false"/>
+        <FIELD NAME="parent" TYPE="int" LENGTH="10" NOTNULL="false" SEQUENCE="false"/>
         <FIELD NAME="data" TYPE="text" NOTNULL="true" SEQUENCE="false"/>
         <FIELD NAME="continue" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="false"/>
       </FIELDS>

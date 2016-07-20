@@ -27,10 +27,10 @@ defined('MOODLE_INTERNAL') || die;
 if ($hassiteconfig) {
     $ADMIN->add('localplugins', new admin_category('local_extension', get_string('pluginname', 'local_extension')));
 
-    $settings = new admin_settingpage('local_extension_settings', get_string('adminsettings', 'local_extension'));
+    $settings = new admin_settingpage('local_extension_settings_general', get_string('admin_settings_general', 'local_extension'));
     $ADMIN->add('local_extension', $settings);
 
-    $managerules = new admin_externalpage('local_extension_rules', get_string('externalrules', 'local_extension'), new moodle_url("$CFG->wwwroot/local/extension/manage.php"));
+    $managerules = new admin_externalpage('local_extension_settings_rules', get_string('externalrules', 'local_extension'), new moodle_url("$CFG->wwwroot/local/extension/manage.php"));
     $ADMIN->add('local_extension', $managerules);
 
     $days = array();
@@ -46,12 +46,4 @@ if ($hassiteconfig) {
             new lang_string('searchforward',      'local_extension'),
             new lang_string('searchforwardhelp',  'local_extension'), 14, $days));
 
-    $rolechoices = role_get_names(context_system::instance(), ROLENAME_ALIAS, true);
-    $settings->add(new admin_setting_configmulticheckbox('local_extension/notifyroles',
-            new lang_string('rolelist',                  'local_extension'),
-            new lang_string('rolehelp',                  'local_extension'), null, $rolechoices));
-
-    $settings->add(new admin_setting_configtextarea('local_extension/emailtemplate',
-            new lang_string('emailtemplate',        'local_extension'),
-            new lang_string('emailtemplatehelp',    'local_extension'), null));
 }

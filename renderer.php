@@ -221,6 +221,45 @@ class local_extension_renderer extends plugin_renderer_base {
             $table->add_data($values);
 
         }
+
+        return $table->finish_output();
+    }
+
+    /**
+     * Render a summary of all triggers in a table.
+     *
+     * @param flexible_table $table
+     * @param array $triggers
+     */
+    public function render_extension_trigger_table($table, $triggers) {
+        if (empty($triggers)) {
+            return;
+        }
+
+        foreach ($triggers as $trigger) {
+
+            $data = '';
+            foreach ($trigger->data as $key => $value) {
+
+                if (strpos($key, "button") !== false) {
+                    continue;
+                }
+            }
+
+            //table columns 'name', 'action', 'role', 'parent', 'continue', 'priority', 'data'
+            $values = array(
+                    $trigger->name,
+                    $trigger->action,
+                    $trigger->role,
+                    $trigger->parent,
+                    $trigger->continue,
+                    $trigger->priority,
+                    $data
+            );
+
+            $table->add_data($values);
+        }
+
         return $table->finish_output();
     }
 

@@ -15,7 +15,7 @@
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
 /**
- * Manage the adapter triggers
+ * Edit a rule / trigger.
  *
  * @package    local_extension
  * @author     Nicholas Hoobin <nicholashoobin@catalyst-au.net>
@@ -26,7 +26,9 @@
 require_once('../../config.php');
 require_once($CFG->libdir . '/adminlib.php');
 
-$PAGE->set_url(new moodle_url('/local/extension/manage.php'));
+$triggerid = optional_param('id', 0, PARAM_INT);
+
+$PAGE->set_url(new moodle_url('/local/extension/editrule.php'));
 
 $context = \context_system::instance();
 require_login();
@@ -41,11 +43,37 @@ $PAGE->requires->css('/local/extension/styles.css');
 
 $renderer = $PAGE->get_renderer('local_extension');
 
+if (!empty($triggerid)) {
+    $data = $DB->get_record('local_extension_triggers', array('id' => $triggerid), '*', MUST_EXIST);
+}
+
+// TODO add parent rules to form.
+
+$mform = new \local_extension\form\rule(null, null);
+
+if ($mform->is_cancelled()) {
+
+    $url = new moodle_url('/local/extension/manage.php');
+    redirect($url);
+    die;
+
+} else if ($form = $mform->get_data()) {
+
+    $rule = new \local_extension\rule();
+    $rule->load_from_form($form);
+
+    if (!empty($rule->id)) {
+        $DB->update_record('local_extension_triggers', $rule);
+    } else {
+        $DB->insert_record('local_extension_triggers', $rule);
+    }
+
+    $url = new moodle_url('/local/extension/manage.php');
+    redirect($url);
+    die;
+
+}
+
 echo $OUTPUT->header();
-
-// Display a table of all triggers when no id is present.
-$table = \local_extension\table::generate_trigger_table();
-$data = \local_extension\table::generate_trigger_data($table);
-echo $renderer->render_extension_trigger_table($table, $data);
-
+echo $mform->display();
 echo $OUTPUT->footer();

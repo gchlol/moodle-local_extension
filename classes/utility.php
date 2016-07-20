@@ -174,69 +174,6 @@ class utility {
         message_send($message);
     }
 
-    /**
-     * Generates the basic requirements the status page table.
-     *
-     * @return flexible_table
-     */
-    public static function generate_table() {
-        global $PAGE;
-
-        $headers = array(
-                get_string('table_header_request', 'local_extension'),
-                get_string('table_header_items', 'local_extension'),
-                get_string('table_header_requestdate', 'local_extension'),
-                get_string('table_header_statushead', 'local_extension'),
-        );
-
-        $columns = array('request', 'date', 'items', 'status');
-
-        $table = new \flexible_table('local_extension_summary');
-        $table->define_columns($columns);
-        $table->define_headers($headers);
-
-        $table->define_baseurl($PAGE->url);
-        $table->set_attribute('id', 'local_extension_table');
-        $table->set_attribute('class', 'generaltable admintable');
-        $table->setup();
-
-        return $table;
-    }
-
-    /**
-     * Generates the data required for the status page table.
-     * @param flexible_table $table
-     * @param integer $userid
-     * @return request[] An array of request objects
-     */
-     public static function generate_table_data($table, $userid = 0) {
-        global $DB;
-
-        // TODO tablelib orderby column options? should we enable this?
-
-        if (!empty($userid)) {
-            $where = " WHERE cm.userid = ? ";
-            $params = array('userid' => $userid);
-        } else {
-            $where = '';
-            $params = array();
-        }
-
-        $sql = "SELECT r.id,
-        r.timestamp,
-        COUNT(cm.request)
-        FROM {local_extension_request} r
-        LEFT JOIN {local_extension_cm} cm
-        ON cm.request = r.id
-        $where
-        GROUP BY r.id
-        ORDER BY r.timestamp ASC";
-
-        $requests = $DB->get_records_sql($sql, $params);
-
-        return $requests;
-    }
-
     public static function course_request_status($courseid, $userid) {
         global $DB;
 
@@ -252,9 +189,9 @@ class utility {
         global $DB;
 
         $sql = "SELECT count(cm.request)
-              FROM {local_extension_cm} cm
-             WHERE userid = :userid
-               AND course = :courseid";
+                  FROM {local_extension_cm} cm
+                 WHERE userid = :userid
+                   AND course = :courseid";
 
         $params = array('userid' => $userid, 'courseid' => $courseid);
 
@@ -295,8 +232,8 @@ class utility {
         }
 
         $sql = "SELECT r.id
-        FROM {local_extension_request} r
-        $where";
+                  FROM {local_extension_request} r
+                $where";
 
         $requestids = $DB->get_fieldset_sql($sql, $params);
 

@@ -38,8 +38,8 @@ $PAGE->set_pagelayout('standard');
 $PAGE->set_title(get_string('pluginname', 'local_extension'));
 $PAGE->requires->css('/local/extension/styles.css');
 
-$table = \local_extension\utility::generate_table();
-$data = \local_extension\utility::generate_table_data($table, $USER->id);
+$table = \local_extension\table::generate_index_table();
+$data = \local_extension\table::generate_index_data($table, $USER->id);
 $url = new moodle_url("/local/extension/request.php");
 
 $renderer = $PAGE->get_renderer('local_extension');

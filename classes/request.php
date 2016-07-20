@@ -72,7 +72,7 @@ class request implements \cache_data_source {
         global $DB;
 
         if (empty($this->requestid)) {
-            throw coding_exception('No request id');
+            throw \coding_exception('No request id');
         }
 
         $requestid = $this->requestid;
@@ -169,7 +169,10 @@ class request implements \cache_data_source {
     }
 
     /**
-     * @param unknown $mform
+     * Updates the cm with via posted data.
+     *
+     * @param moodleform $mform
+     * @param stdClass $data
      */
     public function update_cm_status($user, $data) {
 
