@@ -48,7 +48,7 @@ $renderer = $PAGE->get_renderer('local_extension');
 if ($delete && confirm_sesskey()) {
 
     if ($confirm != md5($delete)) {
-        $query = "SELECT id, context, name, role, action, priority, parent, data, continue
+        $query = "SELECT id, name
                     FROM {local_extension_triggers}
                    WHERE id = ?";
 
@@ -91,7 +91,9 @@ echo $renderer->render_extension_trigger_table($table, $data);
 echo html_writer::empty_tag('br');
 
 $url = new moodle_url("/local/extension/editrule.php");
-echo $OUTPUT->single_button($url, get_string('button_edit_rule', 'local_extension'));
 
+$mods = \local_extension\plugininfo\extension::get_enabled_request();
+
+echo $renderer->render_manage_new_rule($mods, $url);
 
 echo $OUTPUT->footer();

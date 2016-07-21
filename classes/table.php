@@ -144,18 +144,38 @@ class table {
 
         $params = array();
 
-        $sql = "SELECT id, context, name, role, action, priority, parent, data, continue
+        $sql = "SELECT id,
+                       context,
+                       name,
+                       role,
+                       action,
+                       priority,
+                       parent,
+                       lengthfromduedate,
+                       lengthtype,
+                       elapsedfromrequest,
+                       elapsedtype,
+                       data
                   FROM {local_extension_triggers}
-              ORDER BY id ASC,
-                       parent ASC,
-                       priority ASC";
+              ORDER BY id";
 
         $records = $DB->get_records_sql($sql, $params);
         $triggers = array();
 
         foreach ($records as $record) {
-            $triggers[] = \local_extension\rule::from_db($record);
+            $triggers[$record->id] = \local_extension\rule::from_db($record);
         }
+
+        usort($triggers, function ($a, $b) {
+            if ($a->id == $b->id) {
+                if ($a->parent == $b->parent) {
+                    return 0;
+                } else if ($a->parent > $b->parent) {
+                    return 1;
+                }
+            }
+
+        });
 
         return $triggers;
     }

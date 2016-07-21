@@ -35,6 +35,14 @@ namespace extension_quiz;
  */
 class request extends \local_extension\base_request {
 
+    public function get_name() {
+        return 'Quiz';
+    }
+
+    public function get_data_type() {
+        return 'quiz';
+    }
+
     /**
      * Is a calendar event something we can handle?
      *

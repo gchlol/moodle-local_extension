@@ -35,6 +35,14 @@ namespace extension_assign;
  */
 class request extends \local_extension\base_request {
 
+    public function get_name() {
+        return 'Assignment';
+    }
+
+    public function get_data_type() {
+        return 'assign';
+    }
+
     /**
      * Is a calendar event something we can handle?
      *

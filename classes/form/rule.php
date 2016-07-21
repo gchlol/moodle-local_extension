@@ -47,8 +47,95 @@ class rule extends \moodleform {
     public function definition() {
         $mform = $this->_form;
 
-        $data = $this->_customdata['data'];
-        $parentrules = $this->_customdata['parentrules'];
+        $datatype = $this->_customdata['datatype'];
+        $parents = $this->_customdata['parents'];
+
+        // Edit Rule Header
+        $mform->addElement('header', 'name_set', get_string('form_rule_header_edit', 'local_extension'), null, null);
+        $mform->setExpanded('name_set');
+
+        // Name
+        $mform->addElement('text', 'name', get_string('form_rule_label_name', 'local_extension'), '');
+        $mform->setType('name', PARAM_TEXT);
+        $mform->addRule('name', get_string('required'), 'required');
+
+        // Priority
+        $optionspriority = array();
+        for ($i = 1; $i <= 10; $i++) {
+            $optionspriority[] = $i;
+        }
+
+        $mform->addElement('select', 'priority', get_string('form_rule_label_priority', 'local_extension'), $optionspriority);
+
+        // Only activate when [parent] has also been triggered.
+        $parentgroup = array();
+
+        $optionsparent = array('N/A');
+        foreach ($parents as $parent) {
+            $optionsparent[$parent->id] = $parent->name;
+        }
+
+        $parentgroup[] = $mform->createElement('select', 'parent', null, $optionsparent);
+        $parentgroup[] = $mform->createElement('static', 'hastriggered', '', get_string('form_rule_label_parent_end', 'local_extension'));
+
+        $mform->addGroup($parentgroup, 'parentgroup', get_string('form_rule_label_parent', 'local_extension'), array(' '), false);
+
+        // If the requested length is [lt/ge] [x] days long.
+        $lengthfromduedate = array();
+
+        $lengthtypes = array(
+                'less than',
+                'greater or equal to',
+        );
+
+        $lengthfromduedategroup[] = $mform->createElement('select', 'lengthtype', '', $lengthtypes);
+        $lengthfromduedategroup[] = $mform->createElement('text', 'lengthfromduedate', '');
+        $lengthfromduedategroup[] = $mform->createElement('static', 'dayslong', '', get_string('form_rule_label_days_long', 'local_extension'));
+
+        $mform->setType('lengthfromduedate', PARAM_INT);
+        $mform->addGroup($lengthfromduedategroup, 'lengthfromduedategroup', get_string('form_rule_label_request_length', 'local_extension'), array(' '), false);
+
+        // and the request is [lt/ge] [x] days old.
+        $elapsedtime = array();
+
+        $lengthtypes = array(
+                'less than',
+                'greater or equal to',
+        );
+
+        $elapsedtimegroup[] = $mform->createElement('select', 'elapsedtype', '', $lengthtypes);
+        $elapsedtimegroup[] = $mform->createElement('text', 'elapsedfromrequest', '');
+        $elapsedtimegroup[] = $mform->createElement('static', 'daysold', '', get_string('form_rule_label_days_old', 'local_extension'));
+
+        $mform->setType('elapsedfromrequest', PARAM_INT);
+        $mform->addGroup($elapsedtimegroup, 'elapsedtimegroup', get_string('form_rule_label_elapsed_length', 'local_extension'), array(' '), false);
+
+        // then set all roles equal to [roletypes] to [action] this request.
+        $actionarray = array();
+
+        $actiontypes = array(
+                get_string('form_rule_select_approve', 'local_extension'),
+                get_string('form_rule_select_subscribe', 'local_extension'),
+        );
+
+        $roletypes = role_get_names(\context_system::instance(), ROLENAME_ALIAS, true);
+
+        $actiongroup[] = $mform->createElement('select', 'role', null, $roletypes);
+        $actiongroup[] = $mform->createElement('static', 'to', '', get_string('form_rule_label_to', 'local_extension'));
+        $actiongroup[] = $mform->createElement('select', 'action', null, $actiontypes);
+        $actiongroup[] = $mform->createElement('static', 'approve', '', get_string('form_rule_label_this_request', 'local_extension'));
+
+        $mform->addGroup($actiongroup, 'actiongroup', get_string('form_rule_label_set_roles', 'local_extension'), array(' '), false);
+
+        // Email template
+        // TODO email subsystem templates
+
+        // Continue
+        /*
+        $options = array(get_string('no'), get_string('yes'));
+        $mform->addElement('select', 'continue', get_string('form_rule_continue', 'local_extension'), $options);
+        $mform->addHelpButton('continue', 'form_rule_continue', 'local_extension');
+        */
 
         // ID
         $mform->addElement('hidden', 'id', 0);
@@ -58,86 +145,8 @@ class rule extends \moodleform {
         $mform->addElement('hidden', 'context', 1);
         $mform->setType('context', PARAM_INT);
 
-        // Edit Rule Header
-        $mform->addElement('header', 'name_set', get_string('form_rule_header_edit', 'local_extension'), null, null);
-        $mform->setExpanded('name_set');
-
-        // Name
-        $mform->addElement('text', 'name', get_string('form_rule_itemname', 'local_extension'), '');
-        $mform->setType('name', PARAM_TEXT);
-        $mform->addRule('name', get_string('required'), 'required');
-        $mform->addHelpButton('name', 'form_rule_itemname', 'local_extension');
-
-        $optionsless = array('');
-        // Less than < days. (1-10).
-        for ($i = 1; $i <= 10; $i++) {
-            $optionsless[] = new \lang_string('numdays', '', $i);
-        }
-
-        $optionsgreater = array('');
-        // Greater than > days (1-10).
-        for ($i = 1; $i <= 10; $i++) {
-            $optionsgreater[] = new \lang_string('numdays', '', $i);
-        }
-
-        $mform->addElement('header', 'extension_length_set', get_string('form_rule_header_extension_length_options', 'local_extension'), null, null);
-        $mform->setExpanded('extension_length_set');
-
-        $radioarray   = array();
-        $radioarray[] = $mform->createElement('radio', 'ruledata_extension_length_radio', '', get_string('radio_less', 'local_extension'), 1);
-        $radioarray[] = $mform->createElement('radio', 'ruledata_extension_length_radio', '', get_string('radio_equal', 'local_extension'), 0);
-        $radioarray[] = $mform->createElement('radio', 'ruledata_extension_length_radio', '', get_string('radio_greater', 'local_extension'), 0);
-        $mform->addGroup($radioarray, 'radioar', '', array(' '), false);
-
-        $mform->addElement('select', 'ruledata_extension_length', get_string('form_rule_extension_length', 'local_extension'), $optionsless);
-        //$mform->addRule('extension_length', get_string('required'), 'required');
-        $mform->addHelpButton('ruledata_extension_length', 'form_rule_extension_length', 'local_extension');
-
-        $mform->addElement('header', 'general_set', get_string('form_rule_header_general_options', 'local_extension'), null, null);
-        $mform->setExpanded('general_set');
-
-        // Time elpased
-        $optionselapsed = array('');
-        for ($i = 1; $i <= 10; $i++) {
-            $optionselapsed[] = new \lang_string('numdays', '', $i);
-        }
-
-        $mform->addElement('select', 'ruledata_time_elapsed', get_string('form_rule_time_elapsed', 'local_extension'), $optionselapsed);
-        $mform->addHelpButton('ruledata_time_elapsed', 'form_rule_time_elapsed', 'local_extension');
-
-        // Role action
-        $options = array(
-            get_string('form_rule_select_approve', 'local_extension'),
-            get_string('form_rule_select_subscribe', 'local_extension'),
-        );
-        $mform->addElement('select', 'action', get_string('form_rule_action', 'local_extension'), $options);
-        $mform->addHelpButton('action', 'form_rule_action', 'local_extension');
-
-        // Roles
-        $options = role_get_names(\context_system::instance(), ROLENAME_ALIAS, true);
-        $mform->addElement('select', 'role', get_string('form_rule_roles', 'local_extension'), $options);
-        $mform->addHelpButton('role', 'form_rule_roles', 'local_extension');
-
-        // Email template
-        // TODO email subsystem templates
-
-        $optionsparent = array();
-        $mform->addElement('select', 'parent', get_string('form_rule_parent', 'local_extension'), $optionsparent);
-        $mform->addHelpButton('parent', 'form_rule_parent', 'local_extension');
-
-        // Continue
-        $options = array(get_string('no'), get_string('yes'));
-        $mform->addElement('select', 'continue', get_string('form_rule_continue', 'local_extension'), $options);
-        $mform->addHelpButton('continue', 'form_rule_continue', 'local_extension');
-
-        // Priority
-        $optionspriority = array();
-        for ($i = 1; $i <= 10; $i++) {
-            $optionspriority[] = $i;
-        }
-
-        $mform->addElement('select', 'priority', get_string('form_rule_priority', 'local_extension'), $optionspriority);
-        $mform->addHelpButton('priority', 'form_rule_priority', 'local_extension');
+        $mform->addElement('hidden', 'datatype', $datatype);
+        $mform->setType('datatype', PARAM_ALPHANUM);
 
         $this->add_action_buttons();
     }

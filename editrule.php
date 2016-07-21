@@ -27,6 +27,7 @@ require_once('../../config.php');
 require_once($CFG->libdir . '/adminlib.php');
 
 $triggerid = optional_param('id', 0, PARAM_INT);
+$datatype = optional_param('datatype', '', PARAM_ALPHANUM);
 
 $PAGE->set_url(new moodle_url('/local/extension/editrule.php'));
 
@@ -47,16 +48,19 @@ $data = null;
 if (!empty($triggerid) && confirm_sesskey()) {
     $record = $DB->get_record('local_extension_triggers', array('id' => $triggerid), '*', MUST_EXIST);
     $data = \local_extension\rule::from_db($record);
+    $data->datatype = $datatype;
 
     // Set the saved serialised data as object properties, which will be loaded as default form values.
-    foreach ($data->data as $key => $value) {
-        $data->$key = $value;
+    if (!empty($data->data)) {
+        foreach ($data->data as $key => $value) {
+            $data->$key = $value;
+        }
     }
 }
 
-// TODO add parent rules to form.
+$parents = $DB->get_records('local_extension_triggers', null, 'id ASC', 'id, name');
 
-$mform = new \local_extension\form\rule(null, null);
+$mform = new \local_extension\form\rule(null, array('parents' => $parents, 'datatype' => $datatype));
 $mform->set_data($data);
 
 if ($mform->is_cancelled()) {

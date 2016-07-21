@@ -128,6 +128,19 @@ abstract class base_request {
         }
     }
 
+
+    /**
+     * A readable name.
+     * @return string Module name
+     */
+    abstract public function get_name();
+
+    /**
+     * Data type name.
+     * @return string Data type name
+     */
+    abstract public function get_data_type();
+
     /**
      * Is a calendar event something we can handle?
      *

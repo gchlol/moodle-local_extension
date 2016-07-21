@@ -234,25 +234,30 @@ class local_extension_renderer extends plugin_renderer_base {
         global $OUTPUT;
         if (!empty($triggers)) {
 
-            foreach ($triggers as $trigger) {
+            foreach ($triggers as $id => $trigger) {
 
                 $buttons = array();
 
-                $url = new moodle_url('/local/extension/editrule.php', array_merge(array('id' => $trigger->id, 'sesskey' => sesskey())));
-                $html = html_writer::empty_tag('img', array('src' => $OUTPUT->pix_url('i/edit'), 'alt' => get_string('edit'), 'class' => 'iconsmall'));
+                $url = new moodle_url('/local/extension/editrule.php', array_merge(array('id' => $trigger->id, 'datatype' => $trigger->data['datatype'], 'sesskey' => sesskey())));
+                $html = html_writer::empty_tag('img', array('src' => $OUTPUT->pix_url('t/edit'), 'alt' => get_string('edit'), 'class' => 'iconsmall'));
                 $buttons[] = html_writer::link($url, $html, array('title' => get_string('edit')));
 
                 $url = new moodle_url('', array_merge(array('delete' => $trigger->id, 'sesskey' => sesskey())));
-                $html = html_writer::empty_tag('img', array('src' => $OUTPUT->pix_url('i/delete'), 'alt' => get_string('delete'), 'class' => 'iconsmall'));
+                $html = html_writer::empty_tag('img', array('src' => $OUTPUT->pix_url('t/delete'), 'alt' => get_string('delete'), 'class' => 'iconsmall'));
                 $buttons[] = html_writer::link($url, $html, array('title' => get_string('delete')));
+
+                $parent = null;
+                if (!empty($trigger->parent)) {
+                    $parent = $triggers[$trigger->parent]->name;
+                }
 
                 //table columns 'name', 'action', 'role', 'parent', 'continue', 'priority', 'data'
                 $values = array(
                         $trigger->name,
                         $trigger->get_action_name(),
                         $trigger->get_role_name(),
-                        $trigger->parent,
-                        $trigger->get_continue_name(),
+                        $parent,
+                        null,
                         $trigger->priority,
                         var_export($trigger, true),
                         implode(' ', $buttons)
@@ -280,8 +285,18 @@ class local_extension_renderer extends plugin_renderer_base {
         return $html;
     }
 
-    public function render_rules($rules) {
+    public function render_manage_new_rule($mods, $url) {
+        $stredit = get_string('button_edit_rule', 'local_extension');
 
+        $options = array();
+
+        foreach ($mods as $mod) {
+            $options[$mod->get_data_type()] = $mod->get_name();
+        }
+
+        $html = $this->single_select($url, 'datatype', $options, '', array('' => $stredit), 'newfieldform');
+
+        return $html;
     }
 }
 

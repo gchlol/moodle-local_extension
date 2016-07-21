@@ -43,11 +43,7 @@ class rule {
 
     const RULE_CONDITION_GE = 1;
 
-    const RULE_CONDITION_EQ = 2;
-
-    const RULE_CONDITION_ELAPSED = 3;
-
-    const RULE_CONDITION_SPECIAL = 4;
+    const RULE_CONDITION_SPECIAL = 2;
 
     public $id = null;
 
@@ -57,17 +53,23 @@ class rule {
 
     public $role = null;
 
-    public $rolenames = null;
-
     public $action = null;
 
     public $priority = null;
 
     public $parent = null;
 
+    public $lengthfromduedate = null;
+
+    public $lengthtype = null;
+
+    public $elapsedfromrequest = null;
+
+    public $elapsedtype = null;
+
     public $data = null;
 
-    public $continue = null;
+    public $rolenames = null;
 
     public function __construct($ruleid = null) {
         $this->id = $ruleid;
@@ -82,9 +84,8 @@ class rule {
                 $this->$key = $form->$key;
 
             } else {
-                if (preg_match("/^ruledata_/", $key)) {
-                    // Add items that are not part of the basic object to the data.
-                    $this->data[$key] = $form->$key;
+                if($key == 'datatype') {
+                    $this->data['datatype'] = $form->$key;
                 }
             }
 
@@ -114,6 +115,10 @@ class rule {
         $ruleid = $this->id;
 
         $record = $DB->get_record('local_extension_triggers', array('id' => $ruleid), '*', MUST_EXIST);
+
+        foreach ($record as $key => $value) {
+            $rule->$key = $record->$key;
+        }
     }
 
     public static function from_id($ruleid) {
@@ -148,10 +153,6 @@ class rule {
             default:
                 return '';
         }
-    }
-
-    public function get_continue_name() {
-        return $this->continue == 1 ? get_string('yes') : get_string('no');
     }
 
 }
