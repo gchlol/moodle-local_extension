@@ -58,7 +58,7 @@ if (!empty($triggerid) && confirm_sesskey()) {
     }
 }
 
-$parents = $DB->get_records('local_extension_triggers', null, 'id ASC', 'id, name');
+$parents = $DB->get_records_menu('local_extension_triggers', null, 'id ASC', 'id, name');
 
 $mform = new \local_extension\form\rule(null, array('parents' => $parents, 'datatype' => $datatype));
 $mform->set_data($data);

@@ -50,11 +50,11 @@ function local_extension_extends_navigation(global_navigation $nav) {
 
             $coursenode = $nav->find($courseid, navigation_node::TYPE_COURSE);
             if (!empty($coursenode)) {
-                $requests = \local_extension\utility::find_request($courseid);
+                $requests = \local_extension\utility::find_course_requests($courseid);
 
                 if (empty($requests)) {
                     // Display the request extension link.
-                    $node = $coursenode->add(get_string('requestextension', 'local_extension'), $url);
+                    $node = $coursenode->add(get_string('nav_request', 'local_extension'), $url);
                 } else {
 
                     $requestcount = \local_extension\utility::count_requests($courseid, $USER->id);
@@ -84,27 +84,28 @@ function local_extension_extends_navigation(global_navigation $nav) {
 
             $modulenode = $nav->find($cmid, navigation_node::TYPE_ACTIVITY);
             if (!empty($modulenode)) {
-                list($request, $cm) = \local_extension\utility::find_request($courseid, $cmid);
+                list($request, $cm) = \local_extension\utility::find_module_requests($courseid, $cmid);
 
                 if (empty($cm)) {
                     // Display the request extension link.
                     $url = new moodle_url('/local/extension/request.php', array('course' => $courseid, 'cmid' => $cmid));
-                    $node = $modulenode->add(get_string('requestextension', 'local_extension'), $url);
+                    $node = $modulenode->add(get_string('nav_request', 'local_extension'), $url);
                 } else {
                     // Display the request status for this module.
                     $url = new moodle_url('/local/extension/status.php', array('id' => $request->requestid));
 
                     $event = $request->mods[$cmid]['event'];
-
+                    $localcm = $request->mods[$cmid]['localcm'];
                     $handler = $request->mods[$cmid]['handler'];
-                    $status = $handler->get_status_name($cm->status);
-                    $result = $handler->get_status_result($cm->status);
 
-                    $delta = $cm->data - $event->timestart;
+                    $status = $localcm->get_state_name();
+                    $result = $localcm->get_state_result();
+
+                    $delta = $cm->get_data() - $event->timestart;
 
                     $extensionlength = format_time($delta);
 
-                    // block_nagivation->trim will truncate the navagation item to 25/50 characters.
+                    // The function block_nagivation->trim will truncate the navagation item to 25/50 characters.
                     $node = $modulenode->add($result . ' ' .$extensionlength . ' extension', $url);
                 }
             }

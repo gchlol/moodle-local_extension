@@ -30,7 +30,8 @@ if ($hassiteconfig) {
     $settings = new admin_settingpage('local_extension_settings_general', get_string('admin_settings_general', 'local_extension'));
     $ADMIN->add('local_extension', $settings);
 
-    $managerules = new admin_externalpage('local_extension_settings_rules', get_string('externalrules', 'local_extension'), new moodle_url("$CFG->wwwroot/local/extension/manage.php"));
+    $manageurl = new moodle_url("$CFG->wwwroot/local/extension/manage.php");
+    $managerules = new admin_externalpage('local_extension_settings_rules', get_string('externalrules', 'local_extension'), $manageurl);
     $ADMIN->add('local_extension', $managerules);
 
     $days = array();

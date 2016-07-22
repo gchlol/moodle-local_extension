@@ -35,47 +35,75 @@ namespace local_extension;
  */
 class rule {
 
+    /** @var integer Action type: Approve. */
     const RULE_ACTION_APPROVE = 0;
 
+    /** @var integer Action type: Subscribe. */
     const RULE_ACTION_SUBSCRIBE = 1;
 
+    /** @var integer Condition: Less than. */
     const RULE_CONDITION_LT = 0;
 
+    /** @var integer Condition: Greater or equal to. */
     const RULE_CONDITION_GE = 1;
 
+    /** @var integer Condition: Special. */
     const RULE_CONDITION_SPECIAL = 2;
 
+    /** @var integer The local_extension_trigger id */
     public $id = null;
 
+    /** @var integer The context associated with this rule */
     public $context = null;
 
+    /** @var string Rule name */
     public $name = null;
 
+    /** @var integer Role that is notified */
     public $role = null;
 
+    /** @var integer Action type */
     public $action = null;
 
+    /** @var integer Priortiy */
     public $priority = null;
 
+    /** @var integer Parent id */
     public $parent = null;
 
+    /** @var integer The length from due date */
     public $lengthfromduedate = null;
 
+    /** @var integer Length from due date type (LT/GE) */
     public $lengthtype = null;
 
+    /** @var integer Time elapsed from request date */
     public $elapsedfromrequest = null;
 
+    /** @var integer Time elapsed from request date type (LT/GE) */
     public $elapsedtype = null;
 
+    /** @var stdClass Custom data assocaited with this object, serialised base64 */
     public $data = null;
 
+    /** @var array Role names lookup */
     public $rolenames = null;
 
+    /**
+     * Rule object constructor.
+     *
+     * @param integer $ruleid
+     */
     public function __construct($ruleid = null) {
         $this->id = $ruleid;
         $this->rolenames = \role_get_names(\context_system::instance(), ROLENAME_ALIAS, true);
     }
 
+    /**
+     * Parses submitted form data and sets the properties of this class to match.
+     *
+     * @param stdClass $form
+     */
     public function load_from_form($form) {
 
         foreach ($form as $key => $value) {
@@ -84,7 +112,7 @@ class rule {
                 $this->$key = $form->$key;
 
             } else {
-                if($key == 'datatype') {
+                if ($key == 'datatype') {
                     $this->data['datatype'] = $form->$key;
                 }
             }
@@ -95,14 +123,24 @@ class rule {
 
     }
 
-    public function data_unserialise() {
+    /**
+     * Unserialises and base64_decodes the saved custom data.
+     * @return data
+     */
+    public function data_load() {
         return unserialize(base64_decode($this->data));
     }
 
+    /**
+     * Saves the custom data, serialising it and then base64_encoding.
+     */
     public function data_save() {
         $this->data = base64_encode(serialize($this->data));
     }
 
+    /**
+     * Loads the data into this object if the id has been set.
+     */
     public function load() {
         global $DB;
 
@@ -119,8 +157,16 @@ class rule {
         foreach ($record as $key => $value) {
             $rule->$key = $record->$key;
         }
+
+        $rule->data = $rule->data_load();
     }
 
+    /**
+     * Obtain a rule object with the given id.
+     *
+     * @param integer $ruleid
+     * @return \local_extension\rule
+     */
     public static function from_id($ruleid) {
         $rule = new rule($ruleid);
         $rule->load();
@@ -128,6 +174,12 @@ class rule {
     }
 
 
+    /**
+     * Obtain a rule object with after applying the moodle data object values.
+     *
+     * @param stdClass $object
+     * @return \local_extension\rule
+     */
     public static function from_db($object) {
         $rule = new rule();
 
@@ -135,15 +187,23 @@ class rule {
             $rule->$key = $object->$key;
         }
 
-        $rule->data = $rule->data_unserialise();
+        $rule->data = $rule->data_load();
 
         return $rule;
     }
 
+    /**
+     * Returns the role name alias for the role that is associated to this class.
+     * @return string
+     */
     public function get_role_name() {
         return $this->rolenames[$this->role];
     }
 
+    /**
+     * Return the actions name that will be performed.
+     * @return string
+     */
     public function get_action_name() {
         switch($this->action) {
             case self::RULE_ACTION_APPROVE:

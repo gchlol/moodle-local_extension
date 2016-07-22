@@ -80,7 +80,7 @@ class request extends \moodleform {
                 $handler->request_definition($mform, $mod);
             }
 
-            // TODO style the width of this textarea
+            // TODO style the width of this textarea.
             $mform->addElement('textarea', 'comment', get_string('comment', 'local_extension'), '');
             $mform->addRule('comment', 'Required', 'required', null, 'client');
 

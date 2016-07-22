@@ -50,16 +50,16 @@ class rule extends \moodleform {
         $datatype = $this->_customdata['datatype'];
         $parents = $this->_customdata['parents'];
 
-        // Edit Rule Header
+        // Edit Rule Header.
         $mform->addElement('header', 'name_set', get_string('form_rule_header_edit', 'local_extension'), null, null);
         $mform->setExpanded('name_set');
 
-        // Name
+        // Name.
         $mform->addElement('text', 'name', get_string('form_rule_label_name', 'local_extension'), '');
         $mform->setType('name', PARAM_TEXT);
         $mform->addRule('name', get_string('required'), 'required');
 
-        // Priority
+        // Priority.
         $optionspriority = array();
         for ($i = 1; $i <= 10; $i++) {
             $optionspriority[] = $i;
@@ -71,8 +71,8 @@ class rule extends \moodleform {
         $parentgroup = array();
 
         $optionsparent = array('N/A');
-        foreach ($parents as $parent) {
-            $optionsparent[$parent->id] = $parent->name;
+        foreach ($parents as $id => $name) {
+            $optionsparent[$id] = $name;
         }
 
         $parentgroup[] = $mform->createElement('select', 'parent', null, $optionsparent);
@@ -127,21 +127,21 @@ class rule extends \moodleform {
 
         $mform->addGroup($actiongroup, 'actiongroup', get_string('form_rule_label_set_roles', 'local_extension'), array(' '), false);
 
-        // Email template
+        // Email template.
         // TODO email subsystem templates
 
-        // Continue
+        // Continue.
         /*
         $options = array(get_string('no'), get_string('yes'));
         $mform->addElement('select', 'continue', get_string('form_rule_continue', 'local_extension'), $options);
         $mform->addHelpButton('continue', 'form_rule_continue', 'local_extension');
         */
 
-        // ID
+        // ID.
         $mform->addElement('hidden', 'id', 0);
         $mform->setType('id', PARAM_INT);
 
-        // Context
+        // Context.
         $mform->addElement('hidden', 'context', 1);
         $mform->setType('context', PARAM_INT);
 

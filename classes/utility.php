@@ -41,14 +41,14 @@ class utility {
     /**
      * Returns a list of candidate dates for activities
      *
-     * @param user $user Userid or user object
+     * @param user $userid Userid or user object
      * @param timestamp $start  Start of search period
      * @param timestamp $end End of search period
      * @param array $options Optional arguments.
      * @return An array of candidates.
      *
      */
-    public static function get_activities($user, $start, $end, $options = null) {
+    public static function get_activities($userid, $start, $end, $options = null) {
         global $DB;
 
         $cid = !empty($options['courseid']) ? $options['courseid'] : 0;
@@ -68,7 +68,7 @@ class utility {
         // Get the events matching our criteria.
         list($courses, $group, $user2) = calendar_set_filters(array());
 
-        $allevents = calendar_get_events($start, $end, array($user), $groups, true);
+        $allevents = calendar_get_events($start, $end, array($userid), $groups, true);
 
         $events = array();
         $courses = array();
@@ -121,15 +121,15 @@ class utility {
             // If a requestid has been provided, obtain the local cm data for this mod.
             $localcm = null;
             if (!empty($requestid)) {
-                $localcm = $DB->get_record('local_extension_cm', array('request' => $requestid, 'cmid' => $cm->id));
+                $localcm = \local_extension\cm::from_requestid($cm->id, $requestid);
 
                 // No local_extension_cm found, we won't need to provide an event.
-                if (empty($localcm)) {
+                if (empty($localcm->cm)) {
                     continue;
                 }
             } else {
                 // Try and obtain a request associated to this user for a course module.
-                $localcm = $DB->get_record('local_extension_cm', array('userid' => $user, 'cmid' => $cm->id));
+                $localcm = \local_extension\cm::from_userid($cm->id, $userid);
             }
 
             $events[$cm->id] = array(
@@ -174,6 +174,11 @@ class utility {
         message_send($message);
     }
 
+    /**
+     * TODO
+     * @param integer $courseid
+     * @param integer $userid
+     */
     public static function course_request_status($courseid, $userid) {
         global $DB;
 
@@ -185,7 +190,7 @@ class utility {
      * @param interger $userid
      * @return integer count
      */
-     public static function count_requests($courseid, $userid) {
+    public static function count_requests($courseid, $userid) {
         global $DB;
 
         $sql = "SELECT count(cm.request)
@@ -210,7 +215,7 @@ class utility {
      * @param integer $requestid
      * @return request A request object.
      */
-     public static function cache_get_request($requestid) {
+    public static function cache_get_request($requestid) {
         $cache = \cache::make('local_extension', 'requests');
         return $cache->get($requestid);
     }
@@ -218,9 +223,10 @@ class utility {
     /**
      * Returns an array of all requests from the cache for the user specified.
      *
+     * @param integer $userid
      * @return request[] An array of requests.
      */
-     public static function cache_get_requests($userid = 0) {
+    public static function cache_get_requests($userid = 0) {
         global $DB;
 
         if (!empty($userid)) {
@@ -252,40 +258,49 @@ class utility {
     }
 
     /**
-     * Obtains the requests for the current user. Filterable by courseid and moduleid.
+     * Returns the requests for a given courseid.
      *
      * @param integer $courseid
-     * @param integer $moduleid
-     * @return request[]|request[]|unknown[]
+     * @return \local_extension\request[]
      */
-    public static function find_request($courseid, $moduleid = 0) {
-        global $USER, $CFG;
+    public static function find_course_requests($courseid) {
+        global $USER;
 
         $requests = self::cache_get_requests($USER->id);
 
-        if (empty($moduleid)) {
-            $matchedrequests = array();
-            // Return matching requests for a course.
-            foreach ($requests as $request) {
-                foreach ($request->cms as $cm) {
-                    if ($courseid == $cm->course) {
-                        $matchedrequests[$cm->request] = $request;
-                        break;
-                    }
+        $matchedrequests = array();
+
+        // Return matching requests for a course.
+        foreach ($requests as $request) {
+            foreach ($request->cms as $cm) {
+                if ($courseid == $cm->get_courseid()) {
+                    $matchedrequests[$cm->requestid] = $request;
+                    break;
                 }
             }
-            return $matchedrequests;
+        }
 
-        } else {
-            // Return a matching course module, eg. assignment, quiz.
-            foreach ($requests as $request) {
-                foreach ($request->cms as $cm) {
-                    if ($courseid == $cm->course && $moduleid == $cm->cmid) {
-                        return array($request, $cm);
-                    }
+        return $matchedrequests;
+    }
+
+    /**
+     * Returns the cm and request.
+     *
+     * @param integer $courseid
+     * @param integer $moduleid
+     * @return \local_extension\request[]|unknown[]
+     */
+    public static function find_module_requests($courseid, $moduleid) {
+        global $USER;
+
+        $requests = self::cache_get_requests($USER->id);
+
+        foreach ($requests as $request) {
+            foreach ($request->cms as $cm) {
+                if ($courseid == $cm->get_courseid() && $moduleid == $cm->get_cmid()) {
+                    return array($request, $cm);
                 }
             }
         }
     }
-
 }

@@ -51,7 +51,7 @@ class update extends \moodleform {
         $renderer = $this->_customdata['renderer'];
         $mods     = $request->mods;
 
-        // TODO determine type of view on this page to show a different header depending on user / context
+        // TODO determine type of view on this page to show a different header depending on user / context.
 
         foreach ($mods as $id => $mod) {
             $handler = $mod['handler'];
@@ -60,11 +60,13 @@ class update extends \moodleform {
             // TODO if $USER has the capabilities / roles to view
             // TODO based on the cm status, present different buttons. (disable the the ones that cannot be clicked?)
 
+            /*
             $buttonarray=array();
             $buttonarray[] = &$mform->createElement('submit', 'approve' . $id, 'Approve');
             $buttonarray[] = &$mform->createElement('submit', 'deny' . $id, 'Deny');
-            //$mform->addGroup($buttonarray, '', '', array(' '), false);
-            //$mform->closeHeaderBefore('');
+            $mform->addGroup($buttonarray, '', '', array(' '), false);
+            $mform->closeHeaderBefore('');
+            */
         }
 
         // TODO replace <br /> with css padding/margins, or does that impact the html->text email output.
@@ -80,7 +82,7 @@ class update extends \moodleform {
         $mform->addElement('hidden', 'id');
         $mform->setType('id', PARAM_INT);
 
-        // To identify the current user, $user equals $OUTPUT->user_picture($USER)
+        // To identify the current user, $user equals $OUTPUT->user_picture($USER).
         $mform->addElement('html', $user);
         $mform->addElement('textarea', 'commentarea', '', '');
 

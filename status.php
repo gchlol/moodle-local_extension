@@ -34,6 +34,8 @@ $requestid = required_param('id', PARAM_INTEGER);
 
 $url = new moodle_url('/local/extension/status.php', array('id' => $requestid));
 $PAGE->set_url($url);
+
+// TODO context could be user, course or module.
 $context = context_user::instance($USER->id);
 $PAGE->set_context($context);
 $PAGE->set_pagelayout('standard');
@@ -43,7 +45,9 @@ $PAGE->requires->css('/local/extension/styles.css');
 
 $request = \local_extension\utility::cache_get_request($requestid);
 $renderer = $PAGE->get_renderer('local_extension');
-$mform = new \local_extension\form\update(null, array('user' => $OUTPUT->user_picture($USER), 'request' => $request, 'renderer' => $renderer));
+
+$params = array('user' => $OUTPUT->user_picture($USER), 'request' => $request, 'renderer' => $renderer);
+$mform = new \local_extension\form\update(null, $params);
 
 if ($form = $mform->get_data()) {
     $comment = $form->commentarea;

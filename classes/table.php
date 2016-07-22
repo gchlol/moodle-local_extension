@@ -135,8 +135,8 @@ class table {
 
     /**
      * Generates the data required for the status page table.
+     *
      * @param flexible_table $table
-     * @param integer $userid
      * @return request[] An array of request objects
      */
     public static function generate_trigger_data($table) {
@@ -159,24 +159,34 @@ class table {
                   FROM {local_extension_triggers}
               ORDER BY id";
 
+        // Obtain the data.
         $records = $DB->get_records_sql($sql, $params);
         $triggers = array();
 
+        // Map the values to a rule object.
         foreach ($records as $record) {
-            $triggers[$record->id] = \local_extension\rule::from_db($record);
+            $triggers[] = \local_extension\rule::from_db($record);
         }
 
+        // Sort them based on parents and priority.
         usort($triggers, function ($a, $b) {
-            if ($a->id == $b->id) {
-                if ($a->parent == $b->parent) {
-                    return 0;
-                } else if ($a->parent > $b->parent) {
+            foreach (array('parent', 'priority', 'id') as $property) {
+                if ($a->$property < $b->$property) {
+                    return -1;
+                } else if ($a->$property > $b->$property) {
                     return 1;
                 }
-            }
 
+            }
+            return 0;
         });
 
-        return $triggers;
+        // Create associated array with triggerid as the key.
+        $return = array();
+        foreach ($triggers as $trigger) {
+            $return["$trigger->id"] = $trigger;
+        }
+
+        return $return;
     }
 }

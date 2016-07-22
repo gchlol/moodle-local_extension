@@ -35,10 +35,19 @@ namespace extension_quiz;
  */
 class request extends \local_extension\base_request {
 
+
+    /**
+     * {@inheritDoc}
+     * @see \local_extension\base_request::get_name()
+     */
     public function get_name() {
         return 'Quiz';
     }
 
+    /**
+     * {@inheritDoc}
+     * @see \local_extension\base_request::get_data_type()
+     */
     public function get_data_type() {
         return 'quiz';
     }
@@ -54,7 +63,7 @@ class request extends \local_extension\base_request {
         return true; // TODO.
     }
 
-    // TODO set the state of the cm
+    // TODO set the state of the cm.
 
     /**
      * Define parts of the request for for an event object
@@ -71,6 +80,7 @@ class request extends \local_extension\base_request {
      *
      * @param moodleform $mform A moodle form object
      * @param array $mod An array of event details
+     * @param user $user The user that is viewing the status.
      */
     public function status_definition($mform, $mod, $user) {
 

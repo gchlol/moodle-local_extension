@@ -45,37 +45,6 @@ class local_extension_renderer extends plugin_renderer_base {
      * @return string $out The html output.
      */
     public function render_extension_status(\local_extension\request $req) {
-        // Returns an associated array of $cms with the $courseid as the key.
-        $cms = $req->get_cms_by_course();
-
-        $out = '';
-
-        $out .= html_writer::start_tag('div', array('class' => 'summary'));
-        $out .= html_writer::tag('span', 'Summary<br /><br />Request sent for review:<br /><br />', array('class' => 'statusheader'));
-
-        foreach ($cms as $courseid => $cmarray) {
-            foreach ($cmarray as $index => $cm) {
-                // Print the course title for each new set of cms.
-                if ($index == 0) {
-                    $course = $req->mods[$cm->cmid]['course'];
-                    $coursename = $course->fullname . ": " . $course->shortname;
-                    $out .= html_writer::tag('span', $coursename, array('class' => 'todo'));
-                }
-
-                $handler = new $cm->handler();
-                $out .= $handler->render_status($cm, $req);
-            }
-        }
-
-        // TODO replace <br /> with css padding/margins, or does that impact the html->text email output.
-        $out .= $this->render_extension_attachments($req);
-        $out .= html_writer::start_tag('br');
-        $out .= $this->render_extension_comments($req);
-        $out .= html_writer::start_tag('br');
-
-        $out .= html_writer::end_div(); // End .summary.
-
-        return $out;
     }
 
     /**
@@ -183,7 +152,6 @@ class local_extension_renderer extends plugin_renderer_base {
         }
         $out .= html_writer::end_div(); // End .attachments.
 
-
         if (!empty($req->files)) {
             return $out;
         }
@@ -196,9 +164,6 @@ class local_extension_renderer extends plugin_renderer_base {
      * @return string $out The html output.
      */
     public function render_extension_email(\local_extension\request $req) {
-        // $html = $this->render_extension_status($req);
-        // $out = \format_text_email($html, FORMAT_HTML);
-        // return $out;
     }
 
     /**
@@ -248,10 +213,10 @@ class local_extension_renderer extends plugin_renderer_base {
 
                 $parent = null;
                 if (!empty($trigger->parent)) {
-                    $parent = $triggers[$trigger->parent]->name;
+                    $parent = $triggers["$trigger->parent"]->name;
                 }
 
-                //table columns 'name', 'action', 'role', 'parent', 'continue', 'priority', 'data'
+                // Table columns 'name', 'action', 'role', 'parent', 'continue', 'priority', 'data'.
                 $values = array(
                         $trigger->name,
                         $trigger->get_action_name(),
@@ -285,6 +250,13 @@ class local_extension_renderer extends plugin_renderer_base {
         return $html;
     }
 
+    /**
+     * TODO
+     *
+     * @param array $mods
+     * @param moodle_url $url
+     * @return string $html
+     */
     public function render_manage_new_rule($mods, $url) {
         $stredit = get_string('button_edit_rule', 'local_extension');
 

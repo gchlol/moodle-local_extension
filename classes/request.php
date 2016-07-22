@@ -38,19 +38,19 @@ class request implements \cache_data_source {
     /** @var integer The local_extension_request database object */
     public $requestid = null;
 
-    /** @var integer The local_extension_request database object */
+    /** @var request The local_extension_request database object */
     public $request = array();
 
-    /** @var integer */
+    /** @var array cm */
     public $cms = array();
 
-    /** @var integer An array of comment objects from the request id */
+    /** @var array An array of comment objects from the request id */
     public $comments = array();
 
-    /** @var integer An array of user objects with the available fields user_picture::fields  */
+    /** @var array An array of user objects with the available fields user_picture::fields  */
     public $users = array();
 
-    /** @var integer An array of attached files that exist for this request id */
+    /** @var array An array of attached files that exist for this request id */
     public $files = array();
 
     /** @var array An array of mods that are used */
@@ -78,7 +78,6 @@ class request implements \cache_data_source {
         $requestid = $this->requestid;
 
         $this->request  = $DB->get_record('local_extension_request', array('id' => $requestid), '*', MUST_EXIST);
-        $this->cms      = $DB->get_records('local_extension_cm', array('request' => $requestid), 'id ASC', 'cmid,course,data,handler,id,request,status,userid');
         $this->comments = $DB->get_records('local_extension_comment', array('request' => $requestid), 'timestamp ASC');
 
         $request = $this->request;
@@ -89,6 +88,11 @@ class request implements \cache_data_source {
 
         list($handlers, $mods) = \local_extension\utility::get_activities($request->userid, $request->searchstart, $request->searchend, $options);
         $this->mods = $mods;
+
+        foreach ($mods as $id => $mod) {
+            $cm = $mod['localcm'];
+            $this->cms[$cm->cmid] = $cm;
+        }
 
         $userids = array($request->userid => $request->userid);
 
@@ -109,7 +113,7 @@ class request implements \cache_data_source {
     }
 
     /**
-     * Obtain request data for the renderer.
+     * Obtain a request class with the given id.
      *
      * @param integer $requestid An id for a request.
      * @return request $req A request data object.
@@ -171,7 +175,7 @@ class request implements \cache_data_source {
     /**
      * Updates the cm with via posted data.
      *
-     * @param moodleform $mform
+     * @param integer $user
      * @param stdClass $data
      */
     public function update_cm_status($user, $data) {
@@ -260,6 +264,8 @@ class request implements \cache_data_source {
      *
      * {@inheritDoc}
      * @see cache_data_source::load_for_cache()
+     *
+     * @param integer $requestid
      * @return \local_extension\request
      */
     public function load_for_cache($requestid) {
@@ -271,6 +277,8 @@ class request implements \cache_data_source {
      *
      * {@inheritDoc}
      * @see cache_data_source::load_many_for_cache()
+     *
+     * @param array $requestids
      * @return \local_extension\request[]
      */
     public function load_many_for_cache(array $requestids) {

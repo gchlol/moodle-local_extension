@@ -80,7 +80,7 @@ $inprogress = array();
 foreach ($mods as $mod) {
 
     // If a local cm object does not exist, then we can make a request for this module.
-    if (empty($mod['localcm'])) {
+    if (empty($mod['localcm']->cm)) {
         $available[] = $mod;
     } else {
         $inprogress[] = $mod;
