@@ -52,6 +52,15 @@ class request extends \local_extension\base_request {
     }
 
     /**
+     * {@inheritDoc}
+     * @see \local_extension\base_request::get_triggers()
+     */
+    public function get_triggers() {
+        $rules = \local_extension\rule::load_all($this->get_data_type());
+        return $rules;
+    }
+
+    /**
      * Is a calendar event something we can handle?
      *
      * @param event $event A calendar event object
@@ -122,6 +131,9 @@ class request extends \local_extension\base_request {
         $html .= \html_writer::end_div(); // End .content.
 
         $mform->addElement('html', \html_writer::tag('p', $html));
+
+        $handler->get_triggers();
+
     }
 
     /**

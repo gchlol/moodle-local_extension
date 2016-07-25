@@ -105,6 +105,7 @@ $string['table_header_rule_actionable'] = 'Actionable';
 $string['table_header_rule_action'] = 'Action';
 $string['table_header_rule_continue'] = 'Continue';
 $string['table_header_rule_data'] = 'Rules';
+$string['table_header_rule_datatype'] = 'Type';
 $string['table_header_rule_name'] = 'Name';
 $string['table_header_rule_parent'] = 'Parent';
 $string['table_header_rule_priority'] = 'Priority';

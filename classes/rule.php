@@ -89,6 +89,9 @@ class rule {
     /** @var array Role names lookup */
     public $rolenames = null;
 
+    /** @var the type name, eg. assign/quiz */
+    public $datatype = null;
+
     /**
      * Rule object constructor.
      *
@@ -110,13 +113,7 @@ class rule {
 
             if (property_exists($this, $key)) {
                 $this->$key = $form->$key;
-
-            } else {
-                if ($key == 'datatype') {
-                    $this->data['datatype'] = $form->$key;
-                }
             }
-
         }
 
         $this->data_save();
@@ -144,8 +141,6 @@ class rule {
     public function load() {
         global $DB;
 
-        $rule->rolename = $roles[$rule->role];
-
         if (empty($this->id)) {
             throw \coding_exception('No rule id');
         }
@@ -155,10 +150,34 @@ class rule {
         $record = $DB->get_record('local_extension_triggers', array('id' => $ruleid), '*', MUST_EXIST);
 
         foreach ($record as $key => $value) {
-            $rule->$key = $record->$key;
+            $this->$key = $record->$key;
         }
 
-        $rule->data = $rule->data_load();
+        $this->data = $this->data_load();
+    }
+
+    public static function load_all($type = null) {
+        global $DB;
+
+        $where = null;
+
+        $sql = "SELECT id
+                  FROM {local_extension_triggers}";
+
+        if (!empty($type)) {
+            $params = array('datatype' => $type);
+        }
+
+
+        $records = $DB->get_records_sql($sql, $params);
+
+        $triggers = array();
+
+        foreach ($records as $record) {
+            $trigger = self::from_db($record);
+        }
+
+        return $triggers;
     }
 
     /**

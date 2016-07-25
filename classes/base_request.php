@@ -83,5 +83,11 @@ abstract class base_request {
      * @return string The data to be stored
      */
     abstract public function request_data($mform, $mod, $data);
-}
 
+    /**
+     * Returns an array of trigger/rules for the handler type.
+     *
+     * @return \local_extension\rule[]
+     */
+    abstract public function get_triggers();
+}

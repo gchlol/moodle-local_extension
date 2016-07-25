@@ -123,10 +123,13 @@ class utility {
             if (!empty($requestid)) {
                 $localcm = \local_extension\cm::from_requestid($cm->id, $requestid);
 
+                // A requestid has been specified, lets list the available local_cms.
+
                 // No local_extension_cm found, we won't need to provide an event.
                 if (empty($localcm->cm)) {
                     continue;
                 }
+
             } else {
                 // Try and obtain a request associated to this user for a course module.
                 $localcm = \local_extension\cm::from_userid($cm->id, $userid);

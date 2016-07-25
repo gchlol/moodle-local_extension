@@ -113,13 +113,13 @@ class table {
                 get_string('table_header_rule_action', 'local_extension'),
                 get_string('table_header_rule_actionable', 'local_extension'),
                 get_string('table_header_rule_parent', 'local_extension'),
-                get_string('table_header_rule_continue', 'local_extension'),
+                get_string('table_header_rule_datatype', 'local_extension'),
                 get_string('table_header_rule_priority', 'local_extension'),
                 get_string('table_header_rule_data', 'local_extension'),
                 '',
         );
 
-        $columns = array('name', 'action', 'role', 'parent', 'continue', 'priority', 'data', '');
+        $columns = array('name', 'action', 'role', 'parent', 'datatype', 'priority', 'data', '');
 
         $table = new \flexible_table('local_extension_triggers');
         $table->define_columns($columns);
@@ -155,6 +155,7 @@ class table {
                        lengthtype,
                        elapsedfromrequest,
                        elapsedtype,
+                       datatype,
                        data
                   FROM {local_extension_triggers}
               ORDER BY id";
@@ -170,7 +171,7 @@ class table {
 
         // Sort them based on parents and priority.
         usort($triggers, function ($a, $b) {
-            foreach (array('parent', 'priority', 'id') as $property) {
+            foreach (array('datatype', 'parent', 'priority', 'id') as $property) {
                 if ($a->$property < $b->$property) {
                     return -1;
                 } else if ($a->$property > $b->$property) {

@@ -52,6 +52,16 @@ class request extends \local_extension\base_request {
         return 'quiz';
     }
 
+    public function get_triggers() {
+        $triggers = \local_extension\rule::load_all($this->get_data_type());
+
+        foreach ($trigger as $rule) {
+
+        }
+
+        print_r($triggers);
+    }
+
     /**
      * Is a calendar event something we can handle?
      *

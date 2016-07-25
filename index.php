@@ -28,9 +28,10 @@ global $CFG, $PAGE;
 
 $PAGE->set_url(new moodle_url('/local/extension/index.php'));
 
+require_login();
+
 // TODO context could be user, course or module.
 $context = \context_user::instance($USER->id);
-require_login();
 
 $PAGE->set_context($context);
 $PAGE->set_pagelayout('standard');

@@ -130,13 +130,6 @@ class rule extends \moodleform {
         // Email template.
         // TODO email subsystem templates
 
-        // Continue.
-        /*
-        $options = array(get_string('no'), get_string('yes'));
-        $mform->addElement('select', 'continue', get_string('form_rule_continue', 'local_extension'), $options);
-        $mform->addHelpButton('continue', 'form_rule_continue', 'local_extension');
-        */
-
         // ID.
         $mform->addElement('hidden', 'id', 0);
         $mform->setType('id', PARAM_INT);

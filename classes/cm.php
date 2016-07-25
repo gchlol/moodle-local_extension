@@ -124,7 +124,7 @@ class cm {
 
             } else {
                 if ($key == 'datatype') {
-                    $this->data['datatype'] = $form->$key;
+                    $this->cm->data['datatype'] = $form->$key;
                 }
             }
 
@@ -139,14 +139,15 @@ class cm {
      * @return data
      */
     public function data_load() {
-        return unserialize(base64_decode($this->cm->data));
+        return unserialize(base64_decode($this->get_data()));
     }
 
     /**
      * Saves the custom data, serialising it and then base64_encoding.
      */
     public function data_save() {
-        $this->cm->data = base64_encode(serialize($this->cm->data));
+        $data = base64_encode(serialize($this->get_data()));
+        $this->set_data($data);
     }
 
     /**
@@ -157,8 +158,8 @@ class cm {
     public function set_state($state) {
         global $DB;
 
-        $this->cm->state = $state;
-        $DB->update_record('local_extension_cm', $this);
+        $this->set_state($state);
+        $DB->update_record('local_extension_cm', $this->cm);
 
         \local_extension\utility::cache_invalidate_request($this->request);
     }
@@ -169,7 +170,7 @@ class cm {
      * @return array An array of available states.
      */
     public function get_next_state() {
-        switch ($this->cm->state) {
+        switch ($this->get_stateid()) {
             case self::STATE_NEW:
                 return array(self::STATE_APPROVED, self::STATE_DENIED, self::STATE_CANCEL);
             case self::STATE_DENIED:
@@ -192,7 +193,7 @@ class cm {
      * @return string the human-readable status name.
      */
     public function get_state_name() {
-        switch ($this->cm->state) {
+        switch ($this->get_stateid()) {
             case self::STATE_NEW:
                 return \get_string('state_new',      'local_extension');
             case self::STATE_DENIED:
@@ -215,7 +216,7 @@ class cm {
      * @return string
      */
     public function get_state_result() {
-        switch ($this->cm->state) {
+        switch ($this->get_stateid()) {
             case self::STATE_NEW:
             case self::STATE_REOPENED:
                 return \get_string('state_result_pending',   'local_extension');
@@ -231,7 +232,7 @@ class cm {
     }
 
     /**
-     * Returns the courseid
+     * Returns the cm courseid
      *
      *  @return integer
      */
@@ -240,7 +241,7 @@ class cm {
     }
 
     /**
-     * Returns the cmid
+     * Returns the cm cmid
      *
      *  @return integer
      */
@@ -249,12 +250,39 @@ class cm {
     }
 
     /**
-     * Retuns the data.
+     * Retuns the cm data.
      *
      * @return mixed
      */
-    public function get_data() {
+    private function get_data() {
         return $this->cm->data;
+    }
+
+    /**
+     * Returns the cm state id
+     *
+     *  @return integer
+     */
+    private function get_stateid() {
+        return $this->cm->state;
+    }
+
+    /**
+     * Set the cm state
+     *
+     * @param integer $state
+     */
+    private function set_stateid($state) {
+        $this->cm->state = $state;
+    }
+
+    /**
+     * Set the cm data
+     *
+     * @param mixed $data
+     */
+    private function set_data($data) {
+        $this->cm->data = $data;
     }
 
 }

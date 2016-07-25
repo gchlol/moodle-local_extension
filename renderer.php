@@ -203,7 +203,7 @@ class local_extension_renderer extends plugin_renderer_base {
 
                 $buttons = array();
 
-                $url = new moodle_url('/local/extension/editrule.php', array_merge(array('id' => $trigger->id, 'datatype' => $trigger->data['datatype'], 'sesskey' => sesskey())));
+                $url = new moodle_url('/local/extension/editrule.php', array_merge(array('id' => $trigger->id, 'datatype' => $trigger->datatype, 'sesskey' => sesskey())));
                 $html = html_writer::empty_tag('img', array('src' => $OUTPUT->pix_url('t/edit'), 'alt' => get_string('edit'), 'class' => 'iconsmall'));
                 $buttons[] = html_writer::link($url, $html, array('title' => get_string('edit')));
 
@@ -222,7 +222,7 @@ class local_extension_renderer extends plugin_renderer_base {
                         $trigger->get_action_name(),
                         $trigger->get_role_name(),
                         $parent,
-                        null,
+                        $trigger->datatype,
                         $trigger->priority,
                         var_export($trigger, true),
                         implode(' ', $buttons)
