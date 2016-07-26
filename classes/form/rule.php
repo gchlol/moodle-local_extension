@@ -84,8 +84,8 @@ class rule extends \moodleform {
         $lengthfromduedate = array();
 
         $lengthtypes = array(
-                'less than',
-                'greater or equal to',
+                get_string('form_rule_less_than', 'local_extension'),
+                get_string('form_rule_greater_or_equal', 'local_extension'),
         );
 
         $lengthfromduedategroup[] = $mform->createElement('select', 'lengthtype', '', $lengthtypes);
@@ -129,6 +129,20 @@ class rule extends \moodleform {
 
         // Email template.
         // TODO email subsystem templates
+        $templates = array('N/A');
+
+        $templategroup = array();
+        $templategroup[] = $mform->createElement('select', 'templates', null, $templates);
+        $templategroup[] = $mform->createElement('static', 'template', '', get_string('form_rule_template', 'local_extension'));
+
+        $mform->addGroup($templategroup, 'templategroup', get_string('form_rule_label_template', 'local_extension'), array(' '), false);
+
+        // TODO email subsystem templates
+        $templategroup2 = array();
+        $templategroup2[] = $mform->createElement('select', 'templates', null, $templates);
+        $templategroup2[] = $mform->createElement('static', 'template', '', get_string('form_rule_template', 'local_extension'));
+
+        $mform->addGroup($templategroup, 'templategroup', get_string('form_rule_label_template_request', 'local_extension'), array(' '), false);
 
         // ID.
         $mform->addElement('hidden', 'id', 0);

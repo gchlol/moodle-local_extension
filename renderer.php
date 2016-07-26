@@ -211,7 +211,7 @@ class local_extension_renderer extends plugin_renderer_base {
                 $html = html_writer::empty_tag('img', array('src' => $OUTPUT->pix_url('t/delete'), 'alt' => get_string('delete'), 'class' => 'iconsmall'));
                 $buttons[] = html_writer::link($url, $html, array('title' => get_string('delete')));
 
-                $parent = null;
+                $parent = 'N/A';
                 if (!empty($trigger->parent)) {
                     $parent = $triggers["$trigger->parent"]->name;
                 }
@@ -224,7 +224,7 @@ class local_extension_renderer extends plugin_renderer_base {
                         $parent,
                         $trigger->datatype,
                         $trigger->priority,
-                        var_export($trigger, true),
+                        $this->render_trigger_item($trigger, $parent),
                         implode(' ', $buttons)
                 );
 
@@ -238,20 +238,66 @@ class local_extension_renderer extends plugin_renderer_base {
     /**
      * Adapter trigger renderer for status management page.
      *
-     * @param integer $triggerid
+     * @param \local_extension\rule $trigger
+     * @param string $parent The name of the parent trigger.
      * @return string $html The html output.
      */
-    public function render_trigger_item($triggerid) {
+    public function render_trigger_item($trigger, $parent) {
         $html  = html_writer::start_tag('div');
-        // TODO trigger content.
-        $html .= html_writer::tag('p', 'Trigger');
+
+        $activate = array(
+            get_string('form_rule_label_parent', 'local_extension'),
+            $parent,
+            get_string('form_rule_label_parent_end', 'local_extension'),
+        );
+        $html .= html_writer::tag('p', implode(' ', $activate));
+
+        $reqlength = array(
+            get_string('form_rule_label_request_length', 'local_extension'),
+            $trigger->lengthtype ? get_string('form_rule_greater_or_equal', 'local_extension') : get_string('form_rule_less_than', 'local_extension'),
+            $trigger->lengthfromduedate,
+            get_string('form_rule_label_days_long', 'local_extension'),
+        );
+        $html .= html_writer::tag('p', implode(' ', $reqlength));
+
+        $elapsedlength = array(
+            get_string('form_rule_label_elapsed_length', 'local_extension'),
+            $trigger->elapsedtype ? get_string('form_rule_greater_or_equal', 'local_extension') : get_string('form_rule_less_than', 'local_extension'),
+            $trigger->elapsedfromrequest,
+            get_string('form_rule_label_days_old', 'local_extension'),
+        );
+        $html .= html_writer::tag('p', implode(' ', $elapsedlength));
+
+        $setroles = array(
+            get_string('form_rule_label_set_roles', 'local_extension'),
+            $trigger->get_role_name(),
+            get_string('form_rule_label_to', 'local_extension'),
+            $trigger->get_action_name(),
+            get_string('form_rule_label_this_request', 'local_extension'),
+        );
+        $html .= html_writer::tag('p', implode(' ', $setroles));
+
+        $notifyrole = array(
+                get_string('form_rule_label_template', 'local_extension'),
+                '',
+                get_string('form_rule_template', 'local_extension'),
+        );
+        $html .= html_writer::tag('p', implode(' ', $notifyrole));
+
+        $notifyrequest = array(
+                get_string('form_rule_label_template_request', 'local_extension'),
+                '',
+                get_string('form_rule_template', 'local_extension'),
+        );
+        $html .= html_writer::tag('p', implode(' ', $notifyrequest));
+
         $html .= html_writer::end_div();
 
         return $html;
     }
 
     /**
-     * TODO
+     * Renders a dropdown select box with the available rule type handlers.
      *
      * @param array $mods
      * @param moodle_url $url
