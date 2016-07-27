@@ -152,7 +152,8 @@ class local_extension_renderer extends plugin_renderer_base {
         }
         $out .= html_writer::end_div(); // End .attachments.
 
-        if (!empty($req->files)) {
+        // The first file will be '.'
+        if (count($files) > 1) {
             return $out;
         }
     }
