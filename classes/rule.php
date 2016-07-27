@@ -159,22 +159,24 @@ class rule {
     public static function load_all($type = null) {
         global $DB;
 
-        $where = null;
+        $params = array();
 
         $sql = "SELECT id
                   FROM {local_extension_triggers}";
 
         if (!empty($type)) {
             $params = array('datatype' => $type);
+
+            $compare = $DB->sql_compare_text('datatype') . " = " . $DB->sql_compare_text(':datatype');
+            $sql .= " WHERE $compare";
         }
 
-
-        $records = $DB->get_records_sql($sql, $params);
+        $fields = $DB->get_fieldset_sql($sql, $params);
 
         $triggers = array();
 
-        foreach ($records as $record) {
-            $trigger = self::from_db($record);
+        foreach ($fields as $id) {
+            $triggers[] = self::from_id($id);
         }
 
         return $triggers;

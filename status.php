@@ -52,7 +52,8 @@ $mform = new \local_extension\form\update(null, $params);
 if ($form = $mform->get_data()) {
     $comment = $form->commentarea;
 
-    $request->update_cm_status($USER, $form);
+    // Parse the form data to see if any accept/deny/reopen/etc buttons have been clicked, and update the state accordingly.
+    $request->update_cm_state($USER, $form);
 
     if (!empty($comment)) {
         $request->add_comment($USER, $comment);

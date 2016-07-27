@@ -173,12 +173,12 @@ class request implements \cache_data_source {
     }
 
     /**
-     * Updates the cm with via posted data.
+     * Updates the cm state with via posted data.
      *
      * @param integer $user
      * @param stdClass $data
      */
-    public function update_cm_status($user, $data) {
+    public function update_cm_state($user, $data) {
 
         foreach ($this->mods as $id => $mod) {
             $handler = $mod['handler'];
@@ -187,20 +187,30 @@ class request implements \cache_data_source {
             $course  = $mod['course'];
 
             $approve = 'approve' . $id;
-            $deny = 'deny' . $id;
+            $deny    = 'deny' . $id;
+            $cancel  = 'cancel' . $id;
+            $reopen  = 'reopen' . $id;
+
             if (!empty($data->$approve)) {
-                $handler->set_state($localcm, $handler::STATUS_APPROVED);
-                $status = $handler->get_status_name($handler::STATUS_APPROVED);
+                $localcm->set_state($localcm::STATE_APPROVED);
+                $status = $localcm->get_state_name();
                 $text = "$status extension for {$course->fullname}, {$event->name}";
                 $this->add_comment($user, $text);
             }
 
             if (!empty($data->$deny)) {
-                $handler->set_state($localcm, $handler::STATUS_DENIED);
-                $status = $handler->get_status_name($handler::STATUS_DENIED);
+                $localcm->set_state($localcm::STATE_DENIED);
+                $status = $localcm->get_state_name();
                 $text = "$status extension for {$course->fullname}, {$event->name}";
                 $this->add_comment($user, $text);
             }
+
+            if (!empty($data->$cancel)) {
+            }
+
+            if (!empty($data->$reopen)) {
+            }
+
 
         }
 

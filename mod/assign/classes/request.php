@@ -131,8 +131,44 @@ class request extends \local_extension\base_request {
         $html .= \html_writer::end_div(); // End .content.
 
         $mform->addElement('html', \html_writer::tag('p', $html));
+    }
 
-        $handler->get_triggers();
+    /**
+     * Renders buttons that can set the status of a cm item.
+     *
+     * @param moodleform $mform A moodle form object
+     * @param array $mod An array of event details
+     * @param user $user The user that is viewing the status.
+     */
+    public function status_modification($mform, $mod, $user = 0) {
+        $cm = $mod['cm'];
+        $event = $mod['event'];
+        $course = $mod['course'];
+        $handler = $mod['handler'];
+        $localcm = $mod['localcm'];
+
+        $id = $localcm->cmid;
+
+        // TODO if $USER has the capabilities / roles to view
+        // TODO based on the cm status, present different buttons. (disable the the ones that cannot be clicked?)
+
+        // Check what role the user has for the cm.
+
+        $context = \context_course::instance($course->id);
+
+        $roles = get_user_roles($context, $user);
+
+        $rolenames = \role_get_names($context, ROLENAME_ALIAS, true);
+
+        // If roleid equals configured role(s) print the available buttons.
+
+        $nextstates = $localcm->get_next_state();
+
+        $buttonarray=array();
+        $buttonarray[] = &$mform->createElement('submit', 'approve' . $id, 'Approve');
+        $buttonarray[] = &$mform->createElement('submit', 'deny' . $id, 'Deny');
+        $mform->addGroup($buttonarray, '', '', array(' '), false);
+        $mform->closeHeaderBefore('');
 
     }
 

@@ -158,10 +158,10 @@ class cm {
     public function set_state($state) {
         global $DB;
 
-        $this->set_state($state);
+        $this->set_stateid($state);
         $DB->update_record('local_extension_cm', $this->cm);
 
-        \local_extension\utility::cache_invalidate_request($this->request);
+        \local_extension\utility::cache_invalidate_request($this->requestid);
     }
 
     /**

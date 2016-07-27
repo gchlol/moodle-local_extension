@@ -117,6 +117,8 @@ if ($mform->is_cancelled()) {
     file_prepare_draft_area($draftitemid, $context->id, 'local_extension', 'attachments', $request['id']);
     file_save_draft_area_files($draftitemid, $context->id, 'local_extension', 'attachments', $request['id']);
 
+    $rules = array();
+
     foreach ($mods as $id => $mod) {
 
         $course = $mod['course'];
@@ -138,10 +140,11 @@ if ($mform->is_cancelled()) {
         );
 
         $cm['id'] = $DB->insert_record('local_extension_cm', $cm);
+
+        $rules = array_merge($rules, $handler->get_triggers());
     }
 
-    // Requres the $PAGE context to be set.
-    // send_status_email($request['id']);
+    // TODO process rules/triggers policy.
 
     $url = new moodle_url('/local/extension/status.php', array('id' => $request['id']));
     redirect($url);

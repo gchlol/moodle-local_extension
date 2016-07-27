@@ -45,6 +45,8 @@ class update extends \moodleform {
      * @see moodleform::definition()
      */
     public function definition() {
+        global $USER;
+
         $mform    = $this->_form;
         $user     = $this->_customdata['user'];
         $request  = $this->_customdata['request'];
@@ -55,18 +57,8 @@ class update extends \moodleform {
 
         foreach ($mods as $id => $mod) {
             $handler = $mod['handler'];
-            $handler->status_definition($mform, $mod, $user);
-
-            // TODO if $USER has the capabilities / roles to view
-            // TODO based on the cm status, present different buttons. (disable the the ones that cannot be clicked?)
-
-            /*
-            $buttonarray=array();
-            $buttonarray[] = &$mform->createElement('submit', 'approve' . $id, 'Approve');
-            $buttonarray[] = &$mform->createElement('submit', 'deny' . $id, 'Deny');
-            $mform->addGroup($buttonarray, '', '', array(' '), false);
-            $mform->closeHeaderBefore('');
-            */
+            $handler->status_definition($mform, $mod, $USER->id);
+            $handler->status_modification($mform, $mod, $USER->id);
         }
 
         // TODO replace <br /> with css padding/margins, or does that impact the html->text email output.
@@ -100,9 +92,6 @@ class update extends \moodleform {
         $mform    = $this->_form;
         $request  = $this->_customdata['request'];
         $renderer = $this->_customdata['renderer'];
-
-        // Don't forget to update the comment stream.
-        $request->load_comments();
 
         $commentidx = $mform->_elementIndex['comments'];
         $mform->_elements[$commentidx]->_text = $renderer->render_extension_comments($request) . \html_writer::start_tag('br');

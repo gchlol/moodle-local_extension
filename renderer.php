@@ -223,7 +223,7 @@ class local_extension_renderer extends plugin_renderer_base {
                         $trigger->get_role_name(),
                         $parent,
                         $trigger->datatype,
-                        $trigger->priority,
+                        $trigger->priority + 1,
                         $this->render_trigger_item($trigger, $parent),
                         implode(' ', $buttons)
                 );
