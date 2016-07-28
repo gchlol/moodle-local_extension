@@ -172,6 +172,12 @@ class request implements \cache_data_source {
         }
     }
 
+    public function process_triggers() {
+        foreach ($this->mods as $mod) {
+
+        }
+    }
+
     /**
      * Updates the cm state with via posted data.
      *
@@ -195,69 +201,36 @@ class request implements \cache_data_source {
                 $localcm->set_state($localcm::STATE_APPROVED);
                 $status = $localcm->get_state_name();
                 $text = "$status extension for {$course->fullname}, {$event->name}";
-                $this->add_comment($user, $text);
+
+                //$this->add_comment($user, $text);
             }
 
             if (!empty($data->$deny)) {
                 $localcm->set_state($localcm::STATE_DENIED);
                 $status = $localcm->get_state_name();
                 $text = "$status extension for {$course->fullname}, {$event->name}";
-                $this->add_comment($user, $text);
+
+                //$this->add_comment($user, $text);
             }
 
             if (!empty($data->$cancel)) {
+                $localcm->set_state($localcm::STATE_CANCEL);
+                $status = $localcm->get_state_name();
+                $text = "$status extension for {$course->fullname}, {$event->name}";
+
+                //$this->add_comment($user, $text);
             }
 
             if (!empty($data->$reopen)) {
+                $localcm->set_state($localcm::STATE_REOPENED);
+                $status = $localcm->get_state_name();
+                $text = "$status extension for {$course->fullname}, {$event->name}";
+
+                //$this->add_comment($user, $text);
             }
 
-
         }
 
-    }
-
-    /**
-     * Gets the local extension cm data.
-     *
-     * @param integer $cmid
-     * @return stdClass $cm local extension cm data.
-     */
-    public function get_local_cm($cmid) {
-        foreach ($this->cms as $localid => $cm) {
-            if ($cm->cmid == $cmid) {
-                return $cm;
-            }
-        }
-        return null;
-    }
-
-    /**
-     * Returns cms grouped by the course they are associated with.
-     * @return array An array of courses and their mods.
-     */
-    public function get_cms_by_course() {
-        $cms = array();
-
-        foreach ($this->cms as $id => $cm) {
-            $cms[$cm->course][] = $cm;
-        }
-
-        return $cms;
-    }
-
-    /**
-     * Returns mods grouped by the course they are associated with.
-     * @return array An array of courses and their mods.
-     */
-    public function get_mods_by_course() {
-        $mods = array();
-
-        foreach ($this->mods as $id => $mod) {
-            $course = $mod['course'];
-            $mods[$course->id][] = $mod;
-        }
-
-        return $mods;
     }
 
     /**

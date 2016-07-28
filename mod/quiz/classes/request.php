@@ -53,13 +53,8 @@ class request extends \local_extension\base_request {
     }
 
     public function get_triggers() {
-        $triggers = \local_extension\rule::load_all($this->get_data_type());
-
-        foreach ($trigger as $rule) {
-
-        }
-
-        print_r($triggers);
+        $rules = \local_extension\rule::load_all($this->get_data_type());
+        return $rules;
     }
 
     /**

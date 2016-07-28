@@ -87,7 +87,7 @@ class cm {
         $cm = new cm($cmid, null, $requestid);
 
         $conditions = array('cmid' => $cm->cmid, 'request' => $cm->requestid);
-        $cm->cm = $DB->get_record('local_extension_cm', $conditions, 'cmid,course,data,handler,id,request,state,userid');
+        $cm->cm = $DB->get_record('local_extension_cm', $conditions, 'cmid,course,data,id,request,state,userid');
 
         return $cm;
     }
@@ -105,7 +105,7 @@ class cm {
         $cm = new cm($cmid, $userid, null);
 
         $conditions = array('cmid' => $cm->cmid, 'userid' => $cm->userid);
-        $cm->cm = $DB->get_record('local_extension_cm', $conditions, 'cmid,course,data,handler,id,request,state,userid');
+        $cm->cm = $DB->get_record('local_extension_cm', $conditions, 'cmid,course,data,id,request,state,userid');
 
         return $cm;
     }
@@ -131,7 +131,6 @@ class cm {
         }
 
         $this->data_save();
-
     }
 
     /**

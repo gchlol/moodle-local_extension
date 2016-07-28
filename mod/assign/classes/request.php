@@ -105,8 +105,6 @@ class request extends \local_extension\base_request {
      * @param user $user The user that is viewing the status.
      */
     public function status_definition($mform, $mod, $user = 0) {
-        // TODO display approve/deny buttons based on capability, role and status.
-
         $cm = $mod['cm'];
         $event = $mod['event'];
         $course = $mod['course'];
@@ -149,7 +147,7 @@ class request extends \local_extension\base_request {
 
         $id = $localcm->cmid;
 
-        // TODO if $USER has the capabilities / roles to view
+        // TODO if $USER has the roles to view
         // TODO based on the cm status, present different buttons. (disable the the ones that cannot be clicked?)
 
         // Check what role the user has for the cm.
@@ -157,7 +155,6 @@ class request extends \local_extension\base_request {
         $context = \context_course::instance($course->id);
 
         $roles = get_user_roles($context, $user);
-
         $rolenames = \role_get_names($context, ROLENAME_ALIAS, true);
 
         // If roleid equals configured role(s) print the available buttons.
@@ -165,8 +162,30 @@ class request extends \local_extension\base_request {
         $nextstates = $localcm->get_next_state();
 
         $buttonarray=array();
-        $buttonarray[] = &$mform->createElement('submit', 'approve' . $id, 'Approve');
-        $buttonarray[] = &$mform->createElement('submit', 'deny' . $id, 'Deny');
+
+        foreach ($nextstates as $state) {
+            switch ($state) {
+                case $localcm::STATE_NEW:
+                case $localcm::STATE_REOPENED:
+                    $buttonarray[] = &$mform->createElement('submit', 'approve' . $id, 'Approve');
+                    break;
+                case $localcm::STATE_DENIED:
+                    //$buttonarray[] = &$mform->createElement('submit', 'reopen' . $id, 'Reopen');
+                    break;
+                case $localcm::STATE_CANCEL:
+                    $buttonarray[] = &$mform->createElement('submit', 'deny' . $id, 'Deny');
+                    break;
+                case $localcm::STATE_APPROVED:
+                    //$buttonarray[] = &$mform->createElement('submit', 'approve' . $id, 'Approve');
+                    //$buttonarray[] = &$mform->createElement('submit', 'deny' . $id, 'Deny');
+                    //$buttonarray[] = &$mform->createElement('submit', 'reopen' . $id, 'Reopen');
+                    break;
+                default:
+                    break;
+
+            }
+        }
+
         $mform->addGroup($buttonarray, '', '', array(' '), false);
         $mform->closeHeaderBefore('');
 

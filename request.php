@@ -117,34 +117,33 @@ if ($mform->is_cancelled()) {
     file_prepare_draft_area($draftitemid, $context->id, 'local_extension', 'attachments', $request['id']);
     file_save_draft_area_files($draftitemid, $context->id, 'local_extension', 'attachments', $request['id']);
 
-    $rules = array();
-
     foreach ($mods as $id => $mod) {
 
         $course = $mod['course'];
         $handler = $mod['handler'];
 
         $data = $handler->request_data($mform, $mod, $form);
+
+        // If no data is present then an extension request date has not been specified.
         if ($data == '') {
             continue;
         }
+
         $cm = array(
             'request' => $request['id'],
             'userid' => $USER->id,
             'course' => $course->id,
             'timestamp' => $now,
             'cmid' => $id,
-            'status' => 0,
+            'state' => 0,
             'data' => $data,
-            'handler' => get_class($handler),
         );
 
         $cm['id'] = $DB->insert_record('local_extension_cm', $cm);
 
-        $rules = array_merge($rules, $handler->get_triggers());
+        // Initiate the trigger/rule logic notifications and subscriptions.
+        $handler->process_triggers($cm);
     }
-
-    // TODO process rules/triggers policy.
 
     $url = new moodle_url('/local/extension/status.php', array('id' => $request['id']));
     redirect($url);

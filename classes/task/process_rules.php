@@ -15,7 +15,7 @@
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
 /**
- * Defines the version of local_extension
+ * Task: Process rules.
  *
  * @package    local_extension
  * @author     Nicholas Hoobin <nicholashoobin@catalyst-au.net>
@@ -23,8 +23,27 @@
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
-defined('MOODLE_INTERNAL') || die();
+namespace local_extension\task;
 
-$plugin->version   = 2016072801;        // The current plugin version (Date: YYYYMMDDXX)
-$plugin->requires  = 2014050800;        // Requires this Moodle version.
-$plugin->component = 'local_extension'; // To check on upgrade, that module sits in correct place.
+class process_rules extends \core\task\scheduled_task {
+    public function get_name() {
+        return get_string('task_process', 'local_extension');
+    }
+
+    public function execute() {
+        global $DB;
+
+        // TODO add request status, closed? to filter this query.
+
+        $sql = "SELECT id
+                  FROM {local_extension_request}";
+
+        $requestids = $DB->get_fieldset_sql($sql);
+
+        foreach ($requestids as $requestid) {
+            $request = \local_extension\request::from_id($requestid);
+
+        }
+    }
+
+}

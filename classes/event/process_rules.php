@@ -15,7 +15,7 @@
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
 /**
- * Defines the version of local_extension
+ * Process triggers event.
  *
  * @package    local_extension
  * @author     Nicholas Hoobin <nicholashoobin@catalyst-au.net>
@@ -23,8 +23,21 @@
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
+namespace local_extension\event;
+
 defined('MOODLE_INTERNAL') || die();
 
-$plugin->version   = 2016072801;        // The current plugin version (Date: YYYYMMDDXX)
-$plugin->requires  = 2014050800;        // Requires this Moodle version.
-$plugin->component = 'local_extension'; // To check on upgrade, that module sits in correct place.
+class process_triggers extends \core\event\base {
+    protected function init() {
+        $this->data['crud'] = 'c';
+        $this->data['edulevel'] = self::LEVEL_PARTICIPATING;
+    }
+
+    public static function get_name() {
+        return get_string('event_process_triggers', 'local_extension');
+    }
+
+    public function get_description() {
+        return "Process the triggers for all active requests";
+    }
+}
