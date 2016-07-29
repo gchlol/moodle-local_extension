@@ -60,19 +60,41 @@ if (!empty($triggerid) && confirm_sesskey()) {
 // Select all root parent items.
 $compare = $DB->sql_compare_text('datatype') . " = " . $DB->sql_compare_text(':datatype');
 $sql = "SELECT id,
-               name
+               name,
+               parent
           FROM {local_extension_triggers}
          WHERE $compare
-           AND parent = 0
       ORDER BY id ASC";
 
 $params = array('datatype' => $datatype);
-$parents = $DB->get_records_sql_menu($sql, $params);
+$records = $DB->get_records_sql($sql, $params);
 
-// If the item we are editing is a parent, then do not allow the user to change the parent value.
-if (array_key_exists($triggerid, $parents)) {
-    $parents = array();
+$parents = array();
+$children = array();
+foreach ($records as $record) {
+    if (empty($record->parent)) {
+        $parents[$record->id] = $record->name;
+    } else {
+        $children[$record->parent][] = $record->name;
+    }
 }
+
+// Check if item has any child objects
+if (array_key_exists($triggerid, $children)) {
+
+    // If the item we are editing is a parent, then do not allow the user to change the parent value.
+    if (array_key_exists($triggerid, $parents)) {
+        $parents = array();
+    }
+
+} else {
+    // Remove the triggerid from the list of possible parents. We do not want to associate the object to itself.
+    if (array_key_exists($triggerid, $parents)) {
+        unset($parents[$triggerid]);
+    }
+}
+
+//
 
 $mform = new \local_extension\form\rule(null, array('parents' => $parents, 'datatype' => $datatype));
 $mform->set_data($data);
