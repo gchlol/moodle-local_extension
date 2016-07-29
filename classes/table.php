@@ -162,30 +162,52 @@ class table {
 
         // Obtain the data.
         $records = $DB->get_records_sql($sql, $params);
-        $triggers = array();
+        $rules = array();
 
         // Map the values to a rule object.
         foreach ($records as $record) {
-            $triggers[] = \local_extension\rule::from_db($record);
+            $rules[] = \local_extension\rule::from_db($record);
         }
 
-        // Sort them based on parents and priority.
-        usort($triggers, function ($a, $b) {
-            foreach (array('datatype', 'parent', 'priority', 'id') as $property) {
-                if ($a->$property < $b->$property) {
-                    return -1;
-                } else if ($a->$property > $b->$property) {
-                    return 1;
-                }
-
-            }
-            return 0;
+        // Sort all the rules based on priority.
+        usort($rules, function($a, $b) {
+            return $a->priority - $b->priority;
         });
 
-        // Create associated array with triggerid as the key.
+        // Ordered array of parent rules based on priority.
+        $parentrules = array();
+
+        // The key is the rules parentid. The values are all the child rules.
+        $parentmap = array();
+
+        foreach ($rules as $rule) {
+            if (!empty($rule->parent)) {
+                $parentmap[$rule->parent][] = $rule;
+            } else {
+                // This is an ordered list of parents
+                $parentrules[] = $rule;
+            }
+        }
+
+        // Ordered list of rules for the table.
+        $ordered = array();
+
+        foreach ($parentrules as $rule) {
+            $ordered[] = $rule;
+
+            // If the rule found has an entry in the parentmap.
+            if (array_key_exists($rule->id, $parentmap)) {
+
+                // Append the array of children to the return result.
+                $children = $parentmap[$rule->id];
+                $ordered = array_merge($ordered, $children);
+
+            }
+        }
+
         $return = array();
-        foreach ($triggers as $trigger) {
-            $return["$trigger->id"] = $trigger;
+        foreach ($ordered as $item) {
+            $return["$item->id"] = $item;
         }
 
         return $return;
