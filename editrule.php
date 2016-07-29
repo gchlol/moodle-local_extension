@@ -46,10 +46,7 @@ $renderer = $PAGE->get_renderer('local_extension');
 
 $data = null;
 if (!empty($triggerid) && confirm_sesskey()) {
-    //$record = $DB->get_record('local_extension_triggers', array('id' => $triggerid), '*', MUST_EXIST);
-    //$data = \local_extension\rule::from_db($record);
     $data = \local_extension\rule::from_id($triggerid);
-    //$data->datatype = $datatype;
 
     // Set the saved serialised data as object properties, which will be loaded as default form values.
     if (!empty($data->data)) {
@@ -59,11 +56,14 @@ if (!empty($triggerid) && confirm_sesskey()) {
     }
 }
 
+
+// Select all root parent items.
 $compare = $DB->sql_compare_text('datatype') . " = " . $DB->sql_compare_text(':datatype');
 $sql = "SELECT id,
                name
           FROM {local_extension_triggers}
          WHERE $compare
+           AND parent = 0
       ORDER BY id ASC";
 
 $params = array('datatype' => $datatype);
