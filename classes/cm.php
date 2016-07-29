@@ -253,7 +253,7 @@ class cm {
      *
      * @return mixed
      */
-    private function get_data() {
+    public function get_data() {
         return $this->cm->data;
     }
 

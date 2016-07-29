@@ -235,26 +235,95 @@ class rule {
         }
     }
 
-    public function check_parent() {
-        // look up local_extension_history
+    /**
+     * Processes the rules associated with this object.
+     *
+     * @param stdClass $request
+     * @param array $mod
+     */
+    public function process($request, $mod) {
+        $event   = $mod['event'];
+        $cm      = $mod['cm'];
+        $localcm = $mod['localcm'];
+        $course  = $mod['course'];
+        $handler = $mod['handler'];
+
+        // If the parent has not been triggered then we abort.
+        if ($this->check_parent() == false) {
+            return false;
+        }
+
+        $this->check_request_length($request, $mod);
+
+        $this->check_elapsed_length($request, $mod);
+
+        // Set roles to [approve/sub]
+
+        // Notify those roles with [template]
+
+        // Notify the user with [template]
+
+        // Write history
 
     }
 
-    public function check_request_length() {
-        // localcm->data is the date requsted.
-        // subtract cm due date to get this value.
-    }
-
-    public function check_elapsed_length() {
-        // request->timestamp is the initial request date.
+    private function check_parent() {
+        // TODO look up local_extension_history
+        return true;
 
     }
 
-    public function notify_roles() {
+    private function check_request_length($request, $mod) {
+        $localcm = $mod['localcm'];
+
+        // The data is encoded when saving to the database, and decoded when loading from it.
+        // This value will be a timestamp.
+        $data = $localcm->get_data();
+
+        $delta = $data - $request->timestamp;
+
+        $days = $this->lengthfromduedate * 24 * 60 * 60;
+
+        if ($this->lengthtype == $this::RULE_CONDITION_LT) {
+            if ($delta < $days) {
+                return true;
+            }
+
+        } else if ($this->lengthtype == $this::RULE_CONDITION_GE) {
+            if ($delta >= $days) {
+                return true;
+            }
+        } else {
+            return false;
+        }
+    }
+
+    private function check_elapsed_length($request, $mod) {
+
+        $delta = time() - $request->timestamp;
+
+        $days = $this->elapsedfromrequest * 24 * 60 * 60;
+
+        if ($this->elapsedtype == $this::RULE_CONDITION_LT) {
+            if ($delta < $days) {
+                return true;
+            }
+
+        } else if ($this->elapsedtype == $this::RULE_CONDITION_GE) {
+            if ($delta >= $days) {
+                return true;
+            }
+        } else {
+            return false;
+        }
 
     }
 
-    public function notify_user() {
+    private function notify_roles($request, $mod) {
+
+    }
+
+    private function notify_user($request, $mod) {
 
     }
 

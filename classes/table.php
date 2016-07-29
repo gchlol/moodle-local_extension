@@ -171,6 +171,7 @@ class table {
 
         $ordered = \local_extension\utility::sort_rules($rules);
 
+        // Indexes the return array with the ruleid. This value is used to determine the name of the possible parent objects.
         $return = array();
         foreach ($ordered as $item) {
             $return["$item->id"] = $item;
