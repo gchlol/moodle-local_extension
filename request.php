@@ -142,7 +142,6 @@ if ($mform->is_cancelled()) {
         $cm['id'] = $DB->insert_record('local_extension_cm', $cm);
 
         // Initiate the trigger/rule logic notifications and subscriptions.
-        $handler->process_triggers($cm);
     }
 
     $url = new moodle_url('/local/extension/status.php', array('id' => $request['id']));

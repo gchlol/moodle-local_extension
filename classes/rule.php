@@ -117,7 +117,6 @@ class rule {
         }
 
         $this->data_save();
-
     }
 
     /**
@@ -235,5 +234,30 @@ class rule {
                 return '';
         }
     }
+
+    public function check_parent() {
+        // look up local_extension_history
+
+    }
+
+    public function check_request_length() {
+        // localcm->data is the date requsted.
+        // subtract cm due date to get this value.
+    }
+
+    public function check_elapsed_length() {
+        // request->timestamp is the initial request date.
+
+    }
+
+    public function notify_roles() {
+
+    }
+
+    public function notify_user() {
+
+    }
+
+
 
 }

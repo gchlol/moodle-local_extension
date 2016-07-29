@@ -172,8 +172,63 @@ class request implements \cache_data_source {
         }
     }
 
+    /**
+     * Each cm item can have a different
+     */
     public function process_triggers() {
+
+        // There can only be one request per course module.
         foreach ($this->mods as $mod) {
+            $handler = $mod['handler'];
+
+            // Rules are saved in the handler as a static value to prevent duplicate lookups.
+            $allrules = $handler->get_triggers();
+
+            // Filter the rules for only this handler type.
+            $rules = array_filter($allrules, function($obj) use ($handler) {
+                if ($obj->datatype == $handler->get_data_type()) {
+                    return $obj;
+                }
+            });
+
+            // Sort all the rules based on priority.
+            usort($rules, function($a, $b) {
+                return $a->priority - $b->priority;
+            });
+
+            // Ordered parent rules based on priority.
+            $parentrules = array();
+
+            // They key is a rule that has children. Value is an array of child object rules.
+            $parentmap = array();
+
+            foreach ($rules as $rule) {
+
+                if (!empty($rule->parent)) {
+                    $parentmap[$rule->parent][] = $rule;
+                } else {
+                    // This is an ordered list of parent
+                    $parentrules[] = $rule;
+                }
+            }
+
+            /*
+             * Example resulting table.
+             *
+             * Rules with no parent, sort by priority.
+             * $parentrules = (
+             *     rule, (id=1)
+             *     rule, (id=2)
+             *     rule  (id=3)
+             * );
+             *
+             * Keys of rules that have children, with an array of child rules sorted by priority.
+             * $parentmap = (
+             *     key 1 => [ rules sorted by priority with parent id 1 ]
+             *     key 2 => [ rules sorted by priority with parent id 2 ]
+             *     key 3 => [r ules sorted by priority with parent id 3 ]
+             * );
+             */
 
         }
     }

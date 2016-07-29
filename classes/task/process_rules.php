@@ -42,7 +42,7 @@ class process_rules extends \core\task\scheduled_task {
 
         foreach ($requestids as $requestid) {
             $request = \local_extension\request::from_id($requestid);
-
+            $request->process_triggers();
         }
     }
 
