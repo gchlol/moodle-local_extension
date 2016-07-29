@@ -140,11 +140,13 @@ if ($mform->is_cancelled()) {
         );
 
         $cm['id'] = $DB->insert_record('local_extension_cm', $cm);
-
-        // Initiate the trigger/rule logic notifications and subscriptions.
     }
 
-    $url = new moodle_url('/local/extension/status.php', array('id' => $request['id']));
+    // Initiate the trigger/rule logic notifications and subscriptions.
+    $request = \local_extension\request::from_id($request['id']);
+    $request->process_triggers();
+
+    $url = new moodle_url('/local/extension/status.php', array('id' => $request->requestid));
     redirect($url);
     die;
 }
