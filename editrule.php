@@ -69,6 +69,11 @@ $sql = "SELECT id,
 $params = array('datatype' => $datatype);
 $parents = $DB->get_records_sql_menu($sql, $params);
 
+// If the item we are editing is a parent, then do not allow the user to change the parent value.
+if (array_key_exists($triggerid, $parents)) {
+    $parents = array();
+}
+
 $mform = new \local_extension\form\rule(null, array('parents' => $parents, 'datatype' => $datatype));
 $mform->set_data($data);
 
