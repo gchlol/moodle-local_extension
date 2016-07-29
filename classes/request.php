@@ -173,7 +173,7 @@ class request implements \cache_data_source {
     }
 
     /**
-     * Each cm item can have a different
+     * Each cm may have a different set of rules that will need to be processed.
      */
     public function process_triggers() {
 
@@ -191,44 +191,8 @@ class request implements \cache_data_source {
                 }
             });
 
-            // Sort all the rules based on priority.
-            usort($rules, function($a, $b) {
-                return $a->priority - $b->priority;
-            });
 
-            // Ordered parent rules based on priority.
-            $parentrules = array();
-
-            // They key is a rule that has children. Value is an array of child object rules.
-            $parentmap = array();
-
-            foreach ($rules as $rule) {
-
-                if (!empty($rule->parent)) {
-                    $parentmap[$rule->parent][] = $rule;
-                } else {
-                    // This is an ordered list of parent
-                    $parentrules[] = $rule;
-                }
-            }
-
-            /*
-             * Example resulting table.
-             *
-             * Rules with no parent, sort by priority.
-             * $parentrules = (
-             *     rule, (id=1)
-             *     rule, (id=2)
-             *     rule  (id=3)
-             * );
-             *
-             * Keys of rules that have children, with an array of child rules sorted by priority.
-             * $parentmap = (
-             *     key 1 => [ rules sorted by priority with parent id 1 ]
-             *     key 2 => [ rules sorted by priority with parent id 2 ]
-             *     key 3 => [r ules sorted by priority with parent id 3 ]
-             * );
-             */
+            $ordered = \local_extension\utility::sort_rules($rules);
 
         }
     }

@@ -306,4 +306,54 @@ class utility {
             }
         }
     }
+
+    /**
+     * Returns the input rules in sorted order.
+     *
+     * Sorted based on the priorty and grouped with parents.
+     *
+     * @param \local_extension\rule[] $rules
+     */
+    public static function sort_rules($rules) {
+
+        // Sort all the rules based on priority.
+        usort($rules, function($a, $b) {
+            return $a->priority - $b->priority;
+        });
+
+        // Ordered parent rules based on priority.
+        $parentrules = array();
+
+        // They key is a rule that has children. Value is an array of child object rules.
+        $parentmap = array();
+
+        foreach ($rules as $rule) {
+
+            if (!empty($rule->parent)) {
+                $parentmap[$rule->parent][] = $rule;
+            } else {
+                // This is an ordered list of parent
+                $parentrules[] = $rule;
+            }
+        }
+
+        // Ordered list of rules for the table.
+        $ordered = array();
+
+        foreach ($parentrules as $rule) {
+            $ordered[] = $rule;
+
+            // If the rule found has an entry in the parentmap.
+            if (array_key_exists($rule->id, $parentmap)) {
+
+                // Append the array of children to the return result.
+                $children = $parentmap[$rule->id];
+                $ordered = array_merge($ordered, $children);
+
+            }
+        }
+
+        return $rules;
+
+    }
 }

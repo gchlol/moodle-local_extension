@@ -169,41 +169,7 @@ class table {
             $rules[] = \local_extension\rule::from_db($record);
         }
 
-        // Sort all the rules based on priority.
-        usort($rules, function($a, $b) {
-            return $a->priority - $b->priority;
-        });
-
-        // Ordered array of parent rules based on priority.
-        $parentrules = array();
-
-        // The key is the rules parentid. The values are all the child rules.
-        $parentmap = array();
-
-        foreach ($rules as $rule) {
-            if (!empty($rule->parent)) {
-                $parentmap[$rule->parent][] = $rule;
-            } else {
-                // This is an ordered list of parents
-                $parentrules[] = $rule;
-            }
-        }
-
-        // Ordered list of rules for the table.
-        $ordered = array();
-
-        foreach ($parentrules as $rule) {
-            $ordered[] = $rule;
-
-            // If the rule found has an entry in the parentmap.
-            if (array_key_exists($rule->id, $parentmap)) {
-
-                // Append the array of children to the return result.
-                $children = $parentmap[$rule->id];
-                $ordered = array_merge($ordered, $children);
-
-            }
-        }
+        $ordered = \local_extension\utility::sort_rules($rules);
 
         $return = array();
         foreach ($ordered as $item) {
