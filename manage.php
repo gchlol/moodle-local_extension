@@ -70,7 +70,17 @@ if ($delete && confirm_sesskey()) {
 
     } else if (data_submitted()) {
 
-        $DB->delete_records('local_extension_triggers', array('id' => $delete));
+        // Select all child rules for id.
+        $sql = "SELECT id
+                  FROM {local_extension_triggers}
+                 WHERE parent = ?";
+        $params = array($delete);
+
+        $items = $DB->get_fieldset_sql($sql, $params);
+        $items[] = $delete;
+
+        // Remove all rules, including the children.
+        $DB->delete_records_list('local_extension_triggers', 'id', $items);
         redirect($pageurl);
 
     } else {
