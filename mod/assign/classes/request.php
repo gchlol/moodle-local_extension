@@ -35,6 +35,9 @@ namespace extension_assign;
  */
 class request extends \local_extension\base_request {
 
+    /** @var \local_extension\rule[] $rules */
+    public static $rules = null;
+
     /**
      * {@inheritDoc}
      * @see \local_extension\base_request::get_name()
@@ -56,8 +59,10 @@ class request extends \local_extension\base_request {
      * @see \local_extension\base_request::get_triggers()
      */
     public function get_triggers() {
-        $rules = \local_extension\rule::load_all($this->get_data_type());
-        return $rules;
+        if (empty(self::$rules)) {
+            self::$rules = \local_extension\rule::load_all($this->get_data_type());
+        }
+        return self::$rules;
     }
 
     /**
