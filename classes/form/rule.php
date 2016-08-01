@@ -127,22 +127,9 @@ class rule extends \moodleform {
 
         $mform->addGroup($actiongroup, 'actiongroup', get_string('form_rule_label_set_roles', 'local_extension'), array(' '), false);
 
-        // Email template.
-        // TODO email subsystem templates
-        $templates = array('N/A');
-
-        $templategroup = array();
-        $templategroup[] = $mform->createElement('select', 'templates', null, $templates);
-        $templategroup[] = $mform->createElement('static', 'template', '', get_string('form_rule_template', 'local_extension'));
-
-        $mform->addGroup($templategroup, 'templategroup', get_string('form_rule_label_template', 'local_extension'), array(' '), false);
-
-        // TODO email subsystem templates
-        $templategroup2 = array();
-        $templategroup2[] = $mform->createElement('select', 'templates', null, $templates);
-        $templategroup2[] = $mform->createElement('static', 'template', '', get_string('form_rule_template', 'local_extension'));
-
-        $mform->addGroup($templategroup, 'templategroup', get_string('form_rule_label_template_request', 'local_extension'), array(' '), false);
+        // Email templates.
+        $mform->addElement('textarea', 'template_notify', get_string('form_rule_label_template', 'local_extension'), 'wrap="virtual" rows="20" cols="50"');
+        $mform->addElement('textarea', 'template_user', get_string('form_rule_label_template_request', 'local_extension'), 'wrap="virtual" rows="20" cols="50"');
 
         // ID.
         $mform->addElement('hidden', 'id', 0);

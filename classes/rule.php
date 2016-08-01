@@ -113,6 +113,8 @@ class rule {
 
             if (property_exists($this, $key)) {
                 $this->$key = $form->$key;
+            } else if (strpos($key, 'template') === 0) {
+                $this->data[$key] = $value;
             }
         }
 
@@ -121,17 +123,31 @@ class rule {
 
     /**
      * Unserialises and base64_decodes the saved custom data.
+     *
      * @return data
      */
     public function data_load() {
-        return unserialize(base64_decode($this->data));
+
+        // Strict decode.
+        $decoded = base64_decode($this->data, true);
+
+        // Suppress E_NOTICE when $data can not be unserialised.
+        $data = @unserialize($decoded);
+
+        if ($data !== false) {
+            return $data;
+        }
+
+        return false;
     }
 
     /**
      * Saves the custom data, serialising it and then base64_encoding.
      */
     public function data_save() {
-        $this->data = base64_encode(serialize($this->data));
+        $data = serialize($this->data);
+
+        $this->data = base64_encode($data);
     }
 
     /**
@@ -155,6 +171,12 @@ class rule {
         $this->data = $this->data_load();
     }
 
+    /**
+     * Loads all rules with the type from $handler->get_name()
+     *
+     * @param string $type
+     * @return \local_extension\rule[]
+     */
     public static function load_all($type = null) {
         global $DB;
 
@@ -192,7 +214,6 @@ class rule {
         $rule->load();
         return $rule;
     }
-
 
     /**
      * Obtain a rule object with after applying the moodle data object values.
@@ -248,29 +269,130 @@ class rule {
         $course  = $mod['course'];
         $handler = $mod['handler'];
 
+        // TODO: Check history to see if this has been triggered already.
+
         // If the parent has not been triggered then we abort.
-        if ($this->check_parent() == false) {
+        if ($this->check_parent() === false) {
             return false;
         }
 
-        $this->check_request_length($request, $mod);
+        if ($this->check_request_length($request, $mod) === false) {
+            return false;
+        }
 
-        $this->check_elapsed_length($request, $mod);
+        if ($this->check_elapsed_length($request, $mod) === false) {
+            return false;
+        }
 
-        // Set roles to [approve/sub]
+        if ($this->action == self::RULE_ACTION_APPROVE) {
+            $this->approve();
+        } else if ($this->action == self::RULE_ACTION_SUBSCRIBE) {
+            $this->subscribe();
+        }
 
-        // Notify those roles with [template]
+        $templates = $this->process_templates($request, $mod);
+        $this->notify_roles($mod, $templates['template_notify']);
+        $this->notify_user($mod, $templates['template_user']);
 
-        // Notify the user with [template]
+        $this->get_request_time($mod);
 
         // Write history
+    }
+
+    private function process_templates($request, $mod) {
+        global $DB;
+
+        // A url to the status page.
+        $url = new \moodle_url('/local/extension/status.php', array('id' => $request->id));
+
+        // The user details for obtaining the full name.
+        $userid = $mod['localcm']->userid;
+        $user = $DB->get_record('user', array('id' => $userid));
+
+        $templatevars = array(
+            '/{{course}}/' => $mod['course']->fullname,
+            '/{{module}}/' => $mod['cm']->name,
+            '/{{student}}/' => \fullname($user),
+            '/{{duedate}}/' => \userdate($mod['event']->timestart),
+            '/{{extensiondate}}/' => \userdate($mod['localcm']->cm->data),
+            '/{{requeststatusurl}}/' => $url,
+            '/{{extensionlength}}/' => $this->get_request_time($mod),
+        );
+
+        $patterns = array_keys($templatevars);
+        $replacements = array_values($templatevars);
+
+        $templates = $this->get_templates();
+        foreach ($templates as $key => $template) {
+            $templates[$key] = preg_replace($patterns, $replacements, $template);
+        }
+
+        return $templates;
+    }
+
+    private function get_templates() {
+        $templates = array (
+            'template_notify' => $this->get_notify_template(),
+            'template_user' => $this->get_user_template(),
+        );
+
+        return $templates;
+
+    }
+
+    private function get_notify_template() {
+        if (!empty($this->data)) {
+            if (array_key_exists('template_notify', $this->data)) {
+                return $this->data['template_notify'];
+            }
+        }
+
+        return false;
+
+    }
+
+    private function get_user_template() {
+        if (!empty($this->data)) {
+
+            if (array_key_exists('template_user', $this->data)) {
+                return $this->data['template_user'];
+            }
+
+        }
+        return false;
 
     }
 
     private function check_parent() {
         // TODO look up local_extension_history
+
         return true;
 
+    }
+
+    private function approve() {
+    }
+
+    private function subscribe() {
+    }
+
+    private function get_request_time($mod) {
+        $localcm = $mod['localcm'];
+
+        // The data is encoded when saving to the database, and decoded when loading from it.
+        // This value will be a timestamp.
+        $daterequested = $localcm->get_data();
+        $datedue = $mod['event']->timestart;
+
+        $delta = $daterequested - $datedue;
+
+        $days = floor($delta / 60 / 60 / 24);
+        $hours = ($delta - ($days * 86400)) / 60 / 60;
+
+        // TODO lang string for this?
+        $str = "{$days} {$hours}";
+
+        return $str;
     }
 
     private function check_request_length($request, $mod) {
@@ -278,18 +400,19 @@ class rule {
 
         // The data is encoded when saving to the database, and decoded when loading from it.
         // This value will be a timestamp.
-        $data = $localcm->get_data();
+        $daterequested = $localcm->get_data();
+        $datedue = $mod['event']->timestart;
 
-        $delta = $data - $request->timestamp;
+        $delta = $daterequested - $datedue;
 
         $days = $this->lengthfromduedate * 24 * 60 * 60;
 
-        if ($this->lengthtype == $this::RULE_CONDITION_LT) {
+        if ($this->lengthtype == self::RULE_CONDITION_LT) {
             if ($delta < $days) {
                 return true;
             }
 
-        } else if ($this->lengthtype == $this::RULE_CONDITION_GE) {
+        } else if ($this->lengthtype == self::RULE_CONDITION_GE) {
             if ($delta >= $days) {
                 return true;
             }
@@ -299,17 +422,16 @@ class rule {
     }
 
     private function check_elapsed_length($request, $mod) {
-
         $delta = time() - $request->timestamp;
 
         $days = $this->elapsedfromrequest * 24 * 60 * 60;
 
-        if ($this->elapsedtype == $this::RULE_CONDITION_LT) {
+        if ($this->elapsedtype == self::RULE_CONDITION_LT) {
             if ($delta < $days) {
                 return true;
             }
 
-        } else if ($this->elapsedtype == $this::RULE_CONDITION_GE) {
+        } else if ($this->elapsedtype == self::RULE_CONDITION_GE) {
             if ($delta >= $days) {
                 return true;
             }
@@ -319,14 +441,16 @@ class rule {
 
     }
 
-    private function notify_roles($request, $mod) {
+    private function notify_roles() {
+        $role = $this->role;
 
+        // TODO notify roles
     }
 
-    private function notify_user($request, $mod) {
+    private function notify_user($mod) {
+        $user = $mod['localcm']->userid;
 
+        // TODO nofity user with template
     }
-
-
 
 }

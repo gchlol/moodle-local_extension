@@ -353,7 +353,7 @@ class utility {
             }
         }
 
-        return $rules;
+        return $ordered;
 
     }
 }

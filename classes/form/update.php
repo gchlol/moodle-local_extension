@@ -76,7 +76,7 @@ class update extends \moodleform {
 
         // To identify the current user, $user equals $OUTPUT->user_picture($USER).
         $mform->addElement('html', $user);
-        $mform->addElement('textarea', 'commentarea', '', '');
+        $mform->addElement('textarea', 'commentarea', '', 'wrap="virtual" rows="5" cols="70"');
 
         $mform->addElement('submit', 'submitcomment', get_string('submit_comment', 'local_extension'));
     }

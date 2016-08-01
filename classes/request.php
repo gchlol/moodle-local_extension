@@ -41,7 +41,7 @@ class request implements \cache_data_source {
     /** @var request The local_extension_request database object */
     public $request = array();
 
-    /** @var array cm */
+    /** @var cm[] cm */
     public $cms = array();
 
     /** @var array An array of comment objects from the request id */
@@ -83,7 +83,7 @@ class request implements \cache_data_source {
         $request = $this->request;
 
         $options = array(
-            'requestid' => $request->id
+            'requestid' => $requestid
         );
 
         list($handlers, $mods) = \local_extension\utility::get_activities($request->userid, $request->searchstart, $request->searchend, $options);
@@ -198,6 +198,20 @@ class request implements \cache_data_source {
             }
 
         }
+    }
+
+    public function check_active() {
+        $active = false;
+        foreach ($cms as $cm) {
+            /* @var $cm cm */
+            $state = $cm->get_stateid();
+
+            if ($state != cm::STATE_CANCEL) {
+                $active = true;
+            }
+        }
+
+        return $active;
     }
 
     /**

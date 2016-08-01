@@ -63,6 +63,8 @@ if ($delete && confirm_sesskey()) {
         $deleteurl = new moodle_url($pageurl, $optionsyes);
         $deletebutton = new single_button($deleteurl, get_string('delete'), 'post');
 
+        // TODO UI details about rules/children that will be deleted.
+
         echo $OUTPUT->confirm('', $deletebutton, $pageurl);
         echo $OUTPUT->footer();
 

@@ -87,7 +87,12 @@ class cm {
         $cm = new cm($cmid, null, $requestid);
 
         $conditions = array('cmid' => $cm->cmid, 'request' => $cm->requestid);
-        $cm->cm = $DB->get_record('local_extension_cm', $conditions, 'cmid,course,data,id,request,state,userid');
+        $record = $DB->get_record('local_extension_cm', $conditions, 'cmid,course,data,id,request,state,userid');
+
+        if (!empty($record)) {
+            $cm->userid = $record->userid;
+            $cm->cm = $record;
+        }
 
         return $cm;
     }
@@ -262,7 +267,7 @@ class cm {
      *
      *  @return integer
      */
-    private function get_stateid() {
+    public function get_stateid() {
         return $this->cm->state;
     }
 

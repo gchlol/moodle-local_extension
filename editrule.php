@@ -27,7 +27,7 @@ require_once('../../config.php');
 require_once($CFG->libdir . '/adminlib.php');
 
 $triggerid = optional_param('id', 0, PARAM_INT);
-$datatype = optional_param('datatype', '', PARAM_ALPHANUM);
+$datatype = required_param('datatype', PARAM_ALPHANUM);
 
 $PAGE->set_url(new moodle_url('/local/extension/editrule.php'));
 
@@ -49,13 +49,13 @@ if (!empty($triggerid) && confirm_sesskey()) {
     $data = \local_extension\rule::from_id($triggerid);
 
     // Set the saved serialised data as object properties, which will be loaded as default form values.
+    // If and only if the form elements have the same name, and they have been saved to the data variable.
     if (!empty($data->data)) {
         foreach ($data->data as $key => $value) {
             $data->$key = $value;
         }
     }
 }
-
 
 // Select all root parent items.
 $compare = $DB->sql_compare_text('datatype') . " = " . $DB->sql_compare_text(':datatype');
@@ -94,8 +94,6 @@ if (array_key_exists($triggerid, $children)) {
     }
 }
 
-//
-
 $mform = new \local_extension\form\rule(null, array('parents' => $parents, 'datatype' => $datatype));
 $mform->set_data($data);
 
@@ -108,6 +106,8 @@ if ($mform->is_cancelled()) {
 } else if ($form = $mform->get_data()) {
 
     $rule = new \local_extension\rule();
+
+    // Also saves template_ form items to the custom data variable.
     $rule->load_from_form($form);
 
     if (!empty($rule->id)) {

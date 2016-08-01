@@ -33,15 +33,18 @@ $courseid  = optional_param('course', 0, PARAM_INTEGER);
 $cmid = optional_param('cmid', 0, PARAM_INTEGER);
 
 if (!empty($cmid)) {
-    $context = context_module::instance($cmid);
     $cm = get_fast_modinfo($courseid)->get_cm($cmid);
     require_login($courseid, null, $cm);
+    $context = context_module::instance($cmid);
+
 } else if (!empty($courseid)) {
-    $context = context_course::instance($courseid);
     require_login($courseid);
+    $context = context_course::instance($courseid);
+
 } else {
-    $context = context_user::instance($USER->id);
     require_login(false);
+    $context = context_user::instance($USER->id);
+
 }
 
 $PAGE->set_context($context);
@@ -117,7 +120,7 @@ if ($mform->is_cancelled()) {
     file_prepare_draft_area($draftitemid, $context->id, 'local_extension', 'attachments', $request['id']);
     file_save_draft_area_files($draftitemid, $context->id, 'local_extension', 'attachments', $request['id']);
 
-    foreach ($mods as $id => $mod) {
+    foreach ($mods as $cmid => $mod) {
 
         $course = $mod['course'];
         $handler = $mod['handler'];
@@ -134,7 +137,7 @@ if ($mform->is_cancelled()) {
             'userid' => $USER->id,
             'course' => $course->id,
             'timestamp' => $now,
-            'cmid' => $id,
+            'cmid' => $cmid,
             'state' => 0,
             'data' => $data,
         );
