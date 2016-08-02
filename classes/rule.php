@@ -309,15 +309,19 @@ class rule {
         $context = \context_course::instance($course->id);
         $users = \get_role_users($role, $context);
 
+        // Iterate over all users in the cm's course that have the roleid $role.
         foreach ($users as $user) {
-            $sub = new \stdClass();
-
             $params = array(
                 'userid' => $user->id,
                 'localcmid' => $localcm->cm->cmid,
             );
 
             $sub = $DB->get_record('local_extension_subscription', $params);
+
+            if (empty($sub)) {
+                $sub = new \stdClass();
+                $sub->access = 0;
+            }
 
             // If the action is the same we are to assume that they have been setup already.
             if ($this->action == $sub->access) {
@@ -328,7 +332,7 @@ class rule {
             $sub->localcmid = $localcm->cm->cmid;
             $sub->lastmod = \time();
 
-            switch ($this->access) {
+            switch ($this->action) {
                 case self::RULE_ACTION_APPROVE:
                     $sub->access = self::RULE_ACTION_APPROVE;
                 case self::RULE_ACTION_SUBSCRIBE:
