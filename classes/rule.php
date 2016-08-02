@@ -276,7 +276,7 @@ class rule {
         }
 
         // If the parent has not been triggered then we abort.
-        if ($this->check_parent($mod) === false) {
+        if ($this->check_parent($mod, $this->parent) === false) {
             return false;
         }
 
@@ -294,31 +294,55 @@ class rule {
         $this->notify_roles($mod, $templates['template_notify']);
         $this->notify_user($mod, $templates['template_user']);
 
-        $this->get_request_time($mod);
-
-        // Write history
+        // Users have been notified and subscriptions setup. Lets write a log of firing this trigger.
+        $this->write_history($mod);
     }
 
     private function setup_subscription($mod) {
         global $DB;
 
-        // TODO userid, based on fetching all roles from the course that match the rule
-        // and adding an entry per user found?
+        $localcm = $mod['localcm'];
+        $course = $mod['course'];
 
-        $sub = array(
-            'userid' => $mod['localcm']->cm->id,
-            'localcmid' => $mod['localcm']->requestid,
-            'access' => 0,
-            'lastmod' => \time(),
-        );
+        $role = $this->role;
 
-        if ($this->action == self::RULE_ACTION_APPROVE) {
-            $sub['access'] = self::RULE_ACTION_APPROVE;
-        } else if ($this->action == self::RULE_ACTION_SUBSCRIBE) {
-            $sub['access'] = self::RULE_ACTION_SUBSCRIBE;
+        $context = \context_course::instance($course->id);
+        $users = \get_role_users($role, $context);
+
+        foreach ($users as $user) {
+            $sub = new \stdClass();
+
+            $params = array(
+                'userid' => $user->id,
+                'localcmid' => $localcm->cm->cmid,
+            );
+
+            $sub = $DB->get_record('local_extension_subscription', $params);
+
+            // If the action is the same we are to assume that they have been setup already.
+            if ($this->action == $sub->access) {
+                break;
+            }
+
+            $sub->userid = $user->id;
+            $sub->localcmid = $localcm->cm->cmid;
+            $sub->lastmod = \time();
+
+            switch ($this->access) {
+                case self::RULE_ACTION_APPROVE:
+                    $sub->access = self::RULE_ACTION_APPROVE;
+                case self::RULE_ACTION_SUBSCRIBE:
+                    $sub->access = self::RULE_ACTION_SUBSCRIBE;
+                default:
+                    $sub->access = 0;
+            }
+
+            if (empty($sub->id)) {
+                $DB->insert_record('local_extension_subscription', $sub);
+            } else {
+                $DB->update_record('local_extension_subscription', $sub);
+            }
         }
-
-        $DB->insert_record('local_extension_subscription', $sub);
 
     }
 
@@ -330,8 +354,8 @@ class rule {
         $params = array(
             'trigger' => $this->id,
             'localcmid' => $localcm->cm->id,
-            'userid' => $localcm->cm->userid,
             'requestid' => $localcm->cm->request,
+            'userid' => $localcm->cm->userid,
         );
 
         $record = $DB->get_record('local_extension_history', $params);
@@ -349,14 +373,16 @@ class rule {
 
         $localcm = $mod['localcm'];
 
+        // TODO state? log?
+
         $history = array(
             'trigger' => $this->id,
             'timestamp' => time(),
             'localcmid' => $localcm->cm->id,
             'requestid' => $localcm->cm->request,
             'userid' => $localcm->cm->userid,
-            'log' => null,
-            'state' => null,
+            'log' => '',
+            'state' => 0,
 
         );
 
@@ -432,11 +458,31 @@ class rule {
 
     }
 
-    private function check_parent($mod) {
-        // TODO look up local_extension_history
+    private function check_parent($mod, $parent) {
+        global $DB;
 
-        return true;
+        // There is no parent. Lets rock.
+        if (empty($parent)) {
+            return true;
+        }
 
+        $localcm = $mod['localcm'];
+
+        $params = array(
+            'trigger' => $parent,
+            'localcmid' => $localcm->cm->id,
+            'requestid' => $localcm->cm->request,
+            'userid' => $localcm->cm->userid,
+        );
+
+        $record = $DB->get_record('local_extension_history', $params);
+
+        // A record has been found. Return true, the parent has previously been activated!
+        if (!empty($record)) {
+            return true;
+        }
+
+        return false;
     }
 
     private function get_request_time($mod) {
