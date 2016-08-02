@@ -36,19 +36,19 @@ namespace local_extension;
 class rule {
 
     /** @var integer Action type: Approve. */
-    const RULE_ACTION_APPROVE = 0;
+    const RULE_ACTION_APPROVE = 1;
 
     /** @var integer Action type: Subscribe. */
-    const RULE_ACTION_SUBSCRIBE = 1;
+    const RULE_ACTION_SUBSCRIBE = 2;
 
     /** @var integer Condition: Less than. */
-    const RULE_CONDITION_LT = 0;
+    const RULE_CONDITION_LT = 1;
 
     /** @var integer Condition: Greater or equal to. */
-    const RULE_CONDITION_GE = 1;
+    const RULE_CONDITION_GE = 2;
 
     /** @var integer Condition: Special. */
-    const RULE_CONDITION_SPECIAL = 2;
+    const RULE_CONDITION_SPECIAL = 3;
 
     /** @var integer The local_extension_trigger id */
     public $id = null;
@@ -263,16 +263,20 @@ class rule {
      * @param array $mod
      */
     public function process($request, $mod) {
+        /*
         $event   = $mod['event'];
         $cm      = $mod['cm'];
         $localcm = $mod['localcm'];
         $course  = $mod['course'];
         $handler = $mod['handler'];
+        */
 
-        // TODO: Check history to see if this has been triggered already.
+        if ($this->check_history($mod) === false) {
+            return false;
+        }
 
         // If the parent has not been triggered then we abort.
-        if ($this->check_parent() === false) {
+        if ($this->check_parent($mod) === false) {
             return false;
         }
 
@@ -284,13 +288,9 @@ class rule {
             return false;
         }
 
-        if ($this->action == self::RULE_ACTION_APPROVE) {
-            $this->approve();
-        } else if ($this->action == self::RULE_ACTION_SUBSCRIBE) {
-            $this->subscribe();
-        }
+        $this->setup_subscription($mod);
 
-        $templates = $this->process_templates($request, $mod);
+        $templates = $this->process_templates($mod);
         $this->notify_roles($mod, $templates['template_notify']);
         $this->notify_user($mod, $templates['template_user']);
 
@@ -299,22 +299,91 @@ class rule {
         // Write history
     }
 
-    private function process_templates($request, $mod) {
+    private function setup_subscription($mod) {
         global $DB;
 
+        // TODO userid, based on fetching all roles from the course that match the rule
+        // and adding an entry per user found?
+
+        $sub = array(
+            'userid' => $mod['localcm']->cm->id,
+            'localcmid' => $mod['localcm']->requestid,
+            'access' => 0,
+            'lastmod' => \time(),
+        );
+
+        if ($this->action == self::RULE_ACTION_APPROVE) {
+            $sub['access'] = self::RULE_ACTION_APPROVE;
+        } else if ($this->action == self::RULE_ACTION_SUBSCRIBE) {
+            $sub['access'] = self::RULE_ACTION_SUBSCRIBE;
+        }
+
+        $DB->insert_record('local_extension_subscription', $sub);
+
+    }
+
+    private function check_history($mod) {
+        global $DB;
+
+        $localcm = $mod['localcm'];
+
+        $params = array(
+            'trigger' => $this->id,
+            'localcmid' => $localcm->cm->id,
+            'userid' => $localcm->cm->userid,
+            'requestid' => $localcm->cm->request,
+        );
+
+        $record = $DB->get_record('local_extension_history', $params);
+
+        // A record has been found. Return false to stop processing the trigger.
+        if (!empty($record)) {
+            return false;
+        }
+
+        return true;
+    }
+
+    private function write_history($mod) {
+        global $DB;
+
+        $localcm = $mod['localcm'];
+
+        $history = array(
+            'trigger' => $this->id,
+            'timestamp' => time(),
+            'localcmid' => $localcm->cm->id,
+            'requestid' => $localcm->cm->request,
+            'userid' => $localcm->cm->userid,
+            'log' => null,
+            'state' => null,
+
+        );
+
+        $DB->insert_record('local_extension_history', $history);
+    }
+
+    private function process_templates($mod) {
+        global $DB;
+
+        $event   = $mod['event'];
+        $cm      = $mod['cm'];
+        $localcm = $mod['localcm'];
+        $course  = $mod['course'];
+
         // A url to the status page.
-        $url = new \moodle_url('/local/extension/status.php', array('id' => $request->id));
+        $url = new \moodle_url('/local/extension/status.php', array('id' => $localcm->cm->request));
 
         // The user details for obtaining the full name.
         $userid = $mod['localcm']->userid;
         $user = $DB->get_record('user', array('id' => $userid));
 
         $templatevars = array(
-            '/{{course}}/' => $mod['course']->fullname,
-            '/{{module}}/' => $mod['cm']->name,
+            '/{{course}}/' => $course->fullname,
+            '/{{module}}/' => $cm->name,
             '/{{student}}/' => \fullname($user),
-            '/{{duedate}}/' => \userdate($mod['event']->timestart),
-            '/{{extensiondate}}/' => \userdate($mod['localcm']->cm->data),
+            '/{{duedate}}/' => \userdate($event->timestart),
+            '/{{extensiondate}}/' => \userdate($localcm->cm->data),
             '/{{requeststatusurl}}/' => $url,
             '/{{extensionlength}}/' => $this->get_request_time($mod),
         );
@@ -363,17 +432,11 @@ class rule {
 
     }
 
-    private function check_parent() {
+    private function check_parent($mod) {
         // TODO look up local_extension_history
 
         return true;
 
-    }
-
-    private function approve() {
-    }
-
-    private function subscribe() {
     }
 
     private function get_request_time($mod) {
@@ -387,7 +450,7 @@ class rule {
         $delta = $daterequested - $datedue;
 
         $days = floor($delta / 60 / 60 / 24);
-        $hours = ($delta - ($days * 86400)) / 60 / 60;
+        $hours = floor(($delta - ($days * 86400)) / 60 / 60);
 
         // TODO lang string for this?
         $str = "{$days} {$hours}";
@@ -441,13 +504,13 @@ class rule {
 
     }
 
-    private function notify_roles() {
+    private function notify_roles($mod, $template) {
         $role = $this->role;
 
         // TODO notify roles
     }
 
-    private function notify_user($mod) {
+    private function notify_user($mod, $template) {
         $user = $mod['localcm']->userid;
 
         // TODO nofity user with template

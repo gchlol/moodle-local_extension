@@ -53,10 +53,8 @@ $PAGE->set_title(get_string('pluginname', 'local_extension'));
 $PAGE->set_heading(get_string('request_page_heading', 'local_extension'));
 $PAGE->requires->css('/local/extension/styles.css');
 
-$config = get_config('local_extension');
-
-$searchback = optional_param('back', $config->searchback, PARAM_INTEGER);
-$searchforward = optional_param('forward', $config->searchforward, PARAM_INTEGER);
+$searchback = optional_param('back', get_config('local_extension', 'searchback'), PARAM_INTEGER);
+$searchforward = optional_param('forward', get_config('local_extension', 'searchforward'), PARAM_INTEGER);
 
 $user = $USER->id;
 $start = time() - $searchback * 24 * 60 * 60;

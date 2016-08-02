@@ -84,8 +84,8 @@ class rule extends \moodleform {
         $lengthfromduedate = array();
 
         $lengthtypes = array(
-                get_string('form_rule_less_than', 'local_extension'),
-                get_string('form_rule_greater_or_equal', 'local_extension'),
+            \local_extension\rule::RULE_CONDITION_LT => 'less than',
+            \local_extension\rule::RULE_CONDITION_GE => 'greater or equal to',
         );
 
         $lengthfromduedategroup[] = $mform->createElement('select', 'lengthtype', '', $lengthtypes);
@@ -99,8 +99,8 @@ class rule extends \moodleform {
         $elapsedtime = array();
 
         $lengthtypes = array(
-                'less than',
-                'greater or equal to',
+            \local_extension\rule::RULE_CONDITION_LT => 'less than',
+            \local_extension\rule::RULE_CONDITION_GE => 'greater or equal to',
         );
 
         $elapsedtimegroup[] = $mform->createElement('select', 'elapsedtype', '', $lengthtypes);
@@ -114,8 +114,8 @@ class rule extends \moodleform {
         $actionarray = array();
 
         $actiontypes = array(
-                get_string('form_rule_select_approve', 'local_extension'),
-                get_string('form_rule_select_subscribe', 'local_extension'),
+            \local_extension\rule::RULE_ACTION_APPROVE   => get_string('form_rule_select_approve', 'local_extension'),
+            \local_extension\rule::RULE_ACTION_SUBSCRIBE => get_string('form_rule_select_subscribe', 'local_extension'),
         );
 
         $roletypes = role_get_names(\context_system::instance(), ROLENAME_ALIAS, true);

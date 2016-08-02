@@ -255,7 +255,7 @@ class local_extension_renderer extends plugin_renderer_base {
 
         $reqlength = array(
             get_string('form_rule_label_request_length', 'local_extension'),
-            $trigger->lengthtype ? get_string('form_rule_greater_or_equal', 'local_extension') : get_string('form_rule_less_than', 'local_extension'),
+            $trigger->lengthtype == $trigger::RULE_CONDITION_GE ? get_string('form_rule_greater_or_equal', 'local_extension') : get_string('form_rule_less_than', 'local_extension'),
             $trigger->lengthfromduedate,
             get_string('form_rule_label_days_long', 'local_extension'),
         );
@@ -263,7 +263,7 @@ class local_extension_renderer extends plugin_renderer_base {
 
         $elapsedlength = array(
             get_string('form_rule_label_elapsed_length', 'local_extension'),
-            $trigger->elapsedtype ? get_string('form_rule_greater_or_equal', 'local_extension') : get_string('form_rule_less_than', 'local_extension'),
+            $trigger->elapsedtype == $trigger::RULE_CONDITION_GE ? get_string('form_rule_greater_or_equal', 'local_extension') : get_string('form_rule_less_than', 'local_extension'),
             $trigger->elapsedfromrequest,
             get_string('form_rule_label_days_old', 'local_extension'),
         );
