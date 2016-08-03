@@ -81,7 +81,7 @@ class request extends \moodleform {
             }
 
             // TODO style the width of this textarea.
-            $mform->addElement('textarea', 'comment', get_string('comment', 'local_extension'), '');
+            $mform->addElement('textarea', 'comment', get_string('comment', 'local_extension'), 'rows="5" cols="70"');
             $mform->addRule('comment', 'Required', 'required', null, 'client');
 
             $mform->addElement('filemanager', 'attachments', get_string('attachments', 'local_extension'), null, array(

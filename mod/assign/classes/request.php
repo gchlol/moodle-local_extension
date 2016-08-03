@@ -148,23 +148,13 @@ class request extends \local_extension\base_request {
         $event = $mod['event'];
         $course = $mod['course'];
         $handler = $mod['handler'];
-        $localcm = $mod['localcm'];
 
+        /* @var $localcm \local_extension\cm */
+        $localcm = $mod['localcm'];
         $id = $localcm->cmid;
 
-        // TODO if $USER has the roles to view
-        // TODO based on the cm status, present different buttons. (disable the the ones that cannot be clicked?)
-
-        // Check what role the user has for the cm.
-
-        $context = \context_course::instance($course->id);
-
-        $roles = get_user_roles($context, $user);
-        $rolenames = \role_get_names($context, ROLENAME_ALIAS, true);
-
-        // If roleid equals configured role(s) print the available buttons.
-
         $nextstates = $localcm->get_next_state();
+        sort($nextstates);
 
         $buttonarray=array();
 
@@ -181,7 +171,7 @@ class request extends \local_extension\base_request {
                     $buttonarray[] = &$mform->createElement('submit', 'deny' . $id, 'Deny');
                     break;
                 case $localcm::STATE_APPROVED:
-                    //$buttonarray[] = &$mform->createElement('submit', 'approve' . $id, 'Approve');
+                    $buttonarray[] = &$mform->createElement('submit', 'approve' . $id, 'Approve');
                     //$buttonarray[] = &$mform->createElement('submit', 'deny' . $id, 'Deny');
                     //$buttonarray[] = &$mform->createElement('submit', 'reopen' . $id, 'Reopen');
                     break;

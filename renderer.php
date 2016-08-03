@@ -71,9 +71,7 @@ class local_extension_renderer extends plugin_renderer_base {
             $out .= html_writer::start_tag('div', array('class' => 'content'));
             $out .= html_writer::tag('span', fullname($user), array('class' => 'name'));
 
-            $context = 1; // TODO what context is this in relation to? Usually one a cm.
-            $role = 'Course coordinator'; // TODO look this up.
-            $out .= html_writer::tag('span', ' - ' . $role, array('class' => 'role'));
+            $out .= html_writer::tag('span', ' - ' . $this->render_role($req, $user->id), array('class' => 'role'));
             $out .= html_writer::tag('span', ' - ' . $this->render_time($comment->timestamp), array('class' => 'time'));
 
             $out .= html_writer::start_tag('div', array('class' => 'message'));
@@ -88,10 +86,64 @@ class local_extension_renderer extends plugin_renderer_base {
     }
 
     /**
+     * Renders role information
+     *
+     * @param role $role
+     * @return string
+     */
+    public function render_role($req, $userid) {
+        $details = '';
+        $roles = array();
+        $highestrole = null;
+        $shortcode = null;
+
+        // Roles are scoped to the enrollment status in courses.
+        foreach ($req->mods as $cmid => $mod) {
+            $course = $mod['course'];
+            $context = \context_course::instance($course->id);
+            $roles = get_user_roles($context, $userid, true);
+
+            $top = array_shift($roles);
+            $modhighest = null;
+
+            // Set the highest local scoped varaible.
+            if (empty($modhighest)) {
+                $modhighest = $top;
+            }
+
+            // Set the highest function scoped varaible.
+            if (empty($highestrole)) {
+                $highestrole = $top;
+                $shortcode = $course->shortname;
+            }
+
+            if ($top->roleid < $modhighest->roleid) {
+                $modhighest = $top;
+            }
+
+            if ($modhighest->roleid < $highestrole->roleid) {
+                $highestrole = $modhighest;
+                $shortcode = $course->shortname;
+            }
+
+            $rolename = role_get_name($modhighest, $context);
+
+            $details .= "{$rolename} - {$course->fullname}\n";
+
+        }
+
+        $rolename = role_get_name($highestrole, $context);
+        //$rolename .= " - " . $shortcode;
+
+        return html_writer::tag('abbr', $rolename, array('title' => $details) );
+
+    }
+
+    /**
      * Render nice times
      *
      * @param integer $time The time to show
-     * @return string $out The html output.
+     * @return string The html output.
      */
     public function render_time($time) {
         $delta = time() - $time;

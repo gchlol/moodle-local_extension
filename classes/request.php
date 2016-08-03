@@ -56,6 +56,9 @@ class request implements \cache_data_source {
     /** @var array An array of mods that are used */
     public $mods = array();
 
+    /** @var array An array of roles that map to cm items and users */
+    public $roles = array();
+
     /**
      * Request object constructor.
      * @param integer $requestid An optional variable to identify the request.
@@ -238,7 +241,7 @@ class request implements \cache_data_source {
                 $status = $localcm->get_state_name();
                 $text = "$status extension for {$course->fullname}, {$event->name}";
 
-                //$this->add_comment($user, $text);
+                // TODO add history based on the state change, user who authorised it.
             }
 
             if (!empty($data->$deny)) {
@@ -246,7 +249,7 @@ class request implements \cache_data_source {
                 $status = $localcm->get_state_name();
                 $text = "$status extension for {$course->fullname}, {$event->name}";
 
-                //$this->add_comment($user, $text);
+                // TODO add history based on the state change, user who authorised it.
             }
 
             if (!empty($data->$cancel)) {
@@ -254,7 +257,7 @@ class request implements \cache_data_source {
                 $status = $localcm->get_state_name();
                 $text = "$status extension for {$course->fullname}, {$event->name}";
 
-                //$this->add_comment($user, $text);
+                // TODO add history based on the state change, user who authorised it.
             }
 
             if (!empty($data->$reopen)) {
@@ -262,7 +265,7 @@ class request implements \cache_data_source {
                 $status = $localcm->get_state_name();
                 $text = "$status extension for {$course->fullname}, {$event->name}";
 
-                //$this->add_comment($user, $text);
+                // TODO add history based on the state change, user who authorised it.
             }
 
         }

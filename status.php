@@ -46,6 +46,14 @@ $PAGE->requires->css('/local/extension/styles.css');
 $request = \local_extension\utility::cache_get_request($requestid);
 $renderer = $PAGE->get_renderer('local_extension');
 
+/*
+$params = array(
+    'userid' => null,
+    'localcmid'
+);
+$DB->get_record('local_extension_subscription', $params);
+*/
+
 $params = array('user' => $OUTPUT->user_picture($USER), 'request' => $request, 'renderer' => $renderer);
 $mform = new \local_extension\form\update(null, $params);
 

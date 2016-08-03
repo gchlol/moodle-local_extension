@@ -288,6 +288,7 @@ class rule {
             return false;
         }
 
+        // TODO move earlier? If a rule has changed but history specifies that it has triggered then the action will not be updated.
         $this->setup_subscription($mod);
 
         $templates = $this->process_templates($mod);
@@ -296,6 +297,21 @@ class rule {
 
         // Users have been notified and subscriptions setup. Lets write a log of firing this trigger.
         $this->write_history($mod);
+    }
+
+    public static function check_access($mod, $userid) {
+        global $DB;
+
+        $localcm = $mod['localcm'];
+
+        $params = array(
+            'userid' => $userid,
+            'localcmid' => $localcm->cm->cmid,
+        );
+
+        $access = $DB->get_field('local_extension_subscription', 'access', $params);
+
+        return $access;
     }
 
     private function setup_subscription($mod) {
@@ -335,10 +351,13 @@ class rule {
             switch ($this->action) {
                 case self::RULE_ACTION_APPROVE:
                     $sub->access = self::RULE_ACTION_APPROVE;
+                    break;
                 case self::RULE_ACTION_SUBSCRIBE:
                     $sub->access = self::RULE_ACTION_SUBSCRIBE;
+                    break;
                 default:
                     $sub->access = 0;
+                    break;
             }
 
             if (empty($sub->id)) {
