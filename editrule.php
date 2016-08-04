@@ -112,6 +112,20 @@ if ($mform->is_cancelled()) {
 
     if (!empty($rule->id)) {
         $DB->update_record('local_extension_triggers', $rule);
+
+        // Update the recorded history to invalidate previous triggered rules.
+        $params = array (
+            'trigger' => $rule->id,
+            'state' => 0
+        );
+        $existing = $DB->get_records('local_extension_history', $params);
+
+        if (!empty($existing)) {
+            foreach ($existing as $record) {
+                $record->state = \local_extension\history::STATE_DISABLED;
+                $DB->update_record('local_extension_history', $record, true);
+            }
+        }
     } else {
         $DB->insert_record('local_extension_triggers', $rule);
     }

@@ -379,9 +379,18 @@ class rule {
             'localcmid' => $localcm->cm->id,
             'requestid' => $localcm->cm->request,
             'userid' => $localcm->cm->userid,
+            'state' => \local_extension\history::STATE_DEFAULT
         );
 
-        $record = $DB->get_record('local_extension_history', $params);
+        $sql = "SELECT id
+                  FROM {local_extension_history}
+                 WHERE trigger = :trigger
+                   AND localcmid = :localcmid
+                   AND requestid = :requestid
+                   AND userid = :userid
+                   AND state = :state";
+
+        $record = $DB->get_record_sql($sql, $params);
 
         // A record has been found. Return false to stop processing the trigger.
         if (!empty($record)) {
