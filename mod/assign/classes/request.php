@@ -181,8 +181,8 @@ class request extends \local_extension\base_request {
             }
         }
 
-        $mform->addGroup($buttonarray, '', '', array(' '), false);
-        $mform->closeHeaderBefore('');
+        $mform->addGroup($buttonarray, 'buttonar', '', array(' '), false);
+        //$mform->closeHeaderBefore('buttonar');
 
     }
 

@@ -45,7 +45,7 @@ class utility {
      * @param timestamp $start  Start of search period
      * @param timestamp $end End of search period
      * @param array $options Optional arguments.
-     * @return An array of candidates.
+     * @return An array of candidates. array($mods, $events)
      *
      */
     public static function get_activities($userid, $start, $end, $options = null) {

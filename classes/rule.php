@@ -35,6 +35,9 @@ namespace local_extension;
  */
 class rule {
 
+    /** @var integer Action type: Default. No access */
+    const RULE_ACTION_DEFAULT = 0;
+
     /** @var integer Action type: Approve. */
     const RULE_ACTION_APPROVE = 1;
 
@@ -135,7 +138,8 @@ class rule {
         $data = @unserialize($decoded);
 
         if ($data !== false) {
-            return $data;
+            $this->data = $data;
+            return true;
         }
 
         return false;
@@ -168,7 +172,7 @@ class rule {
             $this->$key = $record->$key;
         }
 
-        $this->data = $this->data_load();
+        $this->data_load();
     }
 
     /**
@@ -228,7 +232,7 @@ class rule {
             $rule->$key = $object->$key;
         }
 
-        $rule->data = $rule->data_load();
+        $rule->data_load();
 
         return $rule;
     }
@@ -271,6 +275,7 @@ class rule {
         $handler = $mod['handler'];
         */
 
+        // Checks if the trigger for this cm has been activated.
         if ($this->check_history($mod) === false) {
             return false;
         }
@@ -288,7 +293,6 @@ class rule {
             return false;
         }
 
-        // TODO move earlier? If a rule has changed but history specifies that it has triggered then the action will not be updated.
         $this->setup_subscription($mod);
 
         $templates = $this->process_templates($mod);
@@ -314,6 +318,11 @@ class rule {
         return $access;
     }
 
+    /**
+     *
+     *
+     * @param array $mod
+     */
     private function setup_subscription($mod) {
         global $DB;
 
@@ -324,6 +333,25 @@ class rule {
 
         $context = \context_course::instance($course->id);
         $users = \get_role_users($role, $context);
+
+        /*
+         * If a rule has been edited then the roles that have special access may have changed.
+         * With the following lines it will reset all access to default for the rules cm.
+         */
+        $sql = "UPDATE {local_extension_subscription}
+                   SET access = :access,
+                       lastmod = :lastmod
+                 WHERE localcmid = :localcmid";
+
+        $params = array(
+            'localcmid' => $localcm->cm->cmid,
+            'lastmod' => time(),
+            'access' => self::RULE_ACTION_DEFAULT,
+        );
+
+        // TODO review requiremen for resetting subscription details.
+        // or implement a scheduled task to perform this function to clean up subscriptions.
+        // $DB->execute($sql, $params);
 
         // Iterate over all users in the cm's course that have the roleid $role.
         foreach ($users as $user) {
@@ -336,7 +364,7 @@ class rule {
 
             if (empty($sub)) {
                 $sub = new \stdClass();
-                $sub->access = 0;
+                $sub->access = self::RULE_ACTION_DEFAULT;
             }
 
             // If the action is the same we are to assume that they have been setup already.
@@ -356,7 +384,7 @@ class rule {
                     $sub->access = self::RULE_ACTION_SUBSCRIBE;
                     break;
                 default:
-                    $sub->access = 0;
+                    $sub->access = self::RULE_ACTION_DEFAULT;
                     break;
             }
 
@@ -379,7 +407,7 @@ class rule {
             'localcmid' => $localcm->cm->id,
             'requestid' => $localcm->cm->request,
             'userid' => $localcm->cm->userid,
-            'state' => \local_extension\history::STATE_DEFAULT
+            'state' => \local_extension\history::STATE_DEFAULT,
         );
 
         $sql = "SELECT id
@@ -405,8 +433,6 @@ class rule {
 
         $localcm = $mod['localcm'];
 
-        // TODO state? log?
-
         $history = array(
             'trigger' => $this->id,
             'timestamp' => time(),
@@ -414,8 +440,7 @@ class rule {
             'requestid' => $localcm->cm->request,
             'userid' => $localcm->cm->userid,
             'log' => '',
-            'state' => 0,
-
+            'state' => \local_extension\history::STATE_DEFAULT
         );
 
         $DB->insert_record('local_extension_history', $history);
@@ -505,6 +530,7 @@ class rule {
             'localcmid' => $localcm->cm->id,
             'requestid' => $localcm->cm->request,
             'userid' => $localcm->cm->userid,
+            'state' => \local_extension\history::STATE_DEFAULT
         );
 
         $record = $DB->get_record('local_extension_history', $params);
@@ -557,9 +583,9 @@ class rule {
             if ($delta >= $days) {
                 return true;
             }
-        } else {
-            return false;
         }
+
+        return false;
     }
 
     private function check_elapsed_length($request, $mod) {
@@ -576,10 +602,9 @@ class rule {
             if ($delta >= $days) {
                 return true;
             }
-        } else {
-            return false;
         }
 
+        return false;
     }
 
     private function notify_roles($mod, $template) {
