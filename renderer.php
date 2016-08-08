@@ -53,11 +53,20 @@ class local_extension_renderer extends plugin_renderer_base {
      * @param request $req The extension request object.
      * @return string $out The html output.
      */
-    public function render_extension_comments(\local_extension\request $req) {
+    public function render_extension_comments(\local_extension\request $req, $history) {
         $out = '';
 
         $out .= html_writer::start_tag('div', array('class' => 'comments'));
-        foreach ($req->comments as $comment) {
+
+        // Lets merge the comments and history together to have an interleaved stream of information.
+        $comments = array_merge($req->comments, $history);
+
+        // Sort all comments and history based on timestamp.
+        usort($comments, function($a, $b) {
+            return $a->timestamp - $b->timestamp;
+        });
+
+        foreach ($comments as $comment) {
             $user = $req->users[$comment->userid];
 
             $out .= html_writer::start_tag('div', array('class' => 'comment'));

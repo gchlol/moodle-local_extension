@@ -107,12 +107,17 @@ class cm {
     public static function from_userid($cmid, $userid) {
         global $DB;
 
-        $cm = new cm($cmid, $userid, null);
+        $localcm = new cm($cmid, $userid, null);
 
-        $conditions = array('cmid' => $cm->cmid, 'userid' => $cm->userid);
-        $cm->cm = $DB->get_record('local_extension_cm', $conditions, 'cmid,course,data,id,request,state,userid');
+        $conditions = array('cmid' => $localcm->cmid, 'userid' => $localcm->userid);
+        $cm = $DB->get_record('local_extension_cm', $conditions, 'cmid,course,data,id,request,state,userid');
 
-        return $cm;
+        if (!empty($cm)) {
+            $localcm->cm = $cm;
+            $localcm->requestid = $cm->request;
+        }
+
+        return $localcm;
     }
 
     /**
@@ -167,6 +172,24 @@ class cm {
 
         \local_extension\utility::cache_invalidate_request($this->requestid);
     }
+
+    public function write_history($mod, $state, $log) {
+        global $DB;
+
+        $localcm = $mod['localcm'];
+
+        $history = array(
+            'localcmid' => $localcm->cmid,
+            'requestid' => $localcm->requestid,
+            'timestamp' => time(),
+            'message' => $log,
+            'state' => $state,
+            'userid' => $localcm->userid,
+        );
+
+        $DB->insert_record('local_extension_his_state', $history);
+    }
+
 
     /**
      * Query the $cm and get the next available states.

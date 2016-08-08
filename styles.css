@@ -12,21 +12,28 @@
     position: absolute;
     left: 0;
 }
+
 .comment .content {
     padding-left: 60px;
 }
+
 .comment .name {
     font-weight: bold;
 }
+
 span.statusnew {
     background-color: #FFE047;
 }
+
 span.statusdenied {
 }
+
 span.statusapproved {
     background-color: #AFFF44
 }
+
 span.statusreopened {
 }
+
 span.statuscancel {
 }

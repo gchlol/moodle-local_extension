@@ -227,45 +227,31 @@ class request implements \cache_data_source {
 
         foreach ($this->mods as $id => $mod) {
             $handler = $mod['handler'];
+
+            /* @var \local_extension\cm $localcm */
             $localcm = $mod['localcm'];
             $event   = $mod['event'];
             $course  = $mod['course'];
 
-            $approve = 'approve' . $id;
-            $deny    = 'deny' . $id;
-            $cancel  = 'cancel' . $id;
-            $reopen  = 'reopen' . $id;
+            $statearray = array(
+                'approve' => \local_extension\cm::STATE_APPROVED,
+                'deny' => \local_extension\cm::STATE_DENIED,
+                'cancel' => \local_extension\cm::STATE_CANCEL,
+                'reopen' => \local_extension\cm::STATE_REOPENED,
+            );
 
-            if (!empty($data->$approve)) {
-                $localcm->set_state($localcm::STATE_APPROVED);
-                $status = $localcm->get_state_name();
-                $text = "$status extension for {$course->fullname}, {$event->name}";
+            foreach ($statearray as $name => $state) {
+                $item = $name . $id;
 
-                // TODO add history based on the state change, user who authorised it.
-            }
+                if (!empty($data->$item)) {
+                    $localcm->set_state($state);
+                    $status = $localcm->get_state_name();
+                    $log = "$status extension for {$course->fullname}, {$event->name}";
 
-            if (!empty($data->$deny)) {
-                $localcm->set_state($localcm::STATE_DENIED);
-                $status = $localcm->get_state_name();
-                $text = "$status extension for {$course->fullname}, {$event->name}";
+                    $localcm->write_history($mod, $state, $log);
 
-                // TODO add history based on the state change, user who authorised it.
-            }
+                }
 
-            if (!empty($data->$cancel)) {
-                $localcm->set_state($localcm::STATE_CANCEL);
-                $status = $localcm->get_state_name();
-                $text = "$status extension for {$course->fullname}, {$event->name}";
-
-                // TODO add history based on the state change, user who authorised it.
-            }
-
-            if (!empty($data->$reopen)) {
-                $localcm->set_state($localcm::STATE_REOPENED);
-                $status = $localcm->get_state_name();
-                $text = "$status extension for {$course->fullname}, {$event->name}";
-
-                // TODO add history based on the state change, user who authorised it.
             }
 
         }

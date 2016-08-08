@@ -36,14 +36,8 @@ class local_extension_rule_testcase extends advanced_testcase {
     const DEFAULT_TEACHER_COUNT = 2;
     /** @const Default number of editing teachers to create */
     const DEFAULT_EDITING_TEACHER_COUNT = 2;
-    /** @const Optional extra number of students to create */
-    const EXTRA_STUDENT_COUNT = 40;
-    /** @const Optional number of suspended students */
-    const EXTRA_SUSPENDED_COUNT = 10;
-    /** @const Optional extra number of teachers to create */
-    const EXTRA_TEACHER_COUNT = 5;
-    /** @const Optional extra number of editing teachers to create */
-    const EXTRA_EDITING_TEACHER_COUNT = 5;
+    /** @const Default number of mangers to create */
+    const DEFAULT_MANAGER_COUNT = 2;
     /** @const Number of groups to create */
     const GROUP_COUNT = 6;
 
@@ -59,11 +53,13 @@ class local_extension_rule_testcase extends advanced_testcase {
     /** @var array $students List of DEFAULT_STUDENT_COUNT students in the course */
     protected $students = null;
 
+    /** @var array $students List of DEFAULT_MANAGER_COUNT students in the course */
+    protected $managers = null;
+
     /** @var array $groups List of 10 groups in the course */
     protected $groups = null;
 
-
-    /** @var assign $assign An instance of mod_assign to test the rules against */
+    /** @var assign[] $assign An array of mod_assign to test the rules against */
     protected $assign = null;
 
     /**
@@ -90,6 +86,11 @@ class local_extension_rule_testcase extends advanced_testcase {
         $this->students = array();
         for ($i = 0; $i < self::DEFAULT_STUDENT_COUNT; $i++) {
             array_push($this->students, $this->getDataGenerator()->create_user());
+        }
+
+        $this->managers = array();
+        for ($i = 0; $i < self::DEFAULT_MANAGER_COUNT; $i++) {
+            array_push($this->managers, $this->getDataGenerator()->create_user());
         }
 
         $this->groups = array();
@@ -121,20 +122,37 @@ class local_extension_rule_testcase extends advanced_testcase {
             groups_add_member($this->groups[$i % self::GROUP_COUNT], $student);
         }
 
+        $managerrole = $DB->get_record('role', array('shortname'=>'manager'));
+        foreach ($this->managers as $i => $manager) {
+            $this->getDataGenerator()->enrol_user($manager->id,
+                    $this->course->id,
+                    $managerrole->id);
+            groups_add_member($this->groups[$i % self::GROUP_COUNT], $manager);
+        }
+
         $this->setUser($this->editingteachers[0]);
-        $this->setAdminUser();
         $this->create_instance();
 
-        $this->assign = $this->create_instance(array(
-            'duedate' => time(),
-            'attemptreopenmethod' => ASSIGN_ATTEMPT_REOPEN_METHOD_MANUAL,
-            'maxattempts' => 3,
-            'submissiondrafts' => 1,
-            'assignsubmission_onlinetext_enabled' => 1
-        ));
+        $day = 86400;
+
+        // Creates three assignments with the due dates of, tomorrow, one week, one month away.
+        $duedates = array(
+            time() + $day,
+            time() + ($day * 7),
+            time() + ($day * 7 * 4),
+        );
+
+        foreach ($duedates as $duedate) {
+
+            $this->assign[] = $this->create_instance(array(
+                'duedate' => $duedate,
+                'maxattempts' => 3,
+                'submissiondrafts' => 1,
+                'assignsubmission_onlinetext_enabled' => 1
+            ));
+        }
 
         $this->setup_rules();
-
     }
 
     /**
@@ -152,10 +170,15 @@ class local_extension_rule_testcase extends advanced_testcase {
         return new assign($context, $cm, $this->course);
     }
 
+    /**
+     *
+     */
     public function setup_rules() {
         global $DB;
 
         $teacherrole = $DB->get_record('role', array('shortname'=>'teacher'));
+        $editingteacherrole = $DB->get_record('role', array('shortname'=>'editingteacher'));
+        $managerrole = $DB->get_record('role', array('shortname'=>'manager'));
 
         $rules = array(
             (object)[
@@ -178,15 +201,15 @@ class local_extension_rule_testcase extends advanced_testcase {
                 'action' => \local_extension\rule::RULE_ACTION_APPROVE,
                 'context' => 1,
                 'datatype' => 'assign',
-                'elapsedfromrequest' => 5,
+                'elapsedfromrequest' => 8,
                 'elapsedtype' => \local_extension\rule::RULE_CONDITION_GE,
                 'id' => 2,
-                'lengthfromduedate' => 5,
+                'lengthfromduedate' => 8,
                 'lengthtype' => \local_extension\rule::RULE_CONDITION_GE,
                 'name' => 'Rule2',
                 'parent' => 1,
                 'priority' => 1,
-                'role' => $teacherrole->id,
+                'role' => $editingteacherrole->id,
                 'template_notify' => '{{username}}',
                 'template_user' => '{{username}}',
             ],
@@ -202,7 +225,7 @@ class local_extension_rule_testcase extends advanced_testcase {
                 'name' => 'Rule3',
                 'parent' => 1,
                 'priority' => 2,
-                'role' => $teacherrole->id,
+                'role' => $managerrole->id,
                 'template_notify' => '{{username}}',
                 'template_user' => '{{username}}',
             ],
@@ -219,14 +242,24 @@ class local_extension_rule_testcase extends advanced_testcase {
 
     }
 
+    public function create_request() {
+
+    }
+
     /**
      */
     public function test_rules() {
         global $DB;
 
         $now = time();
-        $start = $now - 86400;
-        $end = $now + 86400;
+        $day = 86400;
+
+        // Search behind a day.
+        $start = $now - $day;
+
+        // Look ahead one month.
+        $end = $now + ($day * 7 * 4);
+
         $user = $this->students[0];
 
         list($handlers, $mods) = \local_extension\utility::get_activities($user->id, $start, $end);
@@ -244,7 +277,7 @@ class local_extension_rule_testcase extends advanced_testcase {
             $course = $mod['course'];
             $handler = $mod['handler'];
 
-            $data = time() + 86400;
+            $data = time() + $day;
 
             $cm = array(
                 'request' => $request['id'],
@@ -261,6 +294,11 @@ class local_extension_rule_testcase extends advanced_testcase {
 
         $request = \local_extension\request::from_id($request['id']);
         $request->process_triggers();
+
+        $sub = $DB->get_records('local_extension_subscription');
+        $his = $DB->get_records('local_extension_history');
+
+
     }
 
 }

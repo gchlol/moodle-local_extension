@@ -51,6 +51,7 @@ class update extends \moodleform {
         $user     = $this->_customdata['user'];
         $request  = $this->_customdata['request'];
         $renderer = $this->_customdata['renderer'];
+        $history  = $this->_customdata['history'];
         $mods     = $request->mods;
 
         foreach ($mods as $id => $mod) {
@@ -69,7 +70,7 @@ class update extends \moodleform {
             $mform->addElement('html', $html);
         }
 
-        $html = $renderer->render_extension_comments($request);
+        $html = $renderer->render_extension_comments($request, $history);
         $html .= \html_writer::start_tag('br');
         $mform->addElement('html', $html);
 

@@ -67,7 +67,7 @@ class rule extends \moodleform {
 
         $mform->addElement('select', 'priority', get_string('form_rule_label_priority', 'local_extension'), $optionspriority);
 
-        // Only activate when [parent] has also been triggered.
+        // Only activate when [parent] has been triggered.
         $parentgroup = array();
 
         $optionsparent = array('N/A');
@@ -94,6 +94,7 @@ class rule extends \moodleform {
 
         $mform->setType('lengthfromduedate', PARAM_INT);
         $mform->addGroup($lengthfromduedategroup, 'lengthfromduedategroup', get_string('form_rule_label_request_length', 'local_extension'), array(' '), false);
+        //$mform->addGroupRule('lengthfromduedategroup', get_string('err_numeric', 'form'), 'numeric', 'server');
 
         // and the request is [lt/ge] [x] days old.
         $elapsedtime = array();
@@ -109,6 +110,7 @@ class rule extends \moodleform {
 
         $mform->setType('elapsedfromrequest', PARAM_INT);
         $mform->addGroup($elapsedtimegroup, 'elapsedtimegroup', get_string('form_rule_label_elapsed_length', 'local_extension'), array(' '), false);
+        //$mform->addGroupRule('elapsedtimegroup', get_string('err_numeric', 'form'), 'numeric', 'server');
 
         // then set all roles equal to [roletypes] to [action] this request.
         $actionarray = array();
@@ -128,8 +130,8 @@ class rule extends \moodleform {
         $mform->addGroup($actiongroup, 'actiongroup', get_string('form_rule_label_set_roles', 'local_extension'), array(' '), false);
 
         // Email templates.
-        $mform->addElement('textarea', 'template_notify', get_string('form_rule_label_template', 'local_extension'), 'wrap="virtual" rows="20" cols="50"');
-        $mform->addElement('textarea', 'template_user', get_string('form_rule_label_template_request', 'local_extension'), 'wrap="virtual" rows="20" cols="50"');
+        $mform->addElement('textarea', 'template_notify', get_string('form_rule_label_template', 'local_extension'), 'wrap="virtual" rows="20" cols="80"');
+        $mform->addElement('textarea', 'template_user', get_string('form_rule_label_template_request', 'local_extension'), 'wrap="virtual" rows="20" cols="80"');
 
         // ID.
         $mform->addElement('hidden', 'id', 0);
@@ -155,6 +157,18 @@ class rule extends \moodleform {
     public function validation($data, $files) {
         $errors = parent::validation($data, $files);
         $mform = $this->_form;
+
+        if ($data['lengthfromduedate'] < 1) {
+            $errors['lengthfromduedategroup'] = get_string('form_rule_validate_greater_than_zero', 'local_extension');
+        }
+
+        if ($data['elapsedfromrequest'] < 1) {
+            $errors['elapsedtimegroup'] = get_string('form_rule_validate_greater_than_zero', 'local_extension');
+        }
+
+        if ($data['elapsedfromrequest'] > $data['lengthfromduedate']) {
+            $errors['elapsedtimegroup'] = get_string('form_rule_validate_elapsed', 'local_extension');
+        }
 
         return $errors;
     }

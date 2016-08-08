@@ -411,7 +411,7 @@ class rule {
         );
 
         $sql = "SELECT id
-                  FROM {local_extension_history}
+                  FROM {local_extension_his_sub}
                  WHERE trigger = :trigger
                    AND localcmid = :localcmid
                    AND requestid = :requestid
@@ -439,11 +439,10 @@ class rule {
             'localcmid' => $localcm->cm->id,
             'requestid' => $localcm->cm->request,
             'userid' => $localcm->cm->userid,
-            'log' => '',
             'state' => \local_extension\history::STATE_DEFAULT
         );
 
-        $DB->insert_record('local_extension_history', $history);
+        $DB->insert_record('local_extension_his_sub', $history);
     }
 
     private function process_templates($mod) {
