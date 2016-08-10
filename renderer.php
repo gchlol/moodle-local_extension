@@ -63,6 +63,16 @@ class local_extension_renderer extends plugin_renderer_base {
 
         // Sort all comments and history based on timestamp.
         usort($comments, function($a, $b) {
+
+            // If the timestamps are the same, always return the status update first, comments second.
+            if ($a->timestamp == $b->timestamp) {
+                if (property_exists($a, 'state')) {
+                    return 1;
+                } elseif (property_exists($b, 'state')) {
+                    return 1;
+                }
+            }
+
             return $a->timestamp - $b->timestamp;
         });
 

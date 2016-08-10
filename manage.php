@@ -70,7 +70,7 @@ if ($delete && confirm_sesskey()) {
 
         exit;
 
-    } else if (data_submitted()) {
+    } elseif (data_submitted()) {
 
         // Select all child rules for id.
         $sql = "SELECT id

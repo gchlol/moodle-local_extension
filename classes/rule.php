@@ -298,7 +298,11 @@ class rule {
         $templates = $this->process_templates($mod);
 
         $user_content = $templates['template_user']['text'];
+        $user_subject = $data['template_user_subject'];
+
         $role_content = $templates['template_notify']['text'];
+        $role_subject = $data['template_notify_subject'];
+
         $user = \core_user::get_user($mod['localcm']->userid);
 
         $this->notify_roles($user, $mod['course'], $role_content);

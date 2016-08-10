@@ -127,11 +127,17 @@ class rule extends \moodleform {
         $mform->addGroup($actiongroup, 'actiongroup', get_string('form_rule_label_set_roles', 'local_extension'), array(' '), false);
 
         // Email templates.
-        $editor_notify = $mform->addElement('editor', 'template_notify', get_string('form_rule_label_template', 'local_extension'));
+        $mform->addElement('text', 'template_notify_subject', get_string('form_rule_label_template', 'local_extension'));
+        $mform->setType('template_notify_subject', PARAM_RAW);
+
+        $editor_notify = $mform->addElement('editor', 'template_notify' );
         $mform->setType('template_notify', PARAM_RAW);
         $editor_notify->setValue($editordata['template_notify']);
 
-        $editor_user = $mform->addElement('editor', 'template_user', get_string('form_rule_label_template_request', 'local_extension'));
+        $mform->addElement('text', 'template_user_subject', get_string('form_rule_label_template_request', 'local_extension'));
+        $mform->setType('template_user_subject', PARAM_RAW);
+
+        $editor_user = $mform->addElement('editor', 'template_user');
         $mform->setType('template_user', PARAM_RAW);
         $editor_user->setValue($editordata['template_user']);
 
@@ -161,15 +167,11 @@ class rule extends \moodleform {
         $mform = $this->_form;
 
         if ($data['lengthfromduedate'] < 1) {
-            $errors['lengthfromduedategroup'] = get_string('form_rule_validate_greater_than_zero', 'local_extension');
+            //$errors['lengthfromduedategroup'] = get_string('form_rule_validate_greater_than_zero', 'local_extension');
         }
 
         if ($data['elapsedfromrequest'] < 1) {
-            $errors['elapsedtimegroup'] = get_string('form_rule_validate_greater_than_zero', 'local_extension');
-        }
-
-        if ($data['elapsedfromrequest'] > $data['lengthfromduedate']) {
-            $errors['elapsedtimegroup'] = get_string('form_rule_validate_elapsed', 'local_extension');
+            //$errors['elapsedtimegroup'] = get_string('form_rule_validate_greater_than_zero', 'local_extension');
         }
 
         return $errors;
