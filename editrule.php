@@ -45,7 +45,10 @@ $PAGE->requires->css('/local/extension/styles.css');
 $renderer = $PAGE->get_renderer('local_extension');
 
 $data = null;
-$editordata = null;
+$editordata = array(
+    'template_notify' => array('text' => get_string('template_notify_content', 'local_extension')),
+    'template_user' => array('text' => get_string('template_user_content', 'local_extension')),
+);
 
 if (!empty($triggerid) && confirm_sesskey()) {
     $data = \local_extension\rule::from_id($triggerid);
@@ -56,11 +59,12 @@ if (!empty($triggerid) && confirm_sesskey()) {
         foreach ($data->data as $key => $value) {
 
             if (strpos($key, 'template') === 0) {
-                $editordata[$key] = array('text' => $value);
+                if (!empty($value)) {
+                    $editordata[$key] = array('text' => $value);
+                }
             }
 
             $data->$key = $value;
-
         }
     }
 }
@@ -131,20 +135,21 @@ if ($mform->is_cancelled()) {
         $DB->update_record('local_extension_triggers', $rule);
 
         // Update the recorded history to invalidate previous triggered rules.
+        // TODO: Do we want this?
+        /*
         $params = array (
             'trigger' => $rule->id,
             'state' => \local_extension\history::STATE_DEFAULT
         );
-        $existing = $DB->get_records('local_extension_history', $params);
+        $existing = $DB->get_records('local_extension_his_sub', $params);
 
         if (!empty($existing)) {
             foreach ($existing as $record) {
                 $record->state = \local_extension\history::STATE_DISABLED;
-                $DB->update_record('local_extension_history', $record, true);
+                $DB->update_record('local_extension_his_sub', $record, true);
             }
         }
-
-        // Remove
+        */
 
     } else {
         $DB->insert_record('local_extension_triggers', $rule);

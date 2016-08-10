@@ -458,7 +458,7 @@ class rule {
 
         // The user details for obtaining the full name.
         $userid = $mod['localcm']->userid;
-        $user = $DB->get_record('user', array('id' => $userid));
+        $user = \core_user::get_user($userid);
 
         $templatevars = array(
             '/{{course}}/' => $course->fullname,
@@ -475,9 +475,7 @@ class rule {
         additional name options
         addition course options
         etc. more template varaibles
-
-
-         */
+        */
 
         $patterns = array_keys($templatevars);
         $replacements = array_values($templatevars);
@@ -617,14 +615,19 @@ class rule {
 
     private function notify_roles($mod, $template) {
         $role = $this->role;
-
-        // TODO notify roles
     }
 
     private function notify_user($mod, $template) {
-        $user = $mod['localcm']->userid;
+        $userid = $mod['localcm']->userid;
+        $user = \core_user::get_user($userid);
 
-        // TODO nofity user with template
+        $templates = $this->process_templates($mod);
+
+        $content = $templates['template_notify']['text'];
+
+        $subject = "Extension request for " . \fullname($user);
+
+        \local_extension\utility::send_trigger_email($subject, $content, $user);
     }
 
 }

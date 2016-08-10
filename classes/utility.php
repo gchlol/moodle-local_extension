@@ -154,22 +154,25 @@ class utility {
      * @param integer $requestid
      */
     public static function send_status_email($requestid) {
-        global $DB, $USER, $PAGE;
+    }
 
-        $request = cache_get_request($requestid);
+    /**
+     * Sends a notification email to the roles speficied in a rule.
+     *
+     * @param string $subject
+     * @param string $content
+     * @param stdClass $user
+     */
+    public static function send_trigger_email($subject, $content, $user) {
+        $noreplyuser = \core_user::get_support_user();
 
-        $user = $DB->get_record('user', array('id' => $request->request->userid));
-
-        $renderer = $PAGE->get_renderer('local_extension');
-        $text = $renderer->render_extension_email($request);
-
-        $message = new stdClass();
+        $message = new \stdClass();
         $message->component         = 'local_extension';
         $message->name              = 'status';
-        $message->userfrom          = $USER;
+        $message->userfrom          = $noreplyuser;
         $message->userto            = $user;
-        $message->subject           = "Extension request for " . \fullname($user);
-        $message->fullmessage       = $text;
+        $message->subject           = $subject;
+        $message->fullmessage       = $content;
         $message->fullmessageformat = FORMAT_PLAIN;
         $message->fullmessagehtml   = '';
         $message->smallmessage      = '';
