@@ -39,6 +39,7 @@ $string['event_process_triggers'] = 'Processed triggers';
 $string['event_request_created'] = 'Request created';
 $string['externalrules'] = 'Manage Adapter Triggers';
 $string['form_rule_action'] = 'Action';
+$string['form_rule_any_value'] = 'any value';
 $string['form_rule_continue'] = 'Continue';
 $string['form_rule_extension_length_greater'] = 'Length from due date<br />(greater or equal to x days)';
 $string['form_rule_extension_length'] = 'Length from due date';

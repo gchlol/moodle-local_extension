@@ -50,8 +50,8 @@ class rule {
     /** @var integer Condition: Greater or equal to. */
     const RULE_CONDITION_GE = 2;
 
-    /** @var integer Condition: Special. */
-    const RULE_CONDITION_SPECIAL = 3;
+    /** @var integer Condition: Any. */
+    const RULE_CONDITION_ANY = 3;
 
     /** @var integer The local_extension_trigger id */
     public $id = null;

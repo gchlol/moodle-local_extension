@@ -84,8 +84,9 @@ class rule extends \moodleform {
         $lengthfromduedate = array();
 
         $lengthtypes = array(
-            \local_extension\rule::RULE_CONDITION_LT => 'less than',
-            \local_extension\rule::RULE_CONDITION_GE => 'greater or equal to',
+            \local_extension\rule::RULE_CONDITION_LT => get_string('form_rule_less_than', 'local_extension'),
+            \local_extension\rule::RULE_CONDITION_GE => get_string('form_rule_greater_or_equal', 'local_extension'),
+            \local_extension\rule::RULE_CONDITION_ANY => get_string('form_rule_any_value', 'local_extension'),
         );
 
         $lengthfromduedategroup[] = $mform->createElement('select', 'lengthtype', '', $lengthtypes);
@@ -98,11 +99,6 @@ class rule extends \moodleform {
 
         // and the request is [lt/ge] [x] days old.
         $elapsedtime = array();
-
-        $lengthtypes = array(
-            \local_extension\rule::RULE_CONDITION_LT => 'less than',
-            \local_extension\rule::RULE_CONDITION_GE => 'greater or equal to',
-        );
 
         $elapsedtimegroup[] = $mform->createElement('select', 'elapsedtype', '', $lengthtypes);
         $elapsedtimegroup[] = $mform->createElement('text', 'elapsedfromrequest', '');
