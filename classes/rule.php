@@ -296,8 +296,13 @@ class rule {
         $this->setup_subscription($mod);
 
         $templates = $this->process_templates($mod);
-        $this->notify_roles($mod, $templates['template_notify']);
-        $this->notify_user($mod, $templates['template_user']);
+
+        $user_content = $templates['template_user']['text'];
+        $role_content = $templates['template_notify']['text'];
+        $user = \core_user::get_user($mod['localcm']->userid);
+
+        $this->notify_roles($user, $mod['course'], $role_content);
+        $this->notify_user($user, $user_content, $user);
 
         // Users have been notified and subscriptions setup. Lets write a log of firing this trigger.
         $this->write_history($mod);
@@ -613,21 +618,21 @@ class rule {
         return false;
     }
 
-    private function notify_roles($mod, $template) {
+    private function notify_roles($user, $course, $template) {
         $role = $this->role;
+
+        $context = \context_course::instance($course->id);
+        $users = \get_role_users($role, $context);
+
+        foreach ($users as $emailto) {
+            $this->notify_user($user, $template, $emailto);
+        }
+
     }
 
-    private function notify_user($mod, $template) {
-        $userid = $mod['localcm']->userid;
-        $user = \core_user::get_user($userid);
-
-        $templates = $this->process_templates($mod);
-
-        $content = $templates['template_notify']['text'];
-
+    private function notify_user($user, $template, $emailto) {
         $subject = "Extension request for " . \fullname($user);
-
-        \local_extension\utility::send_trigger_email($subject, $content, $user);
+        \local_extension\utility::send_trigger_email($subject, $template, $emailto);
     }
 
 }

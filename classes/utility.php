@@ -157,20 +157,20 @@ class utility {
     }
 
     /**
-     * Sends a notification email to the roles speficied in a rule.
+     * Sends a notification email.
      *
      * @param string $subject
      * @param string $content
-     * @param stdClass $user
+     * @param stdClass $emailto
      */
-    public static function send_trigger_email($subject, $content, $user) {
+    public static function send_trigger_email($subject, $content, $emailto) {
         $noreplyuser = \core_user::get_support_user();
 
         $message = new \stdClass();
         $message->component         = 'local_extension';
         $message->name              = 'status';
         $message->userfrom          = $noreplyuser;
-        $message->userto            = $user;
+        $message->userto            = $emailto;
         $message->subject           = $subject;
         $message->fullmessage       = $content;
         $message->fullmessageformat = FORMAT_PLAIN;
