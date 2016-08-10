@@ -56,9 +56,6 @@ class local_extension_rule_testcase extends advanced_testcase {
     /** @var array $students List of DEFAULT_MANAGER_COUNT students in the course */
     protected $managers = null;
 
-    /** @var array $groups List of 10 groups in the course */
-    protected $groups = null;
-
     /** @var assign[] $assign An array of mod_assign to test the rules against */
     protected $assign = null;
 
@@ -103,7 +100,6 @@ class local_extension_rule_testcase extends advanced_testcase {
             $this->getDataGenerator()->enrol_user($teacher->id,
                     $this->course->id,
                     $teacherrole->id);
-            groups_add_member($this->groups[$i % self::GROUP_COUNT], $teacher);
         }
 
         $editingteacherrole = $DB->get_record('role', array('shortname'=>'editingteacher'));
@@ -111,7 +107,6 @@ class local_extension_rule_testcase extends advanced_testcase {
             $this->getDataGenerator()->enrol_user($editingteacher->id,
                     $this->course->id,
                     $editingteacherrole->id);
-            groups_add_member($this->groups[$i % self::GROUP_COUNT], $editingteacher);
         }
 
         $studentrole = $DB->get_record('role', array('shortname'=>'student'));
@@ -119,7 +114,6 @@ class local_extension_rule_testcase extends advanced_testcase {
             $this->getDataGenerator()->enrol_user($student->id,
                     $this->course->id,
                     $studentrole->id);
-            groups_add_member($this->groups[$i % self::GROUP_COUNT], $student);
         }
 
         $managerrole = $DB->get_record('role', array('shortname'=>'manager'));
@@ -127,7 +121,6 @@ class local_extension_rule_testcase extends advanced_testcase {
             $this->getDataGenerator()->enrol_user($manager->id,
                     $this->course->id,
                     $managerrole->id);
-            groups_add_member($this->groups[$i % self::GROUP_COUNT], $manager);
         }
 
         $this->setUser($this->editingteachers[0]);
@@ -297,7 +290,6 @@ class local_extension_rule_testcase extends advanced_testcase {
 
         $sub = $DB->get_records('local_extension_subscription');
         $his = $DB->get_records('local_extension_history');
-
 
     }
 
