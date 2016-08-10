@@ -94,19 +94,6 @@
         <INDEX NAME="userid" UNIQUE="false" FIELDS="userid"/>
       </INDEXES>
     </TABLE>
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
     <TABLE NAME="local_extension_subscription" COMMENT="Comments">
       <FIELDS>
         <FIELD NAME="id" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="true"/>

@@ -45,6 +45,8 @@ $PAGE->requires->css('/local/extension/styles.css');
 $renderer = $PAGE->get_renderer('local_extension');
 
 $data = null;
+$editordata = null;
+
 if (!empty($triggerid) && confirm_sesskey()) {
     $data = \local_extension\rule::from_id($triggerid);
 
@@ -52,7 +54,13 @@ if (!empty($triggerid) && confirm_sesskey()) {
     // If and only if the form elements have the same name, and they have been saved to the data variable.
     if (!empty($data->data)) {
         foreach ($data->data as $key => $value) {
+
+            if (strpos($key, 'template') === 0) {
+                $editordata[$key] = array('text' => $value);
+            }
+
             $data->$key = $value;
+
         }
     }
 }
@@ -61,7 +69,8 @@ if (!empty($triggerid) && confirm_sesskey()) {
 $compare = $DB->sql_compare_text('datatype') . " = " . $DB->sql_compare_text(':datatype');
 $sql = "SELECT id,
                name,
-               parent
+               parent,
+               data
           FROM {local_extension_triggers}
          WHERE $compare
       ORDER BY id ASC";
@@ -94,7 +103,15 @@ if (array_key_exists($triggerid, $children)) {
     }
 }
 
-$mform = new \local_extension\form\rule(null, array('parents' => $parents, 'datatype' => $datatype));
+$params = array(
+    'parents' => $parents,
+    'datatype' => $datatype,
+    'editordata' => $editordata,
+);
+
+$mform = new \local_extension\form\rule(null, $params);
+
+
 $mform->set_data($data);
 
 if ($mform->is_cancelled()) {
@@ -103,7 +120,7 @@ if ($mform->is_cancelled()) {
     redirect($url);
     die;
 
-} else if ($form = $mform->get_data()) {
+} elseif ($form = $mform->get_data()) {
 
     $rule = new \local_extension\rule();
 

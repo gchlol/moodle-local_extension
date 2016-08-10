@@ -49,6 +49,7 @@ class rule extends \moodleform {
 
         $datatype = $this->_customdata['datatype'];
         $parents = $this->_customdata['parents'];
+        $editordata = $this->_customdata['editordata'];
 
         // Edit Rule Header.
         $mform->addElement('header', 'name_set', get_string('form_rule_header_edit', 'local_extension'), null, null);
@@ -126,8 +127,13 @@ class rule extends \moodleform {
         $mform->addGroup($actiongroup, 'actiongroup', get_string('form_rule_label_set_roles', 'local_extension'), array(' '), false);
 
         // Email templates.
-        $mform->addElement('textarea', 'template_notify', get_string('form_rule_label_template', 'local_extension'), 'wrap="virtual" rows="20" cols="80"');
-        $mform->addElement('textarea', 'template_user', get_string('form_rule_label_template_request', 'local_extension'), 'wrap="virtual" rows="20" cols="80"');
+        $editor_notify = $mform->addElement('editor', 'template_notify', get_string('form_rule_label_template', 'local_extension'));
+        $mform->setType('template_notify', PARAM_RAW);
+        $editor_notify->setValue($editordata['template_notify']);
+
+        $editor_user = $mform->addElement('editor', 'template_user', get_string('form_rule_label_template_request', 'local_extension'));
+        $mform->setType('template_user', PARAM_RAW);
+        $editor_user->setValue($editordata['template_user']);
 
         // ID.
         $mform->addElement('hidden', 'id', 0);

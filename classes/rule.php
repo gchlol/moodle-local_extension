@@ -470,6 +470,15 @@ class rule {
             '/{{extensionlength}}/' => $this->get_request_time($mod),
         );
 
+        // TODO:
+        /*
+        additional name options
+        addition course options
+        etc. more template varaibles
+
+
+         */
+
         $patterns = array_keys($templatevars);
         $replacements = array_values($templatevars);
 
