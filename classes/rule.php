@@ -575,7 +575,7 @@ class rule {
             'state' => \local_extension\history::STATE_DEFAULT
         );
 
-        $record = $DB->get_record('local_extension_history', $params);
+        $record = $DB->get_record('local_extension_history_trig', $params);
 
         // A record has been found. Return true, the parent has previously been activated!
         if (!empty($record)) {
