@@ -291,10 +291,10 @@ class rule {
         $templates = $this->process_templates($mod);
 
         $usercontent = $templates['template_user']['text'];
-        $usersubject = $data['template_user_subject'];
+        $usersubject = $this->data['template_user_subject'];
 
         $rolecontent = $templates['template_notify']['text'];
-        $rolesubject = $data['template_notify_subject'];
+        $rolesubject = $this->data['template_notify_subject'];
 
         $user = \core_user::get_user($mod['localcm']->userid);
 
@@ -344,21 +344,6 @@ class rule {
         $context = \context_course::instance($course->id);
         $users = \get_role_users($role, $context);
 
-        /*
-         * If a rule has been edited then the roles that have special access may have changed.
-         * With the following lines it will reset all access to default for the rules cm.
-         */
-        $sql = "UPDATE {local_extension_subscription}
-                   SET access = :access,
-                       lastmod = :lastmod
-                 WHERE localcmid = :localcmid";
-
-        $params = array(
-            'localcmid' => $localcm->cm->cmid,
-            'lastmod' => time(),
-            'access' => self::RULE_ACTION_DEFAULT,
-        );
-
         // Iterate over all users in the cm's course that have the roleid $role.
         foreach ($users as $user) {
             $params = array(
@@ -380,7 +365,9 @@ class rule {
 
             $sub->userid = $user->id;
             $sub->localcmid = $localcm->cm->cmid;
+            $sub->requestid = $localcm->requestid;
             $sub->lastmod = \time();
+            $sub->trigger = $this->id;
 
             switch ($this->action) {
                 case self::RULE_ACTION_APPROVE:
@@ -426,7 +413,7 @@ class rule {
         );
 
         $sql = "SELECT id
-                  FROM {local_extension_his_sub}
+                  FROM {local_extension_history_trig}
                  WHERE trigger = :trigger
                    AND localcmid = :localcmid
                    AND requestid = :requestid
@@ -444,7 +431,7 @@ class rule {
     }
 
     /**
-     * The final stage when processing a rule. This will record an entry in the local_extension_his_sub table
+     * The final stage when processing a rule. This will record an entry in the local_extension_history_trig table
      * so that when processing the rule during a cron task will return false and not trigger anything.
      *
      * @param array $mod
@@ -463,7 +450,7 @@ class rule {
             'state' => \local_extension\history::STATE_DEFAULT
         );
 
-        $DB->insert_record('local_extension_his_sub', $history);
+        $DB->insert_record('local_extension_history_trig', $history);
     }
 
     /**
@@ -642,7 +629,9 @@ class rule {
 
         $days = $this->lengthfromduedate * 24 * 60 * 60;
 
-        if ($this->lengthtype == self::RULE_CONDITION_LT) {
+        if ($this->elapsedtype == self::RULE_CONDITION_ANY) {
+            return true;
+        } else if ($this->lengthtype == self::RULE_CONDITION_LT) {
             if ($delta < $days) {
                 return true;
             }
@@ -668,7 +657,9 @@ class rule {
 
         $days = $this->elapsedfromrequest * 24 * 60 * 60;
 
-        if ($this->elapsedtype == self::RULE_CONDITION_LT) {
+        if ($this->elapsedtype == self::RULE_CONDITION_ANY) {
+            return true;
+        } else if ($this->elapsedtype == self::RULE_CONDITION_LT) {
             if ($delta < $days) {
                 return true;
             }

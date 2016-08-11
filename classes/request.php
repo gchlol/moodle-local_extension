@@ -106,6 +106,12 @@ class request implements \cache_data_source {
             $userids[$comment->userid] = $comment->userid;
         }
 
+        // Add a to the $userids, a list of users that are subscribed to this request.
+        $subscribedids = $DB->get_fieldset_select('local_extension_subscription', 'userid', 'requestid = :requestid', array('requestid' => $this->requestid));
+        foreach ($subscribedids as $key => $userid) {
+            $userids[$userid] = $userid;
+        }
+
         // Fetch the users.
         list($uids, $params) = $DB->get_in_or_equal($userids);
         $userfields = \user_picture::fields();
@@ -242,6 +248,9 @@ class request implements \cache_data_source {
             }
 
         }
+
+        // Invalidate the cache for this request, there may be new users subscribed.
+        $this->get_data_cache()->delete($this->requestid);
     }
 
     /**
