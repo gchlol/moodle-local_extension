@@ -96,7 +96,6 @@ class rule extends \moodleform {
 
         $mform->setType('lengthfromduedate', PARAM_INT);
         $mform->addGroup($lengthfromduedategroup, 'lengthfromduedategroup', get_string('form_rule_label_request_length', 'local_extension'), array(' '), false);
-        $mform->addGroupRule('lengthfromduedategroup', get_string('err_numeric', 'form'), 'numeric', 'server');
 
         // And the request is [lt/ge] [x] days old.
         $elapsedtime = array();
@@ -107,7 +106,6 @@ class rule extends \moodleform {
 
         $mform->setType('elapsedfromrequest', PARAM_INT);
         $mform->addGroup($elapsedtimegroup, 'elapsedtimegroup', get_string('form_rule_label_elapsed_length', 'local_extension'), array(' '), false);
-        $mform->addGroupRule('elapsedtimegroup', get_string('err_numeric', 'form'), 'numeric', 'server');
 
         // Then set all roles equal to [roletypes] to [action] this request.
         $actionarray = array();
