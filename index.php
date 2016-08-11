@@ -45,7 +45,9 @@ echo $OUTPUT->header();
 echo html_writer::tag('h2', get_string('page_heading_summary', 'local_extension'));
 
 $table = \local_extension\table::generate_index_table();
-$data = \local_extension\table::generate_index_data($table, $USER->id);
+// TODO Replace 0 with $USER->id to filter the requests.
+// As a active request table must be created.
+$data = \local_extension\table::generate_index_data($table, 0);
 echo $renderer->render_extension_summary_table($table, $data);
 
 echo html_writer::empty_tag('br');
