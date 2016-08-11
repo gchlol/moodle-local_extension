@@ -68,9 +68,9 @@ class local_extension_renderer extends plugin_renderer_base {
             // If the timestamps are the same, always return the status update first, comments second.
             if ($a->timestamp == $b->timestamp) {
                 if (property_exists($a, 'state')) {
-                    return 1;
+                    return -1;
                 } else if (property_exists($b, 'state')) {
-                    return 1;
+                    return -1;
                 }
             }
 
@@ -327,18 +327,49 @@ class local_extension_renderer extends plugin_renderer_base {
 
         $greaterthan = get_string('form_rule_greater_or_equal', 'local_extension');
         $lessthan = get_string('form_rule_less_than', 'local_extension');
+        $any = get_string('form_rule_any_value', 'local_extension');
+
+        $lengthtype = '';
+        switch($trigger->lengthtype) {
+            case $trigger::RULE_CONDITION_GE:
+                $lengthtype = $greaterthan;
+                break;
+            case $trigger::RULE_CONDITION_LT:
+                $lengthtype = $lessthan;
+                break;
+            case $trigger::RULE_CONDITION_ANY:
+                $lengthtype = $any;
+                break;
+            default:
+                break;
+        }
 
         $reqlength = array(
             get_string('form_rule_label_request_length', 'local_extension'),
-            $trigger->lengthtype == $trigger::RULE_CONDITION_GE ? $greaterthan : $lessthan,
+            $lengthtype,
             $trigger->lengthfromduedate,
             get_string('form_rule_label_days_long', 'local_extension'),
         );
         $html .= html_writer::tag('p', implode(' ', $reqlength));
 
+        $elapsedtype = '';
+        switch($trigger->elapsedtype) {
+            case $trigger::RULE_CONDITION_GE:
+                $elapsedtype = $greaterthan;
+                break;
+            case $trigger::RULE_CONDITION_LT:
+                $elapsedtype = $lessthan;
+                break;
+            case $trigger::RULE_CONDITION_ANY:
+                $elapsedtype = $any;
+                break;
+            default:
+                break;
+        }
+
         $elapsedlength = array(
             get_string('form_rule_label_elapsed_length', 'local_extension'),
-            $trigger->elapsedtype == $trigger::RULE_CONDITION_GE ? $greaterthan : $lessthan,
+            $elapsedtype,
             $trigger->elapsedfromrequest,
             get_string('form_rule_label_days_old', 'local_extension'),
         );
@@ -352,20 +383,6 @@ class local_extension_renderer extends plugin_renderer_base {
             get_string('form_rule_label_this_request', 'local_extension'),
         );
         $html .= html_writer::tag('p', implode(' ', $setroles));
-
-        $notifyrole = array(
-                get_string('form_rule_label_template', 'local_extension'),
-                '',
-                get_string('form_rule_template', 'local_extension'),
-        );
-        $html .= html_writer::tag('p', implode(' ', $notifyrole));
-
-        $notifyrequest = array(
-                get_string('form_rule_label_template_request', 'local_extension'),
-                '',
-                get_string('form_rule_template', 'local_extension'),
-        );
-        $html .= html_writer::tag('p', implode(' ', $notifyrequest));
 
         $html .= html_writer::end_div();
 
