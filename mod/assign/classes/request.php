@@ -159,7 +159,7 @@ class request extends \local_extension\base_request {
         $nextstates = $localcm->get_next_state();
         sort($nextstates);
 
-        $buttonarray=array();
+        $buttonarray = array();
 
         foreach ($nextstates as $state) {
             switch ($state) {
@@ -168,15 +168,15 @@ class request extends \local_extension\base_request {
                     $buttonarray[] = &$mform->createElement('submit', 'approve' . $id, 'Approve');
                     break;
                 case $localcm::STATE_DENIED:
-                    //$buttonarray[] = &$mform->createElement('submit', 'reopen' . $id, 'Reopen');
+                    // $buttonarray[] = &$mform->createElement('submit', 'reopen' . $id, 'Reopen');
                     break;
                 case $localcm::STATE_CANCEL:
                     $buttonarray[] = &$mform->createElement('submit', 'deny' . $id, 'Deny');
                     break;
                 case $localcm::STATE_APPROVED:
                     $buttonarray[] = &$mform->createElement('submit', 'approve' . $id, 'Approve');
-                    //$buttonarray[] = &$mform->createElement('submit', 'deny' . $id, 'Deny');
-                    //$buttonarray[] = &$mform->createElement('submit', 'reopen' . $id, 'Reopen');
+                    // $buttonarray[] = &$mform->createElement('submit', 'deny' . $id, 'Deny');
+                    // $buttonarray[] = &$mform->createElement('submit', 'reopen' . $id, 'Reopen');
                     break;
                 default:
                     break;
@@ -185,7 +185,7 @@ class request extends \local_extension\base_request {
         }
 
         $mform->addGroup($buttonarray, 'buttonar', '', array(' '), false);
-        //$mform->closeHeaderBefore('buttonar');
+        $mform->closeHeaderBefore('buttonar');
 
     }
 

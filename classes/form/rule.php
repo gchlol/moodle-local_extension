@@ -81,7 +81,7 @@ class rule extends \moodleform {
 
         $mform->addGroup($parentgroup, 'parentgroup', get_string('form_rule_label_parent', 'local_extension'), array(' '), false);
 
-        // If the requested length is [lt/ge] [x] days long.
+        // And if the requested length is [lt/ge] [x] days long.
         $lengthfromduedate = array();
 
         $lengthtypes = array(
@@ -96,9 +96,9 @@ class rule extends \moodleform {
 
         $mform->setType('lengthfromduedate', PARAM_INT);
         $mform->addGroup($lengthfromduedategroup, 'lengthfromduedategroup', get_string('form_rule_label_request_length', 'local_extension'), array(' '), false);
-        //$mform->addGroupRule('lengthfromduedategroup', get_string('err_numeric', 'form'), 'numeric', 'server');
+        $mform->addGroupRule('lengthfromduedategroup', get_string('err_numeric', 'form'), 'numeric', 'server');
 
-        // and the request is [lt/ge] [x] days old.
+        // And the request is [lt/ge] [x] days old.
         $elapsedtime = array();
 
         $elapsedtimegroup[] = $mform->createElement('select', 'elapsedtype', '', $lengthtypes);
@@ -107,9 +107,9 @@ class rule extends \moodleform {
 
         $mform->setType('elapsedfromrequest', PARAM_INT);
         $mform->addGroup($elapsedtimegroup, 'elapsedtimegroup', get_string('form_rule_label_elapsed_length', 'local_extension'), array(' '), false);
-        //$mform->addGroupRule('elapsedtimegroup', get_string('err_numeric', 'form'), 'numeric', 'server');
+        $mform->addGroupRule('elapsedtimegroup', get_string('err_numeric', 'form'), 'numeric', 'server');
 
-        // then set all roles equal to [roletypes] to [action] this request.
+        // Then set all roles equal to [roletypes] to [action] this request.
         $actionarray = array();
 
         $actiontypes = array(
@@ -130,16 +130,16 @@ class rule extends \moodleform {
         $mform->addElement('text', 'template_notify_subject', get_string('form_rule_label_template', 'local_extension'));
         $mform->setType('template_notify_subject', PARAM_RAW);
 
-        $editor_notify = $mform->addElement('editor', 'template_notify' );
+        $editornotify = $mform->addElement('editor', 'template_notify' );
         $mform->setType('template_notify', PARAM_RAW);
-        $editor_notify->setValue($editordata['template_notify']);
+        $editornotify->setValue($editordata['template_notify']);
 
         $mform->addElement('text', 'template_user_subject', get_string('form_rule_label_template_request', 'local_extension'));
         $mform->setType('template_user_subject', PARAM_RAW);
 
-        $editor_user = $mform->addElement('editor', 'template_user');
+        $editoruser = $mform->addElement('editor', 'template_user');
         $mform->setType('template_user', PARAM_RAW);
-        $editor_user->setValue($editordata['template_user']);
+        $editoruser->setValue($editordata['template_user']);
 
         // ID.
         $mform->addElement('hidden', 'id', 0);
@@ -165,14 +165,6 @@ class rule extends \moodleform {
     public function validation($data, $files) {
         $errors = parent::validation($data, $files);
         $mform = $this->_form;
-
-        if ($data['lengthfromduedate'] < 1) {
-            //$errors['lengthfromduedategroup'] = get_string('form_rule_validate_greater_than_zero', 'local_extension');
-        }
-
-        if ($data['elapsedfromrequest'] < 1) {
-            //$errors['elapsedtimegroup'] = get_string('form_rule_validate_greater_than_zero', 'local_extension');
-        }
 
         return $errors;
     }

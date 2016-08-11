@@ -124,7 +124,7 @@ if ($mform->is_cancelled()) {
     redirect($url);
     die;
 
-} elseif ($form = $mform->get_data()) {
+} else if ($form = $mform->get_data()) {
 
     $rule = new \local_extension\rule();
 

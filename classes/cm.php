@@ -173,6 +173,13 @@ class cm {
         \local_extension\utility::cache_invalidate_request($this->requestid);
     }
 
+    /**
+     * Writes an state change entry to local_extension_his_state.
+     *
+     * @param stdClass $mod
+     * @param integer $state
+     * @param integer $userid
+     */
     public function write_history($mod, $state, $userid) {
         global $DB;
 
@@ -182,7 +189,6 @@ class cm {
             'localcmid' => $localcm->cmid,
             'requestid' => $localcm->requestid,
             'timestamp' => time(),
-            'message' => '',
             'state' => $state,
             'userid' => $userid,
         );
@@ -216,6 +222,7 @@ class cm {
     /**
      * Returns a human readable state name.
      *
+     * @param integer $stateid State id.
      * @throws coding_exception
      * @return string the human-readable status name.
      */
@@ -264,7 +271,7 @@ class cm {
     /**
      * Returns the cm courseid
      *
-     *  @return integer
+     * @return integer
      */
     public function get_courseid() {
         return $this->cm->course;
@@ -273,7 +280,7 @@ class cm {
     /**
      * Returns the cm cmid
      *
-     *  @return integer
+     * @return integer
      */
     public function get_cmid() {
         return $this->cm->cmid;
@@ -291,7 +298,7 @@ class cm {
     /**
      * Returns the cm state id
      *
-     *  @return integer
+     * @return integer
      */
     public function get_stateid() {
         return $this->cm->state;

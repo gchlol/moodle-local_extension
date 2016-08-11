@@ -28,17 +28,24 @@ defined('MOODLE_INTERNAL') || die('Direct access to this script is forbidden');
 global $CFG;
 require_once($CFG->dirroot . '/mod/assign/locallib.php');
 
+/**
+ * Rule tests.
+ *
+ * @author     Nicholas Hoobin <nicholashoobin@catalyst-au.net>
+ * @copyright  Catalyst IT
+ * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
+ */
 class local_extension_rule_testcase extends advanced_testcase {
 
-    /** @const Default number of students to create */
+    /** @var Default number of students to create */
     const DEFAULT_STUDENT_COUNT = 3;
-    /** @const Default number of teachers to create */
+    /** @var Default number of teachers to create */
     const DEFAULT_TEACHER_COUNT = 2;
-    /** @const Default number of editing teachers to create */
+    /** @var Default number of editing teachers to create */
     const DEFAULT_EDITING_TEACHER_COUNT = 2;
-    /** @const Default number of mangers to create */
+    /** @var Default number of mangers to create */
     const DEFAULT_MANAGER_COUNT = 2;
-    /** @const Number of groups to create */
+    /** @var Number of groups to create */
     const GROUP_COUNT = 6;
 
     /** @var stdClass $course New course created to hold the assignments */
@@ -92,31 +99,31 @@ class local_extension_rule_testcase extends advanced_testcase {
 
         $this->groups = array();
         for ($i = 0; $i < self::GROUP_COUNT; $i++) {
-            array_push($this->groups, $this->getDataGenerator()->create_group(array('courseid'=>$this->course->id)));
+            array_push($this->groups, $this->getDataGenerator()->create_group(array('courseid' => $this->course->id)));
         }
 
-        $teacherrole = $DB->get_record('role', array('shortname'=>'teacher'));
+        $teacherrole = $DB->get_record('role', array('shortname' => 'teacher'));
         foreach ($this->teachers as $i => $teacher) {
             $this->getDataGenerator()->enrol_user($teacher->id,
                     $this->course->id,
                     $teacherrole->id);
         }
 
-        $editingteacherrole = $DB->get_record('role', array('shortname'=>'editingteacher'));
+        $editingteacherrole = $DB->get_record('role', array('shortname' => 'editingteacher'));
         foreach ($this->editingteachers as $i => $editingteacher) {
             $this->getDataGenerator()->enrol_user($editingteacher->id,
                     $this->course->id,
                     $editingteacherrole->id);
         }
 
-        $studentrole = $DB->get_record('role', array('shortname'=>'student'));
+        $studentrole = $DB->get_record('role', array('shortname' => 'student'));
         foreach ($this->students as $i => $student) {
             $this->getDataGenerator()->enrol_user($student->id,
                     $this->course->id,
                     $studentrole->id);
         }
 
-        $managerrole = $DB->get_record('role', array('shortname'=>'manager'));
+        $managerrole = $DB->get_record('role', array('shortname' => 'manager'));
         foreach ($this->managers as $i => $manager) {
             $this->getDataGenerator()->enrol_user($manager->id,
                     $this->course->id,
@@ -164,14 +171,14 @@ class local_extension_rule_testcase extends advanced_testcase {
     }
 
     /**
-     *
+     * Setting up some rules in the test database.
      */
     public function setup_rules() {
         global $DB;
 
-        $teacherrole = $DB->get_record('role', array('shortname'=>'teacher'));
-        $editingteacherrole = $DB->get_record('role', array('shortname'=>'editingteacher'));
-        $managerrole = $DB->get_record('role', array('shortname'=>'manager'));
+        $teacherrole = $DB->get_record('role', array('shortname' => 'teacher'));
+        $editingteacherrole = $DB->get_record('role', array('shortname' => 'editingteacher'));
+        $managerrole = $DB->get_record('role', array('shortname' => 'manager'));
 
         $rules = array(
             (object)[
@@ -235,11 +242,8 @@ class local_extension_rule_testcase extends advanced_testcase {
 
     }
 
-    public function create_request() {
-
-    }
-
     /**
+     * Testing the rules.
      */
     public function test_rules() {
         global $DB;

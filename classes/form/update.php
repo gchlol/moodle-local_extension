@@ -58,7 +58,7 @@ class update extends \moodleform {
             $handler = $mod['handler'];
             $handler->status_definition($mform, $mod, $USER->id);
 
-            $access = \local_extension\rule::check_access($mod, $USER->id);
+            $access = \local_extension\rule::get_access($mod, $USER->id);
             if ($access == \local_extension\rule::RULE_ACTION_APPROVE) {
                 $handler->status_modification($mform, $mod, $USER->id);
             }

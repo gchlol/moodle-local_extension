@@ -52,9 +52,15 @@ class request extends \local_extension\base_request {
         return 'quiz';
     }
 
+    /**
+     * {@inheritDoc}
+     * @see \local_extension\base_request::get_triggers()
+     */
     public function get_triggers() {
-        $rules = \local_extension\rule::load_all($this->get_data_type());
-        return $rules;
+        if (empty(self::$rules)) {
+            self::$rules = \local_extension\rule::load_all($this->get_data_type());
+        }
+        return self::$rules;
     }
 
     /**

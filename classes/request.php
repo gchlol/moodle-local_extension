@@ -244,6 +244,11 @@ class request implements \cache_data_source {
         }
     }
 
+    /**
+     * Iterates over every localcm and checks the status. If they are all cancelled then this will return false.
+     *
+     * @return boolean
+     */
     public function check_active() {
         $active = false;
         foreach ($cms as $cm) {

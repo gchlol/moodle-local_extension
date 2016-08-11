@@ -51,6 +51,7 @@ class local_extension_renderer extends plugin_renderer_base {
      * Extension comment renderer.
      *
      * @param request $req The extension request object.
+     * @param array $history A list of comments and state changes.
      * @return string $out The html output.
      */
     public function render_extension_comments(\local_extension\request $req, $history) {
@@ -68,7 +69,7 @@ class local_extension_renderer extends plugin_renderer_base {
             if ($a->timestamp == $b->timestamp) {
                 if (property_exists($a, 'state')) {
                     return 1;
-                } elseif (property_exists($b, 'state')) {
+                } else if (property_exists($b, 'state')) {
                     return 1;
                 }
             }
@@ -107,8 +108,9 @@ class local_extension_renderer extends plugin_renderer_base {
     /**
      * Renders role information
      *
-     * @param role $role
-     * @return string
+     * @param \local_extension\request $req
+     * @param integer $userid
+     * @return string The html output.
      */
     public function render_role($req, $userid) {
         $details = '';
@@ -152,7 +154,6 @@ class local_extension_renderer extends plugin_renderer_base {
         }
 
         $rolename = role_get_name($highestrole, $context);
-        //$rolename .= " - " . $shortcode;
 
         return html_writer::tag('abbr', $rolename, array('title' => $details) );
 
@@ -324,9 +325,12 @@ class local_extension_renderer extends plugin_renderer_base {
         );
         $html .= html_writer::tag('p', implode(' ', $activate));
 
+        $greaterthan = get_string('form_rule_greater_or_equal', 'local_extension');
+        $lessthan = get_string('form_rule_less_than', 'local_extension');
+
         $reqlength = array(
             get_string('form_rule_label_request_length', 'local_extension'),
-            $trigger->lengthtype == $trigger::RULE_CONDITION_GE ? get_string('form_rule_greater_or_equal', 'local_extension') : get_string('form_rule_less_than', 'local_extension'),
+            $trigger->lengthtype == $trigger::RULE_CONDITION_GE ? $greaterthan : $lessthan,
             $trigger->lengthfromduedate,
             get_string('form_rule_label_days_long', 'local_extension'),
         );
@@ -334,7 +338,7 @@ class local_extension_renderer extends plugin_renderer_base {
 
         $elapsedlength = array(
             get_string('form_rule_label_elapsed_length', 'local_extension'),
-            $trigger->elapsedtype == $trigger::RULE_CONDITION_GE ? get_string('form_rule_greater_or_equal', 'local_extension') : get_string('form_rule_less_than', 'local_extension'),
+            $trigger->elapsedtype == $trigger::RULE_CONDITION_GE ? $greaterthan : $lessthan,
             $trigger->elapsedfromrequest,
             get_string('form_rule_label_days_old', 'local_extension'),
         );

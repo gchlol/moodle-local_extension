@@ -34,6 +34,9 @@ namespace local_extension;
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 class history {
+    /** @var integer Defalt/Active history entry. */
     const STATE_DEFAULT = 0x0;
+
+    /** @var integer Disabled history entry. */
     const STATE_DISABLED = 0x1;
 }

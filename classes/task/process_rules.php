@@ -25,11 +25,26 @@
 
 namespace local_extension\task;
 
+/**
+ * Process rules task.
+ *
+ * @author     Nicholas Hoobin <nicholashoobin@catalyst-au.net>
+ * @copyright  Catalyst IT
+ * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
+ */
 class process_rules extends \core\task\scheduled_task {
+    /**
+     * {@inheritDoc}
+     * @see \core\task\scheduled_task::get_name()
+     */
     public function get_name() {
         return get_string('task_process', 'local_extension');
     }
 
+    /**
+     * {@inheritDoc}
+     * @see \core\task\task_base::execute()
+     */
     public function execute() {
         global $DB;
 

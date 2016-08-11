@@ -27,16 +27,36 @@ namespace local_extension\event;
 
 defined('MOODLE_INTERNAL') || die();
 
+/**
+ * Process triggers event.
+ *
+ * @author     Nicholas Hoobin <nicholashoobin@catalyst-au.net>
+ * @copyright  Catalyst IT
+ * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
+ */
 class process_triggers extends \core\event\base {
+    /**
+     * {@inheritDoc}
+     * @see \core\event\base::init()
+     */
     protected function init() {
         $this->data['crud'] = 'c';
         $this->data['edulevel'] = self::LEVEL_PARTICIPATING;
     }
 
+    /**
+     * Returns the name of the event.
+     *
+     * @return string
+     */
     public static function get_name() {
         return get_string('event_process_triggers', 'local_extension');
     }
 
+    /**
+     * {@inheritDoc}
+     * @see \core\event\base::get_description()
+     */
     public function get_description() {
         return "Process the triggers for all active requests";
     }

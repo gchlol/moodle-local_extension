@@ -47,6 +47,8 @@ $renderer = $PAGE->get_renderer('local_extension');
 
 if ($delete && confirm_sesskey()) {
 
+    // TODO: Add content, details about the rule(s) to be deleted.
+
     if ($confirm != md5($delete)) {
         $query = "SELECT id, name
                     FROM {local_extension_triggers}
@@ -59,6 +61,8 @@ if ($delete && confirm_sesskey()) {
         echo $OUTPUT->header();
         echo html_writer::tag('h2', get_string('page_heading_manage_delete', 'local_extension'));
 
+        echo "test";
+
         $optionsyes = array('delete' => $delete, 'confirm' => md5($delete), 'sesskey' => sesskey());
         $deleteurl = new moodle_url($pageurl, $optionsyes);
         $deletebutton = new single_button($deleteurl, get_string('delete'), 'post');
@@ -70,7 +74,7 @@ if ($delete && confirm_sesskey()) {
 
         exit;
 
-    } elseif (data_submitted()) {
+    } else if (data_submitted()) {
 
         // Select all child rules for id.
         $sql = "SELECT id

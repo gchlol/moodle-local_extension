@@ -267,13 +267,6 @@ class rule {
      * @param array $mod
      */
     public function process($request, $mod) {
-        /*
-        $event   = $mod['event'];
-        $cm      = $mod['cm'];
-        $localcm = $mod['localcm'];
-        $course  = $mod['course'];
-        $handler = $mod['handler'];
-        */
 
         // Checks if the trigger for this cm has been activated.
         if ($this->check_history($mod) === false) {
@@ -297,22 +290,29 @@ class rule {
 
         $templates = $this->process_templates($mod);
 
-        $user_content = $templates['template_user']['text'];
-        $user_subject = $data['template_user_subject'];
+        $usercontent = $templates['template_user']['text'];
+        $usersubject = $data['template_user_subject'];
 
-        $role_content = $templates['template_notify']['text'];
-        $role_subject = $data['template_notify_subject'];
+        $rolecontent = $templates['template_notify']['text'];
+        $rolesubject = $data['template_notify_subject'];
 
         $user = \core_user::get_user($mod['localcm']->userid);
 
-        $this->notify_roles($user, $mod['course'], $role_content);
-        $this->notify_user($user, $user_content, $user);
+        $this->notify_roles($user, $mod['course'], $rolecontent);
+        $this->notify_user($user, $usercontent, $user);
 
         // Users have been notified and subscriptions setup. Lets write a log of firing this trigger.
         $this->write_history($mod);
     }
 
-    public static function check_access($mod, $userid) {
+    /**
+     * Obtains the level of access from the table local_extension_subscription.
+     *
+     * @param array $mod
+     * @param integer $userid
+     * @return mixed|boolean
+     */
+    public static function get_access($mod, $userid) {
         global $DB;
 
         $localcm = $mod['localcm'];
@@ -328,9 +328,10 @@ class rule {
     }
 
     /**
+     * Using the current rule configuration, this will setup the users with specific roles to have view/modification
+     * access to the localcm item.
      *
-     *
-     * @param array $mod
+     * @param unknown $mod
      */
     private function setup_subscription($mod) {
         global $DB;
@@ -357,10 +358,6 @@ class rule {
             'lastmod' => time(),
             'access' => self::RULE_ACTION_DEFAULT,
         );
-
-        // TODO review requiremen for resetting subscription details.
-        // or implement a scheduled task to perform this function to clean up subscriptions.
-        // $DB->execute($sql, $params);
 
         // Iterate over all users in the cm's course that have the roleid $role.
         foreach ($users as $user) {
@@ -406,6 +403,15 @@ class rule {
 
     }
 
+    /**
+     * If the localcm has a history entry then this will return false.
+     * This means that the triggers/rules have been fired off and users were notified.
+     *
+     * We do not want to fire the trigger multiple times.
+     *
+     * @param array $mod
+     * @return boolean
+     */
     private function check_history($mod) {
         global $DB;
 
@@ -437,6 +443,12 @@ class rule {
         return true;
     }
 
+    /**
+     * The final stage when processing a rule. This will record an entry in the local_extension_his_sub table
+     * so that when processing the rule during a cron task will return false and not trigger anything.
+     *
+     * @param array $mod
+     */
     private function write_history($mod) {
         global $DB;
 
@@ -454,6 +466,12 @@ class rule {
         $DB->insert_record('local_extension_his_sub', $history);
     }
 
+    /**
+     * Replaces the varaibles in each template with data and returns them.
+     *
+     * @param array $mod
+     * @return mixed|boolean[]|\local_extension\stdClass[]
+     */
     private function process_templates($mod) {
         global $DB;
 
@@ -497,6 +515,11 @@ class rule {
         return $templates;
     }
 
+    /**
+     * Obtains the templates.
+     *
+     * @return boolean[]|\local_extension\stdClass[]
+     */
     private function get_templates() {
         $templates = array (
             'template_notify' => $this->get_notify_template(),
@@ -507,6 +530,11 @@ class rule {
 
     }
 
+    /**
+     * Obtains the notify template.
+     *
+     * @return \local_extension\stdClass|boolean
+     */
     private function get_notify_template() {
         if (!empty($this->data)) {
             if (array_key_exists('template_notify', $this->data)) {
@@ -518,6 +546,11 @@ class rule {
 
     }
 
+    /**
+     * Obtains the user_template.
+     *
+     * @return \local_extension\stdClass|boolean
+     */
     private function get_user_template() {
         if (!empty($this->data)) {
 
@@ -530,6 +563,13 @@ class rule {
 
     }
 
+    /**
+     * If this rule has a parent value, we will check the history to see if that has been processed or not.
+     *
+     * @param array $mod
+     * @param integer $parent
+     * @return boolean
+     */
     private function check_parent($mod, $parent) {
         global $DB;
 
@@ -558,6 +598,12 @@ class rule {
         return false;
     }
 
+    /**
+     * Returns the request length.
+     *
+     * @param array $mod
+     * @return string
+     */
     private function get_request_time($mod) {
         $localcm = $mod['localcm'];
 
@@ -577,6 +623,13 @@ class rule {
         return $str;
     }
 
+    /**
+     * Checks the rule for request list.
+     *
+     * @param \local_extension\request $request
+     * @param array $mod
+     * @return boolean
+     */
     private function check_request_length($request, $mod) {
         $localcm = $mod['localcm'];
 
@@ -603,6 +656,13 @@ class rule {
         return false;
     }
 
+    /**
+     * Checks the rule for elapsed lenth.
+     *
+     * @param \local_extension\request $request
+     * @param array $mod
+     * @return boolean
+     */
     private function check_elapsed_length($request, $mod) {
         $delta = time() - $request->timestamp;
 
@@ -622,6 +682,13 @@ class rule {
         return false;
     }
 
+    /**
+     * Notify all users in the course, with the role that this rule specifies.
+     *
+     * @param stdClass $user
+     * @param stdClass $course
+     * @param array $template
+     */
     private function notify_roles($user, $course, $template) {
         $role = $this->role;
 
@@ -634,6 +701,13 @@ class rule {
 
     }
 
+    /**
+     * Notify the user that is assigned to this localcm based on the current rule.
+     *
+     * @param stdClass $user
+     * @param array $template
+     * @param stdClass $emailto
+     */
     private function notify_user($user, $template, $emailto) {
         $subject = "Extension request for " . \fullname($user);
         \local_extension\utility::send_trigger_email($subject, $template, $emailto);
