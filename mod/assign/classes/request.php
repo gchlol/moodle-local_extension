@@ -112,7 +112,7 @@ class request extends \local_extension\base_request {
      * @param array $mod An array of event details
      * @param user $user The user that is viewing the status.
      */
-    public function status_definition($mform, $mod, $user = 0) {
+    public function status_definition($mform, $mod) {
         $cm = $mod['cm'];
         $event = $mod['event'];
         $course = $mod['course'];

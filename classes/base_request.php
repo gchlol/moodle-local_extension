@@ -70,9 +70,8 @@ abstract class base_request {
      *
      * @param moodleform $mform A moodle form object
      * @param array $mod An array of event details
-     * @param user $user The user that is viewing the status.
      */
-    abstract public function status_definition($mform, $mod, $user);
+    abstract public function status_definition($mform, $mod);
 
     /**
      * Return data to be stored for the request

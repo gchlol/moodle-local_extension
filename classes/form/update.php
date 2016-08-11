@@ -56,11 +56,11 @@ class update extends \moodleform {
 
         foreach ($mods as $id => $mod) {
             $handler = $mod['handler'];
-            $handler->status_definition($mform, $mod, $USER->id);
+            $handler->status_definition($mform, $mod);
 
             $access = \local_extension\rule::get_access($mod, $USER->id);
             if ($access == \local_extension\rule::RULE_ACTION_APPROVE) {
-                $handler->status_modification($mform, $mod, $USER->id);
+                $handler->status_modification($mform, $mod);
             }
         }
 
