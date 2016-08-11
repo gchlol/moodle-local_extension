@@ -97,11 +97,6 @@ class local_extension_rule_testcase extends advanced_testcase {
             array_push($this->managers, $this->getDataGenerator()->create_user());
         }
 
-        $this->groups = array();
-        for ($i = 0; $i < self::GROUP_COUNT; $i++) {
-            array_push($this->groups, $this->getDataGenerator()->create_group(array('courseid' => $this->course->id)));
-        }
-
         $teacherrole = $DB->get_record('role', array('shortname' => 'teacher'));
         foreach ($this->teachers as $i => $teacher) {
             $this->getDataGenerator()->enrol_user($teacher->id,
