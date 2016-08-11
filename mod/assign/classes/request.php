@@ -123,7 +123,6 @@ class request extends \local_extension\base_request {
         $html = \html_writer::tag('p', $html . ' ' . get_string('dueon', 'extension_assign', \userdate($event->timestart)));
         $mform->addElement('html', \html_writer::tag('p', $html));
 
-        // TODO depending on the url, status.php/request.php, provide a link back to the status.php page in the request status string.
         $status = $localcm->get_state_name();
 
         $url = new \moodle_url("/local/extension/status.php", array('id' => $localcm->requestid));
@@ -146,7 +145,7 @@ class request extends \local_extension\base_request {
      * @param array $mod An array of event details
      * @param user $user The user that is viewing the status.
      */
-    public function status_modification($mform, $mod, $user = 0) {
+    public function status_modification($mform, $mod) {
         $cm = $mod['cm'];
         $event = $mod['event'];
         $course = $mod['course'];
@@ -156,33 +155,41 @@ class request extends \local_extension\base_request {
         $localcm = $mod['localcm'];
         $id = $localcm->cmid;
 
-        $nextstates = $localcm->get_next_state();
-        sort($nextstates);
+        /*
+        STATE_NEW = 0;
+        STATE_DENIED = 1;
+        STATE_APPROVED = 2;
+        STATE_REOPENED = 3;
+        STATE_CANCEL = 4;
+        */
 
-        $buttonarray = array();
+        switch ($localcm->get_stateid()) {
+            case $localcm::STATE_NEW:
+                $buttonarray[] = &$mform->createElement('submit', 'approve' . $id, 'Approve');
+                $buttonarray[] = &$mform->createElement('submit', 'deny' . $id, 'Deny');
+                $buttonarray[] = &$mform->createElement('submit', 'cancel' . $id, 'Cancel');
+                break;
+            case $localcm::STATE_REOPENED:
+                $buttonarray[] = &$mform->createElement('submit', 'approve' . $id, 'Approve');
+                $buttonarray[] = &$mform->createElement('submit', 'deny' . $id, 'Deny');
+                $buttonarray[] = &$mform->createElement('submit', 'cancel' . $id, 'Cancel');
+                break;
+            case $localcm::STATE_DENIED:
+                $buttonarray[] = &$mform->createElement('submit', 'reopen' . $id, 'Reopen');
+                $buttonarray[] = &$mform->createElement('submit', 'cancel' . $id, 'Cancel');
+                break;
+            case $localcm::STATE_CANCEL:
+                $buttonarray[] = &$mform->createElement('submit', 'reopen' . $id, 'Reopen');
+                break;
+            case $localcm::STATE_APPROVED:
+                $buttonarray[] = &$mform->createElement('submit', 'deny' . $id, 'Deny');
+                $buttonarray[] = &$mform->createElement('submit', 'cancel' . $id, 'Cancel');
+                break;
+            default:
+                break;
 
-        foreach ($nextstates as $state) {
-            switch ($state) {
-                case $localcm::STATE_NEW:
-                case $localcm::STATE_REOPENED:
-                    $buttonarray[] = &$mform->createElement('submit', 'approve' . $id, 'Approve');
-                    break;
-                case $localcm::STATE_DENIED:
-                    // $buttonarray[] = &$mform->createElement('submit', 'reopen' . $id, 'Reopen');
-                    break;
-                case $localcm::STATE_CANCEL:
-                    $buttonarray[] = &$mform->createElement('submit', 'deny' . $id, 'Deny');
-                    break;
-                case $localcm::STATE_APPROVED:
-                    $buttonarray[] = &$mform->createElement('submit', 'approve' . $id, 'Approve');
-                    // $buttonarray[] = &$mform->createElement('submit', 'deny' . $id, 'Deny');
-                    // $buttonarray[] = &$mform->createElement('submit', 'reopen' . $id, 'Reopen');
-                    break;
-                default:
-                    break;
-
-            }
         }
+
 
         $mform->addGroup($buttonarray, 'buttonar', '', array(' '), false);
         $mform->closeHeaderBefore('buttonar');

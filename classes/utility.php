@@ -149,7 +149,6 @@ class utility {
 
     /**
      * Sends a status email to the student.
-     * TODO Implement sending to course coordinators with the capabilitiy and role to grant extensions.
      *
      * @param integer $requestid
      */
@@ -192,6 +191,7 @@ class utility {
 
     /**
      * Returns the number of requests the user has for a specific course.
+     *
      * @param interger $courseid
      * @param interger $userid
      * @return integer count

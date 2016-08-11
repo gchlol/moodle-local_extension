@@ -196,29 +196,6 @@ class cm {
         $DB->insert_record('local_extension_his_state', $history);
     }
 
-
-    /**
-     * Query the $cm and get the next available states.
-     *
-     * @return array An array of available states.
-     */
-    public function get_next_state() {
-        switch ($this->get_stateid()) {
-            case self::STATE_NEW:
-                return array(self::STATE_APPROVED, self::STATE_DENIED, self::STATE_CANCEL);
-            case self::STATE_DENIED:
-                return array(self::STATE_REOPENED, self::STATE_CANCEL);
-            case self::STATE_APPROVED:
-                return array(self::STATE_CANCEL, self::STATE_REOPENED);
-            case self::STATE_REOPENED:
-                return array(self::STATE_APPROVED, self::STATE_CANCEL, self::STATE_DENIED);
-            case self::STATE_CANCEL:
-                return array();
-            default:
-                return array();
-        }
-    }
-
     /**
      * Returns a human readable state name.
      *
