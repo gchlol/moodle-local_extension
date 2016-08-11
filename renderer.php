@@ -409,5 +409,24 @@ class local_extension_renderer extends plugin_renderer_base {
 
         return $html;
     }
+
+    /**
+     * Prints the list of rules, and child rules that may be deleted on manage.php
+     *
+     * @param array $rules
+     * @return string
+     */
+    public function render_delete_rules($rules) {
+        $html = '';
+
+        foreach ($rules as $rule) {
+            $html .= html_writer::start_div();
+            $html .= var_export($rule, true);
+            $html .= html_writer::end_div();
+
+        }
+
+        return $html;
+    }
 }
 

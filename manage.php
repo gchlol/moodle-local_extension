@@ -47,32 +47,29 @@ $renderer = $PAGE->get_renderer('local_extension');
 
 if ($delete && confirm_sesskey()) {
 
-    // TODO: Add content, details about the rule(s) to be deleted.
-
     if ($confirm != md5($delete)) {
         $query = "SELECT id, name
                     FROM {local_extension_triggers}
-                   WHERE id = ?";
+                   WHERE id = ?
+                      OR parent = ?";
 
-        $params = array('id' => $delete);
+        $params = array('id' => $delete, 'parent' => $delete);
 
-        $result = $DB->get_record_sql($query, $params);
+        $result = $DB->get_records_sql($query, $params);
 
         echo $OUTPUT->header();
         echo html_writer::tag('h2', get_string('page_heading_manage_delete', 'local_extension'));
-
-        echo "test";
 
         $optionsyes = array('delete' => $delete, 'confirm' => md5($delete), 'sesskey' => sesskey());
         $deleteurl = new moodle_url($pageurl, $optionsyes);
         $deletebutton = new single_button($deleteurl, get_string('delete'), 'post');
 
-        // TODO UI details about rules/children that will be deleted.
+        echo $renderer->render_delete_rules($result);
 
         echo $OUTPUT->confirm('', $deletebutton, $pageurl);
         echo $OUTPUT->footer();
 
-        exit;
+        exit();
 
     } else if (data_submitted()) {
 
@@ -82,7 +79,10 @@ if ($delete && confirm_sesskey()) {
                  WHERE parent = ?";
         $params = array($delete);
 
+        // List of rule ids associated to this $delete id.
         $items = $DB->get_fieldset_sql($sql, $params);
+
+        // Add the $ruleid.
         $items[] = $delete;
 
         // Remove all rules, including the children.
