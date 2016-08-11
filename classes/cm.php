@@ -173,7 +173,7 @@ class cm {
         \local_extension\utility::cache_invalidate_request($this->requestid);
     }
 
-    public function write_history($mod, $state, $log) {
+    public function write_history($mod, $state, $userid) {
         global $DB;
 
         $localcm = $mod['localcm'];
@@ -182,9 +182,9 @@ class cm {
             'localcmid' => $localcm->cmid,
             'requestid' => $localcm->requestid,
             'timestamp' => time(),
-            'message' => $log,
+            'message' => '',
             'state' => $state,
-            'userid' => $localcm->userid,
+            'userid' => $userid,
         );
 
         $DB->insert_record('local_extension_his_state', $history);
@@ -219,8 +219,11 @@ class cm {
      * @throws coding_exception
      * @return string the human-readable status name.
      */
-    public function get_state_name() {
-        switch ($this->get_stateid()) {
+    public function get_state_name($stateid = null) {
+        if ($stateid == null) {
+            $stateid = $this->get_stateid();
+        }
+        switch ($stateid) {
             case self::STATE_NEW:
                 return \get_string('state_new',      'local_extension');
             case self::STATE_DENIED:

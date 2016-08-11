@@ -45,26 +45,13 @@ $PAGE->requires->css('/local/extension/styles.css');
 
 $request = \local_extension\utility::cache_get_request($requestid);
 
-// Selecting the records which have a null trigger from the history.
-$sql = "SELECT id,
-               localcmid,
-               requestid,
-               timestamp,
-               message,
-               state,
-               userid
-         FROM {local_extension_his_state}
-        WHERE requestid = :requestid";
-
-$history = $DB->get_records_sql($sql, array('requestid' => $requestid));
-
 $renderer = $PAGE->get_renderer('local_extension');
 
 $params = array(
     'user' => $OUTPUT->user_picture($USER),
     'request' => $request,
     'renderer' => $renderer,
-    'history' => $history
+    'history' => $request->state_history()
 );
 
 $mform = new \local_extension\form\update(null, $params);

@@ -176,6 +176,47 @@ class request implements \cache_data_source {
     }
 
     /**
+     * Returns the state change history to be used with interleaving the comment stream when viewing status.php
+     *
+     * @return array $history
+     */
+    public function state_history() {
+        global $DB;
+
+        // Selecting the state changes from the history for this request.
+        $sql = "SELECT id,
+               localcmid,
+               requestid,
+               timestamp,
+               state,
+               userid
+          FROM {local_extension_his_state}
+         WHERE requestid = :requestid";
+
+        $records = $DB->get_records_sql($sql, array('requestid' => $this->requestid));
+        $history = array();
+
+        foreach ($records as $record) {
+            $mod = $this->mods[$record->localcmid];
+
+            /* @var \local_extension\cm $localcm */
+            $localcm = $mod['localcm'];
+            $event   = $mod['event'];
+            $course  = $mod['course'];
+
+            $status = $localcm->get_state_name($record->state);
+            $log = "$status extension for {$course->fullname}, {$event->name}";
+
+            // Add class property 'message' to interleave with the comment stream.
+            $record->message = $log;
+
+            $history[] = $record;
+        }
+
+        return $history;
+    }
+
+    /**
      * Each cm may have a different set of rules that will need to be processed.
      */
     public function process_triggers() {
@@ -246,10 +287,7 @@ class request implements \cache_data_source {
                 if (!empty($data->$item)) {
                     $localcm->set_state($state);
                     $status = $localcm->get_state_name();
-                    $log = "$status extension for {$course->fullname}, {$event->name}";
-
-                    $localcm->write_history($mod, $state, $log);
-
+                    $localcm->write_history($mod, $state, $user->id);
                 }
 
             }
