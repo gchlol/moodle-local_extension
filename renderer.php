@@ -268,7 +268,7 @@ class local_extension_renderer extends plugin_renderer_base {
      * @param flexible_table $table
      * @param array $triggers
      */
-    public function render_extension_trigger_table($table, $triggers) {
+    public function render_extension_trigger_table($table, $triggers, $parent = null) {
         global $OUTPUT;
         if (!empty($triggers)) {
 
@@ -284,9 +284,9 @@ class local_extension_renderer extends plugin_renderer_base {
                 $html = html_writer::empty_tag('img', array('src' => $OUTPUT->pix_url('t/delete'), 'alt' => get_string('delete'), 'class' => 'iconsmall'));
                 $buttons[] = html_writer::link($url, $html, array('title' => get_string('delete')));
 
-                $parent = 'N/A';
-                if (!empty($trigger->parent)) {
-                    $parent = $triggers["$trigger->parent"]->name;
+                $parentstr = 'N/A';
+                if (!empty($parent)) {
+                    $parentstr = $parent->name;
                 }
 
                 // Table columns 'name', 'action', 'role', 'parent', 'continue', 'priority', 'data'.
@@ -294,33 +294,37 @@ class local_extension_renderer extends plugin_renderer_base {
                         $trigger->name,
                         $trigger->get_action_name(),
                         $trigger->get_role_name(),
-                        $parent,
+                        $parentstr,
                         $trigger->datatype,
                         $trigger->priority + 1,
-                        $this->render_trigger_item($trigger, $parent),
+                        $this->render_trigger_rule_text($trigger, $parentstr),
                         implode(' ', $buttons)
                 );
 
                 $table->add_data($values);
+
+                if (!empty($trigger->children)) {
+                    $this->render_extension_trigger_table($table, $trigger->children, $trigger);
+                }
             }
         }
 
-        return $table->finish_output();
+        return $table;
     }
 
     /**
      * Adapter trigger renderer for status management page.
      *
      * @param \local_extension\rule $trigger
-     * @param string $parent The name of the parent trigger.
+     * @param string $parentstr The name of the parent trigger.
      * @return string $html The html output.
      */
-    public function render_trigger_item($trigger, $parent) {
+    public function render_trigger_rule_text($trigger, $parentstr) {
         $html  = html_writer::start_tag('div');
 
         $activate = array(
             get_string('form_rule_label_parent', 'local_extension'),
-            $parent,
+            $parentstr,
             get_string('form_rule_label_parent_end', 'local_extension'),
         );
         $html .= html_writer::tag('p', implode(' ', $activate));
@@ -421,6 +425,8 @@ class local_extension_renderer extends plugin_renderer_base {
 
         foreach ($rules as $rule) {
             $html .= html_writer::start_div();
+
+            // TODO
             $html .= var_export($rule, true);
             $html .= html_writer::end_div();
 

@@ -241,7 +241,7 @@ class request implements \cache_data_source {
                 }
             });
 
-            $ordered = \local_extension\utility::sort_rules($rules);
+            $ordered = \local_extension\utility::rule_tree($rules);
 
             foreach ($ordered as $rule) {
                 $rule->process($this->request, $mod);

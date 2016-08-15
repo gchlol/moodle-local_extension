@@ -357,7 +357,74 @@ class utility {
         }
 
         return $ordered;
+    }
 
+    /**
+     * Returns a tree structure of the rules.
+     * Nested child rules can be accessed via $rule->children
+     *
+     * @param \local_extension\rule[] $rules
+     * @param number $parent
+     * @return \local_extension\rule[] Tree structure.
+     */
+    public static function rule_tree(array $rules, $parent = 0) {
+        $branch = array();
+
+        foreach ($rules as $element) {
+            if ($element->parent == $parent) {
+                $children = self::rule_tree($rules, $element->id);
+
+                // Sort the child nodes based on priority.
+                usort($children, function($a, $b) {
+                    return $a->priority - $b->priority;
+                });
+
+                if ($children) {
+                    $element->children = $children;
+                }
+
+                $branch[] = $element;
+            }
+        }
+
+        return $branch;
+    }
+
+
+    /**
+     * Returns an array of ids that are possible candidates for being a parent item.
+     *
+     * @param \local_extension\rule[] $rules
+     * @param interger $id The id that will not be added, nor children added.
+     * @param array $idlist A growing list of ids that can be possible parent items.
+     * @return array An associated array of id=>name for parents.
+     */
+    public static function rule_tree_check_children(array $rules, $id, $idlist = null) {
+
+        if (empty($idlist)) {
+            $idlist = array();
+        }
+
+        // Sort the rules based on priority.
+        usort($rules, function($a, $b) {
+            return $a->priority - $b->priority;
+        });
+
+        foreach ($rules as $rule) {
+
+            if ($rule->id == $id) {
+                continue;
+            }
+
+            if(!empty($rule->children)) {
+                $children = self::rule_tree_check_children($rule->children, $id, $idlist);
+                $idlist = $idlist + $children;
+            }
+
+            $idlist[$rule->id] = $rule->name;
+        }
+
+        return array_reverse($idlist, true);
     }
 
 }

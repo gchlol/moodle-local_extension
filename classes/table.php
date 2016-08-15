@@ -142,41 +142,9 @@ class table {
     public static function generate_trigger_data($table) {
         global $DB;
 
-        $params = array();
+        $rules = \local_extension\rule::load_all();
+        $ordered = \local_extension\utility::rule_tree($rules);
 
-        $sql = "SELECT id,
-                       context,
-                       name,
-                       role,
-                       action,
-                       priority,
-                       parent,
-                       lengthfromduedate,
-                       lengthtype,
-                       elapsedfromrequest,
-                       elapsedtype,
-                       datatype,
-                       data
-                  FROM {local_extension_triggers}
-              ORDER BY id";
-
-        // Obtain the data.
-        $records = $DB->get_records_sql($sql, $params);
-        $rules = array();
-
-        // Map the values to a rule object.
-        foreach ($records as $record) {
-            $rules[] = \local_extension\rule::from_db($record);
-        }
-
-        $ordered = \local_extension\utility::sort_rules($rules);
-
-        // Indexes the return array with the ruleid. This value is used to determine the name of the possible parent objects.
-        $return = array();
-        foreach ($ordered as $item) {
-            $return["$item->id"] = $item;
-        }
-
-        return $return;
+        return $ordered;
     }
 }

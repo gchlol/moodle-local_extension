@@ -102,7 +102,10 @@ echo html_writer::tag('h2', get_string('page_heading_manage', 'local_extension')
 // Display a table of all triggers when no id is present.
 $table = \local_extension\table::generate_trigger_table();
 $data = \local_extension\table::generate_trigger_data($table);
-echo $renderer->render_extension_trigger_table($table, $data);
+
+$renderer->render_extension_trigger_table($table, $data);
+
+echo $table->finish_output();
 
 echo html_writer::empty_tag('br');
 

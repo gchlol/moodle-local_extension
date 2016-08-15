@@ -48,8 +48,9 @@ class rule extends \moodleform {
         $mform = $this->_form;
 
         $datatype = $this->_customdata['datatype'];
-        $parents = $this->_customdata['parents'];
+        $rules = $this->_customdata['rules'];
         $editordata = $this->_customdata['editordata'];
+        $ruleid = $this->_customdata['ruleid'];
 
         // Edit Rule Header.
         $mform->addElement('header', 'name_set', get_string('form_rule_header_edit', 'local_extension'), null, null);
@@ -68,14 +69,12 @@ class rule extends \moodleform {
 
         $mform->addElement('select', 'priority', get_string('form_rule_label_priority', 'local_extension'), $optionspriority);
 
+        // Prevent cyclic dependencies and exclude children from this rule.
+        $optionsparent = \local_extension\utility::rule_tree_check_children($rules, $ruleid);
+        $optionsparent = array('N/A') + $optionsparent;
+
         // Only activate when [parent] has been triggered.
         $parentgroup = array();
-
-        $optionsparent = array('N/A');
-        foreach ($parents as $id => $name) {
-            $optionsparent[$id] = $name;
-        }
-
         $parentgroup[] = $mform->createElement('select', 'parent', null, $optionsparent);
         $parentgroup[] = $mform->createElement('static', 'hastriggered', '', get_string('form_rule_label_parent_end', 'local_extension'));
 
