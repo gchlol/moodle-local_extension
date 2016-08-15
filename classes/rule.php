@@ -472,16 +472,25 @@ class rule {
 
         // The user details for obtaining the full name.
         $userid = $mod['localcm']->userid;
+
         $user = \core_user::get_user($userid);
 
         $templatevars = array(
             '/{{course}}/' => $course->fullname,
             '/{{module}}/' => $cm->name,
             '/{{student}}/' => \fullname($user),
+            '/{{student_first}}/' => $user->firstname,
+            '/{{student_middle}}/' => $user->middlename,
+            '/{{student_last}}/' => $user->lastname,
+            '/{{student_alternate}}/' => $user->alternatename,
             '/{{duedate}}/' => \userdate($event->timestart),
             '/{{extensiondate}}/' => \userdate($localcm->cm->data),
             '/{{requeststatusurl}}/' => $url,
             '/{{extensionlength}}/' => $this->get_request_time($mod),
+            '/{{rulename}}/' => $this->name,
+            '/{{role}}/' => $this->rolenames[$this->role],
+            '/{{eventname}}/' => $event->name,
+            '/{{eventdescription}}/' => $event->description,
         );
 
         // TODO:
