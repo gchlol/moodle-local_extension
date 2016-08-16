@@ -189,10 +189,12 @@ class local_extension_renderer extends plugin_renderer_base {
      * @return string $out The html output.
      */
     public function render_extension_attachments(\local_extension\request $req) {
-        list($fs, $files) = $req->fetch_attachments();
+        global $OUTPUT;
+
+        list($fs, $files) = $req->fetch_attachments($req);
 
         $out  = html_writer::start_tag('div', array('class' => 'attachments'));
-        $out .= html_writer::tag('p', get_string('attachments', 'local_extension'));
+        $out .= get_string('attachments', 'local_extension');
 
         foreach ($files as $file) {
 
@@ -219,7 +221,10 @@ class local_extension_renderer extends plugin_renderer_base {
             );
 
             $filelink = html_writer::link($fileurl, $f->get_filename());
-            $out .= html_writer::tag('p', $filelink);
+
+            $out .= $filelink;
+
+            $out .= $OUTPUT->pix_icon(file_file_icon($file, 24), get_mimetype_description($file));
 
         }
         $out .= html_writer::end_div(); // End .attachments.
