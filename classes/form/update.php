@@ -84,7 +84,9 @@ class update extends \moodleform {
         // To identify the current user, $user equals $OUTPUT->user_picture($USER).
         $mform->addElement('html', $user);
 
-        $mform->addElement('filemanager', 'attachments', '', null, array('subdirs' => 0));
+        if ($USER->id == $request->request->userid) {
+            $mform->addElement('filemanager', 'attachments', '', null, array('subdirs' => 0));
+        }
 
         $mform->addElement('textarea', 'commentarea', '', 'wrap="virtual" rows="5" cols="70"');
 

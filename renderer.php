@@ -191,7 +191,7 @@ class local_extension_renderer extends plugin_renderer_base {
     public function render_extension_attachments(\local_extension\request $req) {
         global $OUTPUT;
 
-        list($fs, $files) = $req->fetch_attachments($req);
+        list($fs, $files) = $req->fetch_attachments();
 
         $out  = html_writer::start_tag('div', array('class' => 'attachments'));
         $out .= get_string('attachments', 'local_extension');

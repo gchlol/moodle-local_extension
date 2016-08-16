@@ -44,6 +44,7 @@ $PAGE->set_heading(get_string('status_page_heading', 'local_extension'));
 $PAGE->requires->css('/local/extension/styles.css');
 
 $request = \local_extension\utility::cache_get_request($requestid);
+$fileareaitemid = $request->request->timestamp . $requestid;
 
 $renderer = $PAGE->get_renderer('local_extension');
 
@@ -58,7 +59,7 @@ $mform = new \local_extension\form\update(null, $params);
 
 $draftitemid = file_get_submitted_draft_itemid('attachments');
 
-file_prepare_draft_area($draftitemid, $context->id, 'local_extension', 'attachments', $requestid);
+file_prepare_draft_area($draftitemid, $context->id, 'local_extension', 'attachments', $fileareaitemid);
 
 $entry = new stdClass();
 $entry->attachments = $draftitemid;
@@ -67,7 +68,7 @@ $mform->set_data($entry);
 if ($form = $mform->get_data()) {
     $comment = $form->commentarea;
 
-    file_save_draft_area_files($draftitemid, $context->id, 'local_extension', 'attachments', $request->requestid);
+    file_save_draft_area_files($draftitemid, $context->id, 'local_extension', 'attachments', $fileareaitemid);
 
     // Parse the form data to see if any accept/deny/reopen/etc buttons have been clicked, and update the state accordingly.
     $request->update_cm_state($USER, $form);

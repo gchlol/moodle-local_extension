@@ -136,14 +136,20 @@ class request implements \cache_data_source {
     /**
      * Fetches the attachments for this request.
      *
-     * @param \local_extension\request $req
      * @return file_storage[]|stored_file[][]
      */
-    public function fetch_attachments($req) {
-        $context = \context_user::instance($req->request->userid);
+    public function fetch_attachments() {
+        $request = $this->request;
+
+        // Obtain the context for the user that has submitted a request.
+        $context = \context_user::instance($request->userid);
 
         $fs = get_file_storage();
-        $files = $fs->get_area_files($context->id, 'local_extension', 'attachments', $this->requestid);
+
+        $fileareaitemid = $request->timestamp . $request->id;
+
+        // The request timestamp is the item id concatenated with the requestid.
+        $files = $fs->get_area_files($context->id, 'local_extension', 'attachments', $fileareaitemid);
 
         return array($fs, $files);
     }
