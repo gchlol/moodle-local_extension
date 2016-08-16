@@ -44,8 +44,8 @@ class rule {
     /** @var integer Action type: Subscribe. */
     const RULE_ACTION_SUBSCRIBE = 2;
 
-    /** @var integer Action type: Approval => Subscribe. If a child rule is triggered then this downgrades the action to subscribe. */
-    const RULE_ACTION_DOWNGRADE = 4;
+    /** @var integer Action type: Force the approval status. Do not downgrade to subscribe. */
+    const RULE_ACTION_FORCEAPPROVE = 4;
 
     /** @var integer Condition: Less than. */
     const RULE_CONDITION_LT = 1;
@@ -264,8 +264,8 @@ class rule {
                 return get_string('form_rule_select_approve', 'local_extension');
             case self::RULE_ACTION_SUBSCRIBE:
                 return get_string('form_rule_select_subscribe', 'local_extension');
-            case self::RULE_ACTION_DOWNGRADE:
-                return get_string('form_rule_select_downgrade', 'local_extension');
+            case self::RULE_ACTION_FORCEAPPROVE:
+                return get_string('form_rule_select_forceapprove', 'local_extension');
             default:
                 return '';
         }
@@ -403,6 +403,51 @@ class rule {
             } else {
                 $DB->update_record('local_extension_subscription', $sub);
             }
+        }
+
+        if (!empty($this->parentrule)) {
+            $this->downgrade_status($mod, $this->parentrule);
+        }
+    }
+
+    /**
+     * When a rule is triggered that has parent items, we will revoke approval status to the earlier roles.
+     * Unless that rule is set for FORCE_APPROVE.
+     *
+     * @param array $mod
+     * @param rule $rule
+     */
+    private function downgrade_status($mod, $rule) {
+        global $DB;
+
+        $localcm = $mod['localcm'];
+        $course = $mod['course'];
+
+        // If the rule has specified that the roles will be forced to approve, we skip dowgrading the acccess.
+        if ($rule->action != \local_extension\rule::RULE_ACTION_FORCEAPPROVE) {
+
+            $users = $this->rule_get_role_users($course, $rule->role);
+            foreach ($users as $user) {
+                $params = array(
+                    'userid' => $user->id,
+                    'localcmid' => $localcm->cm->cmid,
+                );
+
+                $sub = $DB->get_record('local_extension_subscription', $params);
+                if (empty($sub)) {
+                    continue;
+                }
+
+                if ($sub->access != \local_extension\rule::RULE_ACTION_SUBSCRIBE) {
+                    $sub->access = \local_extension\rule::RULE_ACTION_SUBSCRIBE;
+                    $sub->lastmod = \time();
+                    $DB->update_record('local_extension_subscription', $sub);
+                }
+            }
+        }
+
+        if (!empty($rule->parentrule)) {
+            $this->downgrade_status($mod, $rule->parentrule);
         }
 
     }

@@ -112,7 +112,7 @@ class rule extends \moodleform {
         $actiontypes = array(
             \local_extension\rule::RULE_ACTION_APPROVE   => get_string('form_rule_select_approve', 'local_extension'),
             \local_extension\rule::RULE_ACTION_SUBSCRIBE => get_string('form_rule_select_subscribe', 'local_extension'),
-            \local_extension\rule::RULE_ACTION_DOWNGRADE => get_string('form_rule_select_downgrade', 'local_extension'),
+            \local_extension\rule::RULE_ACTION_FORCEAPPROVE => get_string('form_rule_select_forceapprove', 'local_extension'),
         );
 
         $roletypes = role_get_names(\context_system::instance(), ROLENAME_ALIAS, true);

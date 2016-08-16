@@ -58,7 +58,7 @@ class update extends \moodleform {
             $handler = $mod['handler'];
             $handler->status_definition($mform, $mod);
 
-            $approve = (\local_extension\rule::RULE_ACTION_APPROVE | \local_extension\rule::RULE_ACTION_DOWNGRADE);
+            $approve = (\local_extension\rule::RULE_ACTION_APPROVE | \local_extension\rule::RULE_ACTION_FORCEAPPROVE);
 
             $access = \local_extension\rule::get_access($mod, $USER->id);
 
