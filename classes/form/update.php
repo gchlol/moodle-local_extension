@@ -58,10 +58,14 @@ class update extends \moodleform {
             $handler = $mod['handler'];
             $handler->status_definition($mform, $mod);
 
+            $approve = (\local_extension\rule::RULE_ACTION_APPROVE | \local_extension\rule::RULE_ACTION_DOWNGRADE);
+
             $access = \local_extension\rule::get_access($mod, $USER->id);
-            if ($access == \local_extension\rule::RULE_ACTION_APPROVE) {
+
+            if ($access & $approve) {
                 $handler->status_modification($mform, $mod);
             }
+
         }
 
         // TODO replace <br /> with css padding/margins, or does that impact the html->text email output.

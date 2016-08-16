@@ -44,6 +44,9 @@ class rule {
     /** @var integer Action type: Subscribe. */
     const RULE_ACTION_SUBSCRIBE = 2;
 
+    /** @var integer Action type: Approval => Subscribe. If a child rule is triggered then this downgrades the action to subscribe. */
+    const RULE_ACTION_DOWNGRADE = 4;
+
     /** @var integer Condition: Less than. */
     const RULE_CONDITION_LT = 1;
 
@@ -94,6 +97,12 @@ class rule {
 
     /** @var the type name, eg. assign/quiz */
     public $datatype = null;
+
+    /** @var array An array of child rules */
+    public $children = null;
+
+    /** @var rule A reference to the parent rule */
+    public $parentrule = null;
 
     /**
      * Rule object constructor.
@@ -255,6 +264,8 @@ class rule {
                 return get_string('form_rule_select_approve', 'local_extension');
             case self::RULE_ACTION_SUBSCRIBE:
                 return get_string('form_rule_select_subscribe', 'local_extension');
+            case self::RULE_ACTION_DOWNGRADE:
+                return get_string('form_rule_select_downgrade', 'local_extension');
             default:
                 return '';
         }
@@ -327,6 +338,24 @@ class rule {
         return $access;
     }
 
+    private function rule_get_role_users($course, $role) {
+        $users = array();
+
+        // Obtain users with the role at course level.
+        $context = \context_course::instance($course->id);
+        $users += \get_role_users($role, $context);
+
+        // Obtain users with the role at course category level.
+        $contextcat = \context_coursecat::instance($course->category);
+        $users += \get_role_users($role, $contextcat);
+
+        // Obtain users with the role at site level.
+        $contextsite = \context_system::instance();
+        $users += \get_role_users($role, $contextsite);
+
+        return $users;
+    }
+
     /**
      * Using the current rule configuration, this will setup the users with specific roles to have view/modification
      * access to the localcm item.
@@ -341,8 +370,7 @@ class rule {
 
         $role = $this->role;
 
-        $context = \context_course::instance($course->id);
-        $users = \get_role_users($role, $context);
+        $users = $this->rule_get_role_users($course, $role);
 
         // Iterate over all users in the cm's course that have the roleid $role.
         foreach ($users as $user) {
@@ -368,18 +396,7 @@ class rule {
             $sub->requestid = $localcm->requestid;
             $sub->lastmod = \time();
             $sub->trigger = $this->id;
-
-            switch ($this->action) {
-                case self::RULE_ACTION_APPROVE:
-                    $sub->access = self::RULE_ACTION_APPROVE;
-                    break;
-                case self::RULE_ACTION_SUBSCRIBE:
-                    $sub->access = self::RULE_ACTION_SUBSCRIBE;
-                    break;
-                default:
-                    $sub->access = self::RULE_ACTION_DEFAULT;
-                    break;
-            }
+            $sub->access = $this->action;
 
             if (empty($sub->id)) {
                 $DB->insert_record('local_extension_subscription', $sub);
@@ -692,8 +709,7 @@ class rule {
     private function notify_roles($user, $course, $template) {
         $role = $this->role;
 
-        $context = \context_course::instance($course->id);
-        $users = \get_role_users($role, $context);
+        $users= $this->rule_get_role_users($course, $role);
 
         foreach ($users as $emailto) {
             $this->notify_user($user, $template, $emailto);
