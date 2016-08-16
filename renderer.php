@@ -115,8 +115,6 @@ class local_extension_renderer extends plugin_renderer_base {
     public function render_role($req, $userid) {
         $details = '';
         $roles = array();
-        $highestrole = null;
-        $shortcode = null;
 
         // Roles are scoped to the enrollment status in courses.
         foreach ($req->mods as $cmid => $mod) {
@@ -124,36 +122,12 @@ class local_extension_renderer extends plugin_renderer_base {
             $context = \context_course::instance($course->id);
             $roles = get_user_roles($context, $userid, true);
 
-            $top = array_shift($roles);
-            $modhighest = null;
-
-            // Set the highest local scoped varaible.
-            if (empty($modhighest)) {
-                $modhighest = $top;
+            foreach ($roles as $role) {
+                $rolename = role_get_name($role, $context);
+                $details .= "{$rolename} - {$course->fullname}\n";
             }
-
-            // Set the highest function scoped varaible.
-            if (empty($highestrole)) {
-                $highestrole = $top;
-                $shortcode = $course->shortname;
-            }
-
-            if ($top->roleid < $modhighest->roleid) {
-                $modhighest = $top;
-            }
-
-            if ($modhighest->roleid < $highestrole->roleid) {
-                $highestrole = $modhighest;
-                $shortcode = $course->shortname;
-            }
-
-            $rolename = role_get_name($modhighest, $context);
-
-            $details .= "{$rolename} - {$course->fullname}\n";
 
         }
-
-        $rolename = role_get_name($highestrole, $context);
 
         return html_writer::tag('abbr', $rolename, array('title' => $details) );
 
