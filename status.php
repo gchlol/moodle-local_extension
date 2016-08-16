@@ -56,8 +56,18 @@ $params = array(
 
 $mform = new \local_extension\form\update(null, $params);
 
+$draftitemid = file_get_submitted_draft_itemid('attachments');
+
+file_prepare_draft_area($draftitemid, $context->id, 'local_extension', 'attachments', $requestid);
+
+$entry = new stdClass();
+$entry->attachments = $draftitemid;
+$mform->set_data($entry);
+
 if ($form = $mform->get_data()) {
     $comment = $form->commentarea;
+
+    file_save_draft_area_files($draftitemid, $context->id, 'local_extension', 'attachments', $request->requestid);
 
     // Parse the form data to see if any accept/deny/reopen/etc buttons have been clicked, and update the state accordingly.
     $request->update_cm_state($USER, $form);
@@ -66,9 +76,13 @@ if ($form = $mform->get_data()) {
         $request->add_comment($USER, $comment);
     }
 
+    // Invalidate the cache for this request. The content has changed.
+    $request->get_data_cache()->delete($request->requestid);
+
     redirect($url);
 } else {
-    $mform->set_data(array('id' => $requestid));
+    $data = array('id' => $requestid);
+    $mform->set_data($data);
 }
 
 echo $OUTPUT->header();
