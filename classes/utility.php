@@ -383,7 +383,7 @@ class utility {
                     $element->children = $children;
 
                     foreach ($children as $child) {
-                        $child->parentrule = &$element;
+                        $child->parentrule = $element;
                     }
                 }
 

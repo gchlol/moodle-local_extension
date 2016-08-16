@@ -93,7 +93,7 @@ $string['state_approved'] = '<span class="statusapproved">Granted</span>';
 $string['state_cancel'] = '<span class="statuscancel">Cancelled</span>';
 $string['state_denied'] = '<span class="statusdenied">Denied</span>';
 $string['state_new'] = '<span class="statusnew">Requested</span>';
-$string['state_reopened'] = '<span class="statusreopened">Reopened Request</span>';
+$string['state_reopened'] = '<span class="statusreopened">Reopened</span>';
 $string['state_result_approved'] = 'Approved';
 $string['state_result_cancelled'] = 'Cancelled';
 $string['state_result_denied'] = 'Denied';
