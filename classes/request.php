@@ -243,13 +243,27 @@ class request implements \cache_data_source {
             $ordered = \local_extension\utility::rule_tree($rules);
 
             foreach ($ordered as $rule) {
-                $rule->process($this->request, $mod);
+                //$rule->process($this->request, $mod);
+                $this->process_recursive($mod, $rule);
             }
 
         }
 
         // Invalidate the cache for this request, there may be new users subscribed.
         $this->get_data_cache()->delete($this->requestid);
+    }
+
+    private function process_recursive($mod, $rule) {
+        $rule->process($this->request, $mod);
+
+        if (!empty($rule->children)) {
+
+            foreach ($rule->children as $child) {
+                $this->process_recursive($mod, $child);
+            }
+
+        }
+
     }
 
     /**

@@ -381,6 +381,10 @@ class utility {
 
                 if ($children) {
                     $element->children = $children;
+
+                    foreach ($children as $child) {
+                        $child->parentrule = &$element;
+                    }
                 }
 
                 $branch[] = $element;
@@ -412,6 +416,7 @@ class utility {
 
         foreach ($rules as $rule) {
 
+            // Prevent this branch and all child nodes from being a parent.
             if ($rule->id == $id) {
                 continue;
             }
