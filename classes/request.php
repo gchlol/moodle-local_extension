@@ -183,13 +183,24 @@ class request implements \cache_data_source {
         }
     }
 
+    public function get_history() {
+        $history = array();
+
+        $history += $this->state_history();
+        $history += $this->attachment_history();
+
+        return $history;
+    }
+
     /**
      * Returns the state change history to be used with interleaving the comment stream when viewing status.php
      *
      * @return array $history
      */
-    public function state_history() {
+    private function state_history() {
         global $DB;
+
+        $history = array();
 
         // Selecting the state changes from the history for this request.
         $sql = "SELECT id,
@@ -202,7 +213,6 @@ class request implements \cache_data_source {
                  WHERE requestid = :requestid";
 
         $records = $DB->get_records_sql($sql, array('requestid' => $this->requestid));
-        $history = array();
 
         foreach ($records as $record) {
             $mod = $this->mods[$record->localcmid];
@@ -220,6 +230,14 @@ class request implements \cache_data_source {
 
             $history[] = $record;
         }
+
+        return $history;
+    }
+
+    private function attachment_history() {
+        global $DB;
+
+        $history = array();
 
         $fs = get_file_storage();
 
@@ -246,8 +264,9 @@ class request implements \cache_data_source {
             );
 
             $filelink = \html_writer::link($fileurl, $file->get_filename());
-            $record->message = get_string('status_file_attachment', 'local_extension', $filelink);
 
+            // Add class property 'message' to interleave with the comment stream.
+            $record->message = get_string('status_file_attachment', 'local_extension', $filelink);
 
             $history[] = $record;
         }
