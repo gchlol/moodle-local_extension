@@ -44,10 +44,10 @@ class cm {
     const STATE_APPROVED = 2;
 
     /** @var integer Reopened request. */
-    const STATE_REOPENED = 3;
+    const STATE_REOPENED = 4;
 
     /** @var integer Cancelled request. */
-    const STATE_CANCEL = 4;
+    const STATE_CANCEL = 8;
 
     /** @var integer The local_extension_cm id */
     public $cmid = null;

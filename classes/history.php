@@ -35,8 +35,8 @@ namespace local_extension;
  */
 class history {
     /** @var integer Defalt/Active history entry. */
-    const STATE_DEFAULT = 0x0;
+    const STATE_DEFAULT = 0;
 
     /** @var integer Disabled history entry. */
-    const STATE_DISABLED = 0x1;
+    const STATE_DISABLED = 1;
 }

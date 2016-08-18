@@ -54,7 +54,7 @@ class rule {
     const RULE_CONDITION_GE = 2;
 
     /** @var integer Condition: Any. */
-    const RULE_CONDITION_ANY = 3;
+    const RULE_CONDITION_ANY = 4;
 
     /** @var integer The local_extension_trigger id */
     public $id = null;
