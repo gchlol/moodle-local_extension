@@ -339,6 +339,12 @@ class rule {
         return $access;
     }
 
+    /**
+     * Returns the list of users with the input role for the scope of this category, course, cm.
+     *
+     * @param stdClass $course
+     * @param stdClass $role
+     */
     private function rule_get_role_users($course, $role) {
         $users = array();
 
@@ -425,7 +431,7 @@ class rule {
         $course = $mod['course'];
 
         // If the rule has specified that the roles will be forced to approve, we skip dowgrading the acccess.
-        if ($rule->action != \local_extension\rule::RULE_ACTION_FORCEAPPROVE) {
+        if ($rule->action != self::RULE_ACTION_FORCEAPPROVE) {
 
             $users = $this->rule_get_role_users($course, $rule->role);
             foreach ($users as $user) {
@@ -439,8 +445,8 @@ class rule {
                     continue;
                 }
 
-                if ($sub->access != \local_extension\rule::RULE_ACTION_SUBSCRIBE) {
-                    $sub->access = \local_extension\rule::RULE_ACTION_SUBSCRIBE;
+                if ($sub->access != self::RULE_ACTION_SUBSCRIBE) {
+                    $sub->access = self::RULE_ACTION_SUBSCRIBE;
                     $sub->lastmod = \time();
                     $DB->update_record('local_extension_subscription', $sub);
                 }
@@ -746,7 +752,7 @@ class rule {
     private function notify_roles($user, $course, $template) {
         $role = $this->role;
 
-        $users= $this->rule_get_role_users($course, $role);
+        $users = $this->rule_get_role_users($course, $role);
 
         foreach ($users as $emailto) {
             $this->notify_user($user, $template, $emailto);

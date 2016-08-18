@@ -257,6 +257,7 @@ class local_extension_renderer extends plugin_renderer_base {
      *
      * @param flexible_table $table
      * @param array $triggers
+     * @param integer $parent
      */
     public function render_extension_trigger_table($table, $triggers, $parent = null) {
         global $OUTPUT;

@@ -335,7 +335,7 @@ class utility {
             if (!empty($rule->parent)) {
                 $parentmap[$rule->parent][] = $rule;
             } else {
-                // This is an ordered list of parent
+                // This is an ordered list of parents.
                 $parentrules[] = $rule;
             }
         }
@@ -421,7 +421,7 @@ class utility {
                 continue;
             }
 
-            if(!empty($rule->children)) {
+            if (!empty($rule->children)) {
                 $children = self::rule_tree_check_children($rule->children, $id, $idlist);
                 $idlist = $idlist + $children;
             }

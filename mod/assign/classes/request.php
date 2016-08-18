@@ -110,7 +110,6 @@ class request extends \local_extension\base_request {
      *
      * @param moodleform $mform A moodle form object
      * @param array $mod An array of event details
-     * @param user $user The user that is viewing the status.
      */
     public function status_definition($mform, $mod) {
         $cm = $mod['cm'];
@@ -143,7 +142,6 @@ class request extends \local_extension\base_request {
      *
      * @param moodleform $mform A moodle form object
      * @param array $mod An array of event details
-     * @param user $user The user that is viewing the status.
      */
     public function status_modification($mform, $mod) {
         $cm = $mod['cm'];
@@ -189,7 +187,6 @@ class request extends \local_extension\base_request {
                 break;
 
         }
-
 
         $mform->addGroup($buttonarray, 'buttonar', '', array(' '), false);
         $mform->closeHeaderBefore('buttonar');

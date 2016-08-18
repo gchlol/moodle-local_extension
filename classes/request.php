@@ -183,6 +183,11 @@ class request implements \cache_data_source {
         }
     }
 
+    /**
+     * Returns the attachment and statechange history to be used with interleaving the comment stream when viewing status.php
+     *
+     * @return array $history
+     */
     public function get_history() {
         $history = array();
 
@@ -234,6 +239,11 @@ class request implements \cache_data_source {
         return $history;
     }
 
+    /**
+     * Returns the attachment change history to be used with interleaving the comment stream when viewing status.php
+     *
+     * @return array $history
+     */
     private function attachment_history() {
         global $DB;
 
@@ -305,6 +315,12 @@ class request implements \cache_data_source {
         $this->get_data_cache()->delete($this->requestid);
     }
 
+    /**
+     * Processes the rule and request recursively.
+     *
+     * @param array $mod
+     * @param rule $rule
+     */
     private function process_recursive($mod, $rule) {
         /* @var \local_extension\rule $rule */
         $rule->process($this->request, $mod);
@@ -375,6 +391,11 @@ class request implements \cache_data_source {
 
     }
 
+    /**
+     * Adds a store_file hash to the history for this request.
+     *
+     * @param \stored_file $file
+     */
     public function add_attachment_history(\stored_file $file) {
         global $DB;
 

@@ -84,7 +84,7 @@ if ($form = $mform->get_data()) {
             $filerecord = new stdClass();
             $filerecord->contextid = $usercontext->id;
             $filerecord->component = 'user';
-            $filerecord->filearea ='draft';
+            $filerecord->filearea = 'draft';
             $filerecord->itemid = $draftitemid;
 
             // Check if see if the pathname hash exists before adding the file.
