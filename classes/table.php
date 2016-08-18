@@ -46,10 +46,10 @@ class table {
         global $PAGE;
 
         $headers = array(
-                get_string('table_header_request', 'local_extension'),
-                get_string('table_header_items', 'local_extension'),
-                get_string('table_header_requestdate', 'local_extension'),
-                get_string('table_header_statushead', 'local_extension'),
+            get_string('table_header_request', 'local_extension'),
+            get_string('table_header_items', 'local_extension'),
+            get_string('table_header_requestdate', 'local_extension'),
+            get_string('table_header_statushead', 'local_extension'),
         );
 
         $columns = array('request', 'date', 'items', 'status');
@@ -74,8 +74,6 @@ class table {
      */
     public static function generate_index_data($table, $userid = 0) {
         global $DB;
-
-        // TODO tablelib orderby column options? should we enable this?
 
         if (!empty($userid)) {
             $where = " WHERE cm.userid = ? ";
@@ -109,14 +107,14 @@ class table {
         global $PAGE;
 
         $headers = array(
-                get_string('table_header_rule_name', 'local_extension'),
-                get_string('table_header_rule_action', 'local_extension'),
-                get_string('table_header_rule_actionable', 'local_extension'),
-                get_string('table_header_rule_parent', 'local_extension'),
-                get_string('table_header_rule_datatype', 'local_extension'),
-                get_string('table_header_rule_priority', 'local_extension'),
-                get_string('table_header_rule_data', 'local_extension'),
-                '',
+            get_string('table_header_rule_name', 'local_extension'),
+            get_string('table_header_rule_action', 'local_extension'),
+            get_string('table_header_rule_actionable', 'local_extension'),
+            get_string('table_header_rule_parent', 'local_extension'),
+            get_string('table_header_rule_datatype', 'local_extension'),
+            get_string('table_header_rule_priority', 'local_extension'),
+            get_string('table_header_rule_data', 'local_extension'),
+            '',
         );
 
         $columns = array('name', 'action', 'role', 'parent', 'datatype', 'priority', 'data', '');

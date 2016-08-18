@@ -79,7 +79,6 @@ if ($form = $mform->get_data()) {
 
     // File count must be greater that 1, as an item is the directory '.'.
     if (count($draftfiles) > 1) {
-
         // We need to add the existing files to the draft area so they are saved and merged with the new area.
         foreach ($oldfiles as $oldfile) {
             $filerecord = new stdClass();
@@ -88,8 +87,7 @@ if ($form = $mform->get_data()) {
             $filerecord->filearea ='draft';
             $filerecord->itemid = $draftitemid;
 
-            // Check if see if the pathname hash exsits before adding the file.
-
+            // Check if see if the pathname hash exists before adding the file.
             $hash = $fs->get_pathname_hash(
                 $usercontext->id,
                 'user',
@@ -99,7 +97,7 @@ if ($form = $mform->get_data()) {
                 $oldfile->get_filename()
             );
 
-            // We do not delete / update / modify the old file.
+            // We do not delete / update / modify the old file. Ideally we will not reach this state due to the previous validation.
             if (!array_key_exists($hash, $draftfiles)) {
                 $fs->create_file_from_storedfile($filerecord, $oldfile);
             }

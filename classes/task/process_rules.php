@@ -48,7 +48,7 @@ class process_rules extends \core\task\scheduled_task {
     public function execute() {
         global $DB;
 
-        // TODO add request status, closed? to filter this query.
+        // TODO add request status, closed? to filter this query. When is a request closed?
 
         $sql = "SELECT id
                   FROM {local_extension_request}";

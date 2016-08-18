@@ -193,13 +193,13 @@ class request implements \cache_data_source {
 
         // Selecting the state changes from the history for this request.
         $sql = "SELECT id,
-               localcmid,
-               requestid,
-               timestamp,
-               state,
-               userid
-          FROM {local_extension_his_state}
-         WHERE requestid = :requestid";
+                       localcmid,
+                       requestid,
+                       timestamp,
+                       state,
+                       userid
+                  FROM {local_extension_his_state}
+                 WHERE requestid = :requestid";
 
         $records = $DB->get_records_sql($sql, array('requestid' => $this->requestid));
         $history = array();

@@ -35,7 +35,7 @@ function local_extension_extends_navigation(global_navigation $nav) {
     $contextlevel = $context->contextlevel;
     $sitecontext = context_system::instance();
 
-    // TODO add perms checks here. Maybe.
+    // TODO add perms checks here. Maybe. Allow for students only?
 
     if (isloggedin() and !isguestuser()) {
         // General link in the navigation menu.
