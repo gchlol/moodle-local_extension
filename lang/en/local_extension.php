@@ -99,6 +99,7 @@ $string['state_result_approved'] = 'Approved';
 $string['state_result_cancelled'] = 'Cancelled';
 $string['state_result_denied'] = 'Denied';
 $string['state_result_pending'] = 'Pending';
+$string['status_file_attachment'] = 'File attached {$a}';
 $string['status_page_heading'] = 'Extension Status';
 $string['submit_comment'] = 'Submit comment';
 $string['submit_request'] = 'Submit request';

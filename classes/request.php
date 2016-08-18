@@ -221,6 +221,37 @@ class request implements \cache_data_source {
             $history[] = $record;
         }
 
+        $fs = get_file_storage();
+
+        // Selecting the attachment history for this request.
+        $sql = "SELECT id,
+                       requestid,
+                       timestamp,
+                       filehash,
+                       userid
+                  FROM {local_extension_history_file}
+                 WHERE requestid = :requestid";
+
+        $records = $DB->get_records_sql($sql, array('requestid' => $this->requestid));
+
+        foreach ($records as $record) {
+            $file = $fs->get_file_by_hash($record->filehash);
+            $fileurl = \moodle_url::make_pluginfile_url(
+                $file->get_contextid(),
+                $file->get_component(),
+                $file->get_filearea(),
+                $file->get_itemid(),
+                $file->get_filepath(),
+                $file->get_filename()
+            );
+
+            $filelink = \html_writer::link($fileurl, $file->get_filename());
+            $record->message = get_string('status_file_attachment', 'local_extension', $filelink);
+
+
+            $history[] = $record;
+        }
+
         return $history;
     }
 
@@ -323,6 +354,19 @@ class request implements \cache_data_source {
 
         }
 
+    }
+
+    public function add_attachment_history(\stored_file $file) {
+        global $DB;
+
+        $data = array(
+            'requestid' => $this->requestid,
+            'timestamp' => $file->get_timecreated(),
+            'filehash' => $file->get_pathnamehash(),
+            'userid' => $file->get_userid(),
+        );
+
+        $DB->insert_record('local_extension_history_file', $data);
     }
 
     /**

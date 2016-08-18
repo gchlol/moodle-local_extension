@@ -119,6 +119,10 @@ if ($mform->is_cancelled()) {
     $draftitemid = file_get_submitted_draft_itemid('attachments');
     file_save_draft_area_files($draftitemid, $usercontext->id, 'local_extension', 'attachments', $request['id']);
 
+    $fs = get_file_storage();
+    $files = $fs->get_area_files($usercontext->id, 'local_extension', $request['id']);
+    $request->add_attachment_history($file);
+
     foreach ($mods as $cmid => $mod) {
 
         $course = $mod['course'];

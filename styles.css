@@ -21,6 +21,14 @@
     font-weight: bold;
 }
 
+.comment .fileattachment {
+    background-color: #e6e6e6;
+}
+
+.comment .statechange {
+    background-color: #e6e6e6;
+}
+
 span.statusnew {
     background-color: #FFE047;
 }

@@ -78,6 +78,18 @@ class local_extension_renderer extends plugin_renderer_base {
         });
 
         foreach ($comments as $comment) {
+
+            $class = 'content';
+
+            // Add a css class to change background color for file attachments and state changes.
+            if (!empty($comment->filehash)) {
+                $class .= ' fileattachment';
+            }
+
+            if (!empty($comment->state)) {
+                $class .= ' statechange';
+            }
+
             $user = $req->users[$comment->userid];
 
             $out .= html_writer::start_tag('div', array('class' => 'comment'));
@@ -88,7 +100,7 @@ class local_extension_renderer extends plugin_renderer_base {
             ));
             $out .= html_writer::end_div(); // End .avatar.
 
-            $out .= html_writer::start_tag('div', array('class' => 'content'));
+            $out .= html_writer::start_tag('div', array('class' => $class));
             $out .= html_writer::tag('span', fullname($user), array('class' => 'name'));
 
             $out .= html_writer::tag('span', ' - ' . $this->render_role($req, $user->id), array('class' => 'role'));
@@ -100,6 +112,7 @@ class local_extension_renderer extends plugin_renderer_base {
             $out .= html_writer::end_div(); // End .content.
             $out .= html_writer::end_div(); // End .comment.
         }
+
         $out .= html_writer::end_div(); // End .comments.
 
         return $out;
@@ -170,6 +183,7 @@ class local_extension_renderer extends plugin_renderer_base {
         $out .= get_string('attachments', 'local_extension');
 
         foreach ($files as $file) {
+            /* @var stored_file $file */
 
             $f = $fs->get_file(
                 $file->get_contextid(),
@@ -193,11 +207,9 @@ class local_extension_renderer extends plugin_renderer_base {
                 $file->get_filename()
             );
 
-            $filelink = html_writer::link($fileurl, $f->get_filename());
-
-            $out .= $filelink;
-
             $out .= $OUTPUT->pix_icon(file_file_icon($file, 24), get_mimetype_description($file));
+            $out .= html_writer::link($fileurl, $f->get_filename()) . "<br />";
+            $out .= userdate($file->get_timecreated(), '%d %h %Y %l:%M%P') . "<br />";
 
         }
         $out .= html_writer::end_div(); // End .attachments.

@@ -104,6 +104,23 @@ if ($form = $mform->get_data()) {
         }
 
         file_save_draft_area_files($draftitemid, $usercontext->id, 'local_extension', 'attachments', $itemid);
+
+        $draftnames = array();
+        $oldnames = array();
+
+        foreach ($draftfiles as $file) {
+            $draftnames[$file->get_filename()] = $file;
+        }
+
+        foreach ($oldfiles as $file) {
+            $oldnames[$file->get_filename()] = $file;
+        }
+
+        // This diff array will contain all the new files to be attached.
+        $diff = array_diff_key($draftnames, $oldnames);
+        foreach ($diff as $file) {
+            $request->add_attachment_history($file);
+        }
     }
 
     // Parse the form data to see if any accept/deny/reopen/etc buttons have been clicked, and update the state accordingly.
