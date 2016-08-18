@@ -26,11 +26,18 @@
 require_once('../../config.php');
 global $PAGE, $USER;
 
-require_login(false);
-
-// TODO add perms checks here.
+require_login(true);
 
 $requestid = required_param('id', PARAM_INTEGER);
+$request = \local_extension\utility::cache_get_request($requestid);
+
+// $request->user is an array of $userid=>$userobj associated to this request, eg. those that are subscribed, and the user.
+// The list of subscribed users populated each time the request object is generated.
+// The request object is invalidated and regenerated after each comment, attachment added, or rule triggered.
+if (!array_key_exists($USER->id, $request->users)) {
+    // TODO What should we print here?
+    die();
+}
 
 $url = new moodle_url('/local/extension/status.php', array('id' => $requestid));
 $PAGE->set_url($url);
@@ -60,13 +67,14 @@ $mform = new \local_extension\form\update(null, $params);
 if ($form = $mform->get_data()) {
     $comment = $form->commentarea;
 
+    $draftcontext = context_user::instance($USER->id);
     $usercontext = context_user::instance($request->request->userid);
 
     $itemid = $requestid;
     $draftitemid = file_get_submitted_draft_itemid('attachments');
 
     $fs = get_file_storage();
-    $draftfiles = $fs->get_area_files($usercontext->id, 'user', 'draft', $draftitemid, 'id');
+    $draftfiles = $fs->get_area_files($draftcontext->id, 'user', 'draft', $draftitemid, 'id');
     $oldfiles = $fs->get_area_files($usercontext->id, 'local_extension', 'attachments', $itemid, 'id');
 
     // File count must be greater that 1, as an item is the directory '.'.
@@ -94,8 +102,6 @@ if ($form = $mform->get_data()) {
             // We do not delete / update / modify the old file.
             if (!array_key_exists($hash, $draftfiles)) {
                 $fs->create_file_from_storedfile($filerecord, $oldfile);
-            } else {
-                // TODO Provide notification that files are not replaced?
             }
         }
 
