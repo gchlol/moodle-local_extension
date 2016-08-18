@@ -165,15 +165,17 @@ class utility {
     public static function send_trigger_email($subject, $content, $emailto) {
         $noreplyuser = \core_user::get_support_user();
 
+        $text = html_to_text($content);
+
         $message = new \stdClass();
         $message->component         = 'local_extension';
         $message->name              = 'status';
         $message->userfrom          = $noreplyuser;
         $message->userto            = $emailto;
         $message->subject           = $subject;
-        $message->fullmessage       = $content;
+        $message->fullmessage       = $text;
         $message->fullmessageformat = FORMAT_PLAIN;
-        $message->fullmessagehtml   = '';
+        $message->fullmessagehtml   = $content;
         $message->smallmessage      = '';
         $message->notification      = 1;
         message_send($message);
