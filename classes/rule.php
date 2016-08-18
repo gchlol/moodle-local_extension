@@ -301,6 +301,7 @@ class rule {
 
         $templates = $this->process_templates($mod);
 
+        // TODO obtain the templates differently
         $usercontent = $templates['template_user']['text'];
         $usersubject = $this->data['template_user_subject'];
 
@@ -522,8 +523,6 @@ class rule {
      * @return mixed|boolean[]|\local_extension\stdClass[]
      */
     private function process_templates($mod) {
-        global $DB;
-
         $event   = $mod['event'];
         $cm      = $mod['cm'];
         $localcm = $mod['localcm'];
@@ -554,13 +553,6 @@ class rule {
             '/{{eventname}}/' => $event->name,
             '/{{eventdescription}}/' => $event->description,
         );
-
-        // TODO:
-        /*
-        additional name options
-        addition course options
-        etc. more template varaibles
-        */
 
         $patterns = array_keys($templatevars);
         $replacements = array_values($templatevars);

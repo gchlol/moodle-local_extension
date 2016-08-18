@@ -126,7 +126,6 @@ class local_extension_renderer extends plugin_renderer_base {
                 $rolename = role_get_name($role, $context);
                 $details .= "{$rolename} - {$course->fullname}\n";
             }
-
         }
 
         return html_writer::tag('abbr', $rolename, array('title' => $details) );

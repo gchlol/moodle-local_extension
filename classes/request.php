@@ -38,7 +38,7 @@ class request implements \cache_data_source {
     /** @var integer The local_extension_request database object */
     public $requestid = null;
 
-    /** @var request The local_extension_request database object */
+    /** @var stdClass The local_extension_request database object */
     public $request = array();
 
     /** @var cm[] cm */
@@ -106,7 +106,7 @@ class request implements \cache_data_source {
             $userids[$comment->userid] = $comment->userid;
         }
 
-        // Add a to the $userids, a list of users that are subscribed to this request.
+        // Add to the $userids, a list of users that are subscribed to this request.
         $subscribedids = $DB->get_fieldset_select('local_extension_subscription', 'userid', 'requestid = :requestid', array('requestid' => $this->requestid));
         foreach ($subscribedids as $key => $userid) {
             $userids[$userid] = $userid;
@@ -246,7 +246,6 @@ class request implements \cache_data_source {
             $ordered = \local_extension\utility::rule_tree($rules);
 
             foreach ($ordered as $rule) {
-                //$rule->process($this->request, $mod);
                 $this->process_recursive($mod, $rule);
             }
 
@@ -257,6 +256,7 @@ class request implements \cache_data_source {
     }
 
     private function process_recursive($mod, $rule) {
+        /* @var \local_extension\rule $rule */
         $rule->process($this->request, $mod);
 
         if (!empty($rule->children)) {
@@ -275,17 +275,16 @@ class request implements \cache_data_source {
      * @return boolean
      */
     public function check_active() {
-        $active = false;
         foreach ($cms as $cm) {
             /* @var $cm cm */
             $state = $cm->get_stateid();
 
             if ($state != cm::STATE_CANCEL) {
-                $active = true;
+                return true;
             }
         }
 
-        return $active;
+        return false;
     }
 
     /**
