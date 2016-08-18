@@ -90,6 +90,8 @@ foreach ($mods as $mod) {
 
 $mform = new \local_extension\form\request(null, array('available' => $available, 'inprogress' => $inprogress));
 
+$usercontext = context_user::instance($USER->id);
+
 if ($mform->is_cancelled()) {
 
     redirect(new moodle_url('/'));
@@ -115,8 +117,7 @@ if ($mform->is_cancelled()) {
     $comment['id'] = $DB->insert_record('local_extension_comment', $comment);
 
     $draftitemid = file_get_submitted_draft_itemid('attachments');
-    file_prepare_draft_area($draftitemid, $context->id, 'local_extension', 'attachments', $request['id']);
-    file_save_draft_area_files($draftitemid, $context->id, 'local_extension', 'attachments', $request['id']);
+    file_save_draft_area_files($draftitemid, $usercontext->id, 'local_extension', 'attachments', $request['id']);
 
     foreach ($mods as $cmid => $mod) {
 
@@ -150,6 +151,9 @@ if ($mform->is_cancelled()) {
     $url = new moodle_url('/local/extension/status.php', array('id' => $request->requestid));
     redirect($url);
     die;
+} else {
+    $draftitemid = 0;
+    file_prepare_draft_area($draftitemid, $usercontext->id, 'local_extension', 'attachments', 0);
 }
 
 echo $OUTPUT->header();

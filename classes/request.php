@@ -142,14 +142,11 @@ class request implements \cache_data_source {
         $request = $this->request;
 
         // Obtain the context for the user that has submitted a request.
-        $context = \context_user::instance($request->userid);
+        $usercontext = \context_user::instance($request->userid);
 
         $fs = get_file_storage();
 
-        $fileareaitemid = $request->timestamp . $request->id;
-
-        // The request timestamp is the item id concatenated with the requestid.
-        $files = $fs->get_area_files($context->id, 'local_extension', 'attachments', $fileareaitemid);
+        $files = $fs->get_area_files($usercontext->id, 'local_extension', 'attachments', $request->id);
 
         return array($fs, $files);
     }

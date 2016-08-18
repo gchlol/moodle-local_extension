@@ -57,18 +57,50 @@ $params = array(
 
 $mform = new \local_extension\form\update(null, $params);
 
-$draftitemid = file_get_submitted_draft_itemid('attachments');
-
-file_prepare_draft_area($draftitemid, $context->id, 'local_extension', 'attachments', $fileareaitemid);
-
-$entry = new stdClass();
-$entry->attachments = $draftitemid;
-$mform->set_data($entry);
-
 if ($form = $mform->get_data()) {
     $comment = $form->commentarea;
 
-    file_save_draft_area_files($draftitemid, $context->id, 'local_extension', 'attachments', $fileareaitemid);
+    $usercontext = context_user::instance($request->request->userid);
+
+    $itemid = $requestid;
+    $draftitemid = file_get_submitted_draft_itemid('attachments');
+
+    $fs = get_file_storage();
+    $draftfiles = $fs->get_area_files($usercontext->id, 'user', 'draft', $draftitemid, 'id');
+    $oldfiles = $fs->get_area_files($usercontext->id, 'local_extension', 'attachments', $itemid, 'id');
+
+    // File count must be greater that 1, as an item is the directory '.'.
+    if (count($draftfiles) > 1) {
+
+        // We need to add the existing files to the draft area so they are saved and merged with the new area.
+        foreach ($oldfiles as $oldfile) {
+            $filerecord = new stdClass();
+            $filerecord->contextid = $usercontext->id;
+            $filerecord->component = 'user';
+            $filerecord->filearea ='draft';
+            $filerecord->itemid = $draftitemid;
+
+            // Check if see if the pathname hash exsits before adding the file.
+
+            $hash = $fs->get_pathname_hash(
+                $usercontext->id,
+                'user',
+                'draft',
+                $draftitemid,
+                $oldfile->get_filepath(),
+                $oldfile->get_filename()
+            );
+
+            // We do not delete / update / modify the old file.
+            if (!array_key_exists($hash, $draftfiles)) {
+                $fs->create_file_from_storedfile($filerecord, $oldfile);
+            } else {
+                // TODO Provide notification that files are not replaced?
+            }
+        }
+
+        file_save_draft_area_files($draftitemid, $usercontext->id, 'local_extension', 'attachments', $itemid);
+    }
 
     // Parse the form data to see if any accept/deny/reopen/etc buttons have been clicked, and update the state accordingly.
     $request->update_cm_state($USER, $form);
@@ -82,6 +114,15 @@ if ($form = $mform->get_data()) {
 
     redirect($url);
 } else {
+    $usercontext = context_user::instance($USER->id);
+
+    $draftitemid = 0;
+    file_prepare_draft_area($draftitemid, $usercontext->id, 'local_extension', 'attachments', null);
+
+    $entry = new stdClass();
+    $entry->attachments = $draftitemid;
+    $mform->set_data($entry);
+
     $data = array('id' => $requestid);
     $mform->set_data($data);
 }
