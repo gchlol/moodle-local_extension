@@ -129,7 +129,7 @@ function local_extension_extends_navigation(global_navigation $nav) {
  * @return bool false if file not found, does not return if found - justsend the file
  */
 function local_extension_pluginfile($course, $cm, $context, $filearea, $args, $forcedownload, array $options=array()) {
-    global $CFG, $DB;
+    global $CFG, $DB, $USER;
 
     if ($context->contextlevel != CONTEXT_USER) {
         return false;
@@ -142,10 +142,20 @@ function local_extension_pluginfile($course, $cm, $context, $filearea, $args, $f
 
     require_login($course, $true, $cm);
 
-    // TODO add perms checks here.
-
+    // When the file is stored, we use the $item id is the requestid.
     $itemid = array_shift($args);
     $filename = array_pop($args);
+
+    // Lets obtain the cached request.
+    $request = \local_extension\request::from_id($itemid);
+
+    // $request->user is an array of $userid=>$userobj associated to this request, eg. those that are subscribed, and the user.
+    // The list of subscribed users populated each time the request object is generated.
+    // The request object is invalidated and regenerated after each comment, attachment added, or rule triggered.
+    if (!array_key_exists($USER->id, $request->users)) {
+        return false;
+    }
+
     if (!$args) {
         $filepath = '/';
     } else {
