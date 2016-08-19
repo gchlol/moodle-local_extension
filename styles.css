@@ -2,15 +2,15 @@
     font-size: 150%;
 }
 .comment {
-    position: relative;
     margin-bottom: 8px;
     min-height: 30px;
+    position: relative;
 }
 
 .comment .avatar {
-    width: 100px;
+	left: 0;
     position: absolute;
-    left: 0;
+    width: 100px;
 }
 
 .comment .content {
@@ -34,6 +34,7 @@ span.statusnew {
 }
 
 span.statusdenied {
+	background-color: #AFFF44
 }
 
 span.statusapproved {
@@ -41,7 +42,9 @@ span.statusapproved {
 }
 
 span.statusreopened {
+	background-color: #AFFF44
 }
 
 span.statuscancel {
+	background-color: #AFFF44
 }
