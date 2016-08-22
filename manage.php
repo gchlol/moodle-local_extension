@@ -45,18 +45,12 @@ $PAGE->requires->css('/local/extension/styles.css');
 
 $renderer = $PAGE->get_renderer('local_extension');
 
+$rules = \local_extension\rule::load_all();
+$ordered = \local_extension\utility::rule_tree($rules);
+
 if ($delete && confirm_sesskey()) {
 
     if ($confirm != md5($delete)) {
-        $query = "SELECT id, name
-                    FROM {local_extension_triggers}
-                   WHERE id = ?
-                      OR parent = ?";
-
-        $params = array('id' => $delete, 'parent' => $delete);
-
-        $result = $DB->get_records_sql($query, $params);
-
         echo $OUTPUT->header();
         echo html_writer::tag('h2', get_string('page_heading_manage_delete', 'local_extension'));
 
@@ -64,7 +58,9 @@ if ($delete && confirm_sesskey()) {
         $deleteurl = new moodle_url($pageurl, $optionsyes);
         $deletebutton = new single_button($deleteurl, get_string('delete'), 'post');
 
-        echo $renderer->render_delete_rules($result);
+        $branch = \local_extension\utility::rule_tree_branch($ordered, $delete);
+
+        echo $renderer->render_delete_rules($branch);
 
         echo $OUTPUT->confirm('', $deletebutton, $pageurl);
         echo $OUTPUT->footer();
@@ -72,6 +68,9 @@ if ($delete && confirm_sesskey()) {
         exit();
 
     } else if (data_submitted()) {
+
+
+        // TODO recursive delete??
 
         // Select all child rules for id.
         $sql = "SELECT id
@@ -101,9 +100,7 @@ echo html_writer::tag('h2', get_string('page_heading_manage', 'local_extension')
 
 // Display a table of all triggers when no id is present.
 $table = \local_extension\table::generate_trigger_table();
-$data = \local_extension\table::generate_trigger_data($table);
-
-$renderer->render_extension_trigger_table($table, $data);
+$renderer->render_extension_trigger_table($table, $ordered);
 
 echo $table->finish_output();
 

@@ -396,6 +396,29 @@ class utility {
         return $branch;
     }
 
+    /**
+     * Returns a branch of rules with the given parent id.
+     *
+     * Useful for recursive deletion.
+     *
+     * @param array $rules
+     * @param unknown $id
+     * @return unknown|NULL|unknown|NULL
+     */
+    public static function rule_tree_branch(array $rules, $id) {
+        foreach ($rules as $rule) {
+            // We have matched the id, return the branch with its child nodes.
+            if ($rule->id == $id) {
+                return $rule;
+            }
+
+            if (!empty($rule->children)) {
+                return self::rule_tree_branch($rule->chidlren, $id);
+            }
+        }
+
+        return null;
+    }
 
     /**
      * Returns an array of ids that are possible candidates for being a parent item.
