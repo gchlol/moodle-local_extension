@@ -210,7 +210,7 @@ class rule {
         $triggers = array();
 
         foreach ($fields as $id) {
-            $triggers[] = self::from_id($id);
+            $triggers[$id] = self::from_id($id);
         }
 
         return $triggers;
@@ -303,15 +303,18 @@ class rule {
 
         // TODO obtain the templates differently
         $usercontent = $templates['template_user']['text'];
-        $usersubject = $this->data['template_user_subject'];
+        $usersubject = $templates['template_user_subject'];
 
         $rolecontent = $templates['template_notify']['text'];
-        $rolesubject = $this->data['template_notify_subject'];
+        $rolesubject = $templates['template_notify_subject'];
 
         $user = \core_user::get_user($mod['localcm']->userid);
 
-        $this->notify_roles($user, $mod['course'], $rolecontent);
-        $this->notify_user($user, $usercontent, $user);
+        $this->notify_roles($request->id, $rolesubject, $rolecontent, $mod['course']);
+        $this->notify_user($request->id, $usersubject, $usercontent, $user);
+
+        // Notifications have been sent out. Increment the messageid to thread messages.
+        $request->increment_messageid();
 
         // Users have been notified and subscriptions setup. Lets write a log of firing this trigger.
         $this->write_history($mod);
@@ -577,45 +580,26 @@ class rule {
      * @return boolean[]|\local_extension\stdClass[]
      */
     private function get_templates() {
-        $templates = array (
-            'template_notify' => $this->get_notify_template(),
-            'template_user' => $this->get_user_template(),
+        $templates = array();
+
+        $items = array (
+            'template_notify',
+            'template_notify_subject',
+            'template_user',
+            'template_user_subject',
         );
 
+        if (!empty($this->data)) {
+
+            foreach ($items as $template) {
+                if (array_key_exists($template, $this->data)) {
+                    $templates[$template] = $this->data[$template];
+                }
+
+            }
+        }
+
         return $templates;
-
-    }
-
-    /**
-     * Obtains the notify template.
-     *
-     * @return \local_extension\stdClass|boolean
-     */
-    private function get_notify_template() {
-        if (!empty($this->data)) {
-            if (array_key_exists('template_notify', $this->data)) {
-                return $this->data['template_notify'];
-            }
-        }
-
-        return false;
-
-    }
-
-    /**
-     * Obtains the user_template.
-     *
-     * @return \local_extension\stdClass|boolean
-     */
-    private function get_user_template() {
-        if (!empty($this->data)) {
-
-            if (array_key_exists('template_user', $this->data)) {
-                return $this->data['template_user'];
-            }
-
-        }
-        return false;
 
     }
 
