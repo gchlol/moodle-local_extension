@@ -414,14 +414,11 @@ class local_extension_renderer extends plugin_renderer_base {
     public function render_delete_rules($rules) {
         $html = '';
 
-        foreach ($rules as $rule) {
-            $html .= html_writer::start_div();
+        $html .= html_writer::start_div();
 
-            // TODO
-            $html .= var_export($rule, true);
-            $html .= html_writer::end_div();
+        $html .= var_dump($rules);
 
-        }
+        $html .= html_writer::end_div();
 
         return $html;
     }

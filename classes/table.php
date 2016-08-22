@@ -131,18 +131,4 @@ class table {
         return $table;
     }
 
-    /**
-     * Generates the data required for the status page table.
-     *
-     * @param flexible_table $table
-     * @return request[] An array of request objects
-     */
-    public static function generate_trigger_data($table) {
-        global $DB;
-
-        $rules = \local_extension\rule::load_all();
-        $ordered = \local_extension\utility::rule_tree($rules);
-
-        return $ordered;
-    }
 }
