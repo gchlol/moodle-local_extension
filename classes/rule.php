@@ -289,7 +289,7 @@ class rule {
             return false;
         }
 
-        if ($this->check_request_length($request, $mod) === false) {
+        if ($this->check_request_length($mod) === false) {
             return false;
         }
 
@@ -666,11 +666,10 @@ class rule {
     /**
      * Checks the rule for request list.
      *
-     * @param \local_extension\request $request
      * @param array $mod
      * @return boolean
      */
-    private function check_request_length($request, $mod) {
+    private function check_request_length($mod) {
         $localcm = $mod['localcm'];
 
         // The data is encoded when saving to the database, and decoded when loading from it.
@@ -706,7 +705,7 @@ class rule {
      * @return boolean
      */
     private function check_elapsed_length($request, $mod) {
-        $delta = time() - $request->timestamp;
+        $delta = time() - $request->request->timestamp;
 
         $days = $this->elapsedfromrequest * 24 * 60 * 60;
 
