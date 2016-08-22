@@ -116,13 +116,6 @@ if ($mform->is_cancelled()) {
     );
     $comment['id'] = $DB->insert_record('local_extension_comment', $comment);
 
-    $draftitemid = file_get_submitted_draft_itemid('attachments');
-    file_save_draft_area_files($draftitemid, $usercontext->id, 'local_extension', 'attachments', $request['id']);
-
-    $fs = get_file_storage();
-    $files = $fs->get_area_files($usercontext->id, 'local_extension', $request['id']);
-    $request->add_attachment_history($file);
-
     foreach ($mods as $cmid => $mod) {
 
         $course = $mod['course'];
@@ -148,11 +141,21 @@ if ($mform->is_cancelled()) {
         $cm['id'] = $DB->insert_record('local_extension_cm', $cm);
     }
 
-    // Initiate the trigger/rule logic notifications and subscriptions.
-    $request = \local_extension\request::from_id($request['id']);
-    $request->process_triggers();
+    $draftitemid = file_get_submitted_draft_itemid('attachments');
+    file_save_draft_area_files($draftitemid, $usercontext->id, 'local_extension', 'attachments', $request['id']);
 
-    $url = new moodle_url('/local/extension/status.php', array('id' => $request->requestid));
+    // Initiate the trigger/rule logic notifications and subscriptions, file attachment history.
+    $req = \local_extension\request::from_id($request['id']);
+
+    $fs = get_file_storage();
+    $files = $fs->get_area_files($usercontext->id, 'local_extension', 'attachments', $request['id']);
+    foreach ($files as $file) {
+        $req->add_attachment_history($file);
+    }
+
+    $req->process_triggers();
+
+    $url = new moodle_url('/local/extension/status.php', array('id' => $req->requestid));
     redirect($url);
     die;
 } else {
