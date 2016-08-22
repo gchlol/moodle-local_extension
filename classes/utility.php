@@ -158,27 +158,82 @@ class utility {
     /**
      * Sends a notification email.
      *
+     * @param integer $messageid
      * @param string $subject
      * @param string $content
-     * @param stdClass $emailto
+     * @param stdClass $userto
      */
-    public static function send_trigger_email($subject, $content, $emailto) {
-        $noreplyuser = \core_user::get_support_user();
+    public static function send_trigger_email($messageid, $subject, $content, $userto) {
+        $userfrom = \core_user::get_support_user();
 
-        $text = html_to_text($content);
+        // Email threading.
+        $rootid = self::get_email_message_id($messageid, $userto->id);
+
+        if ($messageid > 0) {
+            $parentid = self::get_email_message_id($messageid - 1, $userto->id);
+            $userfrom->customheaders[] = "In-Reply-To: $rootid $parentid";
+            $userfrom->customheaders[] = "References: $parentid";
+        }
+
+        // MS Outlook / Office uses poorly documented and non standard headers, including
+        // Thread-Topic which overrides the Subject and shouldn't contain Re: or Fwd: etc.
+        $userfrom->customheaders[] = "Thread-Topic: $subject";
+        $userfrom->customheaders[] = "Thread-Index: " . substr($rootid, 1, 28);
 
         $message = new \stdClass();
         $message->component         = 'local_extension';
         $message->name              = 'status';
-        $message->userfrom          = $noreplyuser;
-        $message->userto            = $emailto;
+        $message->userfrom          = $userfrom;
+        $message->userto            = $userto;
         $message->subject           = $subject;
-        $message->fullmessage       = $text;
+        $message->fullmessage       = html_to_text($content);;
         $message->fullmessageformat = FORMAT_PLAIN;
         $message->fullmessagehtml   = $content;
         $message->smallmessage      = '';
         $message->notification      = 1;
         message_send($message);
+    }
+
+    /**
+     * Create a message-id string to use in the custom headers of extension request notification emails
+     *
+     * message-id is used by email clients to identify emails and to nest conversations
+     *
+     * @param int $requestid The ID of the request.
+     * @param int $usertoid The ID of the user being notified
+     * @return string A unique message-id
+     */
+    public static function get_email_message_id($requestid, $usertoid) {
+        return self::generate_email_messageid(hash('sha256', $requestid . 'to' . $usertoid));
+    }
+
+    /**
+     * Generate a unique email Message-ID using the moodle domain and install path
+     *
+     * @param string $localpart An optional unique message id prefix.
+     * @return string The formatted ID ready for appending to the email headers.
+     */
+    public static function generate_email_messageid($localpart = null) {
+        global $CFG;
+        $urlinfo = parse_url($CFG->wwwroot);
+
+        $base = '@' . $urlinfo['host'];
+        // If multiple moodles are on the same domain we want to tell them
+        // apart so we add the install path to the local part. This means
+        // that the id local part should never contain a / character so
+        // we can correctly parse the id to reassemble the wwwroot.
+        if (isset($urlinfo['path'])) {
+            $base = $urlinfo['path'] . $base;
+        }
+        if (empty($localpart)) {
+            $localpart = uniqid('', true);
+        }
+
+        // Because we may have an option /installpath suffix to the local part
+        // of the id we need to escape any / chars which are in the $localpart.
+        $localpart = str_replace('/', '%2F', $localpart);
+
+        return '<' . $localpart . $base . '>';
     }
 
     /**

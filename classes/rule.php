@@ -729,17 +729,18 @@ class rule {
     /**
      * Notify all users in the course, with the role that this rule specifies.
      *
-     * @param stdClass $user
+     * @param integer $messageid
+     * @param string $subject
+     * @param string $content
      * @param stdClass $course
-     * @param array $template
      */
-    private function notify_roles($user, $course, $template) {
+    private function notify_roles($messageid, $subject, $content, $course) {
         $role = $this->role;
 
         $users = $this->rule_get_role_users($course, $role);
 
-        foreach ($users as $emailto) {
-            $this->notify_user($user, $template, $emailto);
+        foreach ($users as $userto) {
+            $this->notify_user($messageid, $subject, $content, $userto);
         }
 
     }
@@ -747,13 +748,13 @@ class rule {
     /**
      * Notify the user that is assigned to this localcm based on the current rule.
      *
-     * @param stdClass $user
-     * @param array $template
-     * @param stdClass $emailto
+     * @param integer $messageid
+     * @param string $subject
+     * @param string $content
+     * @param stdClass $userto
      */
-    private function notify_user($user, $template, $emailto) {
-        $subject = "Extension request for " . \fullname($user);
-        \local_extension\utility::send_trigger_email($subject, $template, $emailto);
+    private function notify_user($messageid, $subject, $content, $userto) {
+        \local_extension\utility::send_trigger_email($messageid, $subject, $content, $userto);
     }
 
 }

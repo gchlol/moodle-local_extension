@@ -184,6 +184,20 @@ class request implements \cache_data_source {
     }
 
     /**
+     * Increments the message id value to assist with threading email notification messages.
+     */
+    public function increment_messageid() {
+        global $DB;
+
+        $this->request->messageid++;
+
+        $DB->update_record('local_extension_request', $this->request);
+
+        // The request has changed, lets invalidate the cache.
+        $this->get_data_cache()->delete($this->requestid);
+    }
+
+    /**
      * Returns the attachment and statechange history to be used with interleaving the comment stream when viewing status.php
      *
      * @return array $history
