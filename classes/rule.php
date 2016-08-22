@@ -278,7 +278,6 @@ class rule {
      * @param array $mod
      */
     public function process($request, $mod) {
-
         // Checks if the trigger for this cm has been activated.
         if ($this->check_history($mod) === false) {
             return false;
@@ -297,27 +296,18 @@ class rule {
             return false;
         }
 
-        $this->setup_subscription($mod);
+        $this->setup_subscription($request, $mod);
 
-        $templates = $this->process_templates($mod);
-
-        // TODO obtain the templates differently
-        $usercontent = $templates['template_user']['text'];
-        $usersubject = $templates['template_user_subject'];
-
-        $rolecontent = $templates['template_notify']['text'];
-        $rolesubject = $templates['template_notify_subject'];
-
-        $user = \core_user::get_user($mod['localcm']->userid);
-
-        $this->notify_roles($request->id, $rolesubject, $rolecontent, $mod['course']);
-        $this->notify_user($request->id, $usersubject, $usercontent, $user);
+        $this->send_notifications($request, $mod);
 
         // Notifications have been sent out. Increment the messageid to thread messages.
         $request->increment_messageid();
 
         // Users have been notified and subscriptions setup. Lets write a log of firing this trigger.
         $this->write_history($mod);
+
+        sleep(5);
+
     }
 
     /**
@@ -340,6 +330,28 @@ class rule {
         $access = $DB->get_field('local_extension_subscription', 'access', $params);
 
         return $access;
+    }
+
+    /**
+     * Helper to send notifications for roles based on the rule and request.
+     *
+     * @param \local_extension\request $request
+     * @param array $mod
+     */
+    private function send_notifications($request, $mod) {
+        $templates = $this->process_templates($mod);
+
+        // TODO obtain the templates differently
+        $usercontent = $templates['template_user']['text'];
+        $usersubject = $templates['template_user_subject'];
+
+        $rolecontent = $templates['template_notify']['text'];
+        $rolesubject = $templates['template_notify_subject'];
+
+        $user = \core_user::get_user($mod['localcm']->userid);
+
+        $this->notify_roles($request, $rolesubject, $rolecontent, $mod['course']);
+        $this->notify_user($request, $usersubject, $usercontent, $user);
     }
 
     /**
@@ -370,9 +382,10 @@ class rule {
      * Using the current rule configuration, this will setup the users with specific roles to have view/modification
      * access to the localcm item.
      *
-     * @param unknown $mod
+     * @param \local_extension\request $request
+     * @param array $mod
      */
-    private function setup_subscription($mod) {
+    private function setup_subscription($request, $mod) {
         global $DB;
 
         $localcm = $mod['localcm'];
@@ -728,32 +741,34 @@ class rule {
     /**
      * Notify all users in the course, with the role that this rule specifies.
      *
-     * @param integer $messageid
+     * @param \local_extension\request $request
      * @param string $subject
      * @param string $content
      * @param stdClass $course
      */
-    private function notify_roles($messageid, $subject, $content, $course) {
+    private function notify_roles($request, $subject, $content, $course) {
+        global $DB;
+
         $role = $this->role;
 
-        $users = $this->rule_get_role_users($course, $role);
+        $subscribedids = $DB->get_fieldset_select('local_extension_subscription', 'userid', 'requestid = :requestid', array('requestid' => $request->requestid));
 
-        foreach ($users as $userto) {
-            $this->notify_user($messageid, $subject, $content, $userto);
+        foreach ($subscribedids as $userid) {
+            $userto = \core_user::get_user($userid);
+            $this->notify_user($request, $subject, $content, $userto);
         }
-
     }
 
     /**
      * Notify the user that is assigned to this localcm based on the current rule.
      *
-     * @param integer $messageid
+     * @param \local_extension\request $request
      * @param string $subject
      * @param string $content
      * @param stdClass $userto
      */
-    private function notify_user($messageid, $subject, $content, $userto) {
-        \local_extension\utility::send_trigger_email($messageid, $subject, $content, $userto);
+    private function notify_user($request, $subject, $content, $userto) {
+        \local_extension\utility::send_trigger_email($request, $subject, $content, $userto);
     }
 
 }

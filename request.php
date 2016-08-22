@@ -105,6 +105,7 @@ if ($mform->is_cancelled()) {
         'searchstart' => $start,
         'searchend' => $end,
         'timestamp' => $now,
+        'messageid' => 0,
     );
     $request['id'] = $DB->insert_record('local_extension_request', $request);
 

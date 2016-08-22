@@ -158,25 +158,52 @@ class utility {
     /**
      * Sends a notification email.
      *
-     * @param integer $messageid
+     * @param \local_extension\request $request
      * @param string $subject
      * @param string $content
      * @param stdClass $userto
      */
-    public static function send_trigger_email($messageid, $subject, $content, $userto) {
+    public static function send_trigger_email($request, $subject, $content, $userto) {
         $userfrom = \core_user::get_support_user();
 
         // Email threading.
-        $rootid = self::get_email_message_id($messageid, $userto->id);
 
-        if ($messageid > 0) {
-            $parentid = self::get_email_message_id($messageid - 1, $userto->id);
-            $userfrom->customheaders[] = "In-Reply-To: $rootid $parentid";
-            $userfrom->customheaders[] = "References: $parentid";
+        // The base messageid.
+        $root = $request->requestid . "0";
+        $rootid = self::get_email_message_id($root, $userto->id);
+
+        $inputid = $request->requestid . $request->request->messageid;
+        $messageid = self::get_email_message_id($inputid, $userto->id);
+
+        $userfrom->customheaders = array(
+            'Message-ID: ' . $messageid,
+
+            // Headers to help prevent auto-responders.
+            'Precedence: Bulk',
+            'X-Auto-Response-Suppress: All',
+            'Auto-Submitted: auto-generated',
+        );
+
+        if ($request->request->messageid != 0) {
+            // This post is a reply, so add reply header (RFC 2822).
+            $pid = $request->requestid . $request->request->messageid - 1;
+            $parentid = self::get_email_message_id($pid, $userto->id);
+            $userfrom->customheaders[] = "In-Reply-To: $parentid";
+
+            // If the post is deeply nested we also reference the parent message id and
+            // the root message id (if different) to aid threading when parts of the email
+            // conversation have been deleted (RFC1036).
+            if ($pid - 1 != 0) {
+                $userfrom->customheaders[] = "References: $rootid $parentid";
+            } else {
+                $userfrom->customheaders[] = "References: $parentid";
+            }
+
         }
 
         // MS Outlook / Office uses poorly documented and non standard headers, including
         // Thread-Topic which overrides the Subject and shouldn't contain Re: or Fwd: etc.
+
         $userfrom->customheaders[] = "Thread-Topic: $subject";
         $userfrom->customheaders[] = "Thread-Index: " . substr($rootid, 1, 28);
 

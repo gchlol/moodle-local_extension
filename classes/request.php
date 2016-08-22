@@ -56,9 +56,6 @@ class request implements \cache_data_source {
     /** @var array An array of mods that are used */
     public $mods = array();
 
-    /** @var array An array of roles that map to cm items and users */
-    public $roles = array();
-
     /**
      * Request object constructor.
      * @param integer $requestid An optional variable to identify the request.
@@ -125,7 +122,7 @@ class request implements \cache_data_source {
      * Obtain a request class with the given id.
      *
      * @param integer $requestid An id for a request.
-     * @return request $req A request data object.
+     * @return \local_extension\request $request A request data object.
      */
     public static function from_id($requestid) {
         $request = new request($requestid);
@@ -337,7 +334,7 @@ class request implements \cache_data_source {
      */
     private function process_recursive($mod, $rule) {
         /* @var \local_extension\rule $rule */
-        $rule->process($this->request, $mod);
+        $rule->process($this, $mod);
 
         if (!empty($rule->children)) {
 
@@ -412,6 +409,10 @@ class request implements \cache_data_source {
      */
     public function add_attachment_history(\stored_file $file) {
         global $DB;
+
+        if ($file->is_directory()) {
+            return;
+        }
 
         $data = array(
             'requestid' => $this->requestid,
