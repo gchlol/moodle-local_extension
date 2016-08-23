@@ -51,16 +51,16 @@ class local_extension_renderer extends plugin_renderer_base {
      * Extension comment renderer.
      *
      * @param request $req The extension request object.
-     * @param array $history A list of comments and state changes.
+     * @param boolean $showdate If this is set, then print the full date instead of 'time ago'.
      * @return string $out The html output.
      */
-    public function render_extension_comments(\local_extension\request $req, $history) {
+    public function render_extension_comments(\local_extension\request $req, $showdate = false) {
         $out = '';
 
         $out .= html_writer::start_tag('div', array('class' => 'comments'));
 
-        // Lets merge the comments and history together to have an interleaved stream of information.
-        $comments = array_merge($req->comments, $history);
+        // Fetch the comments, state changes and file attachments.
+        $comments = $req->get_history();
 
         // Sort all comments and history based on timestamp.
         usort($comments, function($a, $b) {
@@ -78,42 +78,56 @@ class local_extension_renderer extends plugin_renderer_base {
         });
 
         foreach ($comments as $comment) {
-
-            $class = 'content';
-
-            // Add a css class to change background color for file attachments and state changes.
-            if (!empty($comment->filehash)) {
-                $class .= ' fileattachment';
-            }
-
-            if (!empty($comment->state)) {
-                $class .= ' statechange';
-            }
-
-            $user = $req->users[$comment->userid];
-
-            $out .= html_writer::start_tag('div', array('class' => 'comment'));
-
-            $out .= html_writer::start_tag('div', array('class' => 'avatar'));
-            $out .= $this->output->user_picture($user, array(
-                'size' => 50,
-            ));
-            $out .= html_writer::end_div(); // End .avatar.
-
-            $out .= html_writer::start_tag('div', array('class' => $class));
-            $out .= html_writer::tag('span', fullname($user), array('class' => 'name'));
-
-            $out .= html_writer::tag('span', ' - ' . $this->render_role($req, $user->id), array('class' => 'role'));
-            $out .= html_writer::tag('span', ' - ' . $this->render_time($comment->timestamp), array('class' => 'time'));
-
-            $out .= html_writer::start_tag('div', array('class' => 'message'));
-            $out .= html_writer::div(format_text(trim($comment->message), FORMAT_MOODLE), 'comment');
-            $out .= html_writer::end_div(); // End .message.
-            $out .= html_writer::end_div(); // End .content.
-            $out .= html_writer::end_div(); // End .comment.
+            $out .= $this->render_single_comment($req, $comment, $showdate);
         }
 
         $out .= html_writer::end_div(); // End .comments.
+
+        return $out;
+    }
+
+    /**
+     * Helper function to render a single comment. Also used in email notifications.
+     *
+     * @param \local_extension\request $req
+     * @param stdClass $comment
+     * @param boolean $showdate If this is set, then print the full date instead of 'time ago'.
+     * @return string $out
+     */
+    public function render_single_comment(\local_extension\request $req, $comment, $showdate = false) {
+        $class = 'content';
+        $out = '';
+
+        // Add a css class to change background color for file attachments and state changes.
+        if (!empty($comment->filehash)) {
+            $class .= ' fileattachment';
+        }
+
+        if (!empty($comment->state)) {
+            $class .= ' statechange';
+        }
+
+        $user = $req->users[$comment->userid];
+
+        $out .= html_writer::start_tag('div', array('class' => 'comment'));
+
+        $out .= html_writer::start_tag('div', array('class' => 'avatar'));
+        $out .= $this->output->user_picture($user, array(
+            'size' => 50,
+        ));
+        $out .= html_writer::end_div(); // End .avatar.
+
+        $out .= html_writer::start_tag('div', array('class' => $class));
+        $out .= html_writer::tag('span', fullname($user), array('class' => 'name'));
+
+        $out .= html_writer::tag('span', ' - ' . $this->render_role($req, $user->id), array('class' => 'role'));
+        $out .= html_writer::tag('span', ' - ' . $this->render_time($comment->timestamp, $showdate), array('class' => 'time'));
+
+        $out .= html_writer::start_tag('div', array('class' => 'message'));
+        $out .= html_writer::div(format_text(trim($comment->message), FORMAT_MOODLE), 'comment');
+        $out .= html_writer::end_div(); // End .message.
+        $out .= html_writer::end_div(); // End .content.
+        $out .= html_writer::end_div(); // End .comment.
 
         return $out;
     }
@@ -149,9 +163,10 @@ class local_extension_renderer extends plugin_renderer_base {
      * Render nice times
      *
      * @param integer $time The time to show
+     * @param boolean $showdate If this is set, then print the full date instead of 'time ago'.
      * @return string The html output.
      */
-    public function render_time($time) {
+    public function render_time($time, $showdate = false) {
         $delta = time() - $time;
 
         // The nice delta.
@@ -165,7 +180,13 @@ class local_extension_renderer extends plugin_renderer_base {
 
         // The full date.
         $fulldate = userdate($time, '%d %h %Y %l:%M%P');
-        return html_writer::tag('abbr', $show, array('title' => $fulldate) );
+
+        if ($showdate) {
+            return html_writer::tag('abbr', $fulldate);
+        } else {
+            return html_writer::tag('abbr', $show, array('title' => $fulldate));
+        }
+
     }
 
     /**
@@ -282,14 +303,14 @@ class local_extension_renderer extends plugin_renderer_base {
 
                 // Table columns 'name', 'action', 'role', 'parent', 'continue', 'priority', 'data'.
                 $values = array(
-                        $trigger->name,
-                        $trigger->get_action_name(),
-                        $trigger->get_role_name(),
-                        $parentstr,
-                        $trigger->datatype,
-                        $trigger->priority + 1,
-                        $this->render_trigger_rule_text($trigger, $parentstr),
-                        implode(' ', $buttons)
+                    $trigger->name,
+                    $trigger->get_action_name(),
+                    $trigger->get_role_name(),
+                    $parentstr,
+                    $trigger->datatype,
+                    $trigger->priority + 1,
+                    $this->render_trigger_rule_text($trigger, $parentstr),
+                    implode(' ', $buttons)
                 );
 
                 $table->add_data($values);
@@ -320,24 +341,7 @@ class local_extension_renderer extends plugin_renderer_base {
         );
         $html .= html_writer::tag('p', implode(' ', $activate));
 
-        $greaterthan = get_string('form_rule_greater_or_equal', 'local_extension');
-        $lessthan = get_string('form_rule_less_than', 'local_extension');
-        $any = get_string('form_rule_any_value', 'local_extension');
-
-        $lengthtype = '';
-        switch($trigger->lengthtype) {
-            case $trigger::RULE_CONDITION_GE:
-                $lengthtype = $greaterthan;
-                break;
-            case $trigger::RULE_CONDITION_LT:
-                $lengthtype = $lessthan;
-                break;
-            case $trigger::RULE_CONDITION_ANY:
-                $lengthtype = $any;
-                break;
-            default:
-                break;
-        }
+        $lengthtype = $this->rule_type($trigger->lengthtype);
 
         $reqlength = array(
             get_string('form_rule_label_request_length', 'local_extension'),
@@ -347,20 +351,7 @@ class local_extension_renderer extends plugin_renderer_base {
         );
         $html .= html_writer::tag('p', implode(' ', $reqlength));
 
-        $elapsedtype = '';
-        switch($trigger->elapsedtype) {
-            case $trigger::RULE_CONDITION_GE:
-                $elapsedtype = $greaterthan;
-                break;
-            case $trigger::RULE_CONDITION_LT:
-                $elapsedtype = $lessthan;
-                break;
-            case $trigger::RULE_CONDITION_ANY:
-                $elapsedtype = $any;
-                break;
-            default:
-                break;
-        }
+        $elapsedtype = $this->rule_type($trigger->elapsedtype);
 
         $elapsedlength = array(
             get_string('form_rule_label_elapsed_length', 'local_extension'),
@@ -382,6 +373,36 @@ class local_extension_renderer extends plugin_renderer_base {
         $html .= html_writer::end_div();
 
         return $html;
+    }
+
+    /**
+     * Internal helper function to return the type of rule length checking.
+     * @param string $triggertype
+     * @return string
+     */
+    private function rule_type($triggertype) {
+        $greaterthan = get_string('form_rule_greater_or_equal', 'local_extension');
+        $lessthan = get_string('form_rule_less_than', 'local_extension');
+        $any = get_string('form_rule_any_value', 'local_extension');
+
+        $type = '';
+
+        switch($triggertype) {
+            case \local_extension\rule::RULE_CONDITION_GE:
+                $type = $greaterthan;
+                break;
+            case \local_extension\rule::RULE_CONDITION_LT:
+                $type = $lessthan;
+                break;
+            case \local_extension\rule::RULE_CONDITION_ANY:
+                $type = $any;
+                break;
+            default:
+                $type = '';
+                break;
+        }
+
+        return $type;
     }
 
     /**

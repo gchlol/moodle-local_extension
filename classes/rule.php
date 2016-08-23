@@ -339,7 +339,7 @@ class rule {
      * @param array $mod
      */
     private function send_notifications($request, $mod) {
-        $templates = $this->process_templates($mod);
+        $templates = $this->process_templates($request, $mod);
 
         // TODO obtain the templates differently
         $usercontent = $templates['template_user']['text'];
@@ -541,14 +541,19 @@ class rule {
     /**
      * Replaces the varaibles in each template with data and returns them.
      *
+     * @param \local_extension\request $request
      * @param array $mod
+     * @param stdClass $contentchange An object with a single comment/statechange/attachment.
      * @return mixed|boolean[]|\local_extension\stdClass[]
      */
-    private function process_templates($mod) {
+    public function process_templates($request, $mod, $contentchange = null) {
+        global $PAGE;
+
         $event   = $mod['event'];
         $cm      = $mod['cm'];
         $localcm = $mod['localcm'];
         $course  = $mod['course'];
+        $handler = $mod['handler'];
 
         // A url to the status page.
         $url = new \moodle_url('/local/extension/status.php', array('id' => $localcm->cm->request));
@@ -557,6 +562,8 @@ class rule {
         $userid = $mod['localcm']->userid;
 
         $user = \core_user::get_user($userid);
+
+        $renderer = $PAGE->get_renderer('local_extension');
 
         $templatevars = array(
             '/{{course}}/' => $course->fullname,
@@ -571,9 +578,14 @@ class rule {
             '/{{requeststatusurl}}/' => $url,
             '/{{extensionlength}}/' => $this->get_request_time($mod),
             '/{{rulename}}/' => $this->name,
-            '/{{role}}/' => $this->rolenames[$this->role],
+            '/{{rolename}}/' => $this->rolenames[$this->role],
             '/{{eventname}}/' => $event->name,
             '/{{eventdescription}}/' => $event->description,
+            '/{{attachments}}/' => $renderer->render_extension_attachments($request),
+            '/{{fullhistory}}/' => $renderer->render_extension_comments($request, true),
+            '/{{statechanges}}/' => null,
+            '/{{statuspage}}/' => null,
+            '/{{contentchange}}/' => $renderer->render_single_comment($request, $contentchange, true),
         );
 
         $patterns = array_keys($templatevars);
@@ -746,17 +758,24 @@ class rule {
      * @param string $content
      * @param stdClass $course
      */
-    private function notify_roles($request, $subject, $content, $course) {
+    private function notify_roles(\local_extension\request $request, $subject, $content, $course) {
         global $DB;
 
         $role = $this->role;
+        $users = $this->rule_get_role_users($course, $role);
 
+        foreach ($users as $userto) {
+            $this->notify_user($request, $subject, $content, $userto);
+        }
+
+        /*
         $subscribedids = $DB->get_fieldset_select('local_extension_subscription', 'userid', 'requestid = :requestid', array('requestid' => $request->requestid));
 
         foreach ($subscribedids as $userid) {
             $userto = \core_user::get_user($userid);
             $this->notify_user($request, $subject, $content, $userto);
         }
+        */
     }
 
     /**
@@ -767,7 +786,7 @@ class rule {
      * @param string $content
      * @param stdClass $userto
      */
-    private function notify_user($request, $subject, $content, $userto) {
+    private function notify_user(\local_extension\request $request, $subject, $content, $userto) {
         \local_extension\utility::send_trigger_email($request, $subject, $content, $userto);
     }
 

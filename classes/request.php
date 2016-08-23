@@ -56,6 +56,9 @@ class request implements \cache_data_source {
     /** @var array An array of mods that are used */
     public $mods = array();
 
+    /** @var array A list of subscribed user ids */
+    public $subscribedids = array();
+
     /**
      * Request object constructor.
      * @param integer $requestid An optional variable to identify the request.
@@ -104,8 +107,8 @@ class request implements \cache_data_source {
         }
 
         // Add to the $userids, a list of users that are subscribed to this request.
-        $subscribedids = $DB->get_fieldset_select('local_extension_subscription', 'userid', 'requestid = :requestid', array('requestid' => $this->requestid));
-        foreach ($subscribedids as $key => $userid) {
+        $this->subscribedids = $DB->get_fieldset_select('local_extension_subscription', 'userid', 'requestid = :requestid', array('requestid' => $this->requestid));
+        foreach ($this->subscribedids as $key => $userid) {
             $userids[$userid] = $userid;
         }
 
@@ -165,6 +168,8 @@ class request implements \cache_data_source {
         );
         $DB->insert_record('local_extension_comment', $comment);
 
+        $this->notify_subscribers($comment);
+
         // Invalidate the cache for this request. The content has changed.
         self::get_data_cache()->delete($this->requestid);
     }
@@ -202,10 +207,22 @@ class request implements \cache_data_source {
     public function get_history() {
         $history = array();
 
+        $history += $this->comment_history();
         $history += $this->state_history();
         $history += $this->attachment_history();
 
         return $history;
+    }
+
+    /**
+     * Returns the comment history to be used with interleaving the comment stream when viewing status.php
+     */
+    private function comment_history() {
+        global $DB;
+
+        $records = $DB->get_records('local_extension_comment', array('request' => $this->requestid), 'timestamp ASC');
+
+        return $records;
     }
 
     /**
@@ -244,7 +261,7 @@ class request implements \cache_data_source {
             // Add class property 'message' to interleave with the comment stream.
             $record->message = $log;
 
-            $history[] = $record;
+            $history[$record->id] = $record;
         }
 
         return $history;
@@ -392,8 +409,14 @@ class request implements \cache_data_source {
 
                 if (!empty($data->$item)) {
                     $localcm->set_state($state);
+
                     $status = $localcm->get_state_name();
-                    $localcm->write_history($mod, $state, $user->id);
+
+                    $history = (object) $localcm->write_history($mod, $state, $user->id);
+
+                    $history->message = "$status extension for {$course->fullname}, {$event->name}";
+
+                    $this->notify_subscribers($history, $mod);
                 }
 
             }
@@ -422,6 +445,41 @@ class request implements \cache_data_source {
         );
 
         $DB->insert_record('local_extension_history_file', $data);
+    }
+
+    /**
+     * Each comment, state change and file attachment will fire off a notification to all subscribed users.
+     *
+     * @param unknown $item
+     * @param array $mod
+     */
+    public function notify_subscribers($item, $mod = null) {
+        global $PAGE, $DB;
+
+        foreach ($this->subscribedids as $userid) {
+            $userto = \core_user::get_user($userid);
+
+            // TODO subject, content padding, fetch the subscriber rule template?
+            $params = array(
+                'userid' => $userid,
+                'requestid' => $this->requestid,
+            );
+
+            $ruleid = $DB->get_field('local_extension_subscription', 'trigger', $params);
+            $rule = \local_extension\rule::from_id($ruleid);
+
+            $templates = $rule->process_templates($this, $mod, $item);
+
+            $subject = $templates['template_notify_subject'];
+            $content = $templates['template_notify']['text'];
+
+            // $content = $PAGE->get_renderer('local_extension')->render_single_comment($this, $item, true);
+
+            \local_extension\utility::send_trigger_email($this, $subject, $content, $userto);
+        }
+
+        // Increment the messageid to assist with inbox threading.
+        $this->increment_messageid();
     }
 
     /**

@@ -59,7 +59,6 @@ $params = array(
     'user' => $OUTPUT->user_picture($USER),
     'request' => $request,
     'renderer' => $renderer,
-    'history' => $request->get_history(),
 );
 
 $mform = new \local_extension\form\update(null, $params);

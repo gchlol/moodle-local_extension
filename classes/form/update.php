@@ -51,7 +51,6 @@ class update extends \moodleform {
         $user     = $this->_customdata['user'];
         $request  = $this->_customdata['request'];
         $renderer = $this->_customdata['renderer'];
-        $history  = $this->_customdata['history'];
         $mods     = $request->mods;
 
         foreach ($mods as $id => $mod) {
@@ -74,7 +73,7 @@ class update extends \moodleform {
             $mform->addElement('html', $html);
         }
 
-        $html = $renderer->render_extension_comments($request, $history);
+        $html = $renderer->render_extension_comments($request);
         $html .= \html_writer::start_tag('br');
         $mform->addElement('html', $html);
 
@@ -123,45 +122,48 @@ class update extends \moodleform {
         $mform = $this->_form;
 
         $itemid = $data['id'];
-        $draftitemid = $data['attachments'];
 
-        $draftcontext = \context_user::instance($USER->id);
-        $usercontext = \context_user::instance($this->_customdata['request']->request->userid);
+        if (!empty($data['attachments'])) {
+            $draftitemid = $data['attachments'];
 
-        $fs = get_file_storage();
-        $draftfiles = $fs->get_area_files($draftcontext->id, 'user', 'draft', $draftitemid, 'id');
-        $oldfiles = $fs->get_area_files($usercontext->id, 'local_extension', 'attachments', $itemid, 'id');
+            $draftcontext = \context_user::instance($USER->id);
+            $usercontext = \context_user::instance($this->_customdata['request']->request->userid);
 
-        if (count($draftfiles) > 1) {
-            $oldnames = array();
+            $fs = get_file_storage();
+            $draftfiles = $fs->get_area_files($draftcontext->id, 'user', 'draft', $draftitemid, 'id');
+            $oldfiles = $fs->get_area_files($usercontext->id, 'local_extension', 'attachments', $itemid, 'id');
 
-            foreach ($oldfiles as $file) {
-                $oldnames[] = $file->get_filename();
-            }
+            if (count($draftfiles) > 1) {
+                $oldnames = array();
 
-            $duplicates = array();
-
-            foreach ($draftfiles as $file) {
-                if (in_array($file->get_filename(), $oldnames) && !$file->is_directory()) {
-                    $duplicates[] = $file->get_filename();
-                }
-            }
-
-            if (!empty($duplicates)) {
-                $res = null;
-
-                $wrapped = array_map(function($str) {
-                    return sprintf("\"%s\"", $str);
-                }, $duplicates);
-
-                if (count($wrapped) > 1) {
-                    $last = array_pop($wrapped);
-                    $res = implode($wrapped, ', ') . ' and ' . $last;
-                } else {
-                    $res = $wrapped[0];
+                foreach ($oldfiles as $file) {
+                    $oldnames[] = $file->get_filename();
                 }
 
-                $errors['attachments'] = get_string('form_rule_validate_duplicate_files', 'local_extension' , $res);
+                $duplicates = array();
+
+                foreach ($draftfiles as $file) {
+                    if (in_array($file->get_filename(), $oldnames) && !$file->is_directory()) {
+                        $duplicates[] = $file->get_filename();
+                    }
+                }
+
+                if (!empty($duplicates)) {
+                    $res = null;
+
+                    $wrapped = array_map(function($str) {
+                        return sprintf("\"%s\"", $str);
+                    }, $duplicates);
+
+                    if (count($wrapped) > 1) {
+                        $last = array_pop($wrapped);
+                        $res = implode($wrapped, ', ') . ' and ' . $last;
+                    } else {
+                        $res = $wrapped[0];
+                    }
+
+                    $errors['attachments'] = get_string('form_rule_validate_duplicate_files', 'local_extension' , $res);
+                }
             }
         }
 

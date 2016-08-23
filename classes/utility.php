@@ -136,23 +136,15 @@ class utility {
             }
 
             $events[$cm->id] = array(
-                    'event' => $event,
-                    'cm' => $cm,
-                    'localcm' => $localcm,
-                    'course' => $courses[$courseid],
-                    'handler' => $handler,
+                'event' => $event,
+                'cm' => $cm,
+                'localcm' => $localcm,
+                'course' => $courses[$courseid],
+                'handler' => $handler,
             );
         }
 
         return array($mods, $events);
-    }
-
-    /**
-     * Sends a status email to the student.
-     *
-     * @param integer $requestid
-     */
-    public static function send_status_email($requestid) {
     }
 
     /**
@@ -163,7 +155,7 @@ class utility {
      * @param string $content
      * @param stdClass $userto
      */
-    public static function send_trigger_email($request, $subject, $content, $userto) {
+    public static function send_trigger_email(\local_extension\request $request, $subject, $content, $userto) {
         $userfrom = \core_user::get_support_user();
 
         // Email threading.

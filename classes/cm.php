@@ -58,7 +58,7 @@ class cm {
     /** @var integer The request id associated with this cm */
     public $requestid = null;
 
-    /** @var integer The local_extension_cm database object */
+    /** @var stdClass The local_extension_cm database object */
     public $cm = null;
 
     /**
@@ -174,11 +174,12 @@ class cm {
     }
 
     /**
-     * Writes an state change entry to local_extension_his_state.
+     * Writes an state change entry to local_extension_his_state. Returns the history object.
      *
      * @param stdClass $mod
      * @param integer $state
      * @param integer $userid
+     * @return stdClass $history
      */
     public function write_history($mod, $state, $userid) {
         global $DB;
@@ -194,6 +195,8 @@ class cm {
         );
 
         $DB->insert_record('local_extension_his_state', $history);
+
+        return $history;
     }
 
     /**

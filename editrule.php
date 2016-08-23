@@ -29,6 +29,10 @@ require_once($CFG->libdir . '/adminlib.php');
 $triggerid = optional_param('id', 0, PARAM_INT);
 $datatype = required_param('datatype', PARAM_ALPHANUM);
 
+if (empty($datatype)) {
+    throw new coding_exception('required_param() requires $parname and $type to be specified (parameter: datatype)');
+}
+
 $PAGE->set_url(new moodle_url('/local/extension/editrule.php'));
 
 $context = context_system::instance();
@@ -98,24 +102,6 @@ if ($mform->is_cancelled()) {
 
     if (!empty($rule->id)) {
         $DB->update_record('local_extension_triggers', $rule);
-
-        // Update the recorded history to invalidate previous triggered rules.
-        // TODO: Do we want this?
-        /*
-        $params = array (
-            'trigger' => $rule->id,
-            'state' => \local_extension\history::STATE_DEFAULT
-        );
-        $existing = $DB->get_records('local_extension_his_sub', $params);
-
-        if (!empty($existing)) {
-            foreach ($existing as $record) {
-                $record->state = \local_extension\history::STATE_DISABLED;
-                $DB->update_record('local_extension_his_sub', $record, true);
-            }
-        }
-        */
-
     } else {
         $DB->insert_record('local_extension_triggers', $rule);
     }
