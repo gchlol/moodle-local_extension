@@ -305,9 +305,6 @@ class rule {
 
         // Users have been notified and subscriptions setup. Lets write a log of firing this trigger.
         $this->write_history($mod);
-
-        sleep(5);
-
     }
 
     /**

@@ -158,7 +158,7 @@ if ($mform->is_cancelled()) {
 
     $url = new moodle_url('/local/extension/status.php', array('id' => $req->requestid));
     redirect($url);
-    die;
+    die();
 } else {
     $draftitemid = 0;
     file_prepare_draft_area($draftitemid, $usercontext->id, 'local_extension', 'attachments', 0);

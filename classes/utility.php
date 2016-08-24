@@ -482,7 +482,7 @@ class utility {
      *
      * @param array $rules
      * @param unknown $id
-     * @return unknown|NULL|unknown|NULL
+     * @return unknown|boolean|unknown|boolean
      */
     public static function rule_tree_branch(array $rules, $id) {
         foreach ($rules as $rule) {
@@ -492,11 +492,11 @@ class utility {
             }
 
             if (!empty($rule->children)) {
-                return self::rule_tree_branch($rule->chidlren, $id);
+                return self::rule_tree_branch($rule->children, $id);
             }
         }
 
-        return null;
+        return false;
     }
 
     /**

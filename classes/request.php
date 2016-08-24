@@ -99,8 +99,6 @@ class request implements \cache_data_source {
 
         $userids = array($request->userid => $request->userid);
 
-        // TODO need to sort cms by date and comments by date.
-
         // Obtain a unique list of userids that have been commenting.
         foreach ($this->comments as $comment) {
             $userids[$comment->userid] = $comment->userid;
