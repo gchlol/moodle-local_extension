@@ -141,6 +141,7 @@ class local_extension_renderer extends plugin_renderer_base {
      */
     public function render_role($req, $userid) {
         $details = '';
+        $rolename = '';
         $roles = array();
 
         // Roles are scoped to the enrollment status in courses.
@@ -151,7 +152,9 @@ class local_extension_renderer extends plugin_renderer_base {
 
             foreach ($roles as $role) {
                 $rolename = role_get_name($role, $context);
-                $details .= "{$rolename} - {$course->fullname}\n";
+                if (!empty($rolename)) {
+                    $details .= "{$rolename} - {$course->fullname}\n";
+                }
             }
         }
 
