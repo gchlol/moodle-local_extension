@@ -47,6 +47,12 @@ class request implements \cache_data_source {
     /** @var array An array of comment objects from the request id */
     public $comments = array();
 
+    /** @var array An array of state change objects from the request id */
+    public $statechanges = array();
+
+    /** @var array An array of file attachment objects from the request id */
+    public $attachments = array();
+
     /** @var array An array of user objects with the available fields user_picture::fields  */
     public $users = array();
 
@@ -106,6 +112,7 @@ class request implements \cache_data_source {
 
         // Add to the $userids, a list of users that are subscribed to this request.
         $this->subscribedids = $DB->get_fieldset_select('local_extension_subscription', 'userid', 'requestid = :requestid', array('requestid' => $this->requestid));
+        $this->subscribedids[] = $request->userid;
         foreach ($this->subscribedids as $key => $userid) {
             $userids[$userid] = $userid;
         }
@@ -158,7 +165,7 @@ class request implements \cache_data_source {
     public function add_comment($from, $comment) {
         global $DB;
 
-        $comment = (object)array(
+        $comment = (object) array(
             'request'       => $this->requestid,
             'userid'        => $from->id,
             'timestamp'     => \time(),
@@ -166,10 +173,7 @@ class request implements \cache_data_source {
         );
         $DB->insert_record('local_extension_comment', $comment);
 
-        $this->notify_subscribers($comment);
-
-        // Invalidate the cache for this request. The content has changed.
-        self::get_data_cache()->delete($this->requestid);
+        return $comment;
     }
 
     /**
@@ -237,6 +241,8 @@ class request implements \cache_data_source {
         $history += $this->state_history();
         $history += $this->attachment_history();
 
+        $this->sort_history($history);
+
         return $history;
     }
 
@@ -244,11 +250,7 @@ class request implements \cache_data_source {
      * Returns the comment history to be used with interleaving the comment stream when viewing status.php
      */
     private function comment_history() {
-        global $DB;
-
-        $records = $DB->get_records('local_extension_comment', array('request' => $this->requestid), 'timestamp ASC');
-
-        return $records;
+        return $this->comments;
     }
 
     /**
@@ -318,6 +320,11 @@ class request implements \cache_data_source {
 
         foreach ($records as $record) {
             $file = $fs->get_file_by_hash($record->filehash);
+
+            if (empty($file)) {
+                continue;
+            }
+
             $fileurl = \moodle_url::make_pluginfile_url(
                 $file->get_contextid(),
                 $file->get_component(),
@@ -442,7 +449,8 @@ class request implements \cache_data_source {
 
                     $history->message = "$status extension for {$course->fullname}, {$event->name}";
 
-                    $this->notify_subscribers($history, $mod);
+                    // You can only edit one state at a time, returning here is ok!
+                    return $history;
                 }
 
             }
@@ -452,7 +460,7 @@ class request implements \cache_data_source {
     }
 
     /**
-     * Adds a store_file hash to the history for this request.
+     * Adds a stored_file hash to the history for this request.
      *
      * @param \stored_file $file
      */
@@ -460,7 +468,7 @@ class request implements \cache_data_source {
         global $DB;
 
         if ($file->is_directory()) {
-            return;
+            return null;
         }
 
         $data = array(
@@ -471,26 +479,43 @@ class request implements \cache_data_source {
         );
 
         $DB->insert_record('local_extension_history_file', $data);
+
+        $fileurl = \moodle_url::make_pluginfile_url(
+            $file->get_contextid(),
+            $file->get_component(),
+            $file->get_filearea(),
+            $file->get_itemid(),
+            $file->get_filepath(),
+            $file->get_filename()
+        );
+
+        $filelink = \html_writer::link($fileurl, $file->get_filename());
+        // Add class property 'message' to interleave with the comment stream.
+        $history = (object) $data;
+        $history->message = get_string('status_file_attachment', 'local_extension', $filelink);
+
+        return $history;
     }
 
     /**
      * Each comment, state change and file attachment will fire off a notification to all subscribed users.
      *
-     * @param unknown $item
-     * @param array $mod
+     * @param array $history
      */
-    public function notify_subscribers($item, $mod = null) {
+    public function notify_subscribers($history) {
         global $PAGE, $DB;
+
+        $this->sort_history($history);
 
         foreach ($this->subscribedids as $userid) {
             $userto = \core_user::get_user($userid);
 
-            // TODO subject, content padding, fetch the subscriber rule template?
             $params = array(
                 'userid' => $userid,
                 'requestid' => $this->requestid,
             );
 
+            /*
             $ruleid = $DB->get_field('local_extension_subscription', 'trigger', $params);
             $rule = \local_extension\rule::from_id($ruleid);
 
@@ -498,11 +523,32 @@ class request implements \cache_data_source {
 
             $subject = $templates['template_notify_subject'];
             $content = $templates['template_notify']['text'];
+            */
 
-            // $content = $PAGE->get_renderer('local_extension')->render_single_comment($this, $item, true);
+            $studentname = null;
+            $courseids = array();
+
+            foreach ($this->mods as $id => $mod) {
+                $course = $mod['course'];
+                $event = $mod['event'];
+                $courseids[] = $course->shortname . ' ' . $event->name;
+            }
+
+            // Single content item.
+            $coursestr = '[' . implode(', ', $courseids) . ']';
+            $subject = 'Test Update Notification ' . $coursestr;
+
+            $content = '';
+            foreach ($history as $item) {
+                $content .= $PAGE->get_renderer('local_extension')->render_single_comment($this, $item, true);
+            }
 
             \local_extension\utility::send_trigger_email($this, $subject, $content, $userto);
         }
+
+        // Send notification to user with basic details.
+        // $content = $PAGE->get_renderer('local_extension')->render_single_comment($this, $item, true);
+        // \local_extension\utility::send_trigger_email($this, $subject, $content, $userto);
 
         // Increment the messageid to assist with inbox threading.
         $this->increment_messageid();

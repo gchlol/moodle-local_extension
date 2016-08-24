@@ -76,6 +76,8 @@ if ($form = $mform->get_data()) {
     $draftfiles = $fs->get_area_files($draftcontext->id, 'user', 'draft', $draftitemid, 'id');
     $oldfiles = $fs->get_area_files($usercontext->id, 'local_extension', 'attachments', $itemid, 'id');
 
+    $notifycontent = array();
+
     // File count must be greater that 1, as an item is the directory '.'.
     if (count($draftfiles) > 1) {
         // We need to add the existing files to the draft area so they are saved and merged with the new area.
@@ -118,16 +120,23 @@ if ($form = $mform->get_data()) {
         // This diff array will contain all the new files to be attached.
         $diff = array_diff_key($draftnames, $oldnames);
         foreach ($diff as $file) {
-            $request->add_attachment_history($file);
+            $notifycontent[] = $request->add_attachment_history($file);
         }
     }
 
     // Parse the form data to see if any accept/deny/reopen/etc buttons have been clicked, and update the state accordingly.
-    $request->update_cm_state($USER, $form);
+    $notifycontent[] = $request->update_cm_state($USER, $form);
 
     if (!empty($comment)) {
-        $request->add_comment($USER, $comment);
+        $notifycontent[] = $request->add_comment($USER, $comment);
     }
+
+    // Cleaning up the array.
+    $notifycontent = array_filter($notifycontent, function($obj) {
+        return !is_null($obj);
+    });
+
+    $request->notify_subscribers($notifycontent);
 
     // Invalidate the cache for this request. The content has changed.
     $request->get_data_cache()->delete($request->requestid);

@@ -145,15 +145,25 @@ if ($mform->is_cancelled()) {
     $draftitemid = file_get_submitted_draft_itemid('attachments');
     file_save_draft_area_files($draftitemid, $usercontext->id, 'local_extension', 'attachments', $request['id']);
 
-    // Initiate the trigger/rule logic notifications and subscriptions, file attachment history.
-    $req = \local_extension\request::from_id($request['id']);
-
     $fs = get_file_storage();
     $files = $fs->get_area_files($usercontext->id, 'local_extension', 'attachments', $request['id']);
     foreach ($files as $file) {
-        $req->add_attachment_history($file);
+        if ($file->is_directory()) {
+            continue;
+        }
+
+        $data = array(
+            'requestid' => $request['id'],
+            'timestamp' => $file->get_timecreated(),
+            'filehash' => $file->get_pathnamehash(),
+            'userid' => $file->get_userid(),
+        );
+
+        $DB->insert_record('local_extension_history_file', $data);
     }
 
+    // Initiate the trigger/rule logic notifications and subscriptions, file attachment history.
+    $req = \local_extension\request::from_id($request['id']);
     $req->process_triggers();
 
     $url = new moodle_url('/local/extension/status.php', array('id' => $req->requestid));
