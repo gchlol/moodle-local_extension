@@ -198,6 +198,34 @@ class request implements \cache_data_source {
     }
 
     /**
+     * Sort all comments, state changes and attachments based on timestamp.
+     *
+     * @param array $history
+     */
+    public function sort_history(&$history) {
+        // Sort all comments, state changes and attachments based on timestamp.
+        usort($history, function($a, $b) {
+
+            // If the timestamps are the same, always return the status update/file attachment first, comments second.
+            if ($a->timestamp == $b->timestamp) {
+                if (property_exists($a, 'state')) {
+                    return 1;
+                } else if (property_exists($b, 'state')) {
+                    return 1;
+                }
+
+                if (property_exists($a, 'filehash')) {
+                    return 1;
+                } else if (property_exists($b, 'filehash')) {
+                    return 1;
+                }
+            }
+
+            return $a->timestamp - $b->timestamp;
+        });
+    }
+
+    /**
      * Returns the attachment and statechange history to be used with interleaving the comment stream when viewing status.php
      *
      * @return array $history
