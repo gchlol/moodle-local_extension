@@ -562,6 +562,12 @@ class rule {
 
         $renderer = $PAGE->get_renderer('local_extension');
 
+        if (!empty($contentchange)) {
+            $contenttemplate = $renderer->render_single_comment($request, $contentchange, true);
+        } else {
+            $contenttemplate = null;
+        }
+
         $templatevars = array(
             '/{{course}}/' => $course->fullname,
             '/{{module}}/' => $cm->name,
@@ -582,7 +588,7 @@ class rule {
             '/{{fullhistory}}/' => $renderer->render_extension_comments($request, true),
             '/{{statechanges}}/' => null,
             '/{{statuspage}}/' => null,
-            '/{{contentchange}}/' => $renderer->render_single_comment($request, $contentchange, true),
+            '/{{contentchange}}/' => $contenttemplate,
         );
 
         $patterns = array_keys($templatevars);
