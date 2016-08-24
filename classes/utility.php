@@ -158,6 +158,11 @@ class utility {
     public static function send_trigger_email(\local_extension\request $request, $subject, $content, $userto) {
         $userfrom = \core_user::get_support_user();
 
+        $sendmail = get_config('local_extension', 'emaildisable');
+        if ($sendmail == true) {
+            return;
+        }
+
         // Email threading.
 
         // The base messageid.
