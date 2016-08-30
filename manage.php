@@ -69,7 +69,6 @@ if ($delete && confirm_sesskey()) {
 
     } else if (data_submitted()) {
 
-
         // TODO recursive delete??
 
         // Select all child rules for id.

@@ -38,7 +38,7 @@ class request implements \cache_data_source {
     /** @var integer The local_extension_request database object */
     public $requestid = null;
 
-    /** @var stdClass The local_extension_request database object */
+    /** @var \stdClass The local_extension_request database object */
     public $request = array();
 
     /** @var cm[] cm */
@@ -75,7 +75,7 @@ class request implements \cache_data_source {
 
     /**
      * Loads data into the object
-     * @throws coding_exception
+     * @throws \coding_exception
      */
     public function load() {
         global $DB;
@@ -141,7 +141,7 @@ class request implements \cache_data_source {
     /**
      * Fetches the attachments for this request.
      *
-     * @return file_storage[]|stored_file[][]
+     * @return array
      */
     public function fetch_attachments() {
         $request = $this->request;
@@ -159,8 +159,9 @@ class request implements \cache_data_source {
     /**
      * Adds a comment to the request
      *
-     * @param stdClass $from The user that has commented.
+     * @param \stdClass $from The user that has commented.
      * @param string $comment The comment itself.
+     * @return object|string
      */
     public function add_comment($from, $comment) {
         global $DB;
@@ -402,11 +403,10 @@ class request implements \cache_data_source {
      * @return boolean
      */
     public function check_active() {
-        foreach ($cms as $cm) {
-            /* @var $cm cm */
+        foreach ($this->cms as $cm) {
             $state = $cm->get_stateid();
 
-            if ($state != cm::STATE_CANCEL) {
+            if ($state != \local_extension\cm::STATE_CANCEL) {
                 return true;
             }
         }
@@ -418,7 +418,8 @@ class request implements \cache_data_source {
      * Updates the cm state with via posted data.
      *
      * @param integer $user
-     * @param stdClass $data
+     * @param \stdClass $data
+     * @return object
      */
     public function update_cm_state($user, $data) {
 
@@ -432,9 +433,9 @@ class request implements \cache_data_source {
 
             $statearray = array(
                 'approve' => \local_extension\cm::STATE_APPROVED,
-                'deny' => \local_extension\cm::STATE_DENIED,
-                'cancel' => \local_extension\cm::STATE_CANCEL,
-                'reopen' => \local_extension\cm::STATE_REOPENED,
+                'deny'    => \local_extension\cm::STATE_DENIED,
+                'cancel'  => \local_extension\cm::STATE_CANCEL,
+                'reopen'  => \local_extension\cm::STATE_REOPENED,
             );
 
             foreach ($statearray as $name => $state) {
@@ -463,6 +464,7 @@ class request implements \cache_data_source {
      * Adds a stored_file hash to the history for this request.
      *
      * @param \stored_file $file
+     * @return null|object
      */
     public function add_attachment_history(\stored_file $file) {
         global $DB;
@@ -474,8 +476,8 @@ class request implements \cache_data_source {
         $data = array(
             'requestid' => $this->requestid,
             'timestamp' => $file->get_timecreated(),
-            'filehash' => $file->get_pathnamehash(),
-            'userid' => $file->get_userid(),
+            'filehash'  => $file->get_pathnamehash(),
+            'userid'    => $file->get_userid(),
         );
 
         $DB->insert_record('local_extension_history_file', $data);
@@ -557,7 +559,7 @@ class request implements \cache_data_source {
     /**
      * Returns the request cache.
      *
-     * @return cache_application|cache_session|cache_store
+     * @return \cache_application|\cache_session|\cache_store
      */
     public function get_data_cache() {
         return \cache::make('local_extension', 'requests');
@@ -603,6 +605,13 @@ class request implements \cache_data_source {
      */
     public static function get_instance_for_cache(\cache_definition $definition) {
         return new request();
+    }
+
+    /**
+     * Invalidates the cache for this request.
+     */
+    public function invalidate_request() {
+        $this->get_data_cache()->delete($this->requestid);
     }
 
 }

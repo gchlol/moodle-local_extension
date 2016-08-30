@@ -41,11 +41,11 @@ class utility {
     /**
      * Returns a list of candidate dates for activities
      *
-     * @param user $userid Userid or user object
-     * @param timestamp $start  Start of search period
-     * @param timestamp $end End of search period
+     * @param int|\stdClass $userid Userid or user object
+     * @param int $start  Start of search period
+     * @param int $end End of search period
      * @param array $options Optional arguments.
-     * @return An array of candidates. array($mods, $events)
+     * @return array An array of candidates. array($mods, $events)
      *
      */
     public static function get_activities($userid, $start, $end, $options = null) {
@@ -148,12 +148,12 @@ class utility {
     }
 
     /**
-     * Sends a notification email.
+     * Sends a notification email, or queues them if the request object has more than one local cm/mod item.
      *
      * @param \local_extension\request $request
      * @param string $subject
      * @param string $content
-     * @param stdClass $userto
+     * @param \stdClass $userto
      */
     public static function send_trigger_email(\local_extension\request $request, $subject, $content, $userto) {
         $userfrom = \core_user::get_support_user();
@@ -273,9 +273,9 @@ class utility {
     /**
      * Returns the number of requests the user has for a specific course.
      *
-     * @param interger $courseid
-     * @param interger $userid
-     * @return integer count
+     * @param int $courseid
+     * @param int $userid
+     * @return int count
      */
     public static function count_requests($courseid, $userid) {
         global $DB;
@@ -299,7 +299,7 @@ class utility {
     /**
      * Obtains a request from the cache.
      *
-     * @param integer $requestid
+     * @param int $requestid
      * @return request A request object.
      */
     public static function cache_get_request($requestid) {
@@ -310,7 +310,7 @@ class utility {
     /**
      * Returns an array of all requests from the cache for the user specified.
      *
-     * @param integer $userid
+     * @param int $userid
      * @return request[] An array of requests.
      */
     public static function cache_get_requests($userid = 0) {
@@ -373,9 +373,9 @@ class utility {
     /**
      * Returns the cm and request.
      *
-     * @param integer $courseid
-     * @param integer $moduleid
-     * @return \local_extension\request[]|unknown[]
+     * @param int $courseid
+     * @param int $moduleid
+     * @return array
      */
     public static function find_module_requests($courseid, $moduleid) {
         global $USER;
@@ -397,6 +397,7 @@ class utility {
      * Sorted based on the priorty and grouped with parents.
      *
      * @param \local_extension\rule[] $rules
+     * @return array
      */
     public static function sort_rules($rules) {
 
@@ -445,8 +446,8 @@ class utility {
      * Nested child rules can be accessed via $rule->children
      *
      * @param \local_extension\rule[] $rules
-     * @param number $parent
-     * @return \local_extension\rule[] Tree structure.
+     * @param int|number $parent
+     * @return rule[] Tree structure.
      */
     public static function rule_tree(array $rules, $parent = 0) {
         $branch = array();
@@ -481,8 +482,8 @@ class utility {
      * Useful for recursive deletion.
      *
      * @param array $rules
-     * @param unknown $id
-     * @return unknown|boolean|unknown|boolean
+     * @param int $id
+     * @return boolean
      */
     public static function rule_tree_branch(array $rules, $id) {
         foreach ($rules as $rule) {
@@ -503,7 +504,7 @@ class utility {
      * Returns an array of ids that are possible candidates for being a parent item.
      *
      * @param \local_extension\rule[] $rules
-     * @param interger $id The id that will not be added, nor children added.
+     * @param int $id The id that will not be added, nor children added.
      * @param array $idlist A growing list of ids that can be possible parent items.
      * @return array An associated array of id=>name for parents.
      */

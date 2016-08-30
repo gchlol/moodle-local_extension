@@ -317,11 +317,9 @@ class rule {
     public static function get_access($mod, $userid) {
         global $DB;
 
-        $localcm = $mod['localcm'];
-
         $params = array(
             'userid' => $userid,
-            'localcmid' => $localcm->cm->cmid,
+            'localcmid' => $mod['localcm']->cm->cmid,
         );
 
         $access = $DB->get_field('local_extension_subscription', 'access', $params);
@@ -335,7 +333,7 @@ class rule {
      * @param \local_extension\request $request
      * @param array $mod
      */
-    private function send_notifications($request, $mod) {
+    public function send_notifications($request, $mod) {
         $templates = $this->process_templates($request, $mod);
 
         // TODO obtain the templates differently
@@ -356,6 +354,7 @@ class rule {
      *
      * @param stdClass $course
      * @param stdClass $role
+     * @return array $users
      */
     private function rule_get_role_users($course, $role) {
         $users = array();
@@ -518,7 +517,7 @@ class rule {
      *
      * @param array $mod
      */
-    private function write_history($mod) {
+    public function write_history($mod) {
         global $DB;
 
         $localcm = $mod['localcm'];
@@ -673,14 +672,9 @@ class rule {
      * @return string
      */
     private function get_request_time($mod) {
-        $localcm = $mod['localcm'];
-
         // The data is encoded when saving to the database, and decoded when loading from it.
         // This value will be a timestamp.
-        $daterequested = $localcm->get_data();
-        $datedue = $mod['event']->timestart;
-
-        $delta = $daterequested - $datedue;
+        $delta = $mod['localcm']->get_data() - $mod['event']->timestart;
 
         $days = floor($delta / 60 / 60 / 24);
         $hours = floor(($delta - ($days * 86400)) / 60 / 60);
@@ -759,7 +753,7 @@ class rule {
      * @param \local_extension\request $request
      * @param string $subject
      * @param string $content
-     * @param stdClass $course
+     * @param \stdClass $course
      */
     private function notify_roles(\local_extension\request $request, $subject, $content, $course) {
         global $DB;
@@ -771,14 +765,6 @@ class rule {
             $this->notify_user($request, $subject, $content, $userto);
         }
 
-        /*
-        $subscribedids = $DB->get_fieldset_select('local_extension_subscription', 'userid', 'requestid = :requestid', array('requestid' => $request->requestid));
-
-        foreach ($subscribedids as $userid) {
-            $userto = \core_user::get_user($userid);
-            $this->notify_user($request, $subject, $content, $userto);
-        }
-        */
     }
 
     /**
@@ -787,7 +773,7 @@ class rule {
      * @param \local_extension\request $request
      * @param string $subject
      * @param string $content
-     * @param stdClass $userto
+     * @param \stdClass $userto
      */
     private function notify_user(\local_extension\request $request, $subject, $content, $userto) {
         \local_extension\utility::send_trigger_email($request, $subject, $content, $userto);

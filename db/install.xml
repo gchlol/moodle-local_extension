@@ -124,7 +124,7 @@
       <KEYS>
         <KEY NAME="primary" TYPE="primary" FIELDS="id"/>
         <KEY NAME="localcmid" TYPE="foreign" FIELDS="localcmid" REFTABLE="local_extension_cm" REFFIELDS="id"/>
-         <KEY NAME="trigger" TYPE="foreign" FIELDS="trigger" REFTABLE="local_extension_trigger" REFFIELDS="id"/>
+        <KEY NAME="trigger" TYPE="foreign" FIELDS="trigger" REFTABLE="local_extension_trigger" REFFIELDS="id"/>
         <KEY NAME="userid" TYPE="foreign" FIELDS="userid" REFTABLE="user" REFFIELDS="id"/>
       </KEYS>
       <INDEXES>
