@@ -273,9 +273,11 @@ class rule {
 
     /**
      * Processes the rules associated with this object.
+     * Returning a value of true will identify that notifications need to be sent out.
      *
-     * @param stdClass $request
+     * @param \local_extension\request $request
      * @param array $mod
+     * @return bool
      */
     public function process($request, $mod) {
         // Checks if the trigger for this cm has been activated.
@@ -298,13 +300,9 @@ class rule {
 
         $this->setup_subscription($request, $mod);
 
-        $this->send_notifications($request, $mod);
-
-        // Notifications have been sent out. Increment the messageid to thread messages.
-        $request->increment_messageid();
-
-        // Users have been notified and subscriptions setup. Lets write a log of firing this trigger.
         $this->write_history($mod);
+
+        return true;
     }
 
     /**

@@ -111,8 +111,12 @@ class request implements \cache_data_source {
         }
 
         // Add to the $userids, a list of users that are subscribed to this request.
-        $this->subscribedids = $DB->get_fieldset_select('local_extension_subscription', 'userid', 'requestid = :requestid', array('requestid' => $this->requestid));
+        $fieldset = $DB->get_fieldset_select('local_extension_subscription', 'userid', 'requestid = :requestid', array('requestid' => $this->requestid));
         $this->subscribedids[] = $request->userid;
+
+        // Remove duplicate subscriber ids to prevent spamming them.
+        $this->subscribedids += array_unique($fieldset);
+
         foreach ($this->subscribedids as $key => $userid) {
             $userids[$userid] = $userid;
         }
@@ -199,7 +203,7 @@ class request implements \cache_data_source {
         $DB->update_record('local_extension_request', $this->request);
 
         // The request has changed, lets invalidate the cache.
-        $this->get_data_cache()->delete($this->requestid);
+        $this->invalidate_request();
     }
 
     /**
@@ -351,50 +355,81 @@ class request implements \cache_data_source {
      */
     public function process_triggers() {
 
+        $notifydata = array();
+
         // There can only be one request per course module.
         foreach ($this->mods as $mod) {
             $handler = $mod['handler'];
 
-            // Rules are saved in the handler as a static value to prevent duplicate lookups.
-            $allrules = $handler->get_triggers();
+            // Obtains all rules based on the handlers datatype. eg. assign/quiz.
+            $rules = $handler->get_triggers();
 
-            // Filter the rules for only this handler type.
-            $rules = array_filter($allrules, function($obj) use ($handler) {
-                if ($obj->datatype == $handler->get_data_type()) {
-                    return $obj;
-                }
-            });
-
+            // Creates a tree structure with the rules to process.
             $ordered = \local_extension\utility::rule_tree($rules);
 
             foreach ($ordered as $rule) {
-                $this->process_recursive($mod, $rule);
+                $return = $this->process_recursive($mod, $rule);
+                $notifydata = array_merge($notifydata, $return);
             }
 
         }
 
+        // We have processed the triggers, lets send some emails!
+        if (!empty($notifydata)) {
+
+            /*
+            // TODO replace notifications
+            $rule->send_notifications($this, $mod);
+            */
+
+            // Notifications have been sent out. Increment the messageid to thread messages.
+            $this->increment_messageid();
+        }
+
         // Invalidate the cache for this request, there may be new users subscribed.
-        $this->get_data_cache()->delete($this->requestid);
+        $this->invalidate_request();
     }
 
     /**
      * Processes the rule and request recursively.
      *
      * @param array $mod
-     * @param rule $rule
+     * @param \local_extension\rule $rule
+     * @param array $data
+     * @return array
      */
-    private function process_recursive($mod, $rule) {
-        /* @var \local_extension\rule $rule */
-        $rule->process($this, $mod);
+    private function process_recursive($mod, $rule, &$data = null) {
 
+        // Initialise the data object.
+        if (empty($data)) {
+            $data = array();
+        }
+
+        // Processing a rule.
+        $notify = $rule->process($this, $mod);
+
+        // If true, then we will create a notification data entry that will be returned.
+        if ($notify === true) {
+            $item = new \stdClass();
+
+            $item->requestid = $this->requestid;
+            $item->ruleid = $rule->id;
+            $item->role = $rule->role;
+            $item->cmid = $mod['localcm']->cm->cmid;
+
+            $data[] = $item;
+        }
+
+        // If the rule has children, then we will process them.
         if (!empty($rule->children)) {
 
             foreach ($rule->children as $child) {
-                $this->process_recursive($mod, $child);
+                $data = $this->process_recursive($mod, $child, $data);
             }
 
         }
 
+        return $data;
     }
 
     /**
