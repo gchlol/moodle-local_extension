@@ -36,7 +36,8 @@ $request = \local_extension\utility::cache_get_request($requestid);
 // The request object is invalidated and regenerated after each comment, attachment added, or rule triggered.
 if (!array_key_exists($USER->id, $request->users)) {
     // TODO What should we print here?
-    die();
+    // Permissions checking
+    //die();
 }
 
 $url = new moodle_url('/local/extension/status.php', array('id' => $requestid));

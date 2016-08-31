@@ -189,7 +189,8 @@ class local_extension_renderer extends plugin_renderer_base {
         list($fs, $files) = $req->fetch_attachments();
 
         $out  = html_writer::start_tag('div', array('class' => 'attachments'));
-        $out .= get_string('attachments', 'local_extension');
+        $out .= html_writer::tag('p', get_string('attachments', 'local_extension'));
+        $out .= html_writer::start_tag('ul');
 
         foreach ($files as $file) {
             /* @var stored_file $file */
@@ -216,11 +217,15 @@ class local_extension_renderer extends plugin_renderer_base {
                 $file->get_filename()
             );
 
-            $out .= $OUTPUT->pix_icon(file_file_icon($file, 24), get_mimetype_description($file));
-            $out .= html_writer::link($fileurl, $f->get_filename()) . "<br />";
-            $out .= userdate($file->get_timecreated(), '%d %h %Y %l:%M%P') . "<br />";
+            $out .= html_writer::start_tag('li', array('class' => 'attachment'));
+            $out .= $OUTPUT->pix_icon(file_file_icon($file, 16), get_mimetype_description($file)) . ' ';
+            $out .= html_writer::link($fileurl, $f->get_filename()) . "  ";
+            $out .= userdate($file->get_timecreated(), '%d %h %Y %l:%M%P');
+            $out .= html_writer::end_tag('li'); // End .attachment.
 
         }
+
+        $out .= html_writer::end_tag('ul'); // End .attachment.
         $out .= html_writer::end_div(); // End .attachments.
 
         // The first file will be '.'

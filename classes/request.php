@@ -356,6 +356,7 @@ class request implements \cache_data_source {
     public function process_triggers() {
 
         $notifydata = array();
+        $templatedata = array();
 
         // There can only be one request per course module.
         foreach ($this->mods as $mod) {
@@ -377,10 +378,61 @@ class request implements \cache_data_source {
         // We have processed the triggers, lets send some emails!
         if (!empty($notifydata)) {
 
-            /*
-            // TODO replace notifications
-            $rule->send_notifications($this, $mod);
-            */
+            $rules = array();
+
+            // 1. Generate the template content for each mod item
+            foreach ($notifydata as $data) {
+                // For the rule is that triggered, here is a list of cm templates that are generated.
+                $templatedata[$data->rule->id][] = $data->rule->process_templates($this, $data->mod);
+                $rules[$data->rule->id] = $data->rule;
+            }
+
+            // 2. Join the template subjects and content together in one message
+            foreach ($templatedata as $ruleid => $templatecms) {
+                // If there are multiple cms in a request we need to concatenate them into the one message.
+
+                $templates = new \stdClass();
+
+                foreach($templatecms as $template) {
+                    // TODO subject content needs to be normalised.
+                    $templates->user_subject = $template['template_user_subject'];
+                    $templates->role_subject = $template['template_notify_subject'];
+
+                    if (!empty($templates->user_content)) {
+                        $templates->user_content .= "<hr>" . $template['template_user']['text'];
+                    } else {
+                        $templates->user_content = $template['template_user']['text'];
+                    }
+
+
+                    if (!empty($templates->role_content)) {
+                        $templates->role_content .= "<hr>" . $template['template_notify']['text'];
+                    } else {
+                        $templates->role_content = $template['template_notify']['text'];
+                    }
+                }
+
+                // 3. Notify the roles / user for each rule returned.
+                $rules[$ruleid]->send_notifications($this, $mod, $templates);
+
+                /*
+                // TODO replace notifications
+                $rule->send_notifications($this, $mod, $templates);
+
+                $templates = $this->process_templates($request, $mod);
+                // TODO obtain the templates differently
+                $usercontent = $templates['template_user']['text'];
+                $usersubject = $templates['template_user_subject'];
+
+                $rolecontent = $templates['template_notify']['text'];
+                $rolesubject = $templates['template_notify_subject'];
+
+                $user = \core_user::get_user($mod['localcm']->userid);
+
+                $this->notify_roles($request, $rolesubject, $rolecontent, $mod['course']);
+                $this->notify_user($request, $usersubject, $usercontent, $user);
+                */
+            }
 
             // Notifications have been sent out. Increment the messageid to thread messages.
             $this->increment_messageid();
@@ -412,9 +464,9 @@ class request implements \cache_data_source {
         if ($notify === true) {
             $item = new \stdClass();
 
-            $item->requestid = $this->requestid;
-            $item->ruleid = $rule->id;
+            $item->rule = $rule;
             $item->role = $rule->role;
+            $item->mod = $mod;
             $item->cmid = $mod['localcm']->cm->cmid;
 
             $data[] = $item;
@@ -547,12 +599,12 @@ class request implements \cache_data_source {
         foreach ($this->subscribedids as $userid) {
             $userto = \core_user::get_user($userid);
 
+            /*
             $params = array(
                 'userid' => $userid,
                 'requestid' => $this->requestid,
             );
 
-            /*
             $ruleid = $DB->get_field('local_extension_subscription', 'trigger', $params);
             $rule = \local_extension\rule::from_id($ruleid);
 

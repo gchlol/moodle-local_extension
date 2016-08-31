@@ -156,6 +156,7 @@ class utility {
      * @param \stdClass $userto
      */
     public static function send_trigger_email(\local_extension\request $request, $subject, $content, $userto) {
+        // TODO, FROM THE STUDENT MAKING THE REQUEST.
         $userfrom = \core_user::get_support_user();
 
         $sendmail = get_config('local_extension', 'emaildisable');

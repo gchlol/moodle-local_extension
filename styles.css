@@ -1,6 +1,11 @@
 .mod {
     font-size: 150%;
 }
+
+.attachment {
+    vertical-align: bottom;
+}
+
 .comment {
     margin-bottom: 8px;
     min-height: 30px;
@@ -19,14 +24,6 @@
 
 .comment .name {
     font-weight: bold;
-}
-
-.comment .fileattachment {
-    background-color: #e6e6e6;
-}
-
-.comment .statechange {
-    background-color: #d8d8d8;
 }
 
 span.statusnew {

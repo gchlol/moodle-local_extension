@@ -330,16 +330,16 @@ class rule {
      *
      * @param \local_extension\request $request
      * @param array $mod
+     * @param array $templates
      */
-    public function send_notifications($request, $mod) {
-        $templates = $this->process_templates($request, $mod);
+    public function send_notifications($request, $mod, $templates) {
 
         // TODO obtain the templates differently
-        $usercontent = $templates['template_user']['text'];
-        $usersubject = $templates['template_user_subject'];
+        $usercontent = $templates->user_content;
+        $usersubject = $templates->user_subject;
 
-        $rolecontent = $templates['template_notify']['text'];
-        $rolesubject = $templates['template_notify_subject'];
+        $rolecontent = $templates->role_content;
+        $rolesubject = $templates->role_subject;;
 
         $user = \core_user::get_user($mod['localcm']->userid);
 
@@ -420,6 +420,9 @@ class rule {
             } else {
                 $DB->update_record('local_extension_subscription', $sub);
             }
+
+            // Append the user to the subscribed list.
+            $request->subscribedids[] = $sub->userid;
         }
 
         if (!empty($this->parentrule)) {
