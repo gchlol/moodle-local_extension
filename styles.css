@@ -47,12 +47,12 @@ span.statuscancel {
 }
 
 .mform fieldset div {
-    margin-left: 0px !important;
+    margin-left: 0px;
 }
 
-.mform fieldset div .fgroup {
+.mform fieldset div.fgroup {
     margin-top: 10px;
-    margin-left: 16% !important;
+    margin-left: 16%;
     margin-bottom: 10px;
 }
 

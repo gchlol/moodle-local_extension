@@ -74,6 +74,7 @@ class update extends \moodleform {
             $mform->addElement('html', $html);
         }
 
+        $html .= \html_writer::empty_tag('p');
         $html .= $renderer->render_extension_comments($request);
         $html .= \html_writer::start_tag('br');
         $mform->addElement('html', $html);
