@@ -125,6 +125,7 @@ class rule extends \moodleform {
         $mform->addGroup($actiongroup, 'actiongroup', get_string('form_rule_label_set_roles', 'local_extension'), array(' '), false);
 
         // Email templates.
+        /*
         $mform->addElement(
             'text',
             'template_notify_subject',
@@ -134,11 +135,13 @@ class rule extends \moodleform {
         $mform->setDefault('template_notify_subject', get_string('template_notify_subject', 'local_extension'));
 
         $mform->setType('template_notify_subject', PARAM_RAW);
+        */
 
-        $editornotify = $mform->addElement('editor', 'template_notify' );
+        $editornotify = $mform->addElement('editor', 'template_notify', get_string('form_rule_label_template', 'local_extension'));
         $mform->setType('template_notify', PARAM_RAW);
         $editornotify->setValue($editordata['template_notify']);
 
+        /*
         $mform->addElement('text',
             'template_user_subject',
             get_string('form_rule_label_template_request', 'local_extension'),
@@ -146,8 +149,9 @@ class rule extends \moodleform {
         );
         $mform->setDefault('template_user_subject', get_string('template_user_subject', 'local_extension'));
         $mform->setType('template_user_subject', PARAM_RAW);
+        */
 
-        $editoruser = $mform->addElement('editor', 'template_user');
+        $editoruser = $mform->addElement('editor', 'template_user', get_string('form_rule_label_template_request', 'local_extension'));
         $mform->setType('template_user', PARAM_RAW);
         $editoruser->setValue($editordata['template_user']);
 

@@ -153,12 +153,10 @@ class utility {
      * @param \local_extension\request $request
      * @param string $subject
      * @param string $content
+     * @param \stdClas $userfrom
      * @param \stdClass $userto
      */
-    public static function send_trigger_email(\local_extension\request $request, $subject, $content, $userto) {
-        // TODO, FROM THE STUDENT MAKING THE REQUEST.
-        $userfrom = \core_user::get_support_user();
-
+    public static function send_trigger_email(\local_extension\request $request, $subject, $content, $userfrom, $userto) {
         $sendmail = get_config('local_extension', 'emaildisable');
         if ($sendmail == true) {
             return;
@@ -167,14 +165,10 @@ class utility {
         // Email threading.
 
         // The base messageid.
-        $root = $request->requestid . "0";
-        $rootid = self::get_email_message_id($root, $userto->id);
-
-        $inputid = $request->requestid . $request->request->messageid;
-        $messageid = self::get_email_message_id($inputid, $userto->id);
+        $rootid = self::get_email_message_id($request->requestid, $userto->id);
 
         $userfrom->customheaders = array(
-            'Message-ID: ' . $messageid,
+            'Message-ID: ' . $rootid,
 
             // Headers to help prevent auto-responders.
             'Precedence: Bulk',
@@ -183,20 +177,13 @@ class utility {
         );
 
         if ($request->request->messageid != 0) {
+            $inputid = $request->requestid . $request->request->messageid;
+            $messageid = self::get_email_message_id($inputid, $userto->id);
+
             // This post is a reply, so add reply header (RFC 2822).
-            $pid = $request->requestid . $request->request->messageid - 1;
-            $parentid = self::get_email_message_id($pid, $userto->id);
-            $userfrom->customheaders[] = "In-Reply-To: $parentid";
-
-            // If the post is deeply nested we also reference the parent message id and
-            // the root message id (if different) to aid threading when parts of the email
-            // conversation have been deleted (RFC1036).
-            if ($pid - 1 != 0) {
-                $userfrom->customheaders[] = "References: $rootid $parentid";
-            } else {
-                $userfrom->customheaders[] = "References: $parentid";
-            }
-
+            $userfrom->customheaders[] = "In-Reply-To: $rootid";
+            $userfrom->customheaders[] = "References: $rootid";
+            $userfrom->customheaders[] = 'Message-ID: ' . $messageid;
         }
 
         // MS Outlook / Office uses poorly documented and non standard headers, including
@@ -241,6 +228,9 @@ class utility {
     public static function generate_email_messageid($localpart = null) {
         global $CFG;
         $urlinfo = parse_url($CFG->wwwroot);
+
+        // TODO REMOVE AS THIS IS USED FOR DEMO
+        $urlinfo = parse_url($CFG->wwwroots[0]);
 
         $base = '@' . $urlinfo['host'];
         // If multiple moodles are on the same domain we want to tell them

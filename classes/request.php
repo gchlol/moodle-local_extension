@@ -115,7 +115,7 @@ class request implements \cache_data_source {
         $this->subscribedids[] = $request->userid;
 
         // Remove duplicate subscriber ids to prevent spamming them.
-        $this->subscribedids += array_unique($fieldset);
+        $this->subscribedids = array_merge($this->subscribedids, array_unique($fieldset));
 
         foreach ($this->subscribedids as $key => $userid) {
             $userids[$userid] = $userid;
@@ -393,7 +393,7 @@ class request implements \cache_data_source {
 
                 $templates = new \stdClass();
 
-                foreach($templatecms as $template) {
+                foreach ($templatecms as $template) {
                     // TODO subject content needs to be normalised.
                     $templates->user_subject = $template['template_user_subject'];
                     $templates->role_subject = $template['template_notify_subject'];
@@ -404,7 +404,6 @@ class request implements \cache_data_source {
                         $templates->user_content = $template['template_user']['text'];
                     }
 
-
                     if (!empty($templates->role_content)) {
                         $templates->role_content .= "<hr>" . $template['template_notify']['text'];
                     } else {
@@ -414,24 +413,6 @@ class request implements \cache_data_source {
 
                 // 3. Notify the roles / user for each rule returned.
                 $rules[$ruleid]->send_notifications($this, $mod, $templates);
-
-                /*
-                // TODO replace notifications
-                $rule->send_notifications($this, $mod, $templates);
-
-                $templates = $this->process_templates($request, $mod);
-                // TODO obtain the templates differently
-                $usercontent = $templates['template_user']['text'];
-                $usersubject = $templates['template_user_subject'];
-
-                $rolecontent = $templates['template_notify']['text'];
-                $rolesubject = $templates['template_notify_subject'];
-
-                $user = \core_user::get_user($mod['localcm']->userid);
-
-                $this->notify_roles($request, $rolesubject, $rolecontent, $mod['course']);
-                $this->notify_user($request, $usersubject, $usercontent, $user);
-                */
             }
 
             // Notifications have been sent out. Increment the messageid to thread messages.
@@ -614,6 +595,7 @@ class request implements \cache_data_source {
             $content = $templates['template_notify']['text'];
             */
 
+            /*
             $studentname = null;
             $courseids = array();
 
@@ -626,13 +608,25 @@ class request implements \cache_data_source {
             // Single content item.
             $coursestr = '[' . implode(', ', $courseids) . ']';
             $subject = 'Test Update Notification ' . $coursestr;
+            */
 
             $content = '';
             foreach ($history as $item) {
                 $content .= $PAGE->get_renderer('local_extension')->render_single_comment($this, $item, true);
             }
 
-            \local_extension\utility::send_trigger_email($this, $subject, $content, $userto);
+            // The update is sent from who modified the history.
+            // There will always be at least one history item.
+            $userfrom = \core_user::get_user($history[0]->userid);
+
+            $requestuser = \core_user::get_user($this->request->userid);
+            $data = new \stdClass();
+            $data->requestid = $this->requestid;
+            $data->fullname = \fullname($requestuser, true);
+
+            $subject = get_string('email_notification_subect', 'local_extension', $data);
+
+            \local_extension\utility::send_trigger_email($this, $subject, $content, $userfrom, $userto);
         }
 
         // Send notification to user with basic details.

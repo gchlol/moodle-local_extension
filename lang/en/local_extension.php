@@ -37,6 +37,7 @@ $string['emailtemplate'] = 'Email Template';
 $string['emailtemplatehelp'] = '';
 $string['error_extension_lessthan'] = 'Less than days';
 $string['error_none_selected'] = 'Please select at least one item';
+$string['email_notification_subect'] = 'Extension request #{$a->requestid} for {$a->fullname}.';
 $string['event_process_triggers'] = 'Processed triggers';
 $string['event_request_created'] = 'Request created';
 $string['externalrules'] = 'Manage Adapter Triggers';

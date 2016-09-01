@@ -279,7 +279,7 @@ class rule {
      * @param array $mod
      * @return bool
      */
-    public function process($request, $mod) {
+    public function process(&$request, $mod) {
         // Checks if the trigger for this cm has been activated.
         if ($this->check_history($mod) === false) {
             return false;
@@ -326,7 +326,7 @@ class rule {
     }
 
     /**
-     * Helper to send notifications for roles based on the rule and request.
+     * Helper to send notifications for roles based on the rule and request. Used when processing rules.
      *
      * @param \local_extension\request $request
      * @param array $mod
@@ -334,17 +334,23 @@ class rule {
      */
     public function send_notifications($request, $mod, $templates) {
 
-        // TODO obtain the templates differently
+        $requestuser = \core_user::get_user($request->request->userid);
+        // This is called when processing triggers. So the user to for 'user' notifications should be the requesting user.
+        $userto = $requestuser;
+
+        // The email content, parsed template data.
         $usercontent = $templates->user_content;
-        $usersubject = $templates->user_subject;
-
         $rolecontent = $templates->role_content;
-        $rolesubject = $templates->role_subject;;
 
-        $user = \core_user::get_user($mod['localcm']->userid);
+        // The email subject, for the moment a language string.
+        $data = new \stdClass();
+        $data->requestid = $request->requestid;
+        $data->fullname = \fullname($requestuser, true);
+        $subject = get_string('email_notification_subect', 'local_extension', $data);
 
-        $this->notify_roles($request, $rolesubject, $rolecontent, $mod['course']);
-        $this->notify_user($request, $usersubject, $usercontent, $user);
+        // TODO check if there is any content and not notify roles/users.
+        $this->notify_roles($request, $subject, $rolecontent, $mod['course']);
+        $this->notify_user($request, $subject, $usercontent, $requestuser, $userto);
     }
 
     /**
@@ -379,7 +385,7 @@ class rule {
      * @param \local_extension\request $request
      * @param array $mod
      */
-    private function setup_subscription($request, $mod) {
+    private function setup_subscription(&$request, $mod) {
         global $DB;
 
         $localcm = $mod['localcm'];
@@ -759,11 +765,14 @@ class rule {
     private function notify_roles(\local_extension\request $request, $subject, $content, $course) {
         global $DB;
 
+        // The request is sent from the user that has created the extension.
+        $userfrom = \core_user::get_user($request->request->userid);
+
         $role = $this->role;
         $users = $this->rule_get_role_users($course, $role);
 
         foreach ($users as $userto) {
-            $this->notify_user($request, $subject, $content, $userto);
+            $this->notify_user($request, $subject, $content, $userfrom, $userto);
         }
 
     }
@@ -774,10 +783,11 @@ class rule {
      * @param \local_extension\request $request
      * @param string $subject
      * @param string $content
+     * @param \stdClass $userfrom
      * @param \stdClass $userto
      */
-    private function notify_user(\local_extension\request $request, $subject, $content, $userto) {
-        \local_extension\utility::send_trigger_email($request, $subject, $content, $userto);
+    private function notify_user(\local_extension\request $request, $subject, $content, $userfrom, $userto) {
+        \local_extension\utility::send_trigger_email($request, $subject, $content, $userfrom, $userto);
     }
 
 }
