@@ -629,11 +629,7 @@ class request implements \cache_data_source {
             \local_extension\utility::send_trigger_email($this, $subject, $content, $userfrom, $userto);
         }
 
-        // Send notification to user with basic details.
-        // $content = $PAGE->get_renderer('local_extension')->render_single_comment($this, $item, true);
-        // \local_extension\utility::send_trigger_email($this, $subject, $content, $userto);
-
-        // Increment the messageid to assist with inbox threading.
+        // Increment the messageid to assist with inbox threading / message history.
         $this->increment_messageid();
     }
 

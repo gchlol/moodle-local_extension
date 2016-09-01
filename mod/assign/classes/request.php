@@ -83,7 +83,7 @@ class request extends \local_extension\base_request {
     /**
      * Renders the request details in a form with a date selector.
      *
-     * @param moodleform $mform A moodle form object
+     * @param \MoodleQuickForm $mform A moodle form object
      * @param array $mod An array of event details
      */
     public function request_definition($mform, $mod) {
@@ -108,7 +108,7 @@ class request extends \local_extension\base_request {
     /**
      * Renders the request status in a form with indicators of the request state.
      *
-     * @param moodleform $mform A moodle form object
+     * @param \MoodleQuickForm $mform A moodle form object
      * @param array $mod An array of event details
      */
     public function status_definition($mform, $mod) {
@@ -129,18 +129,18 @@ class request extends \local_extension\base_request {
 
         // TODO case on type of request, ie. exemption, extension, etc.
         // print extension type colour like the scoping document
-        $html  = \html_writer::start_tag('div', array('class' => 'content'));
+        $html  = \html_writer::start_div('content');
         $html .= \html_writer::tag('span', $requeststatus, array('class' => 'status'));
         $html .= \html_writer::tag('span', ' extension until ' . \userdate($localcm->cm->data), array('class' => 'time'));
         $html .= \html_writer::end_div(); // End .content.
 
-        $mform->addElement('html', \html_writer::tag('p', $html));
+        $mform->addElement('html', $html);
     }
 
     /**
      * Renders buttons that can set the status of a cm item.
      *
-     * @param moodleform $mform A moodle form object
+     * @param \MoodleQuickForm $mform A moodle form object
      * @param array $mod An array of event details
      */
     public function status_modification($mform, $mod) {
@@ -152,6 +152,8 @@ class request extends \local_extension\base_request {
         /* @var $localcm \local_extension\cm */
         $localcm = $mod['localcm'];
         $id = $localcm->cmid;
+
+        $buttonarray = array();
 
         /*
         STATE_NEW = 0;
@@ -188,15 +190,13 @@ class request extends \local_extension\base_request {
 
         }
 
-        $mform->addGroup($buttonarray, 'buttonar', '', array(' '), false);
-        $mform->closeHeaderBefore('buttonar');
-
+        $mform->addGroup($buttonarray, 'statusmodgroup'  . $id, '', ' ', false);
     }
 
     /**
      * Validate the parts of the request form for this module
      *
-     * @param moodleform $mform A moodle form object
+     * @param \MoodleQuickForm $mform A moodle form object
      * @param array $mod An array of event details
      * @param array $data An array of form data
      * @return array of error messages
@@ -236,7 +236,7 @@ class request extends \local_extension\base_request {
     /**
      * Return data to be stored for the request
      *
-     * @param moodleform $mform A moodle form object
+     * @param \MoodleQuickForm $mform A moodle form object
      * @param array $mod An array of event details
      * @param array $data An array of form data
      * @return string The data to be stored
