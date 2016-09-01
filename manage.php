@@ -43,6 +43,7 @@ $PAGE->set_title(get_string('pluginname', 'local_extension'));
 $PAGE->set_heading(get_string('rules_page_heading', 'local_extension'));
 $PAGE->requires->css('/local/extension/styles.css');
 
+/* @var $renderer local_extension_renderer */
 $renderer = $PAGE->get_renderer('local_extension');
 
 $rules = \local_extension\rule::load_all();

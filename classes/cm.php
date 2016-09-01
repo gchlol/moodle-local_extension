@@ -34,39 +34,39 @@ namespace local_extension;
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 class cm {
-    /** @var integer New request. */
+    /** @var int New request. */
     const STATE_NEW = 0;
 
-    /** @var integer Denied request. */
+    /** @var int Denied request. */
     const STATE_DENIED = 1;
 
-    /** @var integer Approved request. */
+    /** @var int Approved request. */
     const STATE_APPROVED = 2;
 
-    /** @var integer Reopened request. */
+    /** @var int Reopened request. */
     const STATE_REOPENED = 4;
 
-    /** @var integer Cancelled request. */
+    /** @var int Cancelled request. */
     const STATE_CANCEL = 8;
 
-    /** @var integer The local_extension_cm id */
+    /** @var int The local_extension_cm id */
     public $cmid = null;
 
-    /** @var integer The user id assocaited with this cm */
+    /** @var int The user id assocaited with this cm */
     public $userid = null;
 
-    /** @var integer The request id associated with this cm */
+    /** @var int The request id associated with this cm */
     public $requestid = null;
 
-    /** @var stdClass The local_extension_cm database object */
+    /** @var \stdClass The local_extension_cm database object */
     public $cm = null;
 
     /**
      * Cm constructor
      *
-     * @param integer $cmid
-     * @param integer $userid
-     * @param integer $requestid
+     * @param int $cmid
+     * @param int $userid
+     * @param int $requestid
      */
     public function __construct($cmid, $userid, $requestid) {
         $this->cmid = $cmid;
@@ -77,9 +77,9 @@ class cm {
     /**
      * Obtain a cm class with the requestid.
      *
-     * @param integer $cmid
-     * @param integer $requestid
-     * @return request $req A request data object.
+     * @param int $cmid
+     * @param int $requestid
+     * @return cm $cm Local cm.
      */
     public static function from_requestid($cmid, $requestid) {
         global $DB;
@@ -100,9 +100,9 @@ class cm {
     /**
      * Obtain a cm class with the userid.
      *
-     * @param integer $cmid
-     * @param integer $userid
-     * @return request $req A request data object.
+     * @param int $cmid
+     * @param int $userid
+     * @return cm $localcm Local cm.
      */
     public static function from_userid($cmid, $userid) {
         global $DB;
@@ -123,7 +123,7 @@ class cm {
     /**
      * Parses submitted form data and sets the properties of this class to match.
      *
-     * @param stdClass $form
+     * @param \stdClass $form
      */
     public function load_from_form($form) {
 
@@ -145,7 +145,7 @@ class cm {
 
     /**
      * Unserialises and base64_decodes the saved custom data.
-     * @return data
+     * @return array
      */
     public function data_load() {
         return unserialize(base64_decode($this->get_data()));
@@ -162,7 +162,7 @@ class cm {
     /**
      * Sets the state of this request.
      *
-     * @param integer $state
+     * @param int $state
      */
     public function set_state($state) {
         global $DB;
@@ -176,10 +176,10 @@ class cm {
     /**
      * Writes an state change entry to local_extension_his_state. Returns the history object.
      *
-     * @param stdClass $mod
-     * @param integer $state
-     * @param integer $userid
-     * @return stdClass $history
+     * @param \stdClass $mod
+     * @param int $state
+     * @param int $userid
+     * @return array $history
      */
     public function write_history($mod, $state, $userid) {
         global $DB;
@@ -202,8 +202,8 @@ class cm {
     /**
      * Returns a human readable state name.
      *
-     * @param integer $stateid State id.
-     * @throws coding_exception
+     * @param int $stateid State id.
+     * @throws \coding_exception
      * @return string the human-readable status name.
      */
     public function get_state_name($stateid = null) {
