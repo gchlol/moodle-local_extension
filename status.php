@@ -34,12 +34,14 @@ $request = \local_extension\utility::cache_get_request($requestid);
 // $request->user is an array of $userid=>$userobj associated to this request, eg. those that are subscribed, and the user.
 // The list of subscribed users populated each time the request object is generated.
 // The request object is invalidated and regenerated after each comment, attachment added, or rule triggered.
+
+// Permissions checking
+/*
 if (!array_key_exists($USER->id, $request->users)) {
     // TODO What should we print here?
-    // Permissions checking
-    //die();
+    die();
 }
-
+*/
 $url = new moodle_url('/local/extension/status.php', array('id' => $requestid));
 $PAGE->set_url($url);
 
