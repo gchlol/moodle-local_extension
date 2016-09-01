@@ -45,3 +45,19 @@ span.statusreopened {
 span.statuscancel {
 	background-color: #AFFF44
 }
+
+.mform fieldset div {
+    margin-left: 0px !important;
+}
+
+.mform fieldset div .fgroup {
+    margin-top: 10px;
+    margin-left: 16% !important;
+    margin-bottom: 10px;
+}
+
+.mform fieldset div .comment {
+    margin-bottom: 8px;
+    min-height: 30px;
+    position: relative;
+}
