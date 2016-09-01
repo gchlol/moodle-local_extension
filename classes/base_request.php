@@ -89,4 +89,14 @@ abstract class base_request {
      * @return \local_extension\rule[]
      */
     abstract public function get_triggers();
+
+    /**
+     * Sets the extension length to the requested date. This is called when the approve button is click when viewing the status forum.
+     *
+     * @param int $assignmentid
+     * @param int $userid
+     * @param int $duedate
+     * @return bool
+     */
+    abstract public function submit_extension($assignmentid, $userid, $duedate);
 }

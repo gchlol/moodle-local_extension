@@ -252,4 +252,30 @@ class request extends \local_extension\base_request {
         }
     }
 
+    /**
+     * Grants an extension.
+     *
+     * @param int $assignmentid
+     * @param int $userid
+     * @param int $duedate
+     *
+     * @return bool
+     */
+    public function submit_extension($assignmentid, $userid, $duedate) {
+        global $CFG;
+        require_once("$CFG->dirroot/mod/assign/locallib.php");
+
+        $cm = get_coursemodule_from_instance('assign', $assignmentid, 0, false, MUST_EXIST);
+        $context = \context_module::instance($cm->id);
+
+        $assignment = new \assign($context, $cm, null);
+
+        $warning = '';
+        if (!$assignment->save_user_extension($userid, $duedate)) {
+            $warning = 'User id: ' . $userid . ', Assignment id: ' . $assignmentid . ', Extension date: ' . $duedate;
+        }
+
+        return true;
+    }
+
 }

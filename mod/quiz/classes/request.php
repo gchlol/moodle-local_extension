@@ -123,5 +123,17 @@ class request extends \local_extension\base_request {
         return '';
     }
 
+    /**
+     * Grants an extension.
+     *
+     * @param int $assignmentid
+     * @param int $userid
+     * @param int $duedate
+     * @return bool
+     */
+    public function submit_extension($assignmentid, $userid, $duedate) {
+        // TODO: Implement submit_extension() method.
+    }
+
 }
 

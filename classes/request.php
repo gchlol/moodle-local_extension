@@ -510,6 +510,12 @@ class request implements \cache_data_source {
                 $item = $name . $id;
 
                 if (!empty($data->$item)) {
+
+                    // The extension has been approved.
+                    if ($name == 'approve') {
+                        $handler->submit_extension($event->id, $this->request->userid, $localcm->cm->data);
+                    }
+
                     $localcm->set_state($state);
 
                     $status = $localcm->get_state_name();
