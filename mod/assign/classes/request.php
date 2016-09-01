@@ -270,9 +270,10 @@ class request extends \local_extension\base_request {
 
         $assignment = new \assign($context, $cm, null);
 
-        $warning = '';
+        // $warning = '';
         if (!$assignment->save_user_extension($userid, $duedate)) {
-            $warning = 'User id: ' . $userid . ', Assignment id: ' . $assignmentid . ', Extension date: ' . $duedate;
+            // $warning = 'User id: ' . $userid . ', Assignment id: ' . $assignmentid . ', Extension date: ' . $duedate;
+            return false;
         }
 
         return true;

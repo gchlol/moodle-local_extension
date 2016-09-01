@@ -492,6 +492,7 @@ class request implements \cache_data_source {
     public function update_cm_state($user, $data) {
 
         foreach ($this->mods as $id => $mod) {
+            /* @var \local_extension\base_request $handler */
             $handler = $mod['handler'];
 
             /* @var \local_extension\cm $localcm */
@@ -511,7 +512,7 @@ class request implements \cache_data_source {
 
                 if (!empty($data->$item)) {
 
-                    // The extension has been approved.
+                    // The extension has been approved. Lets hook into the handler and extend the items length.
                     if ($name == 'approve') {
                         $handler->submit_extension($event->id, $this->request->userid, $localcm->cm->data);
                     }

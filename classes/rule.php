@@ -35,61 +35,61 @@ namespace local_extension;
  */
 class rule {
 
-    /** @var integer Action type: Default. No access */
+    /** @var int Action type: Default. No access */
     const RULE_ACTION_DEFAULT = 0;
 
-    /** @var integer Action type: Approve. */
+    /** @var int Action type: Approve. */
     const RULE_ACTION_APPROVE = 1;
 
-    /** @var integer Action type: Subscribe. */
+    /** @var int Action type: Subscribe. */
     const RULE_ACTION_SUBSCRIBE = 2;
 
-    /** @var integer Action type: Force the approval status. Do not downgrade to subscribe. */
+    /** @var int Action type: Force the approval status. Do not downgrade to subscribe. */
     const RULE_ACTION_FORCEAPPROVE = 4;
 
-    /** @var integer Condition: Less than. */
+    /** @var int Condition: Less than. */
     const RULE_CONDITION_LT = 1;
 
-    /** @var integer Condition: Greater or equal to. */
+    /** @var int Condition: Greater or equal to. */
     const RULE_CONDITION_GE = 2;
 
-    /** @var integer Condition: Any. */
+    /** @var int Condition: Any. */
     const RULE_CONDITION_ANY = 4;
 
-    /** @var integer The local_extension_trigger id */
+    /** @var int The local_extension_trigger id */
     public $id = null;
 
-    /** @var integer The context associated with this rule */
+    /** @var int The context associated with this rule */
     public $context = null;
 
     /** @var string Rule name */
     public $name = null;
 
-    /** @var integer Role that is notified */
+    /** @var int Role that is notified */
     public $role = null;
 
-    /** @var integer Action type */
+    /** @var int Action type */
     public $action = null;
 
-    /** @var integer Priortiy */
+    /** @var int Priortiy */
     public $priority = null;
 
-    /** @var integer Parent id */
+    /** @var int Parent id */
     public $parent = null;
 
-    /** @var integer The length from due date */
+    /** @var int The length from due date */
     public $lengthfromduedate = null;
 
-    /** @var integer Length from due date type (LT/GE) */
+    /** @var int Length from due date type (LT/GE) */
     public $lengthtype = null;
 
-    /** @var integer Time elapsed from request date */
+    /** @var int Time elapsed from request date */
     public $elapsedfromrequest = null;
 
-    /** @var integer Time elapsed from request date type (LT/GE) */
+    /** @var int Time elapsed from request date type (LT/GE) */
     public $elapsedtype = null;
 
-    /** @var stdClass Custom data assocaited with this object, serialised base64 */
+    /** @var \stdClass Custom data assocaited with this object, serialised base64 */
     public $data = null;
 
     /** @var array Role names lookup */
@@ -107,7 +107,7 @@ class rule {
     /**
      * Rule object constructor.
      *
-     * @param integer $ruleid
+     * @param int $ruleid
      */
     public function __construct($ruleid = null) {
         $this->id = $ruleid;
@@ -219,7 +219,7 @@ class rule {
     /**
      * Obtain a rule object with the given id.
      *
-     * @param integer $ruleid
+     * @param int $ruleid
      * @return \local_extension\rule
      */
     public static function from_id($ruleid) {
@@ -309,7 +309,7 @@ class rule {
      * Obtains the level of access from the table local_extension_subscription.
      *
      * @param array $mod
-     * @param integer $userid
+     * @param int $userid
      * @return mixed|boolean
      */
     public static function get_access($mod, $userid) {
@@ -641,7 +641,7 @@ class rule {
      * If this rule has a parent value, we will check the history to see if that has been processed or not.
      *
      * @param array $mod
-     * @param integer $parent
+     * @param int $parent
      * @return boolean
      */
     private function check_parent($mod, $parent) {

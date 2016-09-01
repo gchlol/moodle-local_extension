@@ -128,6 +128,7 @@ if ($form = $mform->get_data()) {
     }
 
     // Parse the form data to see if any accept/deny/reopen/etc buttons have been clicked, and update the state accordingly.
+    // If the state has been approved then it will call the handers->submit_extension method to extend the module.
     $notifycontent[] = $request->update_cm_state($USER, $form);
 
     if (!empty($comment)) {
