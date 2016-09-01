@@ -92,7 +92,11 @@ class local_extension_renderer extends plugin_renderer_base {
             $class .= ' statechange';
         }
 
-        $user = $req->users[$comment->userid];
+        if (array_key_exists($comment->userid, $req->users)) {
+            $user = $req->users[$comment->userid];
+        } else {
+            $user = \core_user::get_user($comment->userid);
+        }
 
         $out .= html_writer::start_tag('div', array('class' => 'comment'));
 
