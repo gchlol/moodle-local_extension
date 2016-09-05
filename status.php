@@ -65,6 +65,12 @@ $params = array(
     'renderer' => $renderer,
 );
 
+$requestuser = core_user::get_user($request->request->userid);
+
+$PAGE->navbar->ignore_active();
+$PAGE->navbar->add('Extension Status', new moodle_url('/local/extension/index.php'));
+$PAGE->navbar->add('Extension #' . $requestid . ': ' . \fullname($requestuser), new moodle_url('/local/extension/status.php', array('id' => $request->requestid)));
+
 $mform = new \local_extension\form\update(null, $params);
 
 if ($form = $mform->get_data()) {

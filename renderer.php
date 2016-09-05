@@ -168,7 +168,6 @@ class local_extension_renderer extends plugin_renderer_base {
         $num = strtok($show, ' ');
         $unit = strtok(' ');
         $show = "$num $unit";
-        $show = get_string('ago', 'message', $show);
 
         // The full date.
         $fulldate = userdate($time, '%d %h %Y %l:%M%P');
@@ -184,7 +183,7 @@ class local_extension_renderer extends plugin_renderer_base {
     /**
      * Extension attachment file renderer.
      *
-     * @param request $req The extension request object.
+     * @param \local_extension\request $req The extension request object.
      * @return string $out The html output.
      */
     public function render_extension_attachments(\local_extension\request $req) {
@@ -261,7 +260,13 @@ class local_extension_renderer extends plugin_renderer_base {
                 $statusurl = new moodle_url("/local/extension/status.php", array('id' => $request->id));
                 $status = get_string("table_header_statusrow", "local_extension", $statusurl->out());
 
-                $values = array($request->id, $request->count, userdate($request->timestamp), $status);
+                $values = array(
+                    $request->id,
+                    $request->count,
+                    userdate($request->timestamp),
+                    $status,
+                    \fullname(\core_user::get_user($request->userid)),
+                );
                 $table->add_data($values);
 
             }
@@ -345,7 +350,7 @@ class local_extension_renderer extends plugin_renderer_base {
      * @return string $html The html output.
      */
     public function render_trigger_rule_text($trigger, $parentstr) {
-        $html  = html_writer::start_tag('div');
+           $html  = html_writer::start_tag('div');
 
         if (empty($parentstr)) {
             $activate = get_string('form_rule_label_parent_allways', 'local_extension');
@@ -460,7 +465,7 @@ class local_extension_renderer extends plugin_renderer_base {
             if (!empty($rule->parentrule->name)) {
                 $parentstr = $rule->parentrule->name;
             } else {
-                $parentstr = null;
+                $parentstr = '';
             }
 
             $html .= html_writer::start_div('manageruleitem');

@@ -50,9 +50,10 @@ class table {
             get_string('table_header_items', 'local_extension'),
             get_string('table_header_requestdate', 'local_extension'),
             get_string('table_header_statushead', 'local_extension'),
+            get_string('table_header_username', 'local_extension'),
         );
 
-        $columns = array('request', 'date', 'items', 'status');
+        $columns = array('request', 'date', 'items', 'status', 'username');
 
         $table = new \flexible_table('local_extension_summary');
         $table->define_columns($columns);
@@ -85,6 +86,7 @@ class table {
 
         $sql = "SELECT r.id,
                        r.timestamp,
+                       r.userid,
                        COUNT(cm.request)
                   FROM {local_extension_request} r
              LEFT JOIN {local_extension_cm} cm

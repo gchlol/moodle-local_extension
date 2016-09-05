@@ -50,7 +50,10 @@ class update extends \moodleform {
         $mform    = $this->_form;
         $user     = $this->_customdata['user'];
         $request  = $this->_customdata['request'];
+
+        /* @var \local_extension_renderer $renderer */
         $renderer = $this->_customdata['renderer'];
+
         $mods     = $request->mods;
 
         foreach ($mods as $id => $mod) {
@@ -71,7 +74,6 @@ class update extends \moodleform {
 
         if ($html .= $renderer->render_extension_attachments($request)) {
             $html .= \html_writer::start_tag('br');
-            $mform->addElement('html', $html);
         }
 
         $html .= \html_writer::empty_tag('p');

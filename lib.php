@@ -105,6 +105,8 @@ function local_extension_extends_navigation(global_navigation $nav) {
                     $result = $localcm->get_state_result();
 
                     $delta = $cm->get_data() - $event->timestart;
+
+                    // TODO format time differently
                     $extensionlength = format_time($delta);
 
                     // The function block_nagivation->trim will truncate the navagation item to 25/50 characters.
