@@ -230,7 +230,9 @@ class utility {
         $urlinfo = parse_url($CFG->wwwroot);
 
         // TODO REMOVE AS THIS IS USED FOR DEMO
-        $urlinfo = parse_url($CFG->wwwroots[0]);
+        if (!empty($CFG->wwwroots)) {
+            $urlinfo = parse_url($CFG->wwwroots[0]);
+        }
 
         $base = '@' . $urlinfo['host'];
         // If multiple moodles are on the same domain we want to tell them
