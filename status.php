@@ -52,6 +52,7 @@ $PAGE->set_pagelayout('standard');
 $PAGE->set_title(get_string('pluginname', 'local_extension'));
 $PAGE->set_heading(get_string('status_page_heading', 'local_extension'));
 $PAGE->requires->css('/local/extension/styles.css');
+$PAGE->add_body_class('local_extension');
 
 $request = \local_extension\utility::cache_get_request($requestid);
 $fileareaitemid = $request->request->timestamp . $requestid;

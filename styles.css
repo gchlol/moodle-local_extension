@@ -1,62 +1,62 @@
-.mod {
+.local_extension .mod {
     font-size: 150%;
 }
 
-.attachment {
+.local_extension .attachment {
     vertical-align: bottom;
 }
 
-.comment {
+.local_extension .comment {
     margin-bottom: 8px;
     min-height: 30px;
     position: relative;
 }
 
-.comment .avatar {
+.local_extension .comment .avatar {
 	left: 0;
     position: absolute;
     width: 100px;
 }
 
-.comment .content {
+.local_extension .comment .content {
     padding-left: 60px;
 }
 
-.comment .name {
+.local_extension .comment .name {
     font-weight: bold;
 }
 
-span.statusnew {
+.local_extension span.statusnew {
     background-color: #FFE047;
 }
 
-span.statusdenied {
+.local_extension span.statusdenied {
 	background-color: #AFFF44
 }
 
-span.statusapproved {
+.local_extension span.statusapproved {
     background-color: #AFFF44
 }
 
-span.statusreopened {
+.local_extension span.statusreopened {
 	background-color: #AFFF44
 }
 
-span.statuscancel {
+.local_extension span.statuscancel {
 	background-color: #AFFF44
 }
 
-.mform fieldset div {
-    margin-left: 0px;
+.local_extension .mform fieldset div {
+    margin-left: 0;
 }
 
-.mform fieldset div.fgroup {
-    margin-top: 10px;
-    margin-left: 16%;
+.local_extension .mform fieldset div.fgroup {
     margin-bottom: 10px;
+    margin-left: 16%;
+    margin-top: 10px;
 }
 
-.mform fieldset div .comment {
+.local_extension .mform fieldset div .comment {
     margin-bottom: 8px;
     min-height: 30px;
     position: relative;

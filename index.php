@@ -37,6 +37,7 @@ $PAGE->set_context($context);
 $PAGE->set_pagelayout('standard');
 $PAGE->set_title(get_string('pluginname', 'local_extension'));
 $PAGE->requires->css('/local/extension/styles.css');
+$PAGE->add_body_class('local_extension');
 
 $renderer = $PAGE->get_renderer('local_extension');
 

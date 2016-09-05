@@ -42,6 +42,7 @@ $PAGE->set_pagelayout('standard');
 $PAGE->set_title(get_string('pluginname', 'local_extension'));
 $PAGE->set_heading(get_string('rules_page_heading', 'local_extension'));
 $PAGE->requires->css('/local/extension/styles.css');
+$PAGE->add_body_class('local_extension');
 
 /* @var $renderer local_extension_renderer */
 $renderer = $PAGE->get_renderer('local_extension');

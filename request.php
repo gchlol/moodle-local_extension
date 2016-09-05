@@ -52,6 +52,7 @@ $PAGE->set_pagelayout('standard');
 $PAGE->set_title(get_string('pluginname', 'local_extension'));
 $PAGE->set_heading(get_string('request_page_heading', 'local_extension'));
 $PAGE->requires->css('/local/extension/styles.css');
+$PAGE->add_body_class('local_extension');
 
 $searchback = optional_param('back', get_config('local_extension', 'searchback'), PARAM_INTEGER);
 $searchforward = optional_param('forward', get_config('local_extension', 'searchforward'), PARAM_INTEGER);
