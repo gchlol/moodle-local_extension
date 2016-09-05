@@ -69,8 +69,12 @@ $options = array(
 list($handlers, $mods) = \local_extension\utility::get_activities($user, $start, $end, $options);
 
 if (count($mods) == 0) {
+    $obj = new stdClass();
+    $obj->startrange = userdate($start);
+    $obj->endrange = userdate($end);
+
     echo $OUTPUT->header();
-    echo "no mods!"; // TODO add ui to extend search.
+    echo html_writer::tag('p', get_string('error_no_mods', 'local_extension', $obj));
     echo $OUTPUT->footer();
     exit;
 }

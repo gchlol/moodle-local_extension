@@ -40,6 +40,8 @@ $string['error_none_selected'] = 'Please select at least one item';
 $string['email_notification_subect'] = 'Extension request #{$a->requestid} for {$a->fullname}.';
 $string['event_process_triggers'] = 'Processed triggers';
 $string['event_request_created'] = 'Request created';
+$string['error_no_mods'] = 'The requested date range has no activities that will allow an extension request.
+{$a->startrange} - {$a->endrange}';
 $string['externalrules'] = 'Manage Adapter Triggers';
 $string['form_rule_action'] = 'Action';
 $string['form_rule_any_value'] = 'any value';
