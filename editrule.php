@@ -102,8 +102,10 @@ if ($mform->is_cancelled()) {
 
     if (!empty($rule->id)) {
         $DB->update_record('local_extension_triggers', $rule);
+        $rule->trigger_update_event();
     } else {
-        $DB->insert_record('local_extension_triggers', $rule);
+        $rule->id = $DB->insert_record('local_extension_triggers', $rule);
+        $rule->trigger_create_event($rule->id);
     }
 
     $url = new moodle_url('/local/extension/manage.php');

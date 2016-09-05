@@ -790,4 +790,53 @@ class rule {
         \local_extension\utility::send_trigger_email($request, $subject, $content, $userfrom, $userto);
     }
 
+    /**
+     * Fire off the trigger creation event.
+     *
+     * @param int $id
+     */
+    public function trigger_create_event($id) {
+        $eventdata = array(
+            'context' => \context_system::instance(),
+            'objectid' => $id,
+            'other' => array(
+                'datatype' => $this->datatype,
+            ),
+        );
+
+        \local_extension\event\trigger_create::create($eventdata)->trigger();
+
+    }
+
+    /**
+     * Fire off the trigger disable event.
+     */
+    public function trigger_disable_event() {
+        $eventdata = array(
+            'context' => \context_system::instance(),
+            'objectid' => $this->id,
+            'other' => array(
+                'datatype' => $this->datatype,
+            ),
+        );
+
+        \local_extension\event\trigger_disable::create($eventdata)->trigger();
+
+    }
+
+    /**
+     * Fire off the triger update event.
+     */
+    public function trigger_update_event() {
+        $eventdata = array(
+            'context' => \context_system::instance(),
+            'objectid' => $this->id,
+            'other' => array(
+                'datatype' => $this->datatype,
+            ),
+        );
+
+        \local_extension\event\trigger_update::create($eventdata)->trigger();
+
+    }
 }

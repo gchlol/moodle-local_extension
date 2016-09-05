@@ -86,6 +86,11 @@ if ($delete && confirm_sesskey()) {
 
         // Remove all rules, including the children.
         $DB->delete_records_list('local_extension_triggers', 'id', $items);
+
+        foreach ($items as $deleteid) {
+            $rules[$deleteid]->trigger_disable_event();
+        }
+
         redirect($pageurl);
 
     } else {
