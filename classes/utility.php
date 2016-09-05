@@ -157,8 +157,8 @@ class utility {
      * @param \stdClass $userto
      */
     public static function send_trigger_email(\local_extension\request $request, $subject, $content, $userfrom, $userto) {
-        $sendmail = get_config('local_extension', 'emaildisable');
-        if ($sendmail == true) {
+        $emaildisable = get_config('local_extension', 'emaildisable');
+        if ($emaildisable == true) {
             return;
         }
 

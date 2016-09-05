@@ -56,52 +56,52 @@ class rule {
     /** @var int Condition: Any. */
     const RULE_CONDITION_ANY = 4;
 
-    /** @var int The local_extension_trigger id */
+    /** @var int $id The local_extension_trigger id */
     public $id = null;
 
-    /** @var int The context associated with this rule */
+    /** @var int $context The context associated with this rule */
     public $context = null;
 
-    /** @var string Rule name */
+    /** @var string $name Rule name */
     public $name = null;
 
-    /** @var int Role that is notified */
+    /** @var int $role Role that is notified */
     public $role = null;
 
-    /** @var int Action type */
+    /** @var int $action Action type */
     public $action = null;
 
-    /** @var int Priortiy */
+    /** @var int $priority Priortiy */
     public $priority = null;
 
-    /** @var int Parent id */
+    /** @var int $parent Parent id */
     public $parent = null;
 
-    /** @var int The length from due date */
+    /** @var int $lengthfromduedate The length from due date */
     public $lengthfromduedate = null;
 
-    /** @var int Length from due date type (LT/GE) */
+    /** @var int $lengthtype Length from due date type (LT/GE) */
     public $lengthtype = null;
 
-    /** @var int Time elapsed from request date */
+    /** @var int $elapsedfromrequest Time elapsed from request date */
     public $elapsedfromrequest = null;
 
-    /** @var int Time elapsed from request date type (LT/GE) */
+    /** @var int $elapsedtype Time elapsed from request date type (LT/GE) */
     public $elapsedtype = null;
 
-    /** @var \stdClass Custom data assocaited with this object, serialised base64 */
+    /** @var \stdClass $data Custom data assocaited with this object, serialised base64 */
     public $data = null;
 
-    /** @var array Role names lookup */
+    /** @var array $rolenames Role names lookup */
     public $rolenames = null;
 
-    /** @var the type name, eg. assign/quiz */
+    /** @var string $datatype the type name, eg. assign/quiz */
     public $datatype = null;
 
-    /** @var array An array of child rules */
+    /** @var array $children An array of child rules */
     public $children = null;
 
-    /** @var rule A reference to the parent rule */
+    /** @var rule $parentrule A reference to the parent rule */
     public $parentrule = null;
 
     /**
@@ -117,7 +117,7 @@ class rule {
     /**
      * Parses submitted form data and sets the properties of this class to match.
      *
-     * @param stdClass $form
+     * @param \stdClass $form
      */
     public function load_from_form($form) {
 
@@ -136,7 +136,7 @@ class rule {
     /**
      * Unserialises and base64_decodes the saved custom data.
      *
-     * @return data
+     * @return array
      */
     public function data_load() {
 
@@ -231,7 +231,7 @@ class rule {
     /**
      * Obtain a rule object with after applying the moodle data object values.
      *
-     * @param stdClass $object
+     * @param \stdClass $object
      * @return \local_extension\rule
      */
     public static function from_db($object) {
@@ -356,8 +356,8 @@ class rule {
     /**
      * Returns the list of users with the input role for the scope of this category, course, cm.
      *
-     * @param stdClass $course
-     * @param stdClass $role
+     * @param \stdClass $course
+     * @param \stdClass $role
      * @return array $users
      */
     private function rule_get_role_users($course, $role) {
@@ -546,8 +546,8 @@ class rule {
      *
      * @param \local_extension\request $request
      * @param array $mod
-     * @param stdClass $contentchange An object with a single comment/statechange/attachment.
-     * @return mixed|boolean[]|\local_extension\stdClass[]
+     * @param \stdClass $contentchange An object with a single comment/statechange/attachment.
+     * @return array
      */
     public function process_templates($request, $mod, $contentchange = null) {
         global $PAGE;
@@ -611,7 +611,7 @@ class rule {
     /**
      * Obtains the templates.
      *
-     * @return boolean[]|\local_extension\stdClass[]
+     * @return array
      */
     private function get_templates() {
         $templates = array();
