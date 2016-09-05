@@ -84,11 +84,10 @@ class request implements \cache_data_source {
             throw \coding_exception('No request id');
         }
 
+        $this->request  = $DB->get_record('local_extension_request', array('id' => $this->requestid), '*', MUST_EXIST);
+        $this->comments = $DB->get_records('local_extension_comment', array('request' => $this->requestid), 'timestamp ASC');
+
         $requestid = $this->requestid;
-
-        $this->request  = $DB->get_record('local_extension_request', array('id' => $requestid), '*', MUST_EXIST);
-        $this->comments = $DB->get_records('local_extension_comment', array('request' => $requestid), 'timestamp ASC');
-
         $request = $this->request;
 
         $options = array(
@@ -103,6 +102,7 @@ class request implements \cache_data_source {
             $this->cms[$cm->cmid] = $cm;
         }
 
+        // By deafult add the user that has initiated the request to the list of ids associated with this request.
         $userids = array($request->userid => $request->userid);
 
         // Obtain a unique list of userids that have been commenting.
@@ -578,48 +578,25 @@ class request implements \cache_data_source {
      * Each comment, state change and file attachment will fire off a notification to all subscribed users.
      *
      * @param array $history
+     * @param int $postuserid The ID of the user that updated the request. This user will not receive an notification as they posted the content.
      */
-    public function notify_subscribers($history) {
-        global $PAGE, $DB;
+    public function notify_subscribers($history, $postuserid) {
+        global $PAGE;
 
         $this->sort_history($history);
 
         foreach ($this->subscribedids as $userid) {
-            $userto = \core_user::get_user($userid);
 
-            /*
-            $params = array(
-                'userid' => $userid,
-                'requestid' => $this->requestid,
-            );
-
-            $ruleid = $DB->get_field('local_extension_subscription', 'trigger', $params);
-            $rule = \local_extension\rule::from_id($ruleid);
-
-            $templates = $rule->process_templates($this, $mod, $item);
-
-            $subject = $templates['template_notify_subject'];
-            $content = $templates['template_notify']['text'];
-            */
-
-            /*
-            $studentname = null;
-            $courseids = array();
-
-            foreach ($this->mods as $id => $mod) {
-                $course = $mod['course'];
-                $event = $mod['event'];
-                $courseids[] = $course->shortname . ' ' . $event->name;
+            // Do not send a notification to the user that has posted the update.
+            if ($postuserid == $userid) {
+                continue;
             }
 
-            // Single content item.
-            $coursestr = '[' . implode(', ', $courseids) . ']';
-            $subject = 'Test Update Notification ' . $coursestr;
-            */
+            $userto = \core_user::get_user($userid);
 
-            $content = '';
+            $comments = '';
             foreach ($history as $item) {
-                $content .= $PAGE->get_renderer('local_extension')->render_single_comment($this, $item, true);
+                $comments .= $PAGE->get_renderer('local_extension')->render_single_comment($this, $item, true);
             }
 
             // The update is sent from who modified the history.
@@ -627,11 +604,23 @@ class request implements \cache_data_source {
             $userfrom = \core_user::get_user($history[0]->userid);
 
             $requestuser = \core_user::get_user($this->request->userid);
+            $fullname = \fullname($requestuser, true);
+
             $data = new \stdClass();
             $data->requestid = $this->requestid;
-            $data->fullname = \fullname($requestuser, true);
+            $data->fullname = $fullname;
 
             $subject = get_string('email_notification_subect', 'local_extension', $data);
+
+            $statusurl = new \moodle_url("/local/extension/status.php", array('id' => $this->requestid));
+
+            $obj = new \stdClass();
+            $obj->content = $comments;
+            $obj->id = $this->requestid;
+            $obj->fullname = $fullname;
+            $obj->statusurl = $statusurl->out(true);
+
+            $content = get_string('notification_footer', 'local_extension', $obj);
 
             \local_extension\utility::send_trigger_email($this, $subject, $content, $userfrom, $userto);
         }
