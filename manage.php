@@ -62,7 +62,7 @@ if ($delete && confirm_sesskey()) {
 
         $branch = \local_extension\utility::rule_tree_branch($ordered, $delete);
 
-        echo $renderer->render_delete_rules($branch);
+        echo $renderer->render_delete_rules(array($branch));
 
         echo $OUTPUT->confirm('', $deletebutton, $pageurl);
         echo $OUTPUT->footer();
@@ -70,9 +70,6 @@ if ($delete && confirm_sesskey()) {
         exit();
 
     } else if (data_submitted()) {
-
-        // TODO recursive delete??
-
         // Select all child rules for id.
         $sql = "SELECT id
                   FROM {local_extension_triggers}

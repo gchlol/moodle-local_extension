@@ -26,23 +26,23 @@
     font-weight: bold;
 }
 
-.local_extension span.statusnew {
+.local_extension span .statusnew {
     background-color: #FFE047;
 }
 
-.local_extension span.statusdenied {
+.local_extension span .statusdenied {
 	background-color: #AFFF44
 }
 
-.local_extension span.statusapproved {
+.local_extension span .statusapproved {
     background-color: #AFFF44
 }
 
-.local_extension span.statusreopened {
+.local_extension span .statusreopened {
 	background-color: #AFFF44
 }
 
-.local_extension span.statuscancel {
+.local_extension span .statuscancel {
 	background-color: #AFFF44
 }
 
@@ -60,4 +60,15 @@
     margin-bottom: 8px;
     min-height: 30px;
     position: relative;
+}
+
+.local_extension table tr.clearrow td {
+    border: 1px none !important;
+    background-color: inherit !important;
+}
+.local_extension div .manageruleitem {
+    border-radius: 5px;
+    border: 1px solid;
+    background-color: #d3d3d3;
+    width: 400px;
 }

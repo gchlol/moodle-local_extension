@@ -293,12 +293,12 @@ class local_extension_renderer extends plugin_renderer_base {
                 $html = html_writer::empty_tag('img', array('src' => $OUTPUT->pix_url('t/delete'), 'alt' => get_string('delete'), 'class' => 'iconsmall'));
                 $buttons[] = html_writer::link($url, $html, array('title' => get_string('delete')));
 
-                $parentstr = 'N/A';
+                $parentstr = null;
                 if (!empty($parent)) {
                     $parentstr = $parent->name;
                 }
 
-                // Table columns 'name', 'action', 'role', 'parent', 'continue', 'priority', 'data'.
+                // Table columns 'name', 'action', 'role', 'parent', 'type', 'priority', 'rules'.
                 $values = array(
                     $trigger->name,
                     $trigger->get_action_name(),
@@ -314,7 +314,23 @@ class local_extension_renderer extends plugin_renderer_base {
 
                 if (!empty($trigger->children)) {
                     $this->render_extension_trigger_table($table, $trigger->children, $trigger);
+                    continue;
                 }
+
+                // Adding an empty row to divide sets of rules. A rule set is defined if it has children associated with it.
+                $empty = array(
+                    '',
+                    '',
+                    '',
+                    '',
+                    '',
+                    '',
+                    '',
+                    '',
+                );
+
+                $table->add_data($empty, 'clearrow');
+
             }
         }
 
@@ -331,12 +347,17 @@ class local_extension_renderer extends plugin_renderer_base {
     public function render_trigger_rule_text($trigger, $parentstr) {
         $html  = html_writer::start_tag('div');
 
-        $activate = array(
-            get_string('form_rule_label_parent', 'local_extension'),
-            $parentstr,
-            get_string('form_rule_label_parent_end', 'local_extension'),
-        );
-        $html .= html_writer::tag('p', implode(' ', $activate));
+        if (empty($parentstr)) {
+            $activate = get_string('form_rule_label_parent_allways', 'local_extension');
+            $html .= html_writer::tag('p', $activate);
+        } else {
+            $activate = array(
+                get_string('form_rule_label_parent', 'local_extension'),
+                $parentstr,
+                get_string('form_rule_label_parent_end', 'local_extension'),
+            );
+            $html .= html_writer::tag('p', implode(' ', $activate));
+        }
 
         $lengthtype = $this->rule_type($trigger->lengthtype);
 
@@ -426,17 +447,31 @@ class local_extension_renderer extends plugin_renderer_base {
     /**
      * Prints the list of rules, and child rules that may be deleted on manage.php
      *
-     * @param array $rules
+     * @param \local_extension\rule $branch
+     * @param string $html
      * @return string
      */
-    public function render_delete_rules($rules) {
-        $html = '';
+    public function render_delete_rules($branch, $html = null) {
+        if (empty($html)) {
+            $html = '';
+        }
 
-        $html .= html_writer::start_div();
+        foreach ($branch as $rule) {
+            if (!empty($rule->parentrule->name)) {
+                $parentstr = $rule->parentrule->name;
+            } else {
+                $parentstr = null;
+            }
 
-        $html .= var_dump($rules);
+            $html .= html_writer::start_div('manageruleitem');
+            $html .= $this->render_trigger_rule_text($rule, $parentstr);
+            $html .= html_writer::end_div();
+            $html .= html_writer::empty_tag('br');
 
-        $html .= html_writer::end_div();
+            if (!empty($rule->children)) {
+                $html = $this->render_delete_rules($rule->children, $html);
+            }
+        }
 
         return $html;
     }

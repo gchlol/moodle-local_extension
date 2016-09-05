@@ -43,6 +43,7 @@ function local_extension_extends_navigation(global_navigation $nav) {
         $node = $nav->add(get_string('requestextension_status', 'local_extension'), $url->out(), null, null, 'local_extension');
 
         if ($contextlevel == CONTEXT_COURSE) {
+            // Adding a nagivation string nested in the course that provides a count and status of the requests.
 
             $courseid = optional_param('id', 0, PARAM_INT);
 
@@ -73,6 +74,8 @@ function local_extension_extends_navigation(global_navigation $nav) {
             }
 
         } else if ($contextlevel == CONTEXT_MODULE) {
+             // Adding a navigation string nested in the course module that provides a status update and the extension length
+
             $id = optional_param('id', 0, PARAM_INT);
             $courseid = optional_param('course', 0, PARAM_INT);
             $cmid = optional_param('cmid', 0, PARAM_INT);
@@ -102,7 +105,6 @@ function local_extension_extends_navigation(global_navigation $nav) {
                     $result = $localcm->get_state_result();
 
                     $delta = $cm->get_data() - $event->timestart;
-
                     $extensionlength = format_time($delta);
 
                     // The function block_nagivation->trim will truncate the navagation item to 25/50 characters.

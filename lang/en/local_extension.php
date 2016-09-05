@@ -62,6 +62,7 @@ $string['form_rule_label_elapsed_length'] = 'And the request is';
 $string['form_rule_label_name'] = 'Rule name';
 $string['form_rule_label_parent_end'] = 'has triggered';
 $string['form_rule_label_parent'] = 'Only activate if';
+$string['form_rule_label_parent_allways'] = 'Activate this rule with these conditions';
 $string['form_rule_label_priority'] = 'Priority';
 $string['form_rule_label_request_length'] = 'And the requested length is';
 $string['form_rule_label_set_roles'] = 'Then set all roles equal to';
