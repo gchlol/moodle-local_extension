@@ -140,7 +140,7 @@ if ($form = $mform->get_data()) {
         return !is_null($obj);
     });
 
-    $request->notify_subscribers($notifycontent);
+    $request->notify_subscribers($notifycontent, $USER->id);
 
     // Invalidate the cache for this request. The content has changed.
     $request->get_data_cache()->delete($request->requestid);
