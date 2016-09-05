@@ -378,13 +378,17 @@ class request implements \cache_data_source {
         // We have processed the triggers, lets send some emails!
         if (!empty($notifydata)) {
 
+            /** @var rule[] $rules */
             $rules = array();
 
             // 1. Generate the template content for each mod item
             foreach ($notifydata as $data) {
+                /** @var rule $rule */
+                $rule = $data->rule;
+
                 // For the rule is that triggered, here is a list of cm templates that are generated.
-                $templatedata[$data->rule->id][] = $data->rule->process_templates($this, $data->mod);
-                $rules[$data->rule->id] = $data->rule;
+                $templatedata[$rule->id][] = $rule->process_templates($this, $data->mod);
+                $rules[$rule->id] = $rule;
             }
 
             // 2. Join the template subjects and content together in one message
@@ -394,21 +398,37 @@ class request implements \cache_data_source {
                 $templates = new \stdClass();
 
                 foreach ($templatecms as $template) {
-                    // TODO subject content needs to be normalised.
-                    $templates->user_subject = $template['template_user_subject'];
-                    $templates->role_subject = $template['template_notify_subject'];
 
-                    if (!empty($templates->user_content)) {
-                        $templates->user_content .= "<hr>" . $template['template_user']['text'];
-                    } else {
-                        $templates->user_content = $template['template_user']['text'];
+                    $types = array(
+                        'template_user'   => 'user_content',
+                        'template_notify' => 'role_content',
+                    );
+
+                    foreach ($types as $templatekey => $attribute) {
+
+                        // Checking if the form editor 'text' content has not been found.
+                        if (!array_key_exists('text', $template[$templatekey])) {
+                            continue;
+                        }
+
+                        // Setting the attributes to be empty if the template data is not found.
+                        // FIX for deleting moodle editor data, it leaves a <br> in the text after ctrl+a text deletion :(
+                        if (empty(strip_tags($template[$templatekey]['text']))) {
+                            $templates->$attribute = null;
+                            continue;
+                        }
+
+                        $content = $template[$templatekey]['text'];
+
+                        // Checks to see if the return attribute *_content is set, if is, then it appends a <hr> and the next template item.
+                        if (!empty($templates->$attribute)) {
+                            $templates->$attribute .= "<hr>" . $content;
+                        } else {
+                            $templates->$attribute = $content;
+                        }
+
                     }
 
-                    if (!empty($templates->role_content)) {
-                        $templates->role_content .= "<hr>" . $template['template_notify']['text'];
-                    } else {
-                        $templates->role_content = $template['template_notify']['text'];
-                    }
                 }
 
                 // 3. Notify the roles / user for each rule returned.

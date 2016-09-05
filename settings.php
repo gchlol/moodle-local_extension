@@ -48,6 +48,11 @@ if ($hassiteconfig) {
             new lang_string('searchforwardhelp',  'local_extension'), 14, $days));
 
     $settings->add(new admin_setting_configcheckbox('local_extension/emaildisable',
-            new lang_string('emaildisable',      'local_extension'),
-            new lang_string('emaildisablehelp',  'local_extension'), true));
+            new lang_string('emaildisable',         'local_extension'),
+            new lang_string('emaildisablehelp',     'local_extension'), false));
+
+    $settings->add(new admin_setting_configtext('local_extension/supportusername',
+            new lang_string('supportusername',        'local_extension'),
+            new lang_string('supportusernamehelp',    'local_extension'),
+            new lang_string('supportusernamedefault', 'local_extension')));
 }

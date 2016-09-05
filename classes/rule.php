@@ -333,14 +333,14 @@ class rule {
      * @param array $templates
      */
     public function send_notifications($request, $mod, $templates) {
+        // TODO check if there is any content and not notify roles/users.
 
+        // Sets the request users fullname to the email from name, only for roles that get triggered.
+        $noreplyuser = \core_user::get_noreply_user();
         $requestuser = \core_user::get_user($request->request->userid);
+
         // This is called when processing triggers. So the user to for 'user' notifications should be the requesting user.
         $userto = $requestuser;
-
-        // The email content, parsed template data.
-        $usercontent = $templates->user_content;
-        $rolecontent = $templates->role_content;
 
         // The email subject, for the moment a language string.
         $data = new \stdClass();
@@ -348,9 +348,27 @@ class rule {
         $data->fullname = \fullname($requestuser, true);
         $subject = get_string('email_notification_subect', 'local_extension', $data);
 
-        // TODO check if there is any content and not notify roles/users.
-        $this->notify_roles($request, $subject, $rolecontent, $mod['course']);
-        $this->notify_user($request, $subject, $usercontent, $requestuser, $userto);
+        // Notifying the roles.
+        $rolecontent = $templates->role_content;
+
+        // The $noreplyuser has the full name of the requesting user.
+        $noreplyuser->firstname = \fullname($requestuser);
+
+        $this->notify_roles($request, $subject, $rolecontent, $mod['course'], $noreplyuser);
+
+        // Notifying the user.
+        $usercontent = $templates->user_content;
+        $config = get_config('local_extension');
+        if (!empty($config->supportusername)) {
+            $noreplyuser->firstname = $config->supportusername;
+        } else {
+            $noreplyuser = \core_user::get_noreply_user();
+        }
+
+        // Now notifying the user with the noreplyuser that has a name set, or just the default no reply user.
+        if (!empty($usercontent)) {
+            $this->notify_user($request, $subject, $usercontent, $noreplyuser, $userto);
+        }
     }
 
     /**
@@ -616,11 +634,10 @@ class rule {
     private function get_templates() {
         $templates = array();
 
+        // These array items are the names of form elements that are submitted and saved to the rule data.
         $items = array (
             'template_notify',
-            'template_notify_subject',
             'template_user',
-            'template_user_subject',
         );
 
         if (!empty($this->data)) {
@@ -761,13 +778,9 @@ class rule {
      * @param string $subject
      * @param string $content
      * @param \stdClass $course
+     * @param \stdClass $userfrom
      */
-    private function notify_roles(\local_extension\request $request, $subject, $content, $course) {
-        global $DB;
-
-        // The request is sent from the user that has created the extension.
-        $userfrom = \core_user::get_user($request->request->userid);
-
+    private function notify_roles(\local_extension\request $request, $subject, $content, $course, $userfrom) {
         $role = $this->role;
         $users = $this->rule_get_role_users($course, $role);
 
