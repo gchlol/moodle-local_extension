@@ -201,9 +201,11 @@ class request implements \cache_data_source {
     public function increment_messageid() {
         global $DB;
 
+        $this->request->messageid++;
+
         $record = new \stdClass();
         $record->id = $this->requestid;
-        $record->messageid = $this->request->messageid++;
+        $record->messageid = $this->request->messageid;
 
         $DB->update_record('local_extension_request', $record);
 
