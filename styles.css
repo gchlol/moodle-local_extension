@@ -63,12 +63,12 @@
 }
 
 .local_extension table tr.clearrow td {
-    border: 1px none !important;
     background-color: inherit !important;
+    border: 1px none !important;
 }
 .local_extension div .manageruleitem {
-    border-radius: 5px;
-    border: 1px solid;
     background-color: #d3d3d3;
+    border: 1px solid;
+    border-radius: 5px;
     width: 400px;
 }
