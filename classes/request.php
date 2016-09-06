@@ -178,6 +178,9 @@ class request implements \cache_data_source {
         );
         $DB->insert_record('local_extension_comment', $comment);
 
+        // Update the lastmod
+        $this->update_lastmod();
+
         return $comment;
     }
 
@@ -198,9 +201,11 @@ class request implements \cache_data_source {
     public function increment_messageid() {
         global $DB;
 
-        $this->request->messageid++;
+        $record = new \stdClass();
+        $record->id = $this->requestid;
+        $record->messageid = $this->request->messageid++;
 
-        $DB->update_record('local_extension_request', $this->request);
+        $DB->update_record('local_extension_request', $record);
 
         // The request has changed, lets invalidate the cache.
         $this->invalidate_request();
@@ -545,6 +550,9 @@ class request implements \cache_data_source {
 
                     $history->message = "$status extension for {$course->fullname}, {$event->name}";
 
+                    // Update the lastmod
+                    $this->update_lastmod();
+
                     // You can only edit one state at a time, returning here is ok!
                     return $history;
                 }
@@ -590,6 +598,9 @@ class request implements \cache_data_source {
         // Add class property 'message' to interleave with the comment stream.
         $history = (object) $data;
         $history->message = get_string('status_file_attachment', 'local_extension', $filelink);
+
+        // Update the lastmod
+        $this->update_lastmod();
 
         return $history;
     }
@@ -647,6 +658,23 @@ class request implements \cache_data_source {
 
         // Increment the messageid to assist with inbox threading / message history.
         $this->increment_messageid();
+    }
+
+    /**
+     * Updates the last modified time for this request.
+     *
+     * @return bool
+     */
+    public function update_lastmod() {
+        global $DB;
+
+        $record = new \stdClass();
+        $record->id = $this->requestid;
+        $record->lastmod = time();
+
+        $status = $DB->update_record('local_extension_request', $record);
+
+        return $status;
     }
 
     /**

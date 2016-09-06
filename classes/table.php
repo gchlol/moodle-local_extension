@@ -40,7 +40,7 @@ class table {
     /**
      * Generates the basic requirements the status page table.
      *
-     * @return flexible_table
+     * @return \flexible_table
      */
     public static function generate_index_table() {
         global $PAGE;
@@ -49,11 +49,12 @@ class table {
             get_string('table_header_request', 'local_extension'),
             get_string('table_header_items', 'local_extension'),
             get_string('table_header_requestdate', 'local_extension'),
+            get_string('table_header_lastmod', 'local_extension'),
             get_string('table_header_statushead', 'local_extension'),
             get_string('table_header_username', 'local_extension'),
         );
 
-        $columns = array('request', 'date', 'items', 'status', 'username');
+        $columns = array('request', 'date', 'lastmod', 'items', 'status', 'username');
 
         $table = new \flexible_table('local_extension_summary');
         $table->define_columns($columns);
@@ -68,8 +69,8 @@ class table {
     }
 
     /**
-     * Generates the data required for the status page table.
-     * @param flexible_table $table
+     * Generates the data required for the status page table. Orders by request.lastmod DESC.
+     * @param \flexible_table $table
      * @param integer $userid
      * @return request[] An array of request objects
      */
@@ -86,6 +87,7 @@ class table {
 
         $sql = "SELECT r.id,
                        r.timestamp,
+                       r.lastmod,
                        r.userid,
                        COUNT(cm.request)
                   FROM {local_extension_request} r
@@ -93,7 +95,7 @@ class table {
                     ON cm.request = r.id
                 $where
               GROUP BY r.id
-              ORDER BY r.timestamp ASC";
+              ORDER BY r.lastmod DESC";
 
         $requests = $DB->get_records_sql($sql, $params);
 
@@ -103,7 +105,7 @@ class table {
     /**
      * Generates the basic requirements the status page table.
      *
-     * @return flexible_table
+     * @return \flexible_table
      */
     public static function generate_trigger_table() {
         global $PAGE;

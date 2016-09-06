@@ -264,6 +264,7 @@ class local_extension_renderer extends plugin_renderer_base {
                     $request->id,
                     $request->count,
                     userdate($request->timestamp),
+                    userdate($request->lastmod),
                     $status,
                     \fullname(\core_user::get_user($request->userid)),
                 );
