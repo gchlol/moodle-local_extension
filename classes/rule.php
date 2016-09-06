@@ -730,7 +730,7 @@ class rule {
 
         $days = $this->lengthfromduedate * 24 * 60 * 60;
 
-        if ($this->elapsedtype == self::RULE_CONDITION_ANY) {
+        if ($this->lengthtype == self::RULE_CONDITION_ANY) {
             return true;
         } else if ($this->lengthtype == self::RULE_CONDITION_LT) {
             if ($delta < $days) {
