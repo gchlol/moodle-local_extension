@@ -205,6 +205,9 @@ class rule {
             $sql .= " WHERE $compare";
         }
 
+        // $orderby = $DB->sql_order_by_text('priority');
+        // $sql .= " ORDER BY $orderby ASC";
+
         $fields = $DB->get_fieldset_sql($sql, $params);
 
         $triggers = array();

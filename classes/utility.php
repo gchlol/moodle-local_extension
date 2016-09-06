@@ -445,6 +445,11 @@ class utility {
     public static function rule_tree(array $rules, $parent = 0) {
         $branch = array();
 
+        // Sort the rule nodes based on priority.
+        usort($rules, function($a, $b) {
+            return $a->priority - $b->priority;
+        });
+
         foreach ($rules as $element) {
             if ($element->parent == $parent) {
                 $children = self::rule_tree($rules, $element->id);

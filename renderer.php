@@ -289,6 +289,23 @@ class local_extension_renderer extends plugin_renderer_base {
 
             foreach ($triggers as $id => $trigger) {
 
+                if (empty($trigger->parent)) {
+
+                    // Adding an empty row to divide sets of rules.
+                    $empty = array(
+                        '',
+                        '',
+                        '',
+                        '',
+                        '',
+                        '',
+                        '',
+                        '',
+                    );
+
+                    $table->add_data($empty, 'clearrow');
+                }
+
                 $buttons = array();
 
                 $url = new moodle_url('/local/extension/editrule.php', array_merge(array('id' => $trigger->id, 'datatype' => $trigger->datatype, 'sesskey' => sesskey())));
@@ -318,25 +335,10 @@ class local_extension_renderer extends plugin_renderer_base {
 
                 $table->add_data($values);
 
+                // Render the child items.
                 if (!empty($trigger->children)) {
                     $this->render_extension_trigger_table($table, $trigger->children, $trigger);
-                    continue;
                 }
-
-                // Adding an empty row to divide sets of rules. A rule set is defined if it has children associated with it.
-                $empty = array(
-                    '',
-                    '',
-                    '',
-                    '',
-                    '',
-                    '',
-                    '',
-                    '',
-                );
-
-                $table->add_data($empty, 'clearrow');
-
             }
         }
 
