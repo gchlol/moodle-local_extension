@@ -63,12 +63,14 @@ class utility {
         // filter these events down to one's that can handle extensions.
 
         $groups = null;
-        $courses = null;
+
+        // A list of courses that the $USER is enrolled in, this will be passed to the next filters.
+        $courses = enrol_get_my_courses();
 
         // Get the events matching our criteria.
-        list($courses, $group, $user2) = calendar_set_filters(array());
+        list($courses, $group, $user2) = calendar_set_filters($courses);
 
-        $allevents = calendar_get_events($start, $end, array($userid), $groups, true);
+        $allevents = calendar_get_events($start, $end, array($userid), $groups, $courses);
 
         $events = array();
         $courses = array();
