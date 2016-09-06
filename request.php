@@ -54,6 +54,10 @@ $PAGE->set_heading(get_string('request_page_heading', 'local_extension'));
 $PAGE->requires->css('/local/extension/styles.css');
 $PAGE->add_body_class('local_extension');
 
+$PAGE->navbar->ignore_active();
+$PAGE->navbar->add('Extension Status', new moodle_url('/local/extension/index.php'));
+$PAGE->navbar->add('New Extension Request');
+
 $searchback = optional_param('back', get_config('local_extension', 'searchback'), PARAM_INTEGER);
 $searchforward = optional_param('forward', get_config('local_extension', 'searchforward'), PARAM_INTEGER);
 
@@ -66,6 +70,17 @@ $options = array(
     'moduleid' => $cmid,
     'requestid' => 0
 );
+
+$triggers = \local_extension\rule::load_all();
+if (count($triggers) == 0) {
+    // TODO no triggers are setup. Do not allow extensions.
+
+    // Check if admin capability and send to trigger config page.
+    echo $OUTPUT->header();
+    echo html_writer::tag('p', 'No extension triggers defined.');
+    echo $OUTPUT->footer();
+    // exit;
+}
 
 list($handlers, $mods) = \local_extension\utility::get_activities($user, $start, $end, $options);
 
