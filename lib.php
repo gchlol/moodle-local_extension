@@ -38,13 +38,31 @@ function local_extension_extends_navigation(global_navigation $nav) {
     // TODO add perms checks here. Maybe. Allow for students only?
 
     if (isloggedin() and !isguestuser()) {
+
+        // If there are no triggers setup then we should not show these links at all.
+        // TODO change this? cache it?
+        $triggers = \local_extension\rule::load_all();
+        if (count($triggers) == 0) {
+            return;
+        }
+
+        // This is a map of datatypes and their triggers. Useful to know if a trigger has been set for a datatype later.
+        $datatypes = array();
+        foreach ($triggers as $trigger) {
+            $datatypes[$trigger->datatype][] = $trigger;
+        }
+
         // General link in the navigation menu.
         $url = new moodle_url('/local/extension/index.php');
         $node = $nav->add(get_string('requestextension_status', 'local_extension'), $url->out(), null, null, 'local_extension');
 
         if ($contextlevel == CONTEXT_COURSE) {
-            // Adding a nagivation string nested in the course that provides a count and status of the requests.
+            // If the user is not enrolled, do not provide an extension request link in the course/mod context.
+            if (!is_enrolled($context, $USER->id)) {
+                return;
+            }
 
+            // Adding a nagivation string nested in the course that provides a count and status of the requests.
             $courseid = optional_param('id', 0, PARAM_INT);
 
             $url = new moodle_url('/local/extension/request.php', array('course' => $courseid));
@@ -74,6 +92,11 @@ function local_extension_extends_navigation(global_navigation $nav) {
             }
 
         } else if ($contextlevel == CONTEXT_MODULE) {
+            // If the user is not enrolled, do not provide an extension request link in the course/mod context.
+            if (!is_enrolled($context, $USER->id)) {
+                return;
+            }
+
              // Adding a navigation string nested in the course module that provides a status update and the extension length
 
             $id = optional_param('id', 0, PARAM_INT);
@@ -88,6 +111,19 @@ function local_extension_extends_navigation(global_navigation $nav) {
             $modulenode = $nav->find($cmid, navigation_node::TYPE_ACTIVITY);
             if (!empty($modulenode)) {
                 list($request, $cm) = \local_extension\utility::find_module_requests($courseid, $cmid);
+
+                // TODO check if it is possible to even extend the cm in focus.
+
+                $modinfo = get_fast_modinfo($courseid);
+                $cmdata = $modinfo->cms[$cmid];
+
+                // eg. assign, quiz.
+                $modname = $cmdata->modname;
+
+                // No triggers have been defined for this mod type. It will not show a request extension link.
+                if (!array_key_exists($modname, $datatypes)) {
+                    return;
+                }
 
                 if (empty($cm)) {
                     // Display the request extension link.
@@ -144,7 +180,7 @@ function local_extension_pluginfile($course, $cm, $context, $filearea, $args, $f
         return false;
     }
 
-    require_login($course, $true, $cm);
+    require_login($course, false, $cm);
 
     // When the file is stored, we use the $item id is the requestid.
     $itemid = array_shift($args);
