@@ -64,7 +64,6 @@ class utility {
 
         $groups = null;
 
-        // A list of courses that the $USER is enrolled in, this will be passed to the next filters.
         // A list of courses that the $request->userid is enrolled in, this will be passed to the next filters.
         $courses = enrol_get_users_courses($userid);
 
@@ -156,7 +155,7 @@ class utility {
      * @param \local_extension\request $request
      * @param string $subject
      * @param string $content
-     * @param \stdClas $userfrom
+     * @param \stdClass $userfrom
      * @param \stdClass $userto
      */
     public static function send_trigger_email(\local_extension\request $request, $subject, $content, $userfrom, $userto) {
