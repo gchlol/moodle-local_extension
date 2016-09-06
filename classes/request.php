@@ -655,7 +655,10 @@ class request implements \cache_data_source {
 
             $content = get_string('notification_footer', 'local_extension', $obj);
 
-            \local_extension\utility::send_trigger_email($this, $subject, $content, $userfrom, $userto);
+            $noreplyuser = \core_user::get_noreply_user();
+            $noreplyuser->firstname = \fullname($userfrom, true);
+
+            \local_extension\utility::send_trigger_email($this, $subject, $content, $noreplyuser, $userto);
         }
 
         // Increment the messageid to assist with inbox threading / message history.
