@@ -182,15 +182,17 @@ class request extends \local_extension\base_request {
                 $buttonarray[] = &$mform->createElement('submit', 'reopen' . $id, 'Reopen');
                 break;
             case $localcm::STATE_APPROVED:
-                $buttonarray[] = &$mform->createElement('submit', 'deny' . $id, 'Deny');
-                $buttonarray[] = &$mform->createElement('submit', 'cancel' . $id, 'Cancel');
+                // $buttonarray[] = &$mform->createElement('submit', 'deny' . $id, 'Deny');
+                // $buttonarray[] = &$mform->createElement('submit', 'cancel' . $id, 'Cancel');
                 break;
             default:
                 break;
 
         }
 
-        $mform->addGroup($buttonarray, 'statusmodgroup'  . $id, '', ' ', false);
+        if (!empty($buttonarray)) {
+            $mform->addGroup($buttonarray, 'statusmodgroup' . $id, '', ' ', false);
+        }
     }
 
     /**
