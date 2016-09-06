@@ -72,7 +72,7 @@ class local_extension_rule_testcase extends advanced_testcase {
     protected function setUp() {
         global $DB;
 
-        parent::setup();
+        parent::setUp();
         $this->resetAfterTest(true);
 
         $this->course = $this->getDataGenerator()->create_course();
@@ -184,13 +184,13 @@ class local_extension_rule_testcase extends advanced_testcase {
                 'elapsedtype' => \local_extension\rule::RULE_CONDITION_LT,
                 'id' => 1,
                 'lengthfromduedate' => 5,
-                'lengthtype' => \local_extension\rule::RULE_CONDITION_LT,
+                'lengthtype' => \local_extension\rule::RULE_CONDITION_ANY,
                 'name' => 'Rule1',
                 'parent' => 0,
                 'priority' => 1,
                 'role' => $teacherrole->id,
-                'template_notify' => '{{username}}',
-                'template_user' => '{{username}}',
+                'template_notify' => array('text' => '{{student}}'),
+                'template_user' => array('text' => '{{student}}'),
             ],
             (object)[
                 'action' => \local_extension\rule::RULE_ACTION_APPROVE,
@@ -200,13 +200,13 @@ class local_extension_rule_testcase extends advanced_testcase {
                 'elapsedtype' => \local_extension\rule::RULE_CONDITION_GE,
                 'id' => 2,
                 'lengthfromduedate' => 8,
-                'lengthtype' => \local_extension\rule::RULE_CONDITION_GE,
+                'lengthtype' => \local_extension\rule::RULE_CONDITION_ANY,
                 'name' => 'Rule2',
                 'parent' => 1,
                 'priority' => 1,
                 'role' => $editingteacherrole->id,
-                'template_notify' => '{{username}}',
-                'template_user' => '{{username}}',
+                'template_notify' => array('text' => '{{student}}'),
+                'template_user' => array('text' => '{{student}}'),
             ],
             (object)[
                 'action' => \local_extension\rule::RULE_ACTION_APPROVE,
@@ -216,13 +216,13 @@ class local_extension_rule_testcase extends advanced_testcase {
                 'elapsedtype' => \local_extension\rule::RULE_CONDITION_GE,
                 'id' => 2,
                 'lengthfromduedate' => 15,
-                'lengthtype' => \local_extension\rule::RULE_CONDITION_GE,
+                'lengthtype' => \local_extension\rule::RULE_CONDITION_ANY,
                 'name' => 'Rule3',
                 'parent' => 1,
                 'priority' => 2,
                 'role' => $managerrole->id,
-                'template_notify' => '{{username}}',
-                'template_user' => '{{username}}',
+                'template_notify' => array('text' => '{{student}}'),
+                'template_user' => array('text' => '{{student}}'),
             ],
         );
 
@@ -286,9 +286,6 @@ class local_extension_rule_testcase extends advanced_testcase {
 
         $request = \local_extension\request::from_id($request['id']);
         $request->process_triggers();
-
-        $sub = $DB->get_records('local_extension_subscription');
-        $his = $DB->get_records('local_extension_history');
 
     }
 
