@@ -65,7 +65,8 @@ class utility {
         $groups = null;
 
         // A list of courses that the $USER is enrolled in, this will be passed to the next filters.
-        $courses = enrol_get_my_courses();
+        // A list of courses that the $request->userid is enrolled in, this will be passed to the next filters.
+        $courses = enrol_get_users_courses($userid);
 
         // Get the events matching our criteria.
         list($courses, $group, $user2) = calendar_set_filters($courses);
