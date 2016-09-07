@@ -490,13 +490,17 @@ class utility {
         foreach ($rules as $rule) {
 
             if (!empty($rule->children)) {
-                $rules = self::rule_tree_branch($rule->children, $id);
+                $ret = self::rule_tree_branch($rule->children, $id);
             }
 
             // We have matched the id, return the branch with its child nodes.
             if ($rule->id == $id) {
                 return $rule;
             }
+        }
+
+        if (!empty($ret)) {
+            return $ret;
         }
 
         return false;
