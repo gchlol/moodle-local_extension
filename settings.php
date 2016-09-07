@@ -56,7 +56,7 @@ if ($hassiteconfig) {
         new lang_string('supportusernamehelp',    'local_extension'),
         new lang_string('supportusernamedefault', 'local_extension')));
 
-    $settings->add(new admin_setting_configtextarea('local_extension/extensionpolicy',
+    $settings->add(new admin_setting_confightmleditor('local_extension/extensionpolicy',
         new lang_string('extensionpolicy',          'local_extension'),
         new lang_string('extensionpolicyhelp',      'local_extension'),
         new lang_string('extensionpolicydefault',   'local_extension')));
