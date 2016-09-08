@@ -39,7 +39,7 @@ $PAGE->set_title(get_string('pluginname', 'local_extension'));
 $PAGE->requires->css('/local/extension/styles.css');
 $PAGE->add_body_class('local_extension');
 
-/* @var \local_extension\renderer $renderer */
+/* @var \local_extension_renderer $renderer */
 $renderer = $PAGE->get_renderer('local_extension');
 
 echo $OUTPUT->header();
