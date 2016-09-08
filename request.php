@@ -210,6 +210,13 @@ $contextlevels = array(
 );
 
 $config = get_config('local_extension');
+
+if (!empty($config->extensionpolicyrequest)) {
+    $policy = $config->extensionpolicyrequest;
+}
+
+echo $policy;
+
 foreach ($contextlevels as $contextlevel => $cfg) {
     if ($context->contextlevel == $contextlevel) {
 

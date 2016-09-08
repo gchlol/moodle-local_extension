@@ -170,6 +170,12 @@ if ($form = $mform->get_data()) {
     $mform->set_data($data);
 }
 
+$config = get_config('local_extension');
+if (!empty($config->extensionpolicystatus)) {
+    $policy = $config->extensionpolicystatus;
+}
+
 echo $OUTPUT->header();
+echo $policy;
 $mform->display();
 echo $OUTPUT->footer();
