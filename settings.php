@@ -56,10 +56,15 @@ if ($hassiteconfig) {
         new lang_string('supportusernamehelp',    'local_extension'),
         new lang_string('supportusernamedefault', 'local_extension')));
 
-    $settings->add(new admin_setting_confightmleditor('local_extension/extensionpolicy',
-        new lang_string('extensionpolicy',          'local_extension'),
-        new lang_string('extensionpolicyhelp',      'local_extension'),
-        new lang_string('extensionpolicydefault',   'local_extension')));
+    $settings->add(new admin_setting_confightmleditor('local_extension/extensionpolicyrequest',
+        new lang_string('extensionpolicyrequest',        'local_extension'),
+        new lang_string('extensionpolicyrequesthelp',    'local_extension'),
+        new lang_string('extensionpolicyrequestdefault', 'local_extension')));
+
+    $settings->add(new admin_setting_confightmleditor('local_extension/extensionpolicystatus',
+        new lang_string('extensionpolicystatus',        'local_extension'),
+        new lang_string('extensionpolicystatushelp',    'local_extension'),
+        new lang_string('extensionpolicystatusdefault', 'local_extension')));
 
     $options = array(
         0 => get_string('no'),

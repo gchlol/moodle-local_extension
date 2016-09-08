@@ -46,9 +46,12 @@ $string['event_trigger_update'] = 'Trigger updated';
 $string['error_no_mods'] = 'The requested date range has no activities that will allow an extension request.
 {$a->startrange} - {$a->endrange}';
 $string['externalrules'] = 'Manage Adapter Triggers';
-$string['extensionpolicy'] = 'Extension policy';
-$string['extensionpolicyhelp'] = 'This is displayed on the request item page.';
-$string['extensionpolicydefault'] = 'The default policy.';
+$string['extensionpolicyrequest'] = 'Extension policy for request';
+$string['extensionpolicyrequesthelp'] = 'This is displayed on the request item page.';
+$string['extensionpolicyrequestdefault'] = 'The default policy.';
+$string['extensionpolicystatus'] = 'Extension policy for status';
+$string['extensionpolicystatushelp'] = 'This is displayed on the status item page.';
+$string['extensionpolicystatusdefault'] = 'The default policy.';
 $string['form_rule_action'] = 'Action';
 $string['form_rule_any_value'] = 'any value';
 $string['form_rule_continue'] = 'Continue';
