@@ -50,6 +50,14 @@ class request extends \moodleform {
 
         $inprogress = $this->_customdata['inprogress'];
         $available = $this->_customdata['available'];
+        $course = $this->_customdata['course'];
+        $cmid = $this->_customdata['cmid'];
+
+        $mform->addElement('hidden', 'course', $course);
+        $mform->setType('course', PARAM_INT);
+
+        $mform->addElement('hidden', 'cmid', $cmid);
+        $mform->setType('cmid', PARAM_INT);
 
         if (!empty($inprogress)) {
             $inprogressh = 'Requests in progress';
@@ -60,7 +68,7 @@ class request extends \moodleform {
                 $handler = $mod['handler'];
                 $localcm = $mod['localcm'];
 
-                $handler->status_definition($mform, $mod);
+                $handler->status_definition($mod, $mform);
             }
 
             if (!empty($available)) {
@@ -77,7 +85,7 @@ class request extends \moodleform {
                 $handler = $mod['handler'];
                 $localcm = $mod['localcm'];
 
-                $handler->request_definition($mform, $mod);
+                $handler->request_definition($mod, $mform);
             }
 
             // TODO style the width of this textarea.
@@ -103,11 +111,29 @@ class request extends \moodleform {
      */
     public function validation($data, $files) {
         $errors = parent::validation($data, $files);
+
         $mform = $this->_form;
         $mods = $this->_customdata['available'];
+        $context = $this->_customdata['context'];
 
+        $contextlevels = array(
+            CONTEXT_SYSTEM => "systemcontext",
+            CONTEXT_COURSE => "coursecontext",
+            CONTEXT_MODULE => "modulecontext",
+        );
+
+        $config = get_config('local_extension');
+        /*
+        // TODO validation
+        foreach ($contextlevels as $contextlevel => $cfg) {
+            if ($context->contextlevel == $contextlevel) {
+               if (!empty($config->$cfg)) {
+               } else {
+               }
+            }
+        }
+        */
         $due = array();
-
         foreach ($mods as $id => $mod) {
             $handler = $mod['handler'];
             $cm = $mod['cm'];

@@ -66,9 +66,9 @@ if ($hassiteconfig) {
         1 => get_string('yes')
     );
 
-    $settings->add(new admin_setting_configselect('local_extension/sitecontext',
-        new lang_string('sitecontext',            'local_extension'),
-        new lang_string('sitecontexthelp',        'local_extension'), 0, $options));
+    $settings->add(new admin_setting_configselect('local_extension/systemcontext',
+        new lang_string('systemcontext',          'local_extension'),
+        new lang_string('systemcontexthelp',      'local_extension'), 0, $options));
 
     $settings->add(new admin_setting_configselect('local_extension/coursecontext',
         new lang_string('coursecontext',          'local_extension'),
@@ -77,5 +77,4 @@ if ($hassiteconfig) {
     $settings->add(new admin_setting_configselect('local_extension/modulecontext',
         new lang_string('modulecontext',          'local_extension'),
         new lang_string('modulecontexthelp',      'local_extension'), 1, $options));
-
 }

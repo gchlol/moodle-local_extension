@@ -63,7 +63,7 @@ function local_extension_extends_navigation(global_navigation $nav) {
             }
 
             // Adding a nagivation string nested in the course that provides a count and status of the requests.
-            $courseid = optional_param('id', 0, PARAM_INT);
+            $courseid = optional_param('course', 0, PARAM_INT);
 
             $url = new moodle_url('/local/extension/request.php', array('course' => $courseid));
 

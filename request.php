@@ -29,8 +29,8 @@ global $CFG, $PAGE;
 
 $PAGE->set_url(new moodle_url('/local/extension/request.php'));
 
-$courseid  = optional_param('course', 0, PARAM_INTEGER);
-$cmid = optional_param('cmid', 0, PARAM_INTEGER);
+$courseid  = optional_param('course', 0, PARAM_INT);
+$cmid = optional_param('cmid', 0, PARAM_INT);
 
 if (!empty($cmid)) {
     $cm = get_fast_modinfo($courseid)->get_cm($cmid);
@@ -42,8 +42,8 @@ if (!empty($cmid)) {
     $context = context_course::instance($courseid);
 
 } else {
-    require_login(false);
-    $context = context_user::instance($USER->id);
+    require_login();
+    $context = context_system::instance();
 
 }
 
@@ -58,9 +58,8 @@ $PAGE->navbar->ignore_active();
 $PAGE->navbar->add('Extension Status', new moodle_url('/local/extension/index.php'));
 $PAGE->navbar->add('New Extension Request');
 
-$searchback = optional_param('back', get_config('local_extension', 'searchback'), PARAM_INTEGER);
-$searchforward = optional_param('forward', get_config('local_extension', 'searchforward'), PARAM_INTEGER);
-
+$searchback = optional_param('back', get_config('local_extension', 'searchback'), PARAM_INT);
+$searchforward = optional_param('forward', get_config('local_extension', 'searchforward'), PARAM_INT);
 $user = $USER->id;
 $start = time() - $searchback * 24 * 60 * 60;
 $end = time() + $searchforward * 24 * 60 * 60;
@@ -108,7 +107,15 @@ foreach ($mods as $mod) {
     }
 }
 
-$mform = new \local_extension\form\request(null, array('available' => $available, 'inprogress' => $inprogress));
+$params = array(
+    'available' => $available,
+    'inprogress' => $inprogress,
+    'course' => $courseid,
+    'cmid' => $cmid,
+    'context' => $context
+);
+
+$mform = new \local_extension\form\request(null, $params);
 
 $usercontext = context_user::instance($USER->id);
 
@@ -195,6 +202,39 @@ if ($mform->is_cancelled()) {
 }
 
 echo $OUTPUT->header();
-$mform->display();
-echo $OUTPUT->footer();
 
+$contextlevels = array(
+    CONTEXT_SYSTEM => "systemcontext",
+    CONTEXT_COURSE => "coursecontext",
+    CONTEXT_MODULE => "modulecontext",
+);
+
+$config = get_config('local_extension');
+foreach ($contextlevels as $contextlevel => $cfg) {
+    if ($context->contextlevel == $contextlevel) {
+
+        // If the configuration contexts are enabled then print the overall form to make multiple requests.
+        if (!empty($config->$cfg)) {
+
+            $mform->display();
+
+        } else {
+
+            // If the configuration contexts are disabled then provide links to make individual requests.
+            foreach ($inprogress as $mod) {
+                echo $mod['handler']->status_definition($mod);
+            }
+
+            if (!empty($available)) {
+                echo html_writer::empty_tag('hr');
+            }
+
+            foreach ($available as $mod) {
+                echo $mod['handler']->request_definition($mod);
+            }
+
+        }
+    }
+}
+
+echo $OUTPUT->footer();

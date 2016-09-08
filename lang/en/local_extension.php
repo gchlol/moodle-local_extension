@@ -179,8 +179,8 @@ $string['template_user_content'] = "{{course}} => Course full name<br />
 {{fullhistory}} => The full comment stream for the request<br />";
 $string['template_user_subject'] = 'DEBUG {{student}} {{rulename}} {{rolename}}';
 
-$string['sitecontext'] = 'Allow site context requests';
-$string['sitecontexthelp'] = '';
+$string['systemcontext'] = 'Allow system context requests';
+$string['systemcontexthelp'] = '';
 $string['coursecontext'] = 'Allow course context requests';
 $string['coursecontexthelp'] = '';
 $string['modulecontext'] = 'Allow module context requests';

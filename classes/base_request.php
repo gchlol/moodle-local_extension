@@ -60,23 +60,23 @@ abstract class base_request {
     /**
      * Define parts of the request for for an event object
      *
-     * @param moodleform $mform A moodle form object
-     * @param array $mod An array of event details
+     * @param array $mod An array of event detail
+     * @param \moodleform $mform A moodle form object
      */
-    abstract public function request_definition($mform, $mod);
+    abstract public function request_definition($mod, $mform);
 
     /**
      * Define parts of the request for for an event object
      *
-     * @param moodleform $mform A moodle form object
      * @param array $mod An array of event details
+     * @param \moodleform $mform A moodle form object
      */
-    abstract public function status_definition($mform, $mod);
+    abstract public function status_definition($mod, $mform);
 
     /**
      * Return data to be stored for the request
      *
-     * @param moodleform $mform A moodle form object
+     * @param \moodleform $mform A moodle form object
      * @param array $mod An array of event details
      * @param array $data An array of form data
      * @return string The data to be stored

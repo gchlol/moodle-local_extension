@@ -83,44 +83,51 @@ class request extends \local_extension\base_request {
     /**
      * Renders the request details in a form with a date selector.
      *
-     * @param \MoodleQuickForm $mform A moodle form object
      * @param array $mod An array of event details
+     * @param \MoodleQuickForm $mform A moodle form object
+     * @return string
      */
-    public function request_definition($mform, $mod) {
-
+    public function request_definition($mod, $mform = null) {
         $cm = $mod['cm'];
         $event = $mod['event'];
         $course = $mod['course'];
-        $handler = $mod['handler'];
 
-        $html = \html_writer::tag('b', $course->fullname . ' > ' . $event->name, array('class' => 'mod'));
-        $html = \html_writer::tag('p', $html . ' ' . get_string('dueon', 'extension_assign', \userdate($event->timestart)));
-        $mform->addElement('html', \html_writer::tag('p', $html));
+        $html = \html_writer::start_div('content');
+        $coursestring = \html_writer::tag('b', $course->fullname . ' > ' . $event->name, array('class' => 'mod'));
+        $html .= \html_writer::tag('p', $coursestring . ' ' . get_string('dueon', 'extension_assign', \userdate($event->timestart)));
 
-        $formid = 'due' . $cm->id;
-        $mform->addElement('date_time_selector', $formid, get_string('requestdue', 'extension_assign'),
+        // Setup the mform due element id.
+        if (!empty($mform)) {
+            $mform->addElement('html', \html_writer::tag('p', $html));
+
+            $formid = 'due' . $cm->id;
+            $mform->addElement('date_time_selector', $formid, get_string('requestdue', 'extension_assign'),
                 array('optional' => true, 'step' => 1));
 
-        $mform->setDefault($formid, $event->timestart);
+            $mform->setDefault($formid, $event->timestart);
+        }
+        $html .= \html_writer::end_div(); // End .content.
 
+        return $html;
     }
 
     /**
      * Renders the request status in a form with indicators of the request state.
      *
-     * @param \MoodleQuickForm $mform A moodle form object
      * @param array $mod An array of event details
+     * @param \MoodleQuickForm $mform A moodle form object
+     * @return string
      */
-    public function status_definition($mform, $mod) {
+    public function status_definition($mod, $mform = null) {
         $cm = $mod['cm'];
         $event = $mod['event'];
         $course = $mod['course'];
         $handler = $mod['handler'];
         $localcm = $mod['localcm'];
 
-        $html = \html_writer::tag('b', $course->fullname . ' > ' . $event->name, array('class' => 'mod'));
-        $html = \html_writer::tag('p', $html . ' ' . get_string('dueon', 'extension_assign', \userdate($event->timestart)));
-        $mform->addElement('html', \html_writer::tag('p', $html));
+        $html = \html_writer::start_div('content');
+        $coursestring = \html_writer::tag('b', $course->fullname . ' > ' . $event->name, array('class' => 'mod'));
+        $html .= \html_writer::tag('p', $coursestring . ' ' . get_string('dueon', 'extension_assign', \userdate($event->timestart)));
 
         $status = $localcm->get_state_name();
 
@@ -129,12 +136,16 @@ class request extends \local_extension\base_request {
 
         // TODO case on type of request, ie. exemption, extension, etc.
         // print extension type colour like the scoping document
-        $html  = \html_writer::start_div('content');
+
         $html .= \html_writer::tag('span', $requeststatus, array('class' => 'status'));
         $html .= \html_writer::tag('span', ' extension until ' . \userdate($localcm->cm->data), array('class' => 'time'));
         $html .= \html_writer::end_div(); // End .content.
 
-        $mform->addElement('html', $html);
+        if (!empty($mform)) {
+            $mform->addElement('html', $html);
+        }
+
+        return $html;
     }
 
     /**

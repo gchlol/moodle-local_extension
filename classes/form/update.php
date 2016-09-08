@@ -58,7 +58,7 @@ class update extends \moodleform {
 
         foreach ($mods as $id => $mod) {
             $handler = $mod['handler'];
-            $handler->status_definition($mform, $mod);
+            $handler->status_definition($mod, $mform);
 
             $approve = (\local_extension\rule::RULE_ACTION_APPROVE | \local_extension\rule::RULE_ACTION_FORCEAPPROVE);
 

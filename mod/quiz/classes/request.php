@@ -79,27 +79,27 @@ class request extends \local_extension\base_request {
     /**
      * Define parts of the request for for an event object
      *
-     * @param moodleform $mform A moodle form object
      * @param array $mod An array of event details
+     * @param \moodleform $mform A moodle form object
      */
-    public function request_definition($mform, $mod) {
+    public function request_definition($mod, $mform) {
 
     }
 
     /**
      * Define parts of the request for for an event object
      *
-     * @param moodleform $mform A moodle form object
      * @param array $mod An array of event details
+     * @param \moodleform $mform A moodle form object
      */
-    public function status_definition($mform, $mod) {
+    public function status_definition($mod, $mform) {
 
     }
 
     /**
      * Validate the parts of the request form for this module
      *
-     * @param moodleform $mform A moodle form object
+     * @param \moodleform $mform A moodle form object
      * @param array $mod An array of event details
      * @param array $data An array of form data
      * @return array of error messages
@@ -114,7 +114,7 @@ class request extends \local_extension\base_request {
     /**
      * Return data to be stored for the request
      *
-     * @param moodleform $mform A moodle form object
+     * @param \moodleform $mform A moodle form object
      * @param array $mod An array of event details
      * @param array $data An array of form data
      * @return string The data to be stored
