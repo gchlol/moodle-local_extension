@@ -186,10 +186,12 @@ echo html_writer::table($controlstable);
 $tablecolumns = array();
 $tablecolumns[] = 'userpic';
 $tablecolumns[] = 'fullname';
+$tablecolumns[] = 'requestid';
 
 $tableheaders = array();
 $tableheaders[] = get_string('userpic');
 $tableheaders[] = get_string('fullnameuser');
+$tableheaders[] = 'Request ID';
 
 $table = new flexible_table('usertable');
 
@@ -207,24 +209,26 @@ $joins = array("FROM {local_extension_request} r");
 $wheres = array();
 $params = array();
 
-
 $mainuserfields = user_picture::fields('u', array('username', 'email', 'city', 'country', 'lang', 'timezone', 'maildisplay'));
 
 $extrasql = get_extra_user_fields_sql($context, 'u', '', array(
     'id', 'username', 'firstname', 'lastname', 'email', 'city', 'country',
     'picture', 'lang', 'timezone', 'maildisplay', 'imagealt', 'lastaccess'));
 
-
 $select = "SELECT r.id as rid,
                   cm.id as cmid,
                   r.timestamp,
                   r.lastmod,
                   r.userid,
+                  cmods.module as moduleid,
+                  mods.name as handler,
                   $mainuserfields
                   $extrasql";
+
 $joins[] = "JOIN {local_extension_cm} cm ON cm.request = r.id";
 $joins[] = "JOIN {user} u ON u.id = r.userid";
-$group = '';
+$joins[] = "JOIN {course_modules} cmods ON cm.cmid = cmods.id";
+$joins[] = "JOIN {modules} mods ON mods.id = cmods.module";
 
 $from = implode("\n", $joins);
 if ($wheres) {
@@ -266,7 +270,7 @@ if ($table->get_sql_sort()) {
 
 $matchcount = $DB->count_records_sql("SELECT COUNT(u.id) $from $where", $params);
 
-//$table->initialbars(true);
+// $table->initialbars(true);
 $table->pagesize($perpage, $matchcount);
 
 $userlist = $DB->get_recordset_sql("$select $from $where $sort", $params, $table->get_page_start(), $table->get_page_size());
@@ -294,11 +298,12 @@ if ($userlist) {
 
         $data[] = $OUTPUT->user_picture($user, array('size' => 35, 'courseid' => $course->id));
         $data[] = $profilelink;
+        $data[] = $user->rid;
 
         $table->add_data($data);
     }
 
-    $table->print_html();
+    $table->finish_html();
 }
 
 echo $OUTPUT->footer();
