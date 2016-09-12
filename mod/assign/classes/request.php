@@ -100,9 +100,19 @@ class request extends \local_extension\base_request {
         if (!empty($mform)) {
             $mform->addElement('html', \html_writer::tag('p', $html));
 
+            $startyear = date('Y');
+
+            // TODO get assignment due date, if moves to next year, $startyear += 1.
+            $stopyear = date('Y');
+
             $formid = 'due' . $cm->id;
-            $mform->addElement('date_time_selector', $formid, get_string('requestdue', 'extension_assign'),
-                array('optional' => true, 'step' => 1));
+            $dateconfig = array(
+                'optional' => true,
+                'step' => 1,
+                'startyear' => $startyear,
+                'stopyear' => $stopyear,
+            );
+            $mform->addElement('date_time_selector', $formid, get_string('requestdue', 'extension_assign'), $dateconfig);
 
             $mform->setDefault($formid, $event->timestart);
         }
@@ -221,6 +231,8 @@ class request extends \local_extension\base_request {
         $cm = $mod['cm'];
         $formid = 'due' . $cm->id;
         $now = time();
+
+        $extensionlimit = get_config('local_extension', 'extensionlimit');
 
         $due = $event->timestart;
 

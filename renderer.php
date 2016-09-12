@@ -483,5 +483,6 @@ class local_extension_renderer extends plugin_renderer_base {
 
         return $html;
     }
+
 }
 

@@ -54,11 +54,15 @@ class table {
             get_string('table_header_username', 'local_extension'),
         );
 
-        $columns = array('request', 'date', 'lastmod', 'items', 'status', 'username');
+        $columns = array('id', 'request', 'timestamp', 'lastmod', 'status', 'userid');
 
         $table = new \flexible_table('local_extension_summary');
         $table->define_columns($columns);
         $table->define_headers($headers);
+        $table->sortable(true);
+        $table->pageable(true);
+
+        $table->no_sorting('status');
 
         $table->define_baseurl($PAGE->url);
         $table->set_attribute('id', 'local_extension_table');
@@ -94,8 +98,13 @@ class table {
              LEFT JOIN {local_extension_cm} cm
                     ON cm.request = r.id
                 $where
-              GROUP BY r.id
-              ORDER BY r.lastmod DESC";
+              GROUP BY r.id, cm.request";
+
+        $orderby = $table->get_sql_sort();
+
+        if (!empty($orderby)) {
+            $sql .= " ORDER BY $orderby";
+        }
 
         $requests = $DB->get_records_sql($sql, $params);
 

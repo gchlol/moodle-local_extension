@@ -95,6 +95,7 @@ class request extends \moodleform {
             $mform->addElement('filemanager', 'attachments', get_string('attachments', 'local_extension'), null, array(
                 'subdirs' => 0,
             ));
+            $mform->addRule('attachments', 'Required', 'required', null, 'client');
             $mform->addRule('attachments', 'Required', 'required', null, 'server');
 
             $this->add_action_buttons(true, get_string('submit_request', 'local_extension'));
