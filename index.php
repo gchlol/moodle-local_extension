@@ -130,6 +130,9 @@ if (has_capability('moodle/category:manage', context_system::instance())) {
 // Display a list of enrolled courses to filter by.
 if ($mycourses = enrol_get_my_courses()) {
     $courselist = array();
+
+    $courselist['1'] = 'All';
+
     foreach ($mycourses as $mycourse) {
         $coursecontext = context_course::instance($mycourse->id);
         $courselist[$mycourse->id] = format_string($mycourse->shortname, true, array('context' => $coursecontext));
@@ -200,12 +203,13 @@ $table->define_headers($tableheaders);
 $table->define_baseurl($baseurl->out());
 
 $table->no_sorting('userpic');
+$table->sortable('requestid');
 
 $table->set_attribute('cellspacing', '0');
 
 $table->setup();
 
-$joins = array("FROM {local_extension_request} r");
+$joins = array();
 $wheres = array();
 $params = array();
 
@@ -215,7 +219,7 @@ $extrasql = get_extra_user_fields_sql($context, 'u', '', array(
     'id', 'username', 'firstname', 'lastname', 'email', 'city', 'country',
     'picture', 'lang', 'timezone', 'maildisplay', 'imagealt', 'lastaccess'));
 
-$select = "SELECT r.id as rid,
+$select = "SELECT r.id as requestid,
                   cm.id as cmid,
                   r.timestamp,
                   r.lastmod,
@@ -225,6 +229,7 @@ $select = "SELECT r.id as rid,
                   $mainuserfields
                   $extrasql";
 
+$joins[] = "FROM {local_extension_request} r";
 $joins[] = "JOIN {local_extension_cm} cm ON cm.request = r.id";
 $joins[] = "JOIN {user} u ON u.id = r.userid";
 $joins[] = "JOIN {course_modules} cmods ON cm.cmid = cmods.id";
@@ -280,7 +285,7 @@ if ($userlist) {
     $usersprinted = array();
     foreach ($userlist as $user) {
         if (in_array($user->userid, $usersprinted)) { // Prevent duplicates by r.hidden - MDL-13935.
-            continue;
+            //continue;
         }
         $usersprinted[] = $user->userid; // Add new user to the array of users printed.
 
@@ -298,7 +303,7 @@ if ($userlist) {
 
         $data[] = $OUTPUT->user_picture($user, array('size' => 35, 'courseid' => $course->id));
         $data[] = $profilelink;
-        $data[] = $user->rid;
+        $data[] = $user->requestid;
 
         $table->add_data($data);
     }
