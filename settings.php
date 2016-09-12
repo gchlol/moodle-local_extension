@@ -84,8 +84,7 @@ if ($hassiteconfig) {
         new lang_string('modulecontexthelp',      'local_extension'), 1, $options));
 
     $settings->add(new admin_setting_configtext('local_extension/extensionlimit',
-        new lang_string('extensionlimit',       'local_extension'),
-        new lang_string('extensionlimithelp',   'local_extension'),
-        new lang_string('extensionlimitdefault','local_extension'),
-        PARAM_INT));
+        new lang_string('extensionlimit',        'local_extension'),
+        new lang_string('extensionlimithelp',    'local_extension'),
+        new lang_string('extensionlimitdefault', 'local_extension'), PARAM_INT));
 }

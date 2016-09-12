@@ -68,7 +68,6 @@ function local_extension_extends_navigation(global_navigation $nav) {
                 $courseid = optional_param('course', 0, PARAM_INT);
             }
 
-
             $url = new moodle_url('/local/extension/request.php', array('course' => $courseid));
 
             $coursenode = $nav->find($courseid, navigation_node::TYPE_COURSE);
