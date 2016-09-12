@@ -203,33 +203,28 @@ $table->set_attribute('cellspacing', '0');
 
 $table->setup();
 
-list($esql, $params) = get_enrolled_sql($context, null, null, true);
-$joins = array("FROM {user} u");
+$joins = array("FROM {local_extension_request} r");
 $wheres = array();
+$params = array();
+
+
+$mainuserfields = user_picture::fields('u', array('username', 'email', 'city', 'country', 'lang', 'timezone', 'maildisplay'));
 
 $extrasql = get_extra_user_fields_sql($context, 'u', '', array(
     'id', 'username', 'firstname', 'lastname', 'email', 'city', 'country',
     'picture', 'lang', 'timezone', 'maildisplay', 'imagealt', 'lastaccess'));
 
-$mainuserfields = user_picture::fields('u', array('username', 'email', 'city', 'country', 'lang', 'timezone', 'maildisplay'));
 
-if ($isfrontpage) {
-    $select = "SELECT $mainuserfields, u.lastaccess$extrasql";
-    $joins[] = "JOIN ($esql) e ON e.id = u.id"; // Everybody on the frontpage usually.
-
-} else {
-    $select = "SELECT $mainuserfields, COALESCE(ul.timeaccess, 0) AS lastaccess$extrasql";
-    $joins[] = "JOIN ($esql) e ON e.id = u.id"; // Course enrolled users only.
-    $joins[] = "LEFT JOIN {user_lastaccess} ul ON (ul.userid = u.id AND ul.courseid = :courseid)"; // Not everybody accessed course yet.
-    $params['courseid'] = $course->id;
-}
-
-// Performance hacks - we preload user contexts together with accounts.
-$ccselect = ', ' . context_helper::get_preload_record_columns_sql('ctx');
-$ccjoin = "LEFT JOIN {context} ctx ON (ctx.instanceid = u.id AND ctx.contextlevel = :contextlevel)";
-$params['contextlevel'] = CONTEXT_USER;
-$select .= $ccselect;
-$joins[] = $ccjoin;
+$select = "SELECT r.id as rid,
+                  cm.id as cmid,
+                  r.timestamp,
+                  r.lastmod,
+                  r.userid,
+                  $mainuserfields
+                  $extrasql";
+$joins[] = "JOIN {local_extension_cm} cm ON cm.request = r.id";
+$joins[] = "JOIN {user} u ON u.id = r.userid";
+$group = '';
 
 $from = implode("\n", $joins);
 if ($wheres) {
@@ -271,7 +266,7 @@ if ($table->get_sql_sort()) {
 
 $matchcount = $DB->count_records_sql("SELECT COUNT(u.id) $from $where", $params);
 
-// $table->initialbars(true);
+//$table->initialbars(true);
 $table->pagesize($perpage, $matchcount);
 
 $userlist = $DB->get_recordset_sql("$select $from $where $sort", $params, $table->get_page_start(), $table->get_page_size());
@@ -280,17 +275,17 @@ if ($userlist) {
 
     $usersprinted = array();
     foreach ($userlist as $user) {
-        if (in_array($user->id, $usersprinted)) { // Prevent duplicates by r.hidden - MDL-13935.
+        if (in_array($user->userid, $usersprinted)) { // Prevent duplicates by r.hidden - MDL-13935.
             continue;
         }
-        $usersprinted[] = $user->id; // Add new user to the array of users printed.
+        $usersprinted[] = $user->userid; // Add new user to the array of users printed.
 
         context_helper::preload_from_record($user);
 
-        $usercontext = context_user::instance($user->id);
+        $usercontext = context_user::instance($user->userid);
 
-        if ($piclink = ($USER->id == $user->id || has_capability('moodle/user:viewdetails', $context) || has_capability('moodle/user:viewdetails', $usercontext))) {
-            $profilelink = '<strong><a href="'.$CFG->wwwroot.'/user/view.php?id='.$user->id.'&amp;course='.$course->id.'">'.fullname($user).'</a></strong>';
+        if ($piclink = ($USER->id == $user->userid || has_capability('moodle/user:viewdetails', $context) || has_capability('moodle/user:viewdetails', $usercontext))) {
+            $profilelink = '<strong><a href="'.$CFG->wwwroot.'/user/view.php?id='.$user->userid.'&amp;course='.$course->id.'">'.fullname($user).'</a></strong>';
         } else {
             $profilelink = '<strong>'.fullname($user).'</strong>';
         }
