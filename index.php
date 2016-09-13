@@ -34,6 +34,7 @@ $perpage    = optional_param('perpage', DEFAULT_PAGE_SIZE, PARAM_INT);
 $categoryid = optional_param('catid', 0, PARAM_INT);
 $courseid   = optional_param('id', 0, PARAM_INT);
 $contextid  = optional_param('contextid', 0, PARAM_INT);
+$search     = optional_param('search', '', PARAM_RAW); // Make sure it is processed with p() or s() when sending to output!
 
 $PAGE->set_url('/local/extension/index.php', array(
     'page' => $page,
@@ -41,12 +42,14 @@ $PAGE->set_url('/local/extension/index.php', array(
     'contextid' => $contextid,
     'catid' => $categoryid,
     'id' => $courseid,
+    'search' => $search,
 ));
 
 // Should use this variable so that we don't break stuff every time a variable is added or changed.
 $baseurl = new moodle_url('/local/extension/index.php', array(
     'id' => $courseid,
     'catid' => $categoryid,
+    'search' => s($search)
 ));
 
 if ($contextid) {
@@ -190,11 +193,19 @@ $tablecolumns = array();
 $tablecolumns[] = 'userpic';
 $tablecolumns[] = 'fullname';
 $tablecolumns[] = 'requestid';
+$tablecolumns[] = 'timestamp';
+$tablecolumns[] = 'coursename';
+$tablecolumns[] = 'instance';
+$tablecolumns[] = 'lastmod';
 
 $tableheaders = array();
 $tableheaders[] = get_string('userpic');
 $tableheaders[] = get_string('fullnameuser');
 $tableheaders[] = 'Request ID';
+$tableheaders[] = 'Requested date';
+$tableheaders[] = 'Course';
+$tableheaders[] = 'Activity';
+$tableheaders[] = 'Last modified';
 
 $table = new flexible_table('usertable');
 
@@ -213,6 +224,16 @@ $joins = array();
 $wheres = array();
 $params = array();
 
+if ($courseid != 1) {
+    $wheres[] = "lcm.course = :courseid";
+    $params = array_merge($params, array('courseid' => $courseid), $params);
+}
+
+if ($categoryid != 0) {
+    $wheres[] = "c.category = :categoryid";
+    $params = array_merge($params, array('categoryid' => $categoryid), $params);
+}
+
 $mainuserfields = user_picture::fields('u', array('username', 'email', 'city', 'country', 'lang', 'timezone', 'maildisplay'));
 
 $extrasql = get_extra_user_fields_sql($context, 'u', '', array(
@@ -220,20 +241,23 @@ $extrasql = get_extra_user_fields_sql($context, 'u', '', array(
     'picture', 'lang', 'timezone', 'maildisplay', 'imagealt', 'lastaccess'));
 
 $select = "SELECT r.id as requestid,
-                  cm.id as cmid,
+                  lcm.id as cmid,
                   r.timestamp,
                   r.lastmod,
                   r.userid,
-                  cmods.module as moduleid,
-                  mods.name as handler,
+                  cm.module as module,
+                  md.name as handler,
+                  cm.instance,
+                  c.fullname as coursename,
                   $mainuserfields
                   $extrasql";
 
 $joins[] = "FROM {local_extension_request} r";
-$joins[] = "JOIN {local_extension_cm} cm ON cm.request = r.id";
 $joins[] = "JOIN {user} u ON u.id = r.userid";
-$joins[] = "JOIN {course_modules} cmods ON cm.cmid = cmods.id";
-$joins[] = "JOIN {modules} mods ON mods.id = cmods.module";
+$joins[] = "JOIN {local_extension_cm} lcm ON lcm.request = r.id";
+$joins[] = "JOIN {course_modules} cm ON cm.id = lcm.cmid";
+$joins[] = "JOIN {modules} md ON md.id = cm.module";
+$joins[] = "JOIN {course} c ON c.id = lcm.course";
 
 $from = implode("\n", $joins);
 if ($wheres) {
@@ -278,32 +302,53 @@ $matchcount = $DB->count_records_sql("SELECT COUNT(u.id) $from $where", $params)
 // $table->initialbars(true);
 $table->pagesize($perpage, $matchcount);
 
-$userlist = $DB->get_recordset_sql("$select $from $where $sort", $params, $table->get_page_start(), $table->get_page_size());
+$requestlist = $DB->get_records_sql("$select $from $where $sort", $params, $table->get_page_start(), $table->get_page_size());
 
-if ($userlist) {
+if ($requestlist) {
 
-    $usersprinted = array();
-    foreach ($userlist as $user) {
-        if (in_array($user->userid, $usersprinted)) { // Prevent duplicates by r.hidden - MDL-13935.
-            //continue;
+    // Obtain lists of each module => instance mapping for fetching the titles of the module that was requested.
+    $modulemap = array();
+
+    foreach ($requestlist as $request) {
+        $modulemap[$request->handler][] = $request->instance;
+    }
+
+    $instancenames = array();
+
+    foreach ($modulemap as $handler => $values) {
+        list($instanceids, $params) = $DB->get_in_or_equal($values);
+
+        $sql = "SELECT * 
+                  FROM {".$handler."} 
+                 WHERE id $instanceids";
+
+        $rs = $DB->get_recordset_sql($sql, $params);
+
+        foreach ($rs as $item) {
+            $instancenames[$item->id] = $item->name;
         }
-        $usersprinted[] = $user->userid; // Add new user to the array of users printed.
 
-        context_helper::preload_from_record($user);
+        $rs->close();
+    }
 
-        $usercontext = context_user::instance($user->userid);
+    foreach ($requestlist as $request) {
+        $usercontext = context_user::instance($request->userid);
 
-        if ($piclink = ($USER->id == $user->userid || has_capability('moodle/user:viewdetails', $context) || has_capability('moodle/user:viewdetails', $usercontext))) {
-            $profilelink = '<strong><a href="'.$CFG->wwwroot.'/user/view.php?id='.$user->userid.'&amp;course='.$course->id.'">'.fullname($user).'</a></strong>';
+        if ($piclink = ($USER->id == $request->userid || has_capability('moodle/user:viewdetails', $context) || has_capability('moodle/user:viewdetails', $usercontext))) {
+            $profilelink = '<strong><a href="'.$CFG->wwwroot.'/user/view.php?id='.$request->userid.'&amp;course='.$course->id.'">'.fullname($request).'</a></strong>';
         } else {
-            $profilelink = '<strong>'.fullname($user).'</strong>';
+            $profilelink = '<strong>'.fullname($request).'</strong>';
         }
 
-        $data = array();
-
-        $data[] = $OUTPUT->user_picture($user, array('size' => 35, 'courseid' => $course->id));
-        $data[] = $profilelink;
-        $data[] = $user->requestid;
+        $data = array(
+            $OUTPUT->user_picture($request, array('size' => 35, 'courseid' => $course->id)),
+            $profilelink,
+            $request->requestid,
+            userdate($request->timestamp),
+            $request->coursename,
+            $instancenames[$request->instance],
+            userdate($request->lastmod),
+        );
 
         $table->add_data($data);
     }
