@@ -88,19 +88,6 @@ echo $OUTPUT->header();
 echo html_writer::tag('h2', get_string('page_heading_summary', 'local_extension'));
 
 /*
-$table = \local_extension\table::generate_index_table();
-// TODO Replace 0 with $USER->id to filter the requests.
-// As a active request table must be created.
-$data = \local_extension\table::generate_index_data($table, 0);
-echo $renderer->render_extension_summary_table($table, $data);
-
-echo html_writer::empty_tag('br');
-
-$url = new moodle_url("/local/extension/request.php");
-echo $OUTPUT->single_button($url, get_string('button_request_extension', 'local_extension'));
-*/
-
-/*
  * New filter functionality, searching and listing of requests.
  */
 
@@ -149,9 +136,13 @@ if ($mycourses = enrol_get_my_courses()) {
         'catid' => $categoryid
     ));
 
+
+
     $select = new single_select($popupurl, 'id', $courselist, $courseid, null, 'requestform');
-    $select->set_label(get_string('mycourses'));
-    $controlstable->data[0]->cells[] = $OUTPUT->render($select);
+
+    $html  = html_writer::span(get_string('mycourses'), '', array('id' => 'courses'));
+    $html .= $OUTPUT->render($select);
+    $controlstable->data[0]->cells[] = $html;
 }
 
 // Display a list of all courses to filter by
@@ -210,7 +201,7 @@ $tableheaders[] = 'Request ID';
 $tableheaders[] = 'Requested date';
 $tableheaders[] = 'Course';
 $tableheaders[] = 'Activity';
-$tableheaders[] = 'Last modified';
+$tableheaders[] = 'Last updated by';
 
 $table = new flexible_table('usertable');
 
@@ -241,21 +232,18 @@ if ($categoryid != 0) {
 
 $mainuserfields = user_picture::fields('u', array('username', 'email', 'city', 'country', 'lang', 'timezone', 'maildisplay'));
 
-$extrasql = get_extra_user_fields_sql($context, 'u', '', array(
-    'id', 'username', 'firstname', 'lastname', 'email', 'city', 'country',
-    'picture', 'lang', 'timezone', 'maildisplay', 'imagealt', 'lastaccess'));
-
+// This query obtains ALL requests, that is filtered by category and course.
 $select = "SELECT r.id as requestid,
                   lcm.id as cmid,
                   r.timestamp,
                   r.lastmod,
+                  r.lastmodid,
                   r.userid,
                   cm.module as module,
                   md.name as handler,
                   cm.instance,
                   c.fullname as coursename,
-                  $mainuserfields
-                  $extrasql";
+                  $mainuserfields";
 
 $joins[] = "FROM {local_extension_request} r";
 $joins[] = "JOIN {user} u ON u.id = r.userid";
@@ -304,7 +292,6 @@ if ($table->get_sql_sort()) {
 
 $matchcount = $DB->count_records_sql("SELECT COUNT(u.id) $from $where", $params);
 
-// $table->initialbars(true);
 $table->pagesize($perpage, $matchcount);
 
 $requestlist = $DB->get_records_sql("$select $from $where $sort", $params, $table->get_page_start(), $table->get_page_size());
@@ -345,8 +332,12 @@ if ($requestlist) {
             $profilelink = '<strong>'.fullname($request).'</strong>';
         }
 
+        $lastmoduser = core_user::get_user($request->lastmodid);
+
         $requesturl = new moodle_url('/local/extension/status.php', array('id' => $request->requestid));
         $requestlink = html_writer::link($requesturl, $request->requestid);
+
+        $lastmod = userdate($request->lastmod) . " " . fullname($lastmoduser);
 
         $data = array(
             $OUTPUT->user_picture($request, array('size' => 35, 'courseid' => $course->id)),
@@ -355,7 +346,7 @@ if ($requestlist) {
             userdate($request->timestamp),
             $request->coursename,
             $instancenames[$request->instance],
-            userdate($request->lastmod),
+            $lastmod,
         );
 
         $table->add_data($data);
@@ -363,5 +354,8 @@ if ($requestlist) {
 
     $table->finish_html();
 }
+
+$url = new moodle_url("/local/extension/request.php");
+echo $OUTPUT->single_button($url, get_string('button_request_extension', 'local_extension'));
 
 echo $OUTPUT->footer();

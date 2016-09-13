@@ -129,9 +129,11 @@ if ($mform->is_cancelled()) {
 
     $request = array(
         'userid' => $USER->id,
+        'lastmodid' => $USER->id,
         'searchstart' => $start,
         'searchend' => $end,
         'timestamp' => $now,
+        'lastmod' => $now,
         'messageid' => 0,
     );
     $request['id'] = $DB->insert_record('local_extension_request', $request);

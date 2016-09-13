@@ -179,7 +179,7 @@ class request implements \cache_data_source {
         $DB->insert_record('local_extension_comment', $comment);
 
         // Update the lastmod
-        $this->update_lastmod();
+        $this->update_lastmod($from->id);
 
         return $comment;
     }
@@ -553,7 +553,7 @@ class request implements \cache_data_source {
                     $history->message = "$status extension for {$course->fullname}, {$event->name}";
 
                     // Update the lastmod
-                    $this->update_lastmod();
+                    $this->update_lastmod($user->id);
 
                     // You can only edit one state at a time, returning here is ok!
                     return $history;
@@ -602,7 +602,7 @@ class request implements \cache_data_source {
         $history->message = get_string('status_file_attachment', 'local_extension', $filelink);
 
         // Update the lastmod
-        $this->update_lastmod();
+        $this->update_lastmod($file->get_userid());
 
         return $history;
     }
@@ -668,14 +668,16 @@ class request implements \cache_data_source {
     /**
      * Updates the last modified time for this request.
      *
+     * @param int $userid
      * @return bool
      */
-    public function update_lastmod() {
+    public function update_lastmod($userid) {
         global $DB;
 
         $record = new \stdClass();
         $record->id = $this->requestid;
         $record->lastmod = time();
+        $record->lastmodid = $userid;
 
         $status = $DB->update_record('local_extension_request', $record);
 

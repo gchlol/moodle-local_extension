@@ -150,7 +150,7 @@ if ($form = $mform->get_data()) {
     $request->notify_subscribers($notifycontent, $USER->id);
 
     // Update the lastmod
-    $request->update_lastmod();
+    $request->update_lastmod($USER->id);
 
     // Invalidate the cache for this request. The content has changed.
     $request->get_data_cache()->delete($request->requestid);
