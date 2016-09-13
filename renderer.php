@@ -484,5 +484,43 @@ class local_extension_renderer extends plugin_renderer_base {
         return $html;
     }
 
+    /**
+     * Renders a search input form element that is used with filtering the requests based on course.
+     *
+     * @param \moodle_url $url
+     * @param string $name
+     * @param string $search
+     * @return string
+     */
+    public function render_search_course($url, $name, $search) {
+        $id = html_writer::random_id('search_course_f');
+
+        $label = html_writer::span('Search Courses');
+
+        $inputattributes = array(
+            'type' => 'text',
+            'id' => 'search',
+            'name' => 'search',
+            'value' => s($search),
+        );
+
+        $html = html_writer::input_hidden_params($url, array('search'));
+
+        $html .= html_writer::tag('input', null, $inputattributes);
+
+        $formattributes = array(
+            'method' => 'get',
+            'action' => $url,
+            'id' => $id,
+            'class' => 'searchform'
+        );
+
+        $form = html_writer::tag('form', $html, $formattributes);
+
+        $output = $label . html_writer::div($form, 'coursesearch');
+
+        return $output;
+    }
+
 }
 

@@ -66,9 +66,14 @@
     background-color: inherit !important;
     border: 1px none !important;
 }
+
 .local_extension div .manageruleitem {
     background-color: #d3d3d3;
     border: 1px solid;
     border-radius: 5px;
     width: 400px;
+}
+
+.local_extension div .coursesearch {
+    margin-top: 5px;
 }

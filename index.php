@@ -138,11 +138,11 @@ if ($mycourses = enrol_get_my_courses()) {
 
     foreach ($mycourses as $mycourse) {
         $coursecontext = context_course::instance($mycourse->id);
-        $courselist[$mycourse->id] = format_string($mycourse->shortname, true, array('context' => $coursecontext));
+        $courselist[$mycourse->id] = format_string($mycourse->fullname, true, array('context' => $coursecontext));
     }
     if (has_capability('moodle/site:viewparticipants', $systemcontext)) {
         unset($courselist[SITEID]);
-        $courselist = array(SITEID => format_string($SITE->shortname, true, array('context' => $systemcontext))) + $courselist;
+        $courselist = array(SITEID => format_string($SITE->fullname, true, array('context' => $systemcontext))) + $courselist;
     }
 
     $popupurl = new moodle_url('/local/extension/index.php', array(
@@ -185,6 +185,11 @@ if (has_capability('moodle/category:manage', context_system::instance())) {
 
     $controlstable->data[0]->cells[] = $categorycell;
 }
+
+$searchcoursecell = new html_table_cell();
+$searchcoursecell->attributes['class'] = 'right';
+$searchcoursecell->text = $renderer->render_search_course($baseurl, 'id', $search);
+$controlstable->data[0]->cells[] = $searchcoursecell;
 
 echo html_writer::table($controlstable);
 
@@ -271,8 +276,8 @@ $totalcount = $DB->count_records_sql("SELECT COUNT(u.id) $from $where", $params)
 if (!empty($search)) {
     $fullname = $DB->sql_fullname('u.firstname', 'u.lastname');
     $wheres[] = "(". $DB->sql_like($fullname, ':search1', false, false) .
-        " OR ". $DB->sql_like('email', ':search2', false, false) .
-        " OR ". $DB->sql_like('idnumber', ':search3', false, false) .") ";
+        " OR ". $DB->sql_like('c.fullname', ':search2', false, false) .
+        " OR ". $DB->sql_like('md.name', ':search3', false, false) .") ";
     $params['search1'] = "%$search%";
     $params['search2'] = "%$search%";
     $params['search3'] = "%$search%";
@@ -318,8 +323,8 @@ if ($requestlist) {
     foreach ($modulemap as $handler => $values) {
         list($instanceids, $params) = $DB->get_in_or_equal($values);
 
-        $sql = "SELECT * 
-                  FROM {".$handler."} 
+        $sql = "SELECT *
+                  FROM {".$handler."}
                  WHERE id $instanceids";
 
         $rs = $DB->get_recordset_sql($sql, $params);
@@ -340,10 +345,13 @@ if ($requestlist) {
             $profilelink = '<strong>'.fullname($request).'</strong>';
         }
 
+        $requesturl = new moodle_url('/local/extension/status.php', array('id' => $request->requestid));
+        $requestlink = html_writer::link($requesturl, $request->requestid);
+
         $data = array(
             $OUTPUT->user_picture($request, array('size' => 35, 'courseid' => $course->id)),
             $profilelink,
-            $request->requestid,
+            $requestlink,
             userdate($request->timestamp),
             $request->coursename,
             $instancenames[$request->instance],
