@@ -320,7 +320,7 @@ class rule {
 
         $params = array(
             'userid' => $userid,
-            'localcmid' => $mod['localcm']->cm->cmid,
+            'localcmid' => $mod['localcm']->cm->id,
         );
 
         $access = $DB->get_field('local_extension_subscription', 'access', $params);
