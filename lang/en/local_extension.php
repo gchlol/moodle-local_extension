@@ -43,6 +43,7 @@ $string['error_extension_lessthan'] = 'Less than days';
 $string['error_no_mods'] = 'The requested date range has no activities that will allow an extension request.
 {$a->startrange} - {$a->endrange}';
 $string['error_none_selected'] = 'Please select at least one item';
+$string['error_over_extension_limit'] = 'Your request of {$a->days} days is too long. Please make a shorter request.';
 $string['event_process_triggers'] = 'Processed triggers';
 $string['event_request_created'] = 'Request created';
 $string['event_trigger_create'] = 'Trigger created';

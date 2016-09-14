@@ -234,8 +234,6 @@ class request extends \local_extension\base_request {
         $formid = 'due' . $cm->id;
         $now = time();
 
-        $extensionlimit = get_config('local_extension', 'extensionlimit');
-
         $due = $event->timestart;
 
         if (!array_key_exists($formid, $data)) {

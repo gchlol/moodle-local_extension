@@ -132,15 +132,35 @@ class request extends \moodleform {
             }
         }
         */
+
+        $extensionlimit = get_config('local_extension', 'extensionlimit');
+
         $due = array();
         foreach ($mods as $id => $mod) {
             $handler = $mod['handler'];
             $cm = $mod['cm'];
+            $event = $mod['event'];
             $formid = 'due' . $cm->id;
 
             $due[$formid] = $data[$formid];
 
             $errors += $handler->request_validation($mform, $mod, $data);
+
+            // Validation checking for maximum request length.
+            $timestart = $event->timestart;
+            $requestuntil = $data[$formid];
+            if (!empty($requestuntil)) {
+                $requestlength = $requestuntil - $timestart;
+
+                $days = $requestlength / (3600 * 24);
+                $hours = ($requestlength / 3600) % 24;
+
+                if ($days > $extensionlimit) {
+                    $obj = (object) ['days' => intval($days)];
+                    $errors[$formid] = get_string('error_over_extension_limit', 'local_extension', $obj);
+                }
+            }
+
         }
 
         // The array $due contains the form ids and data (request until date).
