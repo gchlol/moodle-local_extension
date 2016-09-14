@@ -230,28 +230,28 @@ if ($categoryid != 0) {
     $params = array_merge($params, array('categoryid' => $categoryid), $params);
 }
 
-// Filering the subscriptions to only those that belong to the $USER.
+// Filtering the subscriptions to only those that belong to the $USER. If a rule has been triggered this will grant access to individuals to modify/view the requests.
 $wheres[] = "s.userid = :subuserid";
 $params = array_merge($params, array('subuserid' => $USER->id), $params);
 
 $mainuserfields = user_picture::fields('u', array('username', 'email', 'city', 'country', 'lang', 'timezone', 'maildisplay'));
 
-// This query obtains ALL requests cms, based on subscriptions, that is filtered by category, course, userid.
-$select = "SELECT DISTINCT r.id AS rid,
+// This query obtains ALL local cm requests, that the $USER has a subscription to, with the possible filters: coursename, username, activityname.
+$select = "SELECT lcm.id AS lcmid,
+                  lcm.name AS activity,
+                  s.userid AS suserid,
+                  r.id AS rid,
                   r.lastmodid,
                   r.lastmod,
                   r.timestamp,
-                  lcm.userid,
-                  lcm.name as activity,
-                  cm.module,
-                  c.fullname as coursename,
+                  c.fullname AS coursename,
+                  s.userid,
                   $mainuserfields";
 
-$joins[] = "FROM {local_extension_subscription} s";
+$joins[] = "FROM {local_extension_cm} lcm";
 
-$joins[] = "JOIN {local_extension_cm} lcm ON lcm.cmid = s.localcmid";
+$joins[] = "JOIN {local_extension_subscription} s ON s.localcmid = lcm.id";
 $joins[] = "JOIN {local_extension_request} r ON r.id = lcm.request";
-$joins[] = "JOIN {course_modules} cm ON cm.id = lcm.cmid";
 $joins[] = "JOIN {course} c ON c.id = lcm.course";
 $joins[] = "JOIN {user} u ON u.id = r.userid";
 
@@ -315,7 +315,11 @@ if ($requestlist) {
         $requesturl = new moodle_url('/local/extension/status.php', array('id' => $request->rid));
         $requestlink = html_writer::link($requesturl, $request->rid);
 
-        $lastmod = userdate($request->lastmod) . " " . fullname($lastmoduser);
+        $lastmod  = html_writer::start_div('lastmodby');
+        $lastmod .= html_writer::tag('span', userdate($request->lastmod));
+        $lastmod .= html_writer::empty_tag('br');
+        $lastmod .= html_writer::tag('span', fullname($lastmoduser));
+        $lastmod .= html_writer::end_div();
 
         $data = array(
             $OUTPUT->user_picture($request, array('size' => 35, 'courseid' => $course->id)),

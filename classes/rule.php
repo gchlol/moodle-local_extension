@@ -436,7 +436,7 @@ class rule {
             }
 
             $sub->userid = $user->id;
-            $sub->localcmid = $localcm->cmid;
+            $sub->localcmid = $localcm->cm->id;
             $sub->requestid = $localcm->requestid;
             $sub->lastmod = \time();
             $sub->trigger = $this->id;

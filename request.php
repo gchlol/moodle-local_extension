@@ -175,7 +175,7 @@ if ($mform->is_cancelled()) {
         // Setup the default subscription for the user making the request.
         $sub = new stdClass();
         $sub->userid = $USER->id;
-        $sub->localcmid = $cmid;
+        $sub->localcmid = $cm['id'];
         $sub->requestid = $request['id'];
         $sub->lastmod = \time();
         $sub->trigger = null;
