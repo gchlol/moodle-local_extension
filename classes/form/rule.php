@@ -68,6 +68,7 @@ class rule extends \moodleform {
         }
 
         $mform->addElement('select', 'priority', get_string('form_rule_label_priority', 'local_extension'), $optionspriority);
+        $mform->addHelpButton('priority', 'form_rule_label_priority', 'local_extension');
 
         // Prevent cyclic dependencies and exclude children from this rule.
         $optionsparent = \local_extension\utility::rule_tree_check_children($rules, $ruleid);
@@ -79,6 +80,7 @@ class rule extends \moodleform {
         $parentgroup[] = $mform->createElement('static', 'hastriggered', '', get_string('form_rule_label_parent_end', 'local_extension'));
 
         $mform->addGroup($parentgroup, 'parentgroup', get_string('form_rule_label_parent', 'local_extension'), array(' '), false);
+        $mform->addHelpButton('parentgroup', 'form_rule_label_parent', 'local_extension');
 
         // And if the requested length is [lt/ge] [x] days long.
         $lengthfromduedate = array();
@@ -95,6 +97,7 @@ class rule extends \moodleform {
 
         $mform->setType('lengthfromduedate', PARAM_INT);
         $mform->addGroup($lengthfromduedategroup, 'lengthfromduedategroup', get_string('form_rule_label_request_length', 'local_extension'), array(' '), false);
+        $mform->addHelpButton('lengthfromduedategroup', 'form_rule_label_request_length', 'local_extension');
 
         // And the request is [lt/ge] [x] days old.
         $elapsedtime = array();
@@ -105,6 +108,7 @@ class rule extends \moodleform {
 
         $mform->setType('elapsedfromrequest', PARAM_INT);
         $mform->addGroup($elapsedtimegroup, 'elapsedtimegroup', get_string('form_rule_label_elapsed_length', 'local_extension'), array(' '), false);
+        $mform->addHelpButton('elapsedtimegroup', 'form_rule_label_elapsed_length', 'local_extension');
 
         // Then set all roles equal to [roletypes] to [action] this request.
         $actionarray = array();
@@ -123,6 +127,7 @@ class rule extends \moodleform {
         $actiongroup[] = $mform->createElement('static', 'approve', '', get_string('form_rule_label_this_request', 'local_extension'));
 
         $mform->addGroup($actiongroup, 'actiongroup', get_string('form_rule_label_set_roles', 'local_extension'), array(' '), false);
+        $mform->addHelpButton('actiongroup', 'form_rule_label_set_roles', 'local_extension');
 
         // Email templates.
         /*
@@ -140,6 +145,7 @@ class rule extends \moodleform {
         $editornotify = $mform->addElement('editor', 'template_notify', get_string('form_rule_label_template', 'local_extension'));
         $mform->setType('template_notify', PARAM_RAW);
         $editornotify->setValue($editordata['template_notify']);
+        $mform->addHelpButton('template_notify', 'form_rule_label_template', 'local_extension');
 
         /*
         $mform->addElement('text',
@@ -154,6 +160,7 @@ class rule extends \moodleform {
         $editoruser = $mform->addElement('editor', 'template_user', get_string('form_rule_label_template_request', 'local_extension'));
         $mform->setType('template_user', PARAM_RAW);
         $editoruser->setValue($editordata['template_user']);
+        $mform->addHelpButton('template_user', 'form_rule_label_template_request', 'local_extension');
 
         // ID.
         $mform->addElement('hidden', 'id', 0);
