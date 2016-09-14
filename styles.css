@@ -77,3 +77,7 @@
 .local_extension div .coursesearch {
     margin-top: 5px;
 }
+
+.local_extension div .lastmodby {
+    text-align: center;
+}
