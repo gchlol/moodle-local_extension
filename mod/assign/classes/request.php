@@ -98,6 +98,7 @@ class request extends \local_extension\base_request {
 
         // Setup the mform due element id.
         if (!empty($mform)) {
+            $html .= \html_writer::end_div(); // End .content.
             $mform->addElement('html', \html_writer::tag('p', $html));
 
             $startyear = date('Y');
@@ -116,6 +117,7 @@ class request extends \local_extension\base_request {
 
             $mform->setDefault($formid, $event->timestart);
         }
+
         $html .= \html_writer::end_div(); // End .content.
 
         return $html;
@@ -295,9 +297,7 @@ class request extends \local_extension\base_request {
 
         $assignment = new \assign($context, $cm, null);
 
-        // $warning = '';
         if (!$assignment->save_user_extension($userid, $duedate)) {
-            // $warning = 'User id: ' . $userid . ', Assignment id: ' . $assignmentid . ', Extension date: ' . $duedate;
             return false;
         }
 
