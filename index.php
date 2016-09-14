@@ -230,30 +230,53 @@ if ($categoryid != 0) {
     $params = array_merge($params, array('categoryid' => $categoryid), $params);
 }
 
-// Filtering the subscriptions to only those that belong to the $USER. If a rule has been triggered this will grant access to individuals to modify/view the requests.
-$wheres[] = "s.userid = :subuserid";
-$params = array_merge($params, array('subuserid' => $USER->id), $params);
-
 $mainuserfields = user_picture::fields('u', array('username', 'email', 'city', 'country', 'lang', 'timezone', 'maildisplay'));
 
-// This query obtains ALL local cm requests, that the $USER has a subscription to, with the possible filters: coursename, username, activityname.
-$select = "SELECT lcm.id AS lcmid,
-                  lcm.name AS activity,
-                  s.userid AS suserid,
-                  r.id AS rid,
-                  r.lastmodid,
-                  r.lastmod,
-                  r.timestamp,
-                  c.fullname AS coursename,
-                  s.userid,
-                  $mainuserfields";
+$viewallrequests = has_capability('local/extension:viewallrequests', $context);
 
-$joins[] = "FROM {local_extension_cm} lcm";
+if ($viewallrequests) {
 
-$joins[] = "JOIN {local_extension_subscription} s ON s.localcmid = lcm.id";
-$joins[] = "JOIN {local_extension_request} r ON r.id = lcm.request";
-$joins[] = "JOIN {course} c ON c.id = lcm.course";
-$joins[] = "JOIN {user} u ON u.id = r.userid";
+    // This query obtains ALL local cm requests, with the possible filters: coursename, username, activityname.
+    $select = "SELECT lcm.id AS lcmid,
+                      lcm.name AS activity,
+                      r.id AS rid,
+                      r.lastmodid,
+                      r.lastmod,
+                      r.timestamp,
+                      r.userid,
+                      c.fullname AS coursename,
+                      $mainuserfields";
+
+    $joins[] = "FROM {local_extension_cm} lcm";
+
+    $joins[] = "JOIN {local_extension_request} r ON r.id = lcm.request";
+    $joins[] = "JOIN {course} c ON c.id = lcm.course";
+    $joins[] = "JOIN {user} u ON u.id = r.userid";
+
+} else {
+    // Filtering the subscriptions to only those that belong to the $USER. If a rule has been triggered this will grant access to individuals to modify/view the requests.
+    $wheres[] = "s.userid = :subuserid";
+    $params = array_merge($params, array('subuserid' => $USER->id), $params);
+
+    // This query obtains ALL local cm requests, that the $USER has a subscription to, with the possible filters: coursename, username, activityname.
+    $select = "SELECT lcm.id AS lcmid,
+                      lcm.name AS activity,
+                      r.id AS rid,
+                      r.lastmodid,
+                      r.lastmod,
+                      r.timestamp,
+                      r.userid,
+                      c.fullname AS coursename,
+                      $mainuserfields";
+
+    $joins[] = "FROM {local_extension_cm} lcm";
+
+    $joins[] = "JOIN {local_extension_subscription} s ON s.localcmid = lcm.id";
+    $joins[] = "JOIN {local_extension_request} r ON r.id = lcm.request";
+    $joins[] = "JOIN {course} c ON c.id = lcm.course";
+    $joins[] = "JOIN {user} u ON u.id = r.userid";
+
+}
 
 $from = implode("\n", $joins);
 if ($wheres) {

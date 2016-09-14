@@ -46,6 +46,7 @@ $string['event_trigger_update'] = 'Trigger updated';
 $string['error_no_mods'] = 'The requested date range has no activities that will allow an extension request.
 {$a->startrange} - {$a->endrange}';
 $string['externalrules'] = 'Manage Adapter Triggers';
+$string['extension:viewallrequests'] = 'View all extension requests';
 $string['extensionlimit'] = 'Extension length limit in days';
 $string['extensionlimitdefault'] = '28';
 $string['extensionlimithelp'] = 'This is a hard limit which restricts the length that a student can initially request an extension for.';
