@@ -62,9 +62,9 @@ if ($contextid) {
     $course = $DB->get_record('course', array('id' => $courseid), '*', MUST_EXIST);
     $context = context_course::instance($course->id, MUST_EXIST);
 } else {
-    $courseid = 1;
+    $courseid = SITEID;
     $course = $DB->get_record('course', array('id' => $courseid), '*', MUST_EXIST);
-    $context = context_course::instance($course->id, MUST_EXIST);
+    $context = context_coursecat::instance($course->id, MUST_EXIST);
 }
 
 require_login($course);
@@ -99,7 +99,7 @@ $controlstable->cellspacing = 0;
 $controlstable->data[] = new html_table_row();
 
 // Display a list of categories.
-if (has_capability('moodle/category:manage', context_system::instance())) {
+if (has_capability('moodle/category:manage', $context)) {
     $categorylist = array();
     $categorylist[0] = coursecat::get(0)->get_formatted_name();
     $categorylist += coursecat::make_categories_list();
