@@ -163,13 +163,28 @@ if ($mform->is_cancelled()) {
             'userid' => $USER->id,
             'course' => $course->id,
             'timestamp' => $now,
+            'name' => $mod['event']->name,
             'cmid' => $cmid,
             'state' => 0,
             'data' => $data,
         );
 
+
         $cm['id'] = $DB->insert_record('local_extension_cm', $cm);
+
+        // Setup the default subscription for the user making the request.
+        $sub = new stdClass();
+        $sub->userid = $USER->id;
+        $sub->localcmid = $cmid;
+        $sub->requestid = $request['id'];
+        $sub->lastmod = \time();
+        $sub->trigger = null;
+        $sub->access = \local_extension\rule::RULE_ACTION_DEFAULT;
+
+        $DB->insert_record('local_extension_subscription', $sub);
     }
+
+
 
     $draftitemid = file_get_submitted_draft_itemid('attachments');
     file_save_draft_area_files($draftitemid, $usercontext->id, 'local_extension', 'attachments', $request['id']);

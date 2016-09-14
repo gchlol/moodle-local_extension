@@ -35,7 +35,7 @@ namespace local_extension;
  */
 class request implements \cache_data_source {
 
-    /** @var integer The local_extension_request database object */
+    /** @var integer The local_extension_request id */
     public $requestid = null;
 
     /** @var \stdClass The local_extension_request database object */
@@ -112,7 +112,6 @@ class request implements \cache_data_source {
 
         // Add to the $userids, a list of users that are subscribed to this request.
         $fieldset = $DB->get_fieldset_select('local_extension_subscription', 'userid', 'requestid = :requestid', array('requestid' => $this->requestid));
-        $this->subscribedids[] = $request->userid;
 
         // Remove duplicate subscriber ids to prevent spamming them.
         $this->subscribedids = array_merge($this->subscribedids, array_unique($fieldset));

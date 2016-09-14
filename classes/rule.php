@@ -420,7 +420,7 @@ class rule {
         foreach ($users as $user) {
             $params = array(
                 'userid' => $user->id,
-                'localcmid' => $localcm->cm->cmid,
+                'localcmid' => $localcm->cmid,
             );
 
             $sub = $DB->get_record('local_extension_subscription', $params);
@@ -436,7 +436,7 @@ class rule {
             }
 
             $sub->userid = $user->id;
-            $sub->localcmid = $localcm->cm->cmid;
+            $sub->localcmid = $localcm->cmid;
             $sub->requestid = $localcm->requestid;
             $sub->lastmod = \time();
             $sub->trigger = $this->id;
