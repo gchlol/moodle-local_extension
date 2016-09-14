@@ -188,10 +188,10 @@ echo html_writer::table($controlstable);
 $tablecolumns = array();
 $tablecolumns[] = 'userpic';
 $tablecolumns[] = 'fullname';
-$tablecolumns[] = 'requestid';
+$tablecolumns[] = 'rid';
 $tablecolumns[] = 'timestamp';
 $tablecolumns[] = 'coursename';
-$tablecolumns[] = 'instance';
+$tablecolumns[] = 'activity';
 $tablecolumns[] = 'lastmod';
 
 $tableheaders = array();
@@ -230,27 +230,30 @@ if ($categoryid != 0) {
     $params = array_merge($params, array('categoryid' => $categoryid), $params);
 }
 
+// Filering the subscriptions to only those that belong to the $USER.
+$wheres[] = "s.userid = :subuserid";
+$params = array_merge($params, array('subuserid' => $USER->id), $params);
+
 $mainuserfields = user_picture::fields('u', array('username', 'email', 'city', 'country', 'lang', 'timezone', 'maildisplay'));
 
-// This query obtains ALL requests, that is filtered by category and course.
-$select = "SELECT r.id as requestid,
-                  lcm.id as cmid,
-                  r.timestamp,
-                  r.lastmod,
+// This query obtains ALL requests cms, based on subscriptions, that is filtered by category, course, userid.
+$select = "SELECT DISTINCT r.id AS rid,
                   r.lastmodid,
-                  r.userid,
-                  cm.module as module,
-                  md.name as handler,
-                  cm.instance,
+                  r.lastmod,
+                  r.timestamp,
+                  lcm.userid,
+                  lcm.name as activity,
+                  cm.module,
                   c.fullname as coursename,
                   $mainuserfields";
 
-$joins[] = "FROM {local_extension_request} r";
-$joins[] = "JOIN {user} u ON u.id = r.userid";
-$joins[] = "JOIN {local_extension_cm} lcm ON lcm.request = r.id";
+$joins[] = "FROM {local_extension_subscription} s";
+
+$joins[] = "JOIN {local_extension_cm} lcm ON lcm.cmid = s.localcmid";
+$joins[] = "JOIN {local_extension_request} r ON r.id = lcm.request";
 $joins[] = "JOIN {course_modules} cm ON cm.id = lcm.cmid";
-$joins[] = "JOIN {modules} md ON md.id = cm.module";
 $joins[] = "JOIN {course} c ON c.id = lcm.course";
+$joins[] = "JOIN {user} u ON u.id = r.userid";
 
 $from = implode("\n", $joins);
 if ($wheres) {
@@ -265,7 +268,7 @@ if (!empty($search)) {
     $fullname = $DB->sql_fullname('u.firstname', 'u.lastname');
     $wheres[] = "(". $DB->sql_like($fullname, ':search1', false, false) .
         " OR ". $DB->sql_like('c.fullname', ':search2', false, false) .
-        " OR ". $DB->sql_like('md.name', ':search3', false, false) .") ";
+        " OR ". $DB->sql_like('lcm.name', ':search3', false, false) .") ";
     $params['search1'] = "%$search%";
     $params['search2'] = "%$search%";
     $params['search3'] = "%$search%";
@@ -298,31 +301,6 @@ $requestlist = $DB->get_records_sql("$select $from $where $sort", $params, $tabl
 
 if ($requestlist) {
 
-    // Obtain lists of each module => instance mapping for fetching the titles of the module that was requested.
-    $modulemap = array();
-
-    foreach ($requestlist as $request) {
-        $modulemap[$request->handler][] = $request->instance;
-    }
-
-    $instancenames = array();
-
-    foreach ($modulemap as $handler => $values) {
-        list($instanceids, $params) = $DB->get_in_or_equal($values);
-
-        $sql = "SELECT *
-                  FROM {".$handler."}
-                 WHERE id $instanceids";
-
-        $rs = $DB->get_recordset_sql($sql, $params);
-
-        foreach ($rs as $item) {
-            $instancenames[$item->id] = $item->name;
-        }
-
-        $rs->close();
-    }
-
     foreach ($requestlist as $request) {
         $usercontext = context_user::instance($request->userid);
 
@@ -334,8 +312,8 @@ if ($requestlist) {
 
         $lastmoduser = core_user::get_user($request->lastmodid);
 
-        $requesturl = new moodle_url('/local/extension/status.php', array('id' => $request->requestid));
-        $requestlink = html_writer::link($requesturl, $request->requestid);
+        $requesturl = new moodle_url('/local/extension/status.php', array('id' => $request->rid));
+        $requestlink = html_writer::link($requesturl, $request->rid);
 
         $lastmod = userdate($request->lastmod) . " " . fullname($lastmoduser);
 
@@ -345,7 +323,7 @@ if ($requestlist) {
             $requestlink,
             userdate($request->timestamp),
             $request->coursename,
-            $instancenames[$request->instance],
+            $request->activity,
             $lastmod,
         );
 
