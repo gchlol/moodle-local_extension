@@ -72,13 +72,10 @@ $options = array(
 
 $triggers = \local_extension\rule::load_all();
 if (count($triggers) == 0) {
-    // TODO no triggers are setup. Do not allow extensions.
-
     // Check if admin capability and send to trigger config page.
     echo $OUTPUT->header();
-    echo html_writer::tag('p', 'No extension triggers defined.');
+    echo html_writer::tag('p', get_string('page_request_notriggersdefined', 'local_extension'));
     echo $OUTPUT->footer();
-    // exit;
 }
 
 list($handlers, $mods) = \local_extension\utility::get_activities($user, $start, $end, $options);
@@ -169,7 +166,6 @@ if ($mform->is_cancelled()) {
             'data' => $data,
         );
 
-
         $cm['id'] = $DB->insert_record('local_extension_cm', $cm);
 
         // Setup the default subscription for the user making the request.
@@ -183,8 +179,6 @@ if ($mform->is_cancelled()) {
 
         $DB->insert_record('local_extension_subscription', $sub);
     }
-
-
 
     $draftitemid = file_get_submitted_draft_itemid('attachments');
     file_save_draft_area_files($draftitemid, $usercontext->id, 'local_extension', 'attachments', $request['id']);

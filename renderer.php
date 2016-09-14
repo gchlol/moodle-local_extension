@@ -495,8 +495,6 @@ class local_extension_renderer extends plugin_renderer_base {
     public function render_search_course($url, $name, $search) {
         $id = html_writer::random_id('search_course_f');
 
-        $label = html_writer::span('Search Courses');
-
         $inputattributes = array(
             'type' => 'text',
             'id' => 'search',
@@ -504,19 +502,18 @@ class local_extension_renderer extends plugin_renderer_base {
             'value' => s($search),
         );
 
-        $html = html_writer::input_hidden_params($url, array('search'));
-
-        $html .= html_writer::tag('input', null, $inputattributes);
-
         $formattributes = array(
             'method' => 'get',
             'action' => $url,
             'id' => $id,
             'class' => 'searchform'
         );
+        $html  = html_writer::input_hidden_params($url, array('search'));
+        $html .= html_writer::tag('input', null, $inputattributes);
 
         $form = html_writer::tag('form', $html, $formattributes);
 
+        $label = html_writer::span(get_string('renderer_search_text', 'local_extension'));
         $output = $label . html_writer::div($form, 'coursesearch');
 
         return $output;

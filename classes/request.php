@@ -295,7 +295,13 @@ class request implements \cache_data_source {
             $course  = $mod['course'];
 
             $status = $localcm->get_state_name($record->state);
-            $log = "$status extension for {$course->fullname}, {$event->name}";
+
+            $log = new \stdClass();
+            $log->status = $status;
+            $log->course = $course->fullname;
+            $log->event = $event->name;
+
+            $log = get_string('request_state_history_log', 'local_extension', $log);
 
             // Add class property 'message' to interleave with the comment stream.
             $record->message = $log;
@@ -549,7 +555,12 @@ class request implements \cache_data_source {
 
                     $history = (object) $localcm->write_history($mod, $state, $user->id);
 
-                    $history->message = "$status extension for {$course->fullname}, {$event->name}";
+                    $log = new \stdClass();
+                    $log->status = $status;
+                    $log->course = $course->fullname;
+                    $log->event = $event->name;
+
+                    $history->message = get_string('request_state_history_log', 'local_extension', $log);
 
                     // Update the lastmod
                     $this->update_lastmod($user->id);

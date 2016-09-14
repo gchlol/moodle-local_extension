@@ -26,6 +26,7 @@
 
 $string['admin_settings_general'] = 'General settings';
 $string['admin_settings_template'] = 'Template settings';
+$string['and'] = 'and';
 $string['attachments'] = 'Attachments';
 $string['button_edit_rule'] = 'Add a new Rule';
 $string['button_request_extension'] = 'Request an Extension';
@@ -92,7 +93,11 @@ $string['form_rule_validate_duplicate_files'] = 'You can not upload files with a
 $string['form_rule_validate_elapsed'] = 'You must enter a number that is less than the request length';
 $string['form_rule_validate_greater_equal_to_zero'] = 'You must enter a number equal or greater than zero here';
 $string['form_rule_validate_greater_than_zero'] = 'You must enter a number greater than zero here';
+
+$string['form_request_availablerequests'] = 'Available Requests';
+$string['form_request_requestsinprogress'] = 'Requests in progress';
 $string['messageprovider:status'] = 'Activity extension notifications';
+$string['na'] = 'N/A';
 $string['nav_course_request'] = 'extension request';
 $string['nav_course_request_plural'] = 'extension requests';
 $string['nav_request'] = 'Request Extension';
@@ -121,7 +126,6 @@ $string['state_result_cancelled'] = 'Cancelled';
 $string['state_result_denied'] = 'Denied';
 $string['state_result_pending'] = 'Pending';
 $string['status_file_attachment'] = 'File attached {$a}';
-$string['status_page_heading'] = 'Extension Status';
 $string['submit_comment'] = 'Submit comment';
 $string['submit_request'] = 'Submit request';
 $string['subplugintype_extension'] = 'Extension adapter';
@@ -192,3 +196,21 @@ $string['coursecontext'] = 'Allow course context requests';
 $string['coursecontexthelp'] = '';
 $string['modulecontext'] = 'Allow module context requests';
 $string['modulecontexthelp'] = '';
+
+$string['request_state_history_log'] = '{$a->status} extension for {$a->course}, {$a->event}';
+
+$string['page_heading_index'] = 'Extension status';
+$string['page_h2_summary'] = 'Extension status list';
+$string['page_index_all'] = 'All';
+$string['page_index_categories'] = 'Categories';
+$string['page_index_courses'] = 'Courses';
+
+$string['table_header_index_requestid'] = 'Request ID';
+$string['table_header_index_requestdate'] = 'Requested date';
+$string['table_header_index_course'] = 'Course';
+$string['table_header_index_activity'] = 'Activity';
+$string['table_header_index_lastmod'] = 'Lasy updated by';
+
+$string['renderer_search_text'] = 'Search';
+
+$string['page_request_notriggersdefined'] = 'No extension triggers defined.';

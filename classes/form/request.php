@@ -60,8 +60,7 @@ class request extends \moodleform {
         $mform->setType('cmid', PARAM_INT);
 
         if (!empty($inprogress)) {
-            $inprogressh = 'Requests in progress';
-            $mform->addElement('html', $inprogressh);
+            $mform->addElement('html', get_string('form_request_requestsinprogress', 'local_extension'));
 
             // Iterate over the current request items.
             foreach ($inprogress as $id => $mod) {
@@ -77,8 +76,7 @@ class request extends \moodleform {
         }
 
         if (!empty($available)) {
-            $availableh = 'Available Requests';
-            $mform->addElement('html', $availableh);
+            $mform->addElement('html', get_string('form_request_availablerequests', 'local_extension'));
 
             // Iterate over remaining available request items.
             foreach ($available as $id => $mod) {

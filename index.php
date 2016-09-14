@@ -75,8 +75,9 @@ $isfrontpage = ($course->id == SITEID);
 $frontpagectx = context_course::instance(SITEID);
 
 $PAGE->set_context($systemcontext);
-$PAGE->set_pagelayout('admin');
+$PAGE->set_pagelayout('standard');
 $PAGE->set_title(get_string('pluginname', 'local_extension'));
+$PAGE->set_heading(get_string('page_heading_index', 'local_extension'));
 $PAGE->requires->css('/local/extension/styles.css');
 $PAGE->add_body_class('local_extension');
 
@@ -85,7 +86,7 @@ $renderer = $PAGE->get_renderer('local_extension');
 
 echo $OUTPUT->header();
 
-echo html_writer::tag('h2', get_string('page_heading_summary', 'local_extension'));
+echo html_writer::tag('h2', get_string('page_h2_summary', 'local_extension'));
 
 /*
  * New filter functionality, searching and listing of requests.
@@ -107,7 +108,8 @@ if (has_capability('moodle/category:manage', context_system::instance())) {
 
     $select = new single_select($popupurl, 'catid', $categorylist, $categoryid, null, 'requestform');
 
-    $html = html_writer::span('Categories', '', array('id' => 'categories'));
+    $strcategories = get_string('page_index_categories', 'local_extension');
+    $html = html_writer::span($strcategories, '', array('id' => 'categories'));
     $html .= $OUTPUT->render($select);
 
     $categorycell = new html_table_cell();
@@ -121,7 +123,7 @@ if (has_capability('moodle/category:manage', context_system::instance())) {
 if ($mycourses = enrol_get_my_courses()) {
     $courselist = array();
 
-    $courselist['1'] = 'All';
+    $courselist['1'] = get_string('page_index_all', 'local_extension');
 
     foreach ($mycourses as $mycourse) {
         $coursecontext = context_course::instance($mycourse->id);
@@ -135,8 +137,6 @@ if ($mycourses = enrol_get_my_courses()) {
     $popupurl = new moodle_url('/local/extension/index.php', array(
         'catid' => $categoryid
     ));
-
-
 
     $select = new single_select($popupurl, 'id', $courselist, $courseid, null, 'requestform');
 
@@ -155,7 +155,7 @@ if (has_capability('moodle/category:manage', context_system::instance())) {
         $courses = coursecat::get(0)->get_courses(array('recursive' => true));
     }
 
-    $options['1'] = 'All';
+    $options['1'] = get_string('page_index_all', 'local_extension');
 
     foreach ($courses as $course) {
         $options[$course->id] = $course->fullname;
@@ -167,7 +167,8 @@ if (has_capability('moodle/category:manage', context_system::instance())) {
 
     $select = new single_select($popupurl, 'id', $options, $courseid, null, 'requestform');
 
-    $html = html_writer::span('Courses', '', array('id' => 'courses'));
+    $strcourses = get_string('page_index_courses', 'local_extension');
+    $html = html_writer::span($strcourses, '', array('id' => 'courses'));
     $html .= $OUTPUT->render($select);
 
     $categorycell = new html_table_cell();
@@ -197,11 +198,11 @@ $tablecolumns[] = 'lastmod';
 $tableheaders = array();
 $tableheaders[] = get_string('userpic');
 $tableheaders[] = get_string('fullnameuser');
-$tableheaders[] = 'Request ID';
-$tableheaders[] = 'Requested date';
-$tableheaders[] = 'Course';
-$tableheaders[] = 'Activity';
-$tableheaders[] = 'Last updated by';
+$tableheaders[] = get_string('table_header_index_requestid', 'local_extension');
+$tableheaders[] = get_string('table_header_index_requestdate', 'local_extension');
+$tableheaders[] = get_string('table_header_index_course', 'local_extension');
+$tableheaders[] = get_string('table_header_index_activity', 'local_extension');
+$tableheaders[] = get_string('table_header_index_lastmod', 'local_extension');
 
 $table = new flexible_table('usertable');
 

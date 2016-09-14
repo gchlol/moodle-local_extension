@@ -71,7 +71,7 @@ class rule extends \moodleform {
 
         // Prevent cyclic dependencies and exclude children from this rule.
         $optionsparent = \local_extension\utility::rule_tree_check_children($rules, $ruleid);
-        $optionsparent = array('N/A') + $optionsparent;
+        $optionsparent = array(get_string('na', 'local_extension')) + $optionsparent;
 
         // Only activate when [parent] has been triggered.
         $parentgroup = array();

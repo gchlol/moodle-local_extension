@@ -161,7 +161,8 @@ class update extends \moodleform {
 
                     if (count($wrapped) > 1) {
                         $last = array_pop($wrapped);
-                        $res = implode($wrapped, ', ') . ' and ' . $last;
+                        $and = get_string('and', 'local_extension');
+                        $res = implode($wrapped, ', ') . ' ' . $and . ' ' . $last;
                     } else {
                         $res = $wrapped[0];
                     }
