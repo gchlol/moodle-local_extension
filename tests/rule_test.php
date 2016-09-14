@@ -70,10 +70,16 @@ class local_extension_rule_testcase extends advanced_testcase {
      * Initial set up.
      */
     protected function setUp() {
-        global $DB;
+        global $DB, $CFG;
 
         parent::setUp();
         $this->resetAfterTest(true);
+
+        unset_config('noemailever');
+
+        $this->preventResetByRollback();
+
+        $this->redirectEmails();
 
         $this->course = $this->getDataGenerator()->create_course();
 
@@ -258,6 +264,8 @@ class local_extension_rule_testcase extends advanced_testcase {
 
         $request = array(
             'userid' => $user->id,
+            'lastmodid' => $user->id,
+            'lastmod' => $now,
             'searchstart' => $start,
             'searchend' => $end,
             'timestamp' => $now,
@@ -276,6 +284,7 @@ class local_extension_rule_testcase extends advanced_testcase {
                 'userid' => $user->id,
                 'course' => $course->id,
                 'timestamp' => $now,
+                'name' => $mod['event']->name,
                 'cmid' => $cmid,
                 'state' => 0,
                 'data' => $data,
