@@ -519,5 +519,21 @@ class local_extension_renderer extends plugin_renderer_base {
         return $output;
     }
 
+    /**
+     * Renders the request policy that has been defined in the administration configuration.
+     *
+     * @return null|string
+     */
+    public function render_policy() {
+
+        $policy = get_config('local_extension', 'extensionpolicyrequest');
+
+        if (!empty($policy)) {
+            return html_writer::div($policy, 'policy');
+        }
+
+        return null;
+    }
+
 }
 

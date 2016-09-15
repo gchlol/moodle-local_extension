@@ -64,6 +64,8 @@ $user = $USER->id;
 $start = time() - $searchback * 24 * 60 * 60;
 $end = time() + $searchforward * 24 * 60 * 60;
 
+$renderer = $PAGE->get_renderer('local_extension');
+
 $options = array(
     'courseid' => $courseid,
     'moduleid' => $cmid,
@@ -214,6 +216,8 @@ if ($mform->is_cancelled()) {
 
 echo $OUTPUT->header();
 
+echo $renderer->render_policy();
+
 $contextlevels = array(
     CONTEXT_SYSTEM => "systemcontext",
     CONTEXT_COURSE => "coursecontext",
@@ -221,13 +225,6 @@ $contextlevels = array(
 );
 
 $config = get_config('local_extension');
-
-if (!empty($config->extensionpolicyrequest)) {
-    $policy = $config->extensionpolicyrequest;
-}
-
-echo $policy;
-
 foreach ($contextlevels as $contextlevel => $cfg) {
     if ($context->contextlevel == $contextlevel) {
 
