@@ -44,6 +44,10 @@ if (!empty($cmid)) {
     require_login($courseid, null, $cm);
     $context = context_module::instance($cmid);
 
+    // When selecting an individual module, someone has sought to click the link. This will hopefully display the request form.
+    $maxweeks = get_config('local_extension', 'searchforwardmaxweeks');
+    $searchforward = $maxweeks * 7;
+
 } else if (!empty($courseid)) {
     require_login($courseid);
     $context = context_course::instance($courseid);
@@ -234,10 +238,13 @@ $config = get_config('local_extension');
 foreach ($contextlevels as $contextlevel => $cfg) {
     if ($context->contextlevel == $contextlevel) {
 
+        // Only display the search ahead when in the category or course context.
+        if (empty($cmid)) {
+            echo $renderer->render_request_search_controls($courseid, $cmid, $searchback, $searchforward);
+        }
+
         // If the configuration contexts are enabled then print the overall form to make multiple requests.
         if (!empty($config->$cfg)) {
-
-            echo $renderer->render_request_search_controls($courseid, $cmid, $searchback, $searchforward);
 
             $mform->display();
 
