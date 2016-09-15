@@ -52,12 +52,16 @@ class request extends \moodleform {
         $available = $this->_customdata['available'];
         $course = $this->_customdata['course'];
         $cmid = $this->_customdata['cmid'];
+        $searchforward = $this->_customdata['searchforward'];
 
         $mform->addElement('hidden', 'course', $course);
         $mform->setType('course', PARAM_INT);
 
         $mform->addElement('hidden', 'cmid', $cmid);
         $mform->setType('cmid', PARAM_INT);
+
+        $mform->addElement('hidden', 'forward', $searchforward);
+        $mform->setType('forward', PARAM_INT);
 
         if (!empty($inprogress)) {
             $mform->addElement('html', get_string('form_request_requestsinprogress', 'local_extension'));
@@ -93,8 +97,7 @@ class request extends \moodleform {
             $mform->addElement('filemanager', 'attachments', get_string('attachments', 'local_extension'), null, array(
                 'subdirs' => 0,
             ));
-            $mform->addRule('attachments', 'Required', 'required', null, 'client');
-            $mform->addRule('attachments', 'Required', 'required', null, 'server');
+            $mform->addRule('attachments', 'Required', 'required', null, 'client');;
 
             $this->add_action_buttons(true, get_string('submit_request', 'local_extension'));
         }

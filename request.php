@@ -91,18 +91,6 @@ if (count($triggers) == 0) {
 
 list($handlers, $mods) = \local_extension\utility::get_activities($user, $start, $end, $options);
 
-if (count($mods) == 0) {
-    $obj = new stdClass();
-    $obj->startrange = userdate($start);
-    $obj->endrange = userdate($end);
-
-    echo $OUTPUT->header();
-    echo html_writer::tag('p', get_string('error_no_mods', 'local_extension', $obj));
-    echo $renderer->render_request_search_controls($courseid, $cmid, $searchback, $searchforward);
-    echo $OUTPUT->footer();
-    exit;
-}
-
 $available = array();
 $inprogress = array();
 
@@ -121,7 +109,8 @@ $params = array(
     'inprogress' => $inprogress,
     'course' => $courseid,
     'cmid' => $cmid,
-    'context' => $context
+    'context' => $context,
+    'searchforward' => $searchforward,
 );
 
 $mform = new \local_extension\form\request(null, $params);
@@ -225,6 +214,17 @@ if ($mform->is_cancelled()) {
 }
 
 echo $OUTPUT->header();
+
+if (count($mods) == 0) {
+    $obj = new stdClass();
+    $obj->startrange = userdate($start);
+    $obj->endrange = userdate($end);
+
+    echo html_writer::tag('p', get_string('error_no_mods', 'local_extension', $obj));
+    echo $renderer->render_request_search_controls($courseid, $cmid, $searchback, $searchforward);
+    echo $OUTPUT->footer();
+    exit;
+}
 
 echo $renderer->render_policy();
 
