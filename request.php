@@ -27,10 +27,17 @@ require_once('../../config.php');
 require_once($CFG->dirroot . '/calendar/lib.php');
 global $CFG, $PAGE;
 
-$PAGE->set_url(new moodle_url('/local/extension/request.php'));
+$courseid      = optional_param('course', 0, PARAM_INT);
+$cmid          = optional_param('cmid', 0, PARAM_INT);
+$searchback    = optional_param('back', get_config('local_extension', 'searchback'), PARAM_INT);
+$searchforward = optional_param('forward', get_config('local_extension', 'searchforward'), PARAM_INT);
 
-$courseid  = optional_param('course', 0, PARAM_INT);
-$cmid = optional_param('cmid', 0, PARAM_INT);
+$PAGE->set_url(new moodle_url('/local/extension/request.php'), array(
+    'back'    => $searchback,
+    'forward' => $searchforward,
+    'course'  => $courseid,
+    'cmid'    => $cmid,
+));
 
 if (!empty($cmid)) {
     $cm = get_fast_modinfo($courseid)->get_cm($cmid);
@@ -58,8 +65,6 @@ $PAGE->navbar->ignore_active();
 $PAGE->navbar->add('Extension Status', new moodle_url('/local/extension/index.php'));
 $PAGE->navbar->add('New Extension Request');
 
-$searchback = optional_param('back', get_config('local_extension', 'searchback'), PARAM_INT);
-$searchforward = optional_param('forward', get_config('local_extension', 'searchforward'), PARAM_INT);
 $user = $USER->id;
 $start = time() - $searchback * 24 * 60 * 60;
 $end = time() + $searchforward * 24 * 60 * 60;
@@ -230,6 +235,8 @@ foreach ($contextlevels as $contextlevel => $cfg) {
 
         // If the configuration contexts are enabled then print the overall form to make multiple requests.
         if (!empty($config->$cfg)) {
+
+            echo $renderer->render_request_search_controls($courseid, $cmid, $searchback, $searchforward);
 
             $mform->display();
 

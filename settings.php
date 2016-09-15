@@ -39,6 +39,15 @@ if ($hassiteconfig) {
         $days[$c] = new lang_string('numdays', '', $c);
     }
 
+    $weeks = array();
+    for ($c = 1; $c <= 8; $c++) {
+        if ($c == 1) {
+            $weeks[$c] = get_string('week', 'local_extension', $c);
+        } else {
+            $weeks[$c] = get_string('week_plural', 'local_extension', $c);
+        }
+    }
+
     $settings->add(new admin_setting_configselect('local_extension/searchback',
         new lang_string('searchback',         'local_extension'),
         new lang_string('searchbackhelp',     'local_extension'), 7, $days));
@@ -46,6 +55,10 @@ if ($hassiteconfig) {
     $settings->add(new admin_setting_configselect('local_extension/searchforward',
         new lang_string('searchforward',      'local_extension'),
         new lang_string('searchforwardhelp',  'local_extension'), 14, $days));
+
+    $settings->add(new admin_setting_configselect('local_extension/searchforwardmaxweeks',
+        new lang_string('searchforwardmaxweeks',      'local_extension'),
+        new lang_string('searchforwardmaxweekshelp',  'local_extension'), 2, $weeks));
 
     $settings->add(new admin_setting_configcheckbox('local_extension/emaildisable',
         new lang_string('emaildisable',         'local_extension'),

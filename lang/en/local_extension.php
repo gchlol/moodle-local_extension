@@ -161,6 +161,7 @@ $string['page_index_all'] = 'All';
 $string['page_index_categories'] = 'Categories';
 $string['page_index_courses'] = 'Courses';
 $string['page_request_notriggersdefined'] = 'No extension triggers defined.';
+$string['page_request_searchforward'] = 'Look ahead for possible requests in the future';
 $string['pluginname'] = 'Activity extensions';
 $string['renderer_search_text'] = 'Search';
 $string['requestextension_status'] = 'Extension Status';
@@ -173,6 +174,8 @@ $string['searchbackhelp'] = 'How many days to search back from today when reques
 $string['searchback'] = 'Search backward';
 $string['searchforwardhelp'] = 'How many days to search forward from today when requesting an exception.';
 $string['searchforward'] = 'Search forward';
+$string['searchforwardmaxweekshelp'] = 'The number of weeks allowed to search forward when making a request.';
+$string['searchforwardmaxweeks'] = 'Maximum weeks searching forward';
 $string['state_approved'] = '<span class="statusapproved">Granted</span>';
 $string['state_cancel'] = '<span class="statuscancel">Cancelled</span>';
 $string['state_denied'] = '<span class="statusdenied">Denied</span>';
@@ -253,3 +256,5 @@ $string['template_user_content'] = "{{course}} => Course full name<br />
 {{attachments}} => The list of attachments<br />
 {{fullhistory}} => The full comment stream for the request<br />";
 $string['template_user_subject'] = 'DEBUG {{student}} {{rulename}} {{rolename}}';
+$string['week'] = '{$a} week';
+$string['week_plural'] = '{$a} weeks';

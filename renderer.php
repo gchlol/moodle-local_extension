@@ -535,5 +535,66 @@ class local_extension_renderer extends plugin_renderer_base {
         return null;
     }
 
+    /**
+     * Renders a 'weeks' selection box allowing someone to search for requests in the future.
+     *
+     * @param int $courseid
+     * @param int $cmid
+     * @param int $searchback
+     * @param int $searchforward
+     * @return string
+     */
+    public function render_request_search_controls($courseid, $cmid, $searchback, $searchforward) {
+        $controlstable = new html_table();
+        $controlstable->attributes['class'] = 'controls';
+        $controlstable->cellspacing = 0;
+        $controlstable->data[] = new html_table_row();
+
+        $popupurl = new moodle_url('/local/extension/request.php', array(
+            'course'  => $courseid,
+            'cmid'    => $cmid,
+        ));
+
+        $forwardlist = array();
+
+        $searchforwarddefault = get_config('local_extension', 'searchforward');
+        $maxweeks = get_config('local_extension', 'searchforwardmaxweeks');
+
+        for ($i = 1; $i <= $maxweeks; $i++) {
+
+            // Dont add 'weeks' that are less than the default searchforward length.
+            $defaultweeks = $searchforwarddefault / 7;
+
+            if ($i < $defaultweeks) {
+                continue;
+            }
+
+            $week  = get_string('week', 'local_extension', $i);
+            $weeks = get_string('week_plural', 'local_extension', $i);
+
+            $value = 7 * $i;
+
+            if ($i == 1) {
+                $forwardlist[$value] = $week;
+            } else {
+                $forwardlist[$value] = $weeks;
+            }
+        }
+
+        $select = new single_select($popupurl, 'forward', $forwardlist, $searchforward, null, 'requestform');
+        $select->set_label(get_string('page_request_searchforward', 'local_extension'));
+
+        $html = $this->render($select);
+
+        $searchforwardcell = new html_table_cell();
+        $searchforwardcell->attributes['class'] = 'right';
+        $searchforwardcell->text = $html;
+
+        $controlstable->data[0]->cells[] = $searchforwardcell;
+
+        return html_writer::table($controlstable);
+
+    }
+
 }
 
