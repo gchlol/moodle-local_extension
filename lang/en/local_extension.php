@@ -203,6 +203,7 @@ $string['table_header_index_activity'] = 'Activity';
 $string['table_header_index_course'] = 'Course';
 $string['table_header_index_lastmod'] = 'Last updated';
 $string['table_header_index_requestdate'] = 'Creation date';
+$string['table_header_index_requestlength'] = 'Request length';
 $string['table_header_index_requestid'] = 'ID';
 $string['table_header_items'] = 'Number of request items';
 $string['table_header_lastmod'] = 'Last updated';

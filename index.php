@@ -97,6 +97,7 @@ $tablecolumns[] = 'rid';
 $tablecolumns[] = 'userpic';
 $tablecolumns[] = 'fullname';
 $tablecolumns[] = 'timestamp';
+$tablecolumns[] = 'length';
 $tablecolumns[] = 'coursename';
 $tablecolumns[] = 'activity';
 $tablecolumns[] = 'lastmod';
@@ -106,6 +107,7 @@ $tableheaders[] = get_string('table_header_index_requestid', 'local_extension');
 $tableheaders[] = get_string('userpic');
 $tableheaders[] = get_string('fullnameuser');
 $tableheaders[] = get_string('table_header_index_requestdate', 'local_extension');
+$tableheaders[] = get_string('table_header_index_requestlength', 'local_extension');
 $tableheaders[] = get_string('table_header_index_course', 'local_extension');
 $tableheaders[] = get_string('table_header_index_activity', 'local_extension');
 $tableheaders[] = get_string('table_header_index_lastmod', 'local_extension');
@@ -146,6 +148,7 @@ if ($viewallrequests) {
     // This query obtains ALL local cm requests, with the possible filters: coursename, username, activityname.
     $select = "SELECT lcm.id AS lcmid,
                       lcm.name AS activity,
+                      lcm.length,
                       r.id AS rid,
                       r.lastmodid,
                       r.lastmod,
@@ -168,6 +171,7 @@ if ($viewallrequests) {
     // This query obtains ALL local cm requests, that the $USER has a subscription to, with the possible filters: coursename, username, activityname.
     $select = "SELECT lcm.id AS lcmid,
                       lcm.name AS activity,
+                      lcm.length,
                       r.id AS rid,
                       r.lastmodid,
                       r.lastmod,
@@ -258,6 +262,7 @@ if ($requestlist) {
             $OUTPUT->user_picture($request, array('size' => 35, 'courseid' => $course->id)),
             $profilelink,
             userdate($request->timestamp, $format),
+            html_writer::div($requestlength, 'lastmodby'),
             html_writer::link($requesturl, $request->coursename),
             html_writer::link($requesturl, $request->activity),
             $lastmod,

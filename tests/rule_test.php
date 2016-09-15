@@ -288,6 +288,7 @@ class local_extension_rule_testcase extends advanced_testcase {
                 'cmid' => $cmid,
                 'state' => 0,
                 'data' => $data,
+                'length' => $day,
             );
 
             $cm['id'] = $DB->insert_record('local_extension_cm', $cm);

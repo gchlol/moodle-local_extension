@@ -148,6 +148,7 @@ if ($mform->is_cancelled()) {
 
         $course = $mod['course'];
         $handler = $mod['handler'];
+        $event = $mod['event'];
 
         $data = $handler->request_data($mform, $mod, $form);
 
@@ -161,10 +162,11 @@ if ($mform->is_cancelled()) {
             'userid' => $USER->id,
             'course' => $course->id,
             'timestamp' => $now,
-            'name' => $mod['event']->name,
+            'name' => $event->name,
             'cmid' => $cmid,
             'state' => 0,
             'data' => $data,
+            'length' => $data - $event->timestart,
         );
 
         $cm['id'] = $DB->insert_record('local_extension_cm', $cm);
