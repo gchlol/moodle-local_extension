@@ -93,18 +93,18 @@ echo $renderer->render_index_search_controls($context, $categoryid, $courseid, $
 
 // Write the flexible_table with the current details.
 $tablecolumns = array();
+$tablecolumns[] = 'rid';
 $tablecolumns[] = 'userpic';
 $tablecolumns[] = 'fullname';
-$tablecolumns[] = 'rid';
 $tablecolumns[] = 'timestamp';
 $tablecolumns[] = 'coursename';
 $tablecolumns[] = 'activity';
 $tablecolumns[] = 'lastmod';
 
 $tableheaders = array();
+$tableheaders[] = get_string('table_header_index_requestid', 'local_extension');
 $tableheaders[] = get_string('userpic');
 $tableheaders[] = get_string('fullnameuser');
-$tableheaders[] = get_string('table_header_index_requestid', 'local_extension');
 $tableheaders[] = get_string('table_header_index_requestdate', 'local_extension');
 $tableheaders[] = get_string('table_header_index_course', 'local_extension');
 $tableheaders[] = get_string('table_header_index_activity', 'local_extension');
@@ -231,6 +231,8 @@ $requestlist = $DB->get_records_sql("$select $from $where $sort", $params, $tabl
 
 if ($requestlist) {
 
+    $format = '%a, %e %b %y %l:%M %p';
+
     foreach ($requestlist as $request) {
         $usercontext = context_user::instance($request->userid);
 
@@ -246,18 +248,18 @@ if ($requestlist) {
         $requestlink = html_writer::link($requesturl, $request->rid);
 
         $lastmod  = html_writer::start_div('lastmodby');
-        $lastmod .= html_writer::tag('span', userdate($request->lastmod));
+        $lastmod .= html_writer::tag('span', userdate($request->lastmod, $format));
         $lastmod .= html_writer::empty_tag('br');
         $lastmod .= html_writer::tag('span', fullname($lastmoduser));
         $lastmod .= html_writer::end_div();
 
         $data = array(
+            $requestlink,
             $OUTPUT->user_picture($request, array('size' => 35, 'courseid' => $course->id)),
             $profilelink,
-            $requestlink,
-            userdate($request->timestamp),
-            $request->coursename,
-            $request->activity,
+            userdate($request->timestamp, $format),
+            html_writer::link($requesturl, $request->coursename),
+            html_writer::link($requesturl, $request->activity),
             $lastmod,
         );
 
