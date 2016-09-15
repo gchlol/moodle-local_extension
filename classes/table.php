@@ -38,11 +38,11 @@ require_once($CFG->libdir . '/tablelib.php');
 class table {
 
     /**
-     * Generates the basic requirements the status page table.
+     * The list of requests
      *
      * @return \flexible_table
      */
-    public static function generate_index_table() {
+    public static function index_search_table() {
         global $PAGE;
 
         $headers = array(
@@ -70,45 +70,6 @@ class table {
         $table->setup();
 
         return $table;
-    }
-
-    /**
-     * Generates the data required for the status page table. Orders by request.lastmod DESC.
-     * @param \flexible_table $table
-     * @param integer $userid
-     * @return request[] An array of request objects
-     */
-    public static function generate_index_data($table, $userid = 0) {
-        global $DB;
-
-        if (!empty($userid)) {
-            $where = " WHERE cm.userid = ? ";
-            $params = array('userid' => $userid);
-        } else {
-            $where = '';
-            $params = array();
-        }
-
-        $sql = "SELECT r.id,
-                       r.timestamp,
-                       r.lastmod,
-                       r.userid,
-                       COUNT(cm.request)
-                  FROM {local_extension_request} r
-             LEFT JOIN {local_extension_cm} cm
-                    ON cm.request = r.id
-                $where
-              GROUP BY r.id, cm.request";
-
-        $orderby = $table->get_sql_sort();
-
-        if (!empty($orderby)) {
-            $sql .= " ORDER BY $orderby";
-        }
-
-        $requests = $DB->get_records_sql($sql, $params);
-
-        return $requests;
     }
 
     /**

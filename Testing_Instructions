@@ -1,8 +1,8 @@
-Testing extension_assign
-==============================================================================
+Testing local/extension
+========================
 
-Click Add a new course on, course/index.php
-Provide any course fullname and shortname.
+Add a new course at $CFG->wwwroot/course/index.php
+Fill in the minimum required details, Course full name and short name.
 Save the changes.
 
 Navigate to the new course created.
@@ -21,8 +21,8 @@ Description: Expired Assignment
 
 Check the boxes next to all three Availability options and set these dates,
 
-Allow submissions from: Get todays date and subtract a week from the days in the list.
-Due date: Get todays date and subtract a week from the days in the list.
+Allow submissions from: Get today's date and subtract a week from the days in the list.
+Due date: Get today's date and subtract a week from the days in the list.
 Cut-off date: Set it to 1 hour after the due date that has been set.
 
 Set 2:
@@ -45,9 +45,58 @@ Allow submissions from: Add one month to the current day, 00h 00m
 Due date: One month and one week from today, 00h, 00m.
 Cut-off date: Set it to 1 hour after the due date that has been set.
 
+Set up enrolled users and roles
+===============================
+With the course selected, an administrator that can view the administration block.
+Select Users > Enrolled Users. ($CFG->wwwroot/enrol/users.php?id=[courseid])
+
+Enrol users to the course, create the users if necessary.
+
+* Student, Teacher and Manager are default roles.
+
+Add the Student role to all users.
+Add the Teacher role to one user.
+Add the Manager role to one user.
+
+
+Create a rule set
+================
+
+Navigate to $CFG->wwwroot/local/extension/manage.php
+
+In the dropdown box labelled "Add a new rule", click it and select "Assignment"
+
+Enter in a descriptive name.
+
+Rule Name: Notify Teacher
+Priority: 1
+Only activate if: N/A
+And the requested length is: [less than] 10
+And the request is: [any value] 0
+Then set all roles equal to: [Teacher] to [Approve]
+
+Create another rule,
+
+Rule Name: Subscribe Manager
+Priority: 1
+Only activate if: [Notify Teacher]
+And the requested length is: [less than] 10
+And the request is: [any value] 0
+Then set all roles equal to: [Manager] to [Subscribe]
+
 
 Requesting an extension
 =======================
+
+Log in to the LMS as one of the enrolled students.
+
+Select 'Extension Status' from the main navigation block.
+
+Click 'Request an Extension'
+
+
+Validation
+==========
 
 Date validation:
 
@@ -56,6 +105,3 @@ Test requesting for dates (should all fail):
 * the same as the new date
 * within 24 hours of the existing due date
 * before the current time
-
-
-
