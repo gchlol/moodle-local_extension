@@ -81,6 +81,9 @@ $PAGE->set_heading(get_string('page_heading_index', 'local_extension'));
 $PAGE->requires->css('/local/extension/styles.css');
 $PAGE->add_body_class('local_extension');
 
+$PAGE->navbar->ignore_active();
+$PAGE->navbar->add('Extension Status', new moodle_url('/local/extension/index.php'));
+
 /* @var \local_extension_renderer $renderer */
 $renderer = $PAGE->get_renderer('local_extension');
 
@@ -104,7 +107,7 @@ $tablecolumns[] = 'lastmod';
 
 $tableheaders = array();
 $tableheaders[] = get_string('table_header_index_requestid', 'local_extension');
-$tableheaders[] = get_string('userpic');
+$tableheaders[] = get_string('table_header_index_user', 'local_extension');
 $tableheaders[] = get_string('fullnameuser');
 $tableheaders[] = get_string('table_header_index_requestdate', 'local_extension');
 $tableheaders[] = get_string('table_header_index_requestlength', 'local_extension');
@@ -235,7 +238,7 @@ $requestlist = $DB->get_records_sql("$select $from $where $sort", $params, $tabl
 
 if ($requestlist) {
 
-    $format = '%a, %e %b %y %l:%M %p';
+    $format = '%a, %e %b %Y %l:%M %p';
 
     foreach ($requestlist as $request) {
         $usercontext = context_user::instance($request->userid);
@@ -251,10 +254,24 @@ if ($requestlist) {
         $requesturl = new moodle_url('/local/extension/status.php', array('id' => $request->rid));
         $requestlink = html_writer::link($requesturl, $request->rid);
 
+        $requestlength = format_time($request->length);
+        $num = strtok($requestlength, ' ');
+        $unit = strtok(' ');
+        $requestlength = "$num $unit";
+
+        $delta = $request->lastmod - time();
+
+        $show = format_time($delta);
+        $num = strtok($show, ' ');
+        $unit = strtok(' ');
+        $show = "$num $unit";
+
+        $lastmodstring = get_string('ago', 'message', $show);
+
         $lastmod  = html_writer::start_div('lastmodby');
-        $lastmod .= html_writer::tag('span', userdate($request->lastmod, $format));
-        $lastmod .= html_writer::empty_tag('br');
-        $lastmod .= html_writer::tag('span', fullname($lastmoduser));
+        $lastmod .= html_writer::tag('span', $lastmodstring);
+        // $lastmod .= html_writer::empty_tag('br');
+        // $lastmod .= html_writer::tag('span', fullname($lastmoduser));
         $lastmod .= html_writer::end_div();
 
         $data = array(

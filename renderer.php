@@ -170,7 +170,7 @@ class local_extension_renderer extends plugin_renderer_base {
         $show = "$num $unit";
 
         // The full date.
-        $fulldate = userdate($time, '%d %h %Y %l:%M%P');
+        $fulldate = userdate($time);
 
         if ($showdate) {
             return html_writer::tag('abbr', $fulldate);
@@ -223,7 +223,7 @@ class local_extension_renderer extends plugin_renderer_base {
             $out .= html_writer::start_tag('li', array('class' => 'attachment'));
             $out .= $OUTPUT->pix_icon(file_file_icon($file, 16), get_mimetype_description($file)) . ' ';
             $out .= html_writer::link($fileurl, $f->get_filename()) . "  ";
-            $out .= userdate($file->get_timecreated(), '%d %h %Y %l:%M%P');
+            $out .= userdate($file->get_timecreated());
             $out .= html_writer::end_tag('li'); // End .attachment.
 
         }
