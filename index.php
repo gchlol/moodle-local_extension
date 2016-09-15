@@ -37,18 +37,18 @@ $contextid  = optional_param('contextid', 0, PARAM_INT);
 $search     = optional_param('search', '', PARAM_RAW); // Make sure it is processed with p() or s() when sending to output!
 
 $PAGE->set_url('/local/extension/index.php', array(
-    'page' => $page,
-    'perpage' => $perpage,
+    'page'      => $page,
+    'perpage'   => $perpage,
     'contextid' => $contextid,
-    'catid' => $categoryid,
-    'id' => $courseid,
-    'search' => $search,
+    'catid'     => $categoryid,
+    'id'        => $courseid,
+    'search'    => $search,
 ));
 
 // Should use this variable so that we don't break stuff every time a variable is added or changed.
 $baseurl = new moodle_url('/local/extension/index.php', array(
-    'id' => $courseid,
-    'catid' => $categoryid,
+    'id'     => $courseid,
+    'catid'  => $categoryid,
     'search' => s($search)
 ));
 

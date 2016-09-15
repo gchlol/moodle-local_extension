@@ -123,7 +123,7 @@ class request extends \moodleform {
 
         $config = get_config('local_extension');
         /*
-        // TODO validation
+        // TODO validation if the context level cfg has been set, and the requests can be made.
         foreach ($contextlevels as $contextlevel => $cfg) {
             if ($context->contextlevel == $contextlevel) {
                if (!empty($config->$cfg)) {
