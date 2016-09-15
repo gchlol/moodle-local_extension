@@ -94,6 +94,7 @@ if (count($mods) == 0) {
 
     echo $OUTPUT->header();
     echo html_writer::tag('p', get_string('error_no_mods', 'local_extension', $obj));
+    echo $renderer->render_request_search_controls($courseid, $cmid, $searchback, $searchforward);
     echo $OUTPUT->footer();
     exit;
 }

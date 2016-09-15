@@ -545,6 +545,14 @@ class local_extension_renderer extends plugin_renderer_base {
      * @return string
      */
     public function render_request_search_controls($courseid, $cmid, $searchback, $searchforward) {
+        $maxweeks = get_config('local_extension', 'searchforwardmaxweeks');
+        $searchforwarddefault = get_config('local_extension', 'searchforward');
+
+        // Return with a warning message that the look ahead length has exceeded the configured setting.
+        if ($searchforward > $maxweeks * 7) {
+            return html_writer::span(get_string('page_request_outofrange', 'local_extension'));
+        }
+
         $controlstable = new html_table();
         $controlstable->attributes['class'] = 'controls';
         $controlstable->cellspacing = 0;
@@ -556,9 +564,6 @@ class local_extension_renderer extends plugin_renderer_base {
         ));
 
         $forwardlist = array();
-
-        $searchforwarddefault = get_config('local_extension', 'searchforward');
-        $maxweeks = get_config('local_extension', 'searchforwardmaxweeks');
 
         for ($i = 1; $i <= $maxweeks; $i++) {
 
