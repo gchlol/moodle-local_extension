@@ -100,4 +100,8 @@ if ($hassiteconfig) {
         new lang_string('extensionlimit',        'local_extension'),
         new lang_string('extensionlimithelp',    'local_extension'),
         new lang_string('extensionlimitdefault', 'local_extension'), PARAM_INT));
+
+    $settings->add(new admin_setting_configselect('local_extension/requireattachment',
+        new lang_string('requireattachment',      'local_extension'),
+        new lang_string('requireattachmenthelp',  'local_extension'), 1, $options));
 }
