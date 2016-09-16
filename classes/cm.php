@@ -34,25 +34,10 @@ namespace local_extension;
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 class cm {
-    /** @var int New request. */
-    const STATE_NEW = 0;
-
-    /** @var int Denied request. */
-    const STATE_DENIED = 1;
-
-    /** @var int Approved request. */
-    const STATE_APPROVED = 2;
-
-    /** @var int Reopened request. */
-    const STATE_REOPENED = 4;
-
-    /** @var int Cancelled request. */
-    const STATE_CANCEL = 8;
-
     /** @var int The local_extension_cm id */
     public $cmid = null;
 
-    /** @var int The user id assocaited with this cm */
+    /** @var int The user id assocaited with this cm, should be the userid of the request */
     public $userid = null;
 
     /** @var int The request id associated with this cm */
@@ -160,20 +145,6 @@ class cm {
     }
 
     /**
-     * Sets the state of this request.
-     *
-     * @param int $state
-     */
-    public function set_state($state) {
-        global $DB;
-
-        $this->set_stateid($state);
-        $DB->update_record('local_extension_cm', $this->cm);
-
-        \local_extension\utility::cache_invalidate_request($this->requestid);
-    }
-
-    /**
      * Writes an state change entry to local_extension_his_state. Returns the history object.
      *
      * @param \stdClass $mod
@@ -197,55 +168,6 @@ class cm {
         $DB->insert_record('local_extension_his_state', $history);
 
         return $history;
-    }
-
-    /**
-     * Returns a human readable state name.
-     *
-     * @param int $stateid State id.
-     * @throws \coding_exception
-     * @return string the human-readable status name.
-     */
-    public function get_state_name($stateid = null) {
-        if ($stateid == null) {
-            $stateid = $this->get_stateid();
-        }
-        switch ($stateid) {
-            case self::STATE_NEW:
-                return \get_string('state_new',      'local_extension');
-            case self::STATE_DENIED:
-                return \get_string('state_denied',   'local_extension');
-            case self::STATE_APPROVED:
-                return \get_string('state_approved', 'local_extension');
-            case self::STATE_REOPENED:
-                return \get_string('state_reopened', 'local_extension');
-            case self::STATE_CANCEL:
-                return \get_string('state_cancel',   'local_extension');
-            default:
-                throw new \coding_exception('Unknown cm state.');
-        }
-    }
-
-    /**
-     * Returns a string based on the state result.
-     *
-     * @throws \coding_exception
-     * @return string
-     */
-    public function get_state_result() {
-        switch ($this->get_stateid()) {
-            case self::STATE_NEW:
-            case self::STATE_REOPENED:
-                return \get_string('state_result_pending',   'local_extension');
-            case self::STATE_DENIED:
-                return \get_string('state_result_denied',    'local_extension');
-            case self::STATE_APPROVED:
-                return \get_string('state_result_approved',  'local_extension');
-            case self::STATE_CANCEL:
-                return \get_string('state_result_cancelled', 'local_extension');
-            default:
-                throw new \coding_exception('Unknown cm state.');
-        }
     }
 
     /**
@@ -285,12 +207,27 @@ class cm {
     }
 
     /**
-     * Set the cm state
+     * Set the cm state id
      *
      * @param integer $state
      */
     private function set_stateid($state) {
         $this->cm->state = $state;
+    }
+
+    /**
+     * Sets the state of this request.
+     *
+     * @param int $state
+     */
+    public function set_state($state) {
+        global $DB;
+
+        $this->set_stateid($state);
+
+        $DB->update_record('local_extension_cm', $this->cm);
+
+        \local_extension\utility::cache_invalidate_request($this->requestid);
     }
 
     /**

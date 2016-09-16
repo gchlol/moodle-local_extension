@@ -50,22 +50,44 @@ class update extends \moodleform {
         $mform    = $this->_form;
         $user     = $this->_customdata['user'];
         $request  = $this->_customdata['request'];
-
         /* @var \local_extension_renderer $renderer */
         $renderer = $this->_customdata['renderer'];
-
         $mods     = $request->mods;
+
+        $state = \local_extension\state::instance();
 
         foreach ($mods as $id => $mod) {
             $handler = $mod['handler'];
             $handler->status_definition($mod, $mform);
 
-            $approve = (\local_extension\rule::RULE_ACTION_APPROVE | \local_extension\rule::RULE_ACTION_FORCEAPPROVE);
+            /* @var $localcm \local_extension\cm */
+            $localcm = $mod['localcm'];
+            $course = $mod['course'];
+            $id = $localcm->cmid;
+            $stateid = $localcm->cm->state;
+            $userid = $localcm->userid;
 
+            // The capability 'local/extension:modifyrequeststatus' allows a user to force change the status.
+            $context = \context_course::instance($course->id, MUST_EXIST);
+            $forcestatus = has_capability('local/extension:modifyrequeststatus', $context);
+
+            // If the users access is either approve or force, then they can see the approval buttons.
+            $approve = (\local_extension\rule::RULE_ACTION_APPROVE | \local_extension\rule::RULE_ACTION_FORCEAPPROVE);
+            $forcestatus = has_capability('local/extension:modifyrequeststatus', $context);
+
+            // If the users access is either approve or force, then they can see the approval buttons.
+            $approve = (\local_extension\rule::RULE_ACTION_APPROVE | \local_extension\rule::RULE_ACTION_FORCEAPPROVE);
             $access = \local_extension\rule::get_access($mod, $USER->id);
 
-            if ($access & $approve) {
-                $handler->status_modification($mform, $mod);
+            if ($forcestatus) {
+                $state->render_force_buttons($mform, $stateid, $id);
+
+            } else if ($USER->id == $userid) {
+                $state->render_owner_buttons($mform, $stateid, $id);
+
+            } else if ($access & $approve) {
+                $state->render_approve_buttons($mform, $stateid, $id);
+
             }
 
         }

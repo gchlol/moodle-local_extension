@@ -24,7 +24,6 @@
  */
 
 require_once('../../config.php');
-require_once($CFG->libdir.'/tablelib.php');
 require_once($CFG->libdir.'/coursecatlib.php');
 
 define('DEFAULT_PAGE_SIZE', 20);
@@ -45,13 +44,6 @@ $PAGE->set_url('/local/extension/index.php', array(
     'search'    => $search,
 ));
 
-// Should use this variable so that we don't break stuff every time a variable is added or changed.
-$baseurl = new moodle_url('/local/extension/index.php', array(
-    'id'     => $courseid,
-    'catid'  => $categoryid,
-    'search' => s($search)
-));
-
 if ($contextid) {
     $context = context::instance_by_id($contextid, MUST_EXIST);
     if ($context->contextlevel != CONTEXT_COURSE) {
@@ -64,13 +56,18 @@ if ($contextid) {
 } else {
     $courseid = SITEID;
     $course = $DB->get_record('course', array('id' => $courseid), '*', MUST_EXIST);
-    $context = context_coursecat::instance($course->id, MUST_EXIST);
+    $context = context_course::instance($course->id, MUST_EXIST);
+}
+
+if ($categoryid) {
+    $categorycontext = context_coursecat::instance($categoryid);
+} else {
+    $categorycontext = $context;
 }
 
 require_login($course);
 
 $systemcontext = context_system::instance();
-
 $isfrontpage = ($course->id == SITEID);
 $frontpagectx = context_course::instance(SITEID);
 
@@ -91,42 +88,17 @@ echo $OUTPUT->header();
 
 echo html_writer::tag('h2', get_string('page_h2_summary', 'local_extension'));
 
+// Should use this variable so that we don't break stuff every time a variable is added or changed.
+$baseurl = new moodle_url('/local/extension/index.php', array(
+    'id'     => $courseid,
+    'catid'  => $categoryid,
+    'search' => s($search)
+));
+
 // New filter functionality, searching and listing of requests.
 echo $renderer->render_index_search_controls($context, $categoryid, $courseid, $baseurl, $search);
 
-// Write the flexible_table with the current details.
-$tablecolumns = array();
-$tablecolumns[] = 'rid';
-$tablecolumns[] = 'userpic';
-$tablecolumns[] = 'fullname';
-$tablecolumns[] = 'timestamp';
-$tablecolumns[] = 'length';
-$tablecolumns[] = 'coursename';
-$tablecolumns[] = 'activity';
-$tablecolumns[] = 'lastmod';
-
-$tableheaders = array();
-$tableheaders[] = get_string('table_header_index_requestid', 'local_extension');
-$tableheaders[] = get_string('table_header_index_user', 'local_extension');
-$tableheaders[] = get_string('fullnameuser');
-$tableheaders[] = get_string('table_header_index_requestdate', 'local_extension');
-$tableheaders[] = get_string('table_header_index_requestlength', 'local_extension');
-$tableheaders[] = get_string('table_header_index_course', 'local_extension');
-$tableheaders[] = get_string('table_header_index_activity', 'local_extension');
-$tableheaders[] = get_string('table_header_index_lastmod', 'local_extension');
-
-$table = new flexible_table('usertable');
-
-$table->define_columns($tablecolumns);
-$table->define_headers($tableheaders);
-$table->define_baseurl($baseurl->out());
-
-$table->no_sorting('userpic');
-$table->sortable('requestid');
-
-$table->set_attribute('cellspacing', '0');
-
-$table->setup();
+$table = new \local_extension\table\index($baseurl);
 
 $joins = array();
 $wheres = array();
@@ -144,7 +116,14 @@ if ($categoryid != 0) {
 
 $mainuserfields = user_picture::fields('u', array('username', 'email', 'city', 'country', 'lang', 'timezone', 'maildisplay'));
 
-$viewallrequests = has_capability('local/extension:viewallrequests', $context);
+$viewallrequests = false;
+if (has_capability('local/extension:viewallrequests', $categorycontext)) {
+    $viewallrequests = true;
+}
+
+if (has_capability('local/extension:viewallrequests', $context)) {
+    $viewallrequests = true;
+}
 
 if ($viewallrequests) {
 
@@ -152,6 +131,7 @@ if ($viewallrequests) {
     $select = "SELECT lcm.id AS lcmid,
                       lcm.name AS activity,
                       lcm.length,
+                      lcm.state,
                       r.id AS rid,
                       r.lastmodid,
                       r.lastmod,
@@ -175,6 +155,7 @@ if ($viewallrequests) {
     $select = "SELECT lcm.id AS lcmid,
                       lcm.name AS activity,
                       lcm.length,
+                      lcm.state,
                       r.id AS rid,
                       r.lastmodid,
                       r.lastmod,
@@ -282,6 +263,7 @@ if ($requestlist) {
             html_writer::div($requestlength, 'lastmodby'),
             html_writer::link($requesturl, $request->coursename),
             html_writer::link($requesturl, $request->activity),
+            \local_extension\state::instance()->get_state_name($request->state),
             $lastmod,
         );
 

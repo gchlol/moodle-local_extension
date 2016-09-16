@@ -23,7 +23,7 @@
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
-require_once('../../config.php');
+require_once('../../../config.php');
 require_once($CFG->libdir . '/adminlib.php');
 
 $triggerid = optional_param('id', 0, PARAM_INT);
@@ -33,7 +33,7 @@ if (empty($datatype)) {
     throw new coding_exception('required_param() requires $parname and $type to be specified (parameter: datatype)');
 }
 
-$PAGE->set_url(new moodle_url('/local/extension/editrule.php'));
+$PAGE->set_url(new moodle_url('/local/extension/rules/edit.php'));
 
 $context = context_system::instance();
 require_login();
@@ -98,7 +98,7 @@ $mform->set_data($data);
 
 if ($mform->is_cancelled()) {
 
-    $url = new moodle_url('/local/extension/manage.php');
+    $url = new moodle_url('/local/extension/rules/manage.php');
     redirect($url);
     die;
 
@@ -117,7 +117,7 @@ if ($mform->is_cancelled()) {
         $rule->trigger_create_event($rule->id);
     }
 
-    $url = new moodle_url('/local/extension/manage.php');
+    $url = new moodle_url('/local/extension/rules/manage.php');
     redirect($url);
     die;
 

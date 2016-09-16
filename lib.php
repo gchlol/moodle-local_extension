@@ -138,10 +138,9 @@ function local_extension_extends_navigation(global_navigation $nav) {
 
                     $event = $request->mods[$cmid]['event'];
                     $localcm = $request->mods[$cmid]['localcm'];
-                    $handler = $request->mods[$cmid]['handler'];
 
-                    $status = $localcm->get_state_name();
-                    $result = $localcm->get_state_result();
+                    // $status = \local_extension\state::instance()->get_state_name($localcm->cm->state);
+                    $result = \local_extension\state::instance()->get_state_result($localcm->cm->state);
 
                     $delta = $cm->get_data() - $event->timestart;
 

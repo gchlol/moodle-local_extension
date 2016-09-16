@@ -30,7 +30,7 @@ if ($hassiteconfig) {
     $settings = new admin_settingpage('local_extension_settings_general', get_string('admin_settings_general', 'local_extension'));
     $ADMIN->add('local_extension', $settings);
 
-    $manageurl = new moodle_url("$CFG->wwwroot/local/extension/manage.php");
+    $manageurl = new moodle_url("$CFG->wwwroot/local/extension/rules/manage.php");
     $managerules = new admin_externalpage('local_extension_settings_rules', get_string('externalrules', 'local_extension'), $manageurl);
     $ADMIN->add('local_extension', $managerules);
 
@@ -49,20 +49,20 @@ if ($hassiteconfig) {
     }
 
     $settings->add(new admin_setting_configselect('local_extension/searchback',
-        new lang_string('searchback',         'local_extension'),
-        new lang_string('searchbackhelp',     'local_extension'), 7, $days));
+        new lang_string('searchback',             'local_extension'),
+        new lang_string('searchbackhelp',         'local_extension'), 7, $days));
 
     $settings->add(new admin_setting_configselect('local_extension/searchforward',
-        new lang_string('searchforward',      'local_extension'),
-        new lang_string('searchforwardhelp',  'local_extension'), 14, $days));
+        new lang_string('searchforward',          'local_extension'),
+        new lang_string('searchforwardhelp',      'local_extension'), 14, $days));
 
     $settings->add(new admin_setting_configselect('local_extension/searchforwardmaxweeks',
-        new lang_string('searchforwardmaxweeks',      'local_extension'),
-        new lang_string('searchforwardmaxweekshelp',  'local_extension'), 2, $weeks));
+        new lang_string('searchforwardmaxweeks',     'local_extension'),
+        new lang_string('searchforwardmaxweekshelp', 'local_extension'), 2, $weeks));
 
     $settings->add(new admin_setting_configcheckbox('local_extension/emaildisable',
-        new lang_string('emaildisable',         'local_extension'),
-        new lang_string('emaildisablehelp',     'local_extension'), false));
+        new lang_string('emaildisable',             'local_extension'),
+        new lang_string('emaildisablehelp',         'local_extension'), false));
 
     $settings->add(new admin_setting_configtext('local_extension/supportusername',
         new lang_string('supportusername',        'local_extension'),
@@ -72,12 +72,12 @@ if ($hassiteconfig) {
     $settings->add(new admin_setting_confightmleditor('local_extension/extensionpolicyrequest',
         new lang_string('extensionpolicyrequest',        'local_extension'),
         new lang_string('extensionpolicyrequesthelp',    'local_extension'),
-        new lang_string('extensionpolicyrequestdefault', 'local_extension')));
+        ''));
 
     $settings->add(new admin_setting_confightmleditor('local_extension/extensionpolicystatus',
         new lang_string('extensionpolicystatus',        'local_extension'),
         new lang_string('extensionpolicystatushelp',    'local_extension'),
-        new lang_string('extensionpolicystatusdefault', 'local_extension')));
+        ''));
 
     $options = array(
         0 => get_string('no'),
@@ -86,11 +86,11 @@ if ($hassiteconfig) {
 
     $settings->add(new admin_setting_configselect('local_extension/systemcontext',
         new lang_string('systemcontext',          'local_extension'),
-        new lang_string('systemcontexthelp',      'local_extension'), 0, $options));
+        new lang_string('systemcontexthelp',      'local_extension'), 1, $options));
 
     $settings->add(new admin_setting_configselect('local_extension/coursecontext',
         new lang_string('coursecontext',          'local_extension'),
-        new lang_string('coursecontexthelp',      'local_extension'), 0, $options));
+        new lang_string('coursecontexthelp',      'local_extension'), 1, $options));
 
     $settings->add(new admin_setting_configselect('local_extension/modulecontext',
         new lang_string('modulecontext',          'local_extension'),

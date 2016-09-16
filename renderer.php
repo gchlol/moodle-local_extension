@@ -277,82 +277,13 @@ class local_extension_renderer extends plugin_renderer_base {
     }
 
     /**
-     * Render a summary of all triggers in a table.
-     *
-     * @param flexible_table $table
-     * @param array $triggers
-     * @param integer $parent
-     */
-    public function render_extension_trigger_table($table, $triggers, $parent = null) {
-        global $OUTPUT;
-        if (!empty($triggers)) {
-
-            foreach ($triggers as $id => $trigger) {
-
-                if (empty($trigger->parent)) {
-
-                    // Adding an empty row to divide sets of rules.
-                    $empty = array(
-                        '',
-                        '',
-                        '',
-                        '',
-                        '',
-                        '',
-                        '',
-                        '',
-                    );
-
-                    $table->add_data($empty, 'clearrow');
-                }
-
-                $buttons = array();
-
-                $url = new moodle_url('/local/extension/editrule.php', array_merge(array('id' => $trigger->id, 'datatype' => $trigger->datatype, 'sesskey' => sesskey())));
-                $html = html_writer::empty_tag('img', array('src' => $OUTPUT->pix_url('t/edit'), 'alt' => get_string('edit'), 'class' => 'iconsmall'));
-                $buttons[] = html_writer::link($url, $html, array('title' => get_string('edit')));
-
-                $url = new moodle_url('', array_merge(array('delete' => $trigger->id, 'sesskey' => sesskey())));
-                $html = html_writer::empty_tag('img', array('src' => $OUTPUT->pix_url('t/delete'), 'alt' => get_string('delete'), 'class' => 'iconsmall'));
-                $buttons[] = html_writer::link($url, $html, array('title' => get_string('delete')));
-
-                $parentstr = null;
-                if (!empty($parent)) {
-                    $parentstr = $parent->name;
-                }
-
-                // Table columns 'name', 'action', 'role', 'parent', 'type', 'priority', 'rules'.
-                $values = array(
-                    $trigger->name,
-                    $trigger->get_action_name(),
-                    $trigger->get_role_name(),
-                    $parentstr,
-                    $trigger->datatype,
-                    $trigger->priority + 1,
-                    $this->render_trigger_rule_text($trigger, $parentstr),
-                    implode(' ', $buttons)
-                );
-
-                $table->add_data($values);
-
-                // Render the child items.
-                if (!empty($trigger->children)) {
-                    $this->render_extension_trigger_table($table, $trigger->children, $trigger);
-                }
-            }
-        }
-
-        return $table;
-    }
-
-    /**
      * Adapter trigger renderer for status management page.
      *
-     * @param \local_extension\rule $trigger
+     * @param \local_extension\rule $rule
      * @param string $parentstr The name of the parent trigger.
      * @return string $html The html output.
      */
-    public function render_trigger_rule_text($trigger, $parentstr) {
+    public function render_trigger_rule_text($rule, $parentstr) {
            $html  = html_writer::start_tag('div');
 
         if (empty($parentstr)) {
@@ -367,31 +298,31 @@ class local_extension_renderer extends plugin_renderer_base {
             $html .= html_writer::tag('p', implode(' ', $activate));
         }
 
-        $lengthtype = $this->rule_type($trigger->lengthtype);
+        $lengthtype = $rule->rule_type($rule->lengthtype);
 
         $reqlength = array(
             get_string('form_rule_label_request_length', 'local_extension'),
             $lengthtype,
-            $trigger->lengthfromduedate,
+            $rule->lengthfromduedate,
             get_string('form_rule_label_days_long', 'local_extension'),
         );
         $html .= html_writer::tag('p', implode(' ', $reqlength));
 
-        $elapsedtype = $this->rule_type($trigger->elapsedtype);
+        $elapsedtype = $rule->rule_type($rule->elapsedtype);
 
         $elapsedlength = array(
             get_string('form_rule_label_elapsed_length', 'local_extension'),
             $elapsedtype,
-            $trigger->elapsedfromrequest,
+            $rule->elapsedfromrequest,
             get_string('form_rule_label_days_old', 'local_extension'),
         );
         $html .= html_writer::tag('p', implode(' ', $elapsedlength));
 
         $setroles = array(
             get_string('form_rule_label_set_roles', 'local_extension'),
-            $trigger->get_role_name(),
+            $rule->get_role_name(),
             get_string('form_rule_label_to', 'local_extension'),
-            $trigger->get_action_name(),
+            $rule->get_action_name(),
             get_string('form_rule_label_this_request', 'local_extension'),
         );
         $html .= html_writer::tag('p', implode(' ', $setroles));
@@ -401,35 +332,6 @@ class local_extension_renderer extends plugin_renderer_base {
         return $html;
     }
 
-    /**
-     * Internal helper function to return the type of rule length checking.
-     * @param string $triggertype
-     * @return string
-     */
-    private function rule_type($triggertype) {
-        $greaterthan = get_string('form_rule_greater_or_equal', 'local_extension');
-        $lessthan = get_string('form_rule_less_than', 'local_extension');
-        $any = get_string('form_rule_any_value', 'local_extension');
-
-        $type = '';
-
-        switch($triggertype) {
-            case \local_extension\rule::RULE_CONDITION_GE:
-                $type = $greaterthan;
-                break;
-            case \local_extension\rule::RULE_CONDITION_LT:
-                $type = $lessthan;
-                break;
-            case \local_extension\rule::RULE_CONDITION_ANY:
-                $type = $any;
-                break;
-            default:
-                $type = '';
-                break;
-        }
-
-        return $type;
-    }
 
     /**
      * Renders a dropdown select box with the available rule type handlers.
@@ -612,6 +514,8 @@ class local_extension_renderer extends plugin_renderer_base {
      * @return string
      */
     public function render_index_search_controls($context, $categoryid, $courseid, $baseurl, $search) {
+        global $SITE;
+
         $systemcontext = context_system::instance();
 
         // Print a filter settings items across the top of the page.
@@ -621,10 +525,13 @@ class local_extension_renderer extends plugin_renderer_base {
         $controlstable->data[] = new html_table_row();
 
         // Display a list of categories.
-        if (has_capability('moodle/category:manage', $context)) {
+        // if (has_capability('moodle/category:manage', context_system::instance()) || $categoryid == 0) {
+        if (true) {
             $categorylist = array();
             $categorylist[0] = coursecat::get(0)->get_formatted_name();
             $categorylist += coursecat::make_categories_list();
+
+            // TODO filter categories to ones that a student is enrolled in?
 
             $popupurl = new moodle_url('/local/extension/index.php');
 
@@ -651,6 +558,7 @@ class local_extension_renderer extends plugin_renderer_base {
                 $coursecontext = context_course::instance($mycourse->id);
                 $courselist[$mycourse->id] = format_string($mycourse->fullname, true, array('context' => $coursecontext));
             }
+
             if (has_capability('moodle/site:viewparticipants', $systemcontext)) {
                 unset($courselist[SITEID]);
                 $courselist = array(SITEID => format_string($SITE->fullname, true, array('context' => $systemcontext))) + $courselist;
@@ -668,9 +576,8 @@ class local_extension_renderer extends plugin_renderer_base {
         }
 
         // Display a list of all courses to filter by
-
         // TODO change this to categories that the user is enroled in
-        if (has_capability('moodle/category:manage', context_system::instance())) {
+        if (has_capability('local/extension:viewallrequests', $context)) {
             $options = array();
 
             if (!empty($categoryid)) {

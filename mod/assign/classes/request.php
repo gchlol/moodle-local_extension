@@ -141,16 +141,17 @@ class request extends \local_extension\base_request {
         $coursestring = \html_writer::tag('b', $course->fullname . ' > ' . $event->name, array('class' => 'mod'));
         $html .= \html_writer::tag('p', $coursestring . ' ' . get_string('dueon', 'extension_assign', \userdate($event->timestart)));
 
-        $status = $localcm->get_state_name();
+        $status = \local_extension\state::instance()->get_state_name($localcm->cm->state);
 
         $url = new \moodle_url("/local/extension/status.php", array('id' => $localcm->requestid));
         $requeststatus = \html_writer::link($url, $status);
 
-        // TODO case on type of request, ie. exemption, extension, etc.
-        // print extension type colour like the scoping document
-
-        $html .= \html_writer::tag('span', $requeststatus, array('class' => 'status'));
-        $html .= \html_writer::tag('span', ' extension until ' . \userdate($localcm->cm->data), array('class' => 'time'));
+        $obj = (object) array(
+            'status' => $requeststatus,
+            'date' => \userdate($localcm->cm->data),
+        );
+        $statusline = get_string('status_status_line', 'local_extension', $obj);
+        $html .= \html_writer::tag('span', $statusline, array('class' => 'time'));
         $html .= \html_writer::end_div(); // End .content.
 
         if (!empty($mform)) {
@@ -158,64 +159,6 @@ class request extends \local_extension\base_request {
         }
 
         return $html;
-    }
-
-    /**
-     * Renders buttons that can set the status of a cm item.
-     *
-     * @param \MoodleQuickForm $mform A moodle form object
-     * @param array $mod An array of event details
-     */
-    public function status_modification($mform, $mod) {
-        $cm = $mod['cm'];
-        $event = $mod['event'];
-        $course = $mod['course'];
-        $handler = $mod['handler'];
-
-        /* @var $localcm \local_extension\cm */
-        $localcm = $mod['localcm'];
-        $id = $localcm->cmid;
-
-        $buttonarray = array();
-
-        /*
-        STATE_NEW = 0;
-        STATE_DENIED = 1;
-        STATE_APPROVED = 2;
-        STATE_REOPENED = 3;
-        STATE_CANCEL = 4;
-        */
-
-        switch ($localcm->get_stateid()) {
-            case $localcm::STATE_NEW:
-                $buttonarray[] = &$mform->createElement('submit', 'approve' . $id, 'Approve');
-                $buttonarray[] = &$mform->createElement('submit', 'deny' . $id, 'Deny');
-                $buttonarray[] = &$mform->createElement('submit', 'cancel' . $id, 'Cancel');
-                break;
-            case $localcm::STATE_REOPENED:
-                $buttonarray[] = &$mform->createElement('submit', 'approve' . $id, 'Approve');
-                $buttonarray[] = &$mform->createElement('submit', 'deny' . $id, 'Deny');
-                $buttonarray[] = &$mform->createElement('submit', 'cancel' . $id, 'Cancel');
-                break;
-            case $localcm::STATE_DENIED:
-                $buttonarray[] = &$mform->createElement('submit', 'reopen' . $id, 'Reopen');
-                $buttonarray[] = &$mform->createElement('submit', 'cancel' . $id, 'Cancel');
-                break;
-            case $localcm::STATE_CANCEL:
-                $buttonarray[] = &$mform->createElement('submit', 'reopen' . $id, 'Reopen');
-                break;
-            case $localcm::STATE_APPROVED:
-                // $buttonarray[] = &$mform->createElement('submit', 'deny' . $id, 'Deny');
-                // $buttonarray[] = &$mform->createElement('submit', 'cancel' . $id, 'Cancel');
-                break;
-            default:
-                break;
-
-        }
-
-        if (!empty($buttonarray)) {
-            $mform->addGroup($buttonarray, 'statusmodgroup' . $id, '', ' ', false);
-        }
     }
 
     /**
