@@ -82,7 +82,7 @@ $PAGE->requires->css('/local/extension/styles.css');
 $PAGE->add_body_class('local_extension');
 
 $PAGE->navbar->ignore_active();
-$PAGE->navbar->add('Extension Status', new moodle_url('/local/extension/index.php'));
+$PAGE->navbar->add(get_string('breadcrumb_nav_index', 'local_extension'), new moodle_url('/local/extension/index.php'));
 
 /* @var \local_extension_renderer $renderer */
 $renderer = $PAGE->get_renderer('local_extension');

@@ -68,8 +68,10 @@ $params = array(
 $requestuser = core_user::get_user($request->request->userid);
 
 $PAGE->navbar->ignore_active();
-$PAGE->navbar->add('Extension Status', new moodle_url('/local/extension/index.php'));
-$PAGE->navbar->add('Extension #' . $requestid . ': ' . \fullname($requestuser), new moodle_url('/local/extension/status.php', array('id' => $request->requestid)));
+$PAGE->navbar->add(get_string('breadcrumb_nav_index', 'local_extension'), new moodle_url('/local/extension/index.php'));
+
+$obj = (object) ['id' => $requestid, 'name' => \fullname($requestuser)];
+$PAGE->navbar->add(get_string('breadcrumb_nav_status', 'local_extension', $obj), new moodle_url('/local/extension/status.php', array('id' => $request->requestid)));
 
 $mform = new \local_extension\form\update(null, $params);
 

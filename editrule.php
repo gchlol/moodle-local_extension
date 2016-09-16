@@ -84,6 +84,14 @@ $params = array(
     'editordata' => $editordata,
 );
 
+if (empty($triggerid)) {
+    $PAGE->navbar->add(get_string('breadcrumb_nav_rule_new', 'local_extension'));
+
+} else {
+    $PAGE->navbar->add(get_string('breadcrumb_nav_rule_edit', 'local_extension', $rules[$triggerid]->name));
+
+}
+
 $mform = new \local_extension\form\rule(null, $params);
 
 $mform->set_data($data);
