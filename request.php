@@ -255,6 +255,17 @@ foreach ($contextlevels as $contextlevel => $cfg) {
             // If the configuration contexts are disabled then provide links to make individual requests.
             foreach ($inprogress as $mod) {
                 echo $mod['handler']->status_definition($mod);
+
+                $requestid = $mod['localcm']->requestid;
+
+                $params = array('id' => $requestid);
+                $url = new moodle_url('/local/extension/status.php', $params);
+
+                $name = $mod['event']->name;
+                $text = get_string('page_request_requeststatuslink', 'local_extension', $name);
+                $link = html_writer::link($url, $text);
+
+                echo html_writer::tag('p', $link);
             }
 
             if (!empty($available)) {
@@ -263,6 +274,18 @@ foreach ($contextlevels as $contextlevel => $cfg) {
 
             foreach ($available as $mod) {
                 echo $mod['handler']->request_definition($mod);
+
+                $course = $mod['cm']->course;
+                $cmid = $mod['cm']->id;
+
+                $params = array('course' => $course, 'cmid' => $cmid);
+                $url = new moodle_url('/local/extension/request.php', $params);
+
+                $name = $mod['event']->name;
+                $text = get_string('page_request_requestnewlink', 'local_extension', $name);
+                $link = html_writer::link($url, $text);
+
+                echo html_writer::tag('p', $link);
             }
 
         }
