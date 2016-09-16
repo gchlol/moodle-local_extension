@@ -95,26 +95,29 @@ echo html_writer::tag('h2', get_string('page_h2_summary', 'local_extension'));
 echo $renderer->render_index_search_controls($context, $categoryid, $courseid, $baseurl, $search);
 
 // Write the flexible_table with the current details.
-$tablecolumns = array();
-$tablecolumns[] = 'rid';
-$tablecolumns[] = 'userpic';
-$tablecolumns[] = 'fullname';
-$tablecolumns[] = 'timestamp';
-$tablecolumns[] = 'length';
-$tablecolumns[] = 'coursename';
-$tablecolumns[] = 'activity';
-$tablecolumns[] = 'lastmod';
+$tablecolumns = array(
+    'rid',
+    'userpic',
+    'fullname',
+    'timestamp',
+    'length',
+    'coursename',
+    'activity',
+    'state',
+    'lastmod',
+);
 
-$tableheaders = array();
-$tableheaders[] = get_string('table_header_index_requestid', 'local_extension');
-$tableheaders[] = get_string('table_header_index_user', 'local_extension');
-$tableheaders[] = get_string('fullnameuser');
-$tableheaders[] = get_string('table_header_index_requestdate', 'local_extension');
-$tableheaders[] = get_string('table_header_index_requestlength', 'local_extension');
-$tableheaders[] = get_string('table_header_index_course', 'local_extension');
-$tableheaders[] = get_string('table_header_index_activity', 'local_extension');
-$tableheaders[] = get_string('table_header_index_lastmod', 'local_extension');
-
+$tableheaders = array(
+    get_string('table_header_index_requestid', 'local_extension'),
+    get_string('table_header_index_user', 'local_extension'),
+    get_string('fullnameuser'),
+    get_string('table_header_index_requestdate', 'local_extension'),
+    get_string('table_header_index_requestlength', 'local_extension'),
+    get_string('table_header_index_course', 'local_extension'),
+    get_string('table_header_index_activity', 'local_extension'),
+    get_string('table_header_index_status', 'local_extension'),
+    get_string('table_header_index_lastmod', 'local_extension'),
+);
 $table = new flexible_table('usertable');
 
 $table->define_columns($tablecolumns);
@@ -152,6 +155,7 @@ if ($viewallrequests) {
     $select = "SELECT lcm.id AS lcmid,
                       lcm.name AS activity,
                       lcm.length,
+                      lcm.state,
                       r.id AS rid,
                       r.lastmodid,
                       r.lastmod,
@@ -175,6 +179,7 @@ if ($viewallrequests) {
     $select = "SELECT lcm.id AS lcmid,
                       lcm.name AS activity,
                       lcm.length,
+                      lcm.state,
                       r.id AS rid,
                       r.lastmodid,
                       r.lastmod,
@@ -282,6 +287,7 @@ if ($requestlist) {
             html_writer::div($requestlength, 'lastmodby'),
             html_writer::link($requesturl, $request->coursename),
             html_writer::link($requesturl, $request->activity),
+            $request->state,
             $lastmod,
         );
 
