@@ -94,7 +94,9 @@ class rules extends flexible_table {
      * @return bool
      */
     public function set_data(array $rules, rule $parent = null) {
-        global $OUTPUT;
+        global $PAGE;
+
+        $renderer = $PAGE->get_renderer('local_extension');
 
         if (empty($rules)) {
             return false;
@@ -126,7 +128,7 @@ class rules extends flexible_table {
             ));
 
             $edithtml = html_writer::empty_tag('img', array(
-                'src' => $OUTPUT->pix_url('t/edit'),
+                'src' => $renderer->pix_url('t/edit'),
                 'alt' => get_string('edit'),
                 'class' => 'iconsmall'
             ));
@@ -137,7 +139,7 @@ class rules extends flexible_table {
             ));
 
             $deletehtml = html_writer::empty_tag('img', array(
-                'src' => $OUTPUT->pix_url('t/delete'),
+                'src' => $renderer->pix_url('t/delete'),
                 'alt' => get_string('delete'),
                 'class' => 'iconsmall'
             ));
@@ -166,7 +168,7 @@ class rules extends flexible_table {
                 $parentstr,
                 $rule->datatype,
                 $rule->priority + 1,
-                '', // $this->render_rule_text($rule, $parentstr),
+                $renderer->render_trigger_rule_text($rule, $parentstr),
                 implode(' ', $buttons)
             );
 
