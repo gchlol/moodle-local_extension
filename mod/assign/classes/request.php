@@ -143,14 +143,12 @@ class request extends \local_extension\base_request {
 
         $status = \local_extension\state::instance()->get_state_name($localcm->cm->state);
 
-        $url = new \moodle_url("/local/extension/status.php", array('id' => $localcm->requestid));
-        $requeststatus = \html_writer::link($url, $status);
-
         $obj = (object) array(
-            'status' => $requeststatus,
+            'status' => $status,
             'date' => \userdate($localcm->cm->data),
         );
         $statusline = get_string('status_status_line', 'local_extension', $obj);
+
         $html .= \html_writer::tag('span', $statusline, array('class' => 'time'));
         $html .= \html_writer::end_div(); // End .content.
 

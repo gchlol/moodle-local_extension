@@ -34,6 +34,7 @@ namespace local_extension;
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 class state {
+    /** @var state An instance of the state class. */
     private static $instance;
 
     /** @var int New request. */
@@ -51,11 +52,14 @@ class state {
     /** @var int Cancelled request. */
     const STATE_CANCEL = 4;
 
-    const STATE_OWNER_CANCEL = 5;
-    const STATE_OWNER_REOPEN = 6;
-
+    /** @var array An array of state ids */
     public $statearray = array();
 
+    /**
+     * Obtain an instance of this state machine.
+     *
+     * @return state
+     */
     public static function instance() {
         if (self::$instance === null) {
             self::$instance = new state();
@@ -64,6 +68,9 @@ class state {
         return self::$instance;
     }
 
+    /**
+     * The state constructor.
+     */
     protected function __construct() {
         $this->statearray = array(
             'approve' => self::STATE_APPROVED,
@@ -73,6 +80,9 @@ class state {
         );
     }
 
+    /**
+     * Protected clone.
+     */
     protected function __clone() {
     }
 
@@ -123,6 +133,13 @@ class state {
         }
     }
 
+    /**
+     * Renders the approve buttons for a standard user that can approve or deny an extension.
+     *
+     * @param \MoodleQuickForm $mform
+     * @param int $state
+     * @param int $id
+     */
     public function render_approve_buttons(&$mform, $state, $id) {
         $buttonarray = array();
 
@@ -149,6 +166,13 @@ class state {
         }
     }
 
+    /**
+     * Renders the approve buttons for a the owner of the request/cms.
+     *
+     * @param \MoodleQuickForm $mform
+     * @param int $state
+     * @param int $id
+     */
     public function render_owner_buttons(&$mform, $state, $id) {
         $buttonarray = array();
 
@@ -175,6 +199,8 @@ class state {
     }
 
     /**
+     * Renders the approve buttons for an admin user that can approve, deny or cancel an extension.
+     *
      * @param \MoodleQuickForm $mform
      * @param int $state
      * @param int $id

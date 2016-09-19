@@ -41,6 +41,8 @@ require_once($CFG->libdir . '/tablelib.php');
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 class rules extends flexible_table {
+
+    /** @var int Incrementing table id. */
     private static $autoid = 0;
 
     /**
@@ -143,14 +145,14 @@ class rules extends flexible_table {
             $buttons[] = html_writer::link(
                 $editurl,
                 $edithtml,
-                array('title' => get_string('edit'),
-            ));
+                array('title' => get_string('edit'))
+            );
 
             $buttons[] = html_writer::link(
                 $deleteurl,
                 $deletehtml,
-                array('title' => get_string('delete')
-            ));
+                array('title' => get_string('delete'))
+            );
 
             $parentstr = null;
             if (!empty($parent)) {
