@@ -188,6 +188,9 @@ if ($mform->is_cancelled()) {
 
     $fs = get_file_storage();
     $files = $fs->get_area_files($usercontext->id, 'local_extension', 'attachments', $request['id']);
+
+    $now = time();
+
     foreach ($files as $file) {
         if ($file->is_directory()) {
             continue;
@@ -195,7 +198,7 @@ if ($mform->is_cancelled()) {
 
         $data = array(
             'requestid' => $request['id'],
-            'timestamp' => $file->get_timecreated(),
+            'timestamp' => $now,
             'filehash' => $file->get_pathnamehash(),
             'userid' => $file->get_userid(),
         );

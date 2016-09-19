@@ -28,7 +28,7 @@ global $PAGE, $USER;
 
 require_login(true);
 
-$requestid = required_param('id', PARAM_INTEGER);
+$requestid = required_param('id', PARAM_INT);
 $request = \local_extension\utility::cache_get_request($requestid);
 
 // $request->user is an array of $userid=>$userobj associated to this request, eg. those that are subscribed, and the user.
@@ -138,7 +138,7 @@ if ($form = $mform->get_data()) {
 
     // Parse the form data to see if any accept/deny/reopen/etc buttons have been clicked, and update the state accordingly.
     // If the state has been approved then it will call the handers->submit_extension method to extend the module.
-    $notifycontent[] = $request->update_cm_state($USER, $form);
+    $notifycontent[] = \local_extension\state::instance()->update_cm_state($request, $USER, $form);
 
     if (!empty($comment)) {
         $notifycontent[] = $request->add_comment($USER, $comment);
@@ -151,7 +151,7 @@ if ($form = $mform->get_data()) {
 
     $request->notify_subscribers($notifycontent, $USER->id);
 
-    // Update the lastmod
+    // Update the lastmod.
     $request->update_lastmod($USER->id);
 
     // Invalidate the cache for this request. The content has changed.

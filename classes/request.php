@@ -294,7 +294,7 @@ class request implements \cache_data_source {
             $event   = $mod['event'];
             $course  = $mod['course'];
 
-            $status = $localcm->get_state_name($record->state);
+            $status = \local_extension\state::instance()->get_state_name($record->state);
 
             $log = new \stdClass();
             $log->status = $status;
@@ -506,73 +506,12 @@ class request implements \cache_data_source {
         foreach ($this->cms as $cm) {
             $state = $cm->get_stateid();
 
-            if ($state != \local_extension\cm::STATE_CANCEL) {
+            if ($state != \local_extension\state::STATE_CANCEL) {
                 return true;
             }
         }
 
         return false;
-    }
-
-    /**
-     * Updates the cm state with via posted data.
-     *
-     * @param integer $user
-     * @param \stdClass $data
-     * @return object
-     */
-    public function update_cm_state($user, $data) {
-
-        foreach ($this->mods as $id => $mod) {
-            /* @var \local_extension\base_request $handler */
-            $handler = $mod['handler'];
-
-            /* @var \local_extension\cm $localcm */
-            $localcm = $mod['localcm'];
-            $event   = $mod['event'];
-            $course  = $mod['course'];
-
-            $statearray = array(
-                'approve' => \local_extension\cm::STATE_APPROVED,
-                'deny'    => \local_extension\cm::STATE_DENIED,
-                'cancel'  => \local_extension\cm::STATE_CANCEL,
-                'reopen'  => \local_extension\cm::STATE_REOPENED,
-            );
-
-            foreach ($statearray as $name => $state) {
-                $item = $name . $id;
-
-                if (!empty($data->$item)) {
-
-                    // The extension has been approved. Lets hook into the handler and extend the items length.
-                    if ($name == 'approve') {
-                        $handler->submit_extension($event->id, $this->request->userid, $localcm->cm->data);
-                    }
-
-                    $localcm->set_state($state);
-
-                    $status = $localcm->get_state_name();
-
-                    $history = (object) $localcm->write_history($mod, $state, $user->id);
-
-                    $log = new \stdClass();
-                    $log->status = $status;
-                    $log->course = $course->fullname;
-                    $log->event = $event->name;
-
-                    $history->message = get_string('request_state_history_log', 'local_extension', $log);
-
-                    // Update the lastmod
-                    $this->update_lastmod($user->id);
-
-                    // You can only edit one state at a time, returning here is ok!
-                    return $history;
-                }
-
-            }
-
-        }
-
     }
 
     /**
@@ -590,7 +529,7 @@ class request implements \cache_data_source {
 
         $data = array(
             'requestid' => $this->requestid,
-            'timestamp' => $file->get_timecreated(),
+            'timestamp' => time(),
             'filehash'  => $file->get_pathnamehash(),
             'userid'    => $file->get_userid(),
         );

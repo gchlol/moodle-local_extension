@@ -807,6 +807,34 @@ class rule {
     }
 
     /**
+     * Internal helper function to return the type of rule length checking.
+     * @param string $triggertype
+     * @return string
+     */
+    public function rule_type($triggertype) {
+        $any         = get_string('form_rule_any_value', 'local_extension');
+        $greaterthan = get_string('form_rule_greater_or_equal', 'local_extension');
+        $lessthan    = get_string('form_rule_less_than', 'local_extension');
+
+        switch($triggertype) {
+            case self::RULE_CONDITION_GE:
+                $type = $greaterthan;
+                break;
+            case self::RULE_CONDITION_LT:
+                $type = $lessthan;
+                break;
+            case self::RULE_CONDITION_ANY:
+                $type = $any;
+                break;
+            default:
+                $type = '';
+                break;
+        }
+
+        return $type;
+    }
+
+    /**
      * Fire off the trigger creation event.
      *
      * @param int $id

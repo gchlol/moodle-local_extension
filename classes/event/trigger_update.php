@@ -69,6 +69,6 @@ class trigger_update extends \core\event\base {
      */
     public function get_url() {
         $params = array('id' => $this->data['objectid'], 'datatype' => $this->other['datatype'], 'sesskey' => sesskey());
-        return new \moodle_url('/local/extension/editrule.php', $params);
+        return new \moodle_url('/local/extension/rules/edit.php', $params);
     }
 }

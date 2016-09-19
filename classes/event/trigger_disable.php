@@ -68,6 +68,6 @@ class trigger_disable extends \core\event\base {
      * @return \moodle_url
      */
     public function get_url() {
-        return new \moodle_url('/local/extension/manage.php');
+        return new \moodle_url('/local/extension/rules/manage.php');
     }
 }

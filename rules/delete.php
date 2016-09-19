@@ -15,7 +15,7 @@
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
 /**
- * Manage the adapter triggers
+ * Delete a rule.
  *
  * @package    local_extension
  * @author     Nicholas Hoobin <nicholashoobin@catalyst-au.net>
@@ -23,19 +23,22 @@
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
-require_once('../../config.php');
+require_once('../../../config.php');
 require_once($CFG->libdir . '/adminlib.php');
 
-$delete   = optional_param('delete', 0, PARAM_INT);
-$confirm  = optional_param('confirm', '', PARAM_ALPHANUM);   // MD5 confirmation hash.
+use moodle_url;
 
-$pageurl = new moodle_url('/local/extension/manage.php');
-$PAGE->set_url($pageurl);
+$delete = required_param('id', PARAM_INT);
+$confirm = optional_param('confirm', '', PARAM_ALPHANUM);   // MD5 confirmation hash.
 
-$context = \context_system::instance();
+$url = new moodle_url('/local/extension/rules/delete.php');
+$PAGE->set_url($url);
+
+$context = context_system::instance();
+
 require_login();
 
-\admin_externalpage_setup('local_extension_settings_rules');
+admin_externalpage_setup('local_extension_settings_rules');
 
 $PAGE->set_context($context);
 $PAGE->set_pagelayout('standard');
@@ -44,9 +47,10 @@ $PAGE->set_heading(get_string('rules_page_heading', 'local_extension'));
 $PAGE->requires->css('/local/extension/styles.css');
 $PAGE->add_body_class('local_extension');
 
-/* @var $renderer local_extension_renderer */
+/* @var local_extension_renderer $renderer */
 $renderer = $PAGE->get_renderer('local_extension');
 
+// TODO replace with load_branch from ruleid.
 $rules = \local_extension\rule::load_all();
 $ordered = \local_extension\utility::rule_tree($rules);
 
@@ -56,15 +60,19 @@ if ($delete && confirm_sesskey()) {
         echo $OUTPUT->header();
         echo html_writer::tag('h2', get_string('page_heading_manage_delete', 'local_extension'));
 
-        $optionsyes = array('delete' => $delete, 'confirm' => md5($delete), 'sesskey' => sesskey());
-        $deleteurl = new moodle_url($pageurl, $optionsyes);
+        $params = array(
+            'id' => $delete,
+            'confirm' => md5($delete),
+            'sesskey' => sesskey()
+        );
+        $deleteurl = new moodle_url($url, $params);
         $deletebutton = new single_button($deleteurl, get_string('delete'), 'post');
 
         $branch = \local_extension\utility::rule_tree_branch($ordered, $delete);
 
         echo $renderer->render_delete_rules(array($branch));
 
-        echo $OUTPUT->confirm('', $deletebutton, $pageurl);
+        echo $OUTPUT->confirm('', $deletebutton, $url);
         echo $OUTPUT->footer();
 
         exit();
@@ -89,30 +97,10 @@ if ($delete && confirm_sesskey()) {
             $rules[$deleteid]->trigger_disable_event();
         }
 
-        redirect($pageurl);
+        redirect(new moodle_url('/local/extension/rules/manage.php'));
 
     } else {
 
-        redirect($pageurl);
+        redirect(new moodle_url('/local/extension/rules/manage.php'));
     }
 }
-
-echo $OUTPUT->header();
-
-echo html_writer::tag('h2', get_string('page_heading_manage', 'local_extension'));
-
-// Display a table of all triggers when no id is present.
-$table = \local_extension\table::generate_trigger_table();
-$renderer->render_extension_trigger_table($table, $ordered);
-
-echo $table->finish_output();
-
-echo html_writer::empty_tag('br');
-
-$url = new moodle_url("/local/extension/editrule.php");
-
-$mods = \local_extension\plugininfo\extension::get_enabled_request();
-
-echo $renderer->render_manage_new_rule($mods, $url);
-
-echo $OUTPUT->footer();

@@ -26,24 +26,24 @@
     font-weight: bold;
 }
 
-.local_extension span .statusnew {
-    background-color: #FFE047;
+.local_extension span.statusnew {
+    background-color: #fff801;
 }
 
-.local_extension span .statusdenied {
-	background-color: #AFFF44
+.local_extension span.statusdenied {
+	background-color: #ff224f
 }
 
-.local_extension span .statusapproved {
+.local_extension span.statusapproved {
     background-color: #AFFF44
 }
 
-.local_extension span .statusreopened {
-	background-color: #AFFF44
+.local_extension span.statusreopened {
+	background-color: #fff800
 }
 
-.local_extension span .statuscancel {
-	background-color: #AFFF44
+.local_extension span.statuscancel {
+	background-color: #00f1ff
 }
 
 .local_extension .mform fieldset div {
@@ -52,7 +52,6 @@
 
 .local_extension .mform fieldset div.fgroup {
     margin-bottom: 10px;
-    margin-left: 16%;
     margin-top: 10px;
 }
 
@@ -85,4 +84,16 @@
 .local_extension .controls select {
     min-width: 250px;
     max-width: 250px;
+}
+
+.local_extension .label {
+    display: inline;
+    padding: .3em .6em .3em;
+    line-height: 1;
+    font-size: 75%;
+    font-weight: 700;
+    text-align: center;
+    white-space: nowrap;
+    vertical-align: baseline;
+    border-radius: .25em;
 }
