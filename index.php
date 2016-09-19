@@ -255,6 +255,8 @@ if ($requestlist) {
         // $lastmod .= html_writer::tag('span', fullname($lastmoduser));
         $lastmod .= html_writer::end_div();
 
+        $cmstate = \local_extension\state::instance()->get_state_name($request->state);
+
         $data = array(
             $requestlink,
             $OUTPUT->user_picture($request, array('size' => 35, 'courseid' => $course->id)),
@@ -263,7 +265,7 @@ if ($requestlist) {
             html_writer::div($requestlength, 'lastmodby'),
             html_writer::link($requesturl, $request->coursename),
             html_writer::link($requesturl, $request->activity),
-            \local_extension\state::instance()->get_state_name($request->state),
+            html_writer::div($cmstate, 'lastmodby'),
             $lastmod,
         );
 
