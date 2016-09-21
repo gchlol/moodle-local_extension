@@ -40,7 +40,7 @@ if ($hassiteconfig) {
     }
 
     $weeks = array();
-    for ($c = 1; $c <= 8; $c++) {
+    for ($c = 1; $c <= 53; $c++) {
         if ($c == 1) {
             $weeks[$c] = get_string('week', 'local_extension', $c);
         } else {
