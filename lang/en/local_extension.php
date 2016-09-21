@@ -187,6 +187,8 @@ $string['searchforwardhelp'] = 'How many days to search forward from today when 
 $string['searchforward'] = 'Search forward';
 $string['searchforwardmaxweekshelp'] = 'The number of weeks allowed to search forward when making a request.';
 $string['searchforwardmaxweeks'] = 'Maximum weeks searching forward';
+$string['searchbackwardmaxweekshelp'] = 'The number of weeks allowed to search backward when making a request.';
+$string['searchbackwardmaxweeks'] = 'Maximum weeks searching backward';
 $string['state_approved'] = '<span class="statusapproved label">Granted</span>';
 $string['state_button_approve'] = 'Approve request';
 $string['state_button_cancel'] = 'Cancel request';

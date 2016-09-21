@@ -447,11 +447,18 @@ class local_extension_renderer extends plugin_renderer_base {
      * @return string
      */
     public function render_request_search_controls($courseid, $cmid, $searchback, $searchforward) {
-        $maxweeks = get_config('local_extension', 'searchforwardmaxweeks');
+        $maxweeksbackward = get_config('local_extension', 'searchbackwardmaxweeks');
+        $maxweeksforward = get_config('local_extension', 'searchforwardmaxweeks');
         $searchforwarddefault = get_config('local_extension', 'searchforward');
+        $searchbackwarddefault = get_config('local_extension', 'searchback');
 
         // Return with a warning message that the look ahead length has exceeded the configured setting.
-        if ($searchforward > $maxweeks * 7) {
+        if ($searchforward > $maxweeksforward * 7) {
+            return html_writer::span(get_string('page_request_outofrange', 'local_extension'));
+        }
+
+        // Return with a warning message that the look ahead length has exceeded the configured setting.
+        if ($searchback > $maxweeksbackward * 7) {
             return html_writer::span(get_string('page_request_outofrange', 'local_extension'));
         }
 
@@ -468,11 +475,10 @@ class local_extension_renderer extends plugin_renderer_base {
 
         // Searching backward
         $backwardlist = array();
+        for ($i = 1; $i <= $maxweeksbackward; $i++) {
 
-        for ($i = 1; $i <= $maxweeks; $i++) {
-
-            // Dont add 'weeks' that are less than the default searchforward length.
-            $defaultweeks = $searchforwarddefault / 7;
+            // Dont add 'weeks' that are less than the default search length.
+            $defaultweeks = $searchbackwarddefault / 7;
 
             if ($i < $defaultweeks) {
                 continue;
@@ -510,7 +516,7 @@ class local_extension_renderer extends plugin_renderer_base {
 
         $forwardlist = array();
 
-        for ($i = 1; $i <= $maxweeks; $i++) {
+        for ($i = 1; $i <= $maxweeksforward; $i++) {
 
             // Dont add 'weeks' that are less than the default searchforward length.
             $defaultweeks = $searchforwarddefault / 7;

@@ -40,7 +40,7 @@ if ($hassiteconfig) {
     }
 
     $weeks = array();
-    for ($c = 1; $c <= 53; $c++) {
+    for ($c = 1; $c <= 52; $c++) {
         if ($c == 1) {
             $weeks[$c] = get_string('week', 'local_extension', $c);
         } else {
@@ -55,6 +55,10 @@ if ($hassiteconfig) {
     $settings->add(new admin_setting_configselect('local_extension/searchforward',
         new lang_string('searchforward',          'local_extension'),
         new lang_string('searchforwardhelp',      'local_extension'), 14, $days));
+
+    $settings->add(new admin_setting_configselect('local_extension/searchbackwardmaxweeks',
+        new lang_string('searchbackwardmaxweeks',     'local_extension'),
+        new lang_string('searchbackwardmaxweekshelp', 'local_extension'), 2, $weeks));
 
     $settings->add(new admin_setting_configselect('local_extension/searchforwardmaxweeks',
         new lang_string('searchforwardmaxweeks',     'local_extension'),
