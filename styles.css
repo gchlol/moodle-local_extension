@@ -62,8 +62,8 @@
 }
 
 .local_extension table tr.clearrow td {
-    background-color: inherit !important;
-    border: 1px none !important;
+    background-color: inherit;
+    border: 1px none;
 }
 
 .local_extension div .manageruleitem {
@@ -82,18 +82,18 @@
 }
 
 .local_extension .controls select {
-    min-width: 250px;
     max-width: 250px;
+    min-width: 250px;
 }
 
 .local_extension .label {
+    border-radius: .25em;
     display: inline;
-    padding: .3em .6em .3em;
-    line-height: 1;
     font-size: 75%;
     font-weight: 700;
+    line-height: 1;
+    padding: .3em .6em .3em;
     text-align: center;
-    white-space: nowrap;
     vertical-align: baseline;
-    border-radius: .25em;
+    white-space: nowrap;
 }
