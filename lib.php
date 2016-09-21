@@ -24,7 +24,16 @@
  */
 
 /**
- * Add the link to start a request
+ * Add the link to start a request, Moodle 2.9+
+ *
+ * @param global_navigation $nav Navigation
+ */
+function local_extension_extend_navigation(global_navigation $nav) {
+    local_extension_extends_navigation($nav);
+}
+
+/**
+ * Add the link to start a request, Moodle 2.7
  *
  * @param global_navigation $nav Navigation
  */
@@ -100,7 +109,7 @@ function local_extension_extends_navigation(global_navigation $nav) {
                 return;
             }
 
-             // Adding a navigation string nested in the course module that provides a status update and the extension length
+             // Adding a navigation string nested in the course module that provides a status update and the extension length.
 
             $id = optional_param('id', 0, PARAM_INT);
             $courseid = optional_param('course', 0, PARAM_INT);
@@ -120,7 +129,7 @@ function local_extension_extends_navigation(global_navigation $nav) {
                 $modinfo = get_fast_modinfo($courseid);
                 $cmdata = $modinfo->cms[$cmid];
 
-                // eg. assign, quiz.
+                // Eg. assign, quiz.
                 $modname = $cmdata->modname;
 
                 // No triggers have been defined for this mod type. It will not show a request extension link.
@@ -139,12 +148,11 @@ function local_extension_extends_navigation(global_navigation $nav) {
                     $event = $request->mods[$cmid]['event'];
                     $localcm = $request->mods[$cmid]['localcm'];
 
-                    // $status = \local_extension\state::instance()->get_state_name($localcm->cm->state);
                     $result = \local_extension\state::instance()->get_state_result($localcm->cm->state);
 
                     $delta = $cm->get_data() - $event->timestart;
 
-                    // TODO format time differently
+                    // TODO format time differently.
                     $extensionlength = format_time($delta);
 
                     // The function block_nagivation->trim will truncate the navagation item to 25/50 characters.
@@ -191,7 +199,7 @@ function local_extension_pluginfile($course, $cm, $context, $filearea, $args, $f
     // Lets obtain the cached request.
     $request = \local_extension\request::from_id($itemid);
 
-    // $request->user is an array of $userid=>$userobj associated to this request, eg. those that are subscribed, and the user.
+    // Item $request->user is an array of $userid=>$userobj associated to this request, eg. those that are subscribed, and the user.
     // The list of subscribed users populated each time the request object is generated.
     // The request object is invalidated and regenerated after each comment, attachment added, or rule triggered.
     if (!array_key_exists($USER->id, $request->users)) {
