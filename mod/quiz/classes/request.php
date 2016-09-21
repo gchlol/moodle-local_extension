@@ -71,7 +71,7 @@ class request extends \local_extension\base_request {
      * @return boolean True if should be handled
      */
     public function is_candidate($event, $cm) {
-        return true; // TODO.
+        return false; // TODO.
     }
 
     // TODO set the state of the cm.
@@ -126,12 +126,12 @@ class request extends \local_extension\base_request {
     /**
      * Grants an extension.
      *
-     * @param int $assignmentid
+     * @param int $quizid
      * @param int $userid
      * @param int $duedate
      * @return bool
      */
-    public function submit_extension($assignmentid, $userid, $duedate) {
+    public function submit_extension($quizid, $userid, $duedate) {
         // TODO: Implement submit_extension() method.
     }
 
