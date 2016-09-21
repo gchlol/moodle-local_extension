@@ -519,25 +519,14 @@ class local_extension_renderer extends plugin_renderer_base {
 
         $systemcontext = context_system::instance();
 
-        // Print a filter settings items across the top of the page.
+        // Print a filter row across the top of the page.
         $controlstable = new html_table();
         $controlstable->attributes['class'] = 'controls';
         $controlstable->cellspacing = 0;
         $controlstable->data[] = new html_table_row();
 
-        $cats = coursecat::make_categories_list();
         $viewallrequests = false;
         $modifyrequeststatus = false;
-        foreach ($cats as $cid => $cat) {
-            $ctx = context_coursecat::instance($cid);
-            if (has_capability('local/extension:viewallrequests', $ctx)) {
-                $viewallrequests = true;
-            }
-
-            if (has_capability('local/extension:modifyrequeststatus', $ctx)) {
-                $modifyrequeststatus = true;
-            }
-        }
 
         if (has_capability('local/extension:viewallrequests', $context)) {
             $viewallrequests = true;
@@ -547,18 +536,16 @@ class local_extension_renderer extends plugin_renderer_base {
             $modifyrequeststatus = true;
         }
 
+        $categorylist = coursecat::make_categories_list('local/extension:viewallrequests');
         // Display a list of categories.
-        if ($viewallrequests) {
-
-            $categorylist = array();
-            $categorylist[0] = coursecat::get(0)->get_formatted_name();
-            $categorylist += coursecat::make_categories_list();
-
-            // TODO filter categories to ones that a student is enrolled in?
+        if (!empty($categorylist) || $viewallrequests || $modifyrequeststatus) {
+            $catl = array();
+            $catl[0] = coursecat::get(0)->get_formatted_name();
+            $catl += $categorylist;
 
             $popupurl = new moodle_url('/local/extension/index.php');
 
-            $select = new single_select($popupurl, 'catid', $categorylist, $categoryid, null, 'requestform');
+            $select = new single_select($popupurl, 'catid', $catl, $categoryid, null, 'requestform');
 
             $strcategories = get_string('page_index_categories', 'local_extension');
             $html  = html_writer::span($strcategories, '', array('id' => 'categories'));
@@ -572,8 +559,8 @@ class local_extension_renderer extends plugin_renderer_base {
         }
 
         // Display a list of all courses to filter by
-        // TODO change this to categories that the user is enroled in.
-        if ($viewallrequests) {
+        // TODO change this to categories that the user is enroled in. / has the cap to modify
+        if (!empty($categorylist) || $viewallrequests || $modifyrequeststatus) {
             $options = array();
             $options['1'] = get_string('page_index_all', 'local_extension');
 
@@ -644,7 +631,7 @@ class local_extension_renderer extends plugin_renderer_base {
             $controlstable->data[0]->cells[] = $html;
         }
 
-        if ($viewallrequests || $modifyrequeststatus) {
+        if (!empty($categorylist) || $viewallrequests || $modifyrequeststatus) {
 
             // Display a search filter for the status.
             $state = \local_extension\state::instance();
