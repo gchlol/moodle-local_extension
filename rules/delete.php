@@ -47,7 +47,7 @@ $PAGE->set_heading(get_string('rules_page_heading', 'local_extension'));
 $PAGE->requires->css('/local/extension/styles.css');
 $PAGE->add_body_class('local_extension');
 
-/* @var local_extension_renderer $renderer */
+/* @var local_extension_renderer $renderer IDE hinting */
 $renderer = $PAGE->get_renderer('local_extension');
 
 // TODO replace with load_branch from ruleid.

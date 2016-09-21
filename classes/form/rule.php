@@ -75,9 +75,10 @@ class rule extends \moodleform {
         $optionsparent = array(get_string('na', 'local_extension')) + $optionsparent;
 
         // Only activate when [parent] has been triggered.
-        $parentgroup = array();
-        $parentgroup[] = $mform->createElement('select', 'parent', null, $optionsparent);
-        $parentgroup[] = $mform->createElement('static', 'hastriggered', '', get_string('form_rule_label_parent_end', 'local_extension'));
+        $parentgroup = array(
+            $mform->createElement('select', 'parent', null, $optionsparent),
+            $mform->createElement('static', 'hastriggered', '', get_string('form_rule_label_parent_end', 'local_extension')),
+        );
 
         $mform->addGroup($parentgroup, 'parentgroup', get_string('form_rule_label_parent', 'local_extension'), array(' '), false);
         $mform->addHelpButton('parentgroup', 'form_rule_label_parent', 'local_extension');
@@ -91,23 +92,39 @@ class rule extends \moodleform {
             \local_extension\rule::RULE_CONDITION_ANY => get_string('form_rule_any_value', 'local_extension'),
         );
 
-        $lengthfromduedategroup[] = $mform->createElement('select', 'lengthtype', '', $lengthtypes);
-        $lengthfromduedategroup[] = $mform->createElement('text', 'lengthfromduedate', '');
-        $lengthfromduedategroup[] = $mform->createElement('static', 'dayslong', '', get_string('form_rule_label_days_long', 'local_extension'));
+        $lengthfromduedategroup = array(
+            $mform->createElement('select', 'lengthtype', '', $lengthtypes),
+            $mform->createElement('text', 'lengthfromduedate', ''),
+            $mform->createElement('static', 'dayslong', '', get_string('form_rule_label_days_long', 'local_extension')),
+        );
 
         $mform->setType('lengthfromduedate', PARAM_INT);
-        $mform->addGroup($lengthfromduedategroup, 'lengthfromduedategroup', get_string('form_rule_label_request_length', 'local_extension'), array(' '), false);
+        $mform->addGroup(
+            $lengthfromduedategroup,
+            'lengthfromduedategroup',
+            get_string('form_rule_label_request_length', 'local_extension'),
+            array(' '),
+            false
+        );
         $mform->addHelpButton('lengthfromduedategroup', 'form_rule_label_request_length', 'local_extension');
 
         // And the request is [lt/ge] [x] days old.
         $elapsedtime = array();
 
-        $elapsedtimegroup[] = $mform->createElement('select', 'elapsedtype', '', $lengthtypes);
-        $elapsedtimegroup[] = $mform->createElement('text', 'elapsedfromrequest', '');
-        $elapsedtimegroup[] = $mform->createElement('static', 'daysold', '', get_string('form_rule_label_days_old', 'local_extension'));
+        $elapsedtimegroup = array(
+            $mform->createElement('select', 'elapsedtype', '', $lengthtypes),
+            $mform->createElement('text', 'elapsedfromrequest', ''),
+            $mform->createElement('static', 'daysold', '', get_string('form_rule_label_days_old', 'local_extension')),
+        );
 
         $mform->setType('elapsedfromrequest', PARAM_INT);
-        $mform->addGroup($elapsedtimegroup, 'elapsedtimegroup', get_string('form_rule_label_elapsed_length', 'local_extension'), array(' '), false);
+        $mform->addGroup(
+            $elapsedtimegroup,
+            'elapsedtimegroup',
+            get_string('form_rule_label_elapsed_length', 'local_extension'),
+            array(' '),
+            false
+        );
         $mform->addHelpButton('elapsedtimegroup', 'form_rule_label_elapsed_length', 'local_extension');
 
         // Then set all roles equal to [roletypes] to [action] this request.
@@ -121,43 +138,38 @@ class rule extends \moodleform {
 
         $roletypes = role_get_names(\context_system::instance(), ROLENAME_ALIAS, true);
 
-        $actiongroup[] = $mform->createElement('select', 'role', null, $roletypes);
-        $actiongroup[] = $mform->createElement('static', 'to', '', get_string('form_rule_label_to', 'local_extension'));
-        $actiongroup[] = $mform->createElement('select', 'action', null, $actiontypes);
-        $actiongroup[] = $mform->createElement('static', 'approve', '', get_string('form_rule_label_this_request', 'local_extension'));
+        $actiongroup = array(
+            $mform->createElement('select', 'role', null, $roletypes),
+            $mform->createElement('static', 'to', '', get_string('form_rule_label_to', 'local_extension')),
+            $mform->createElement('select', 'action', null, $actiontypes),
+            $mform->createElement('static', 'approve', '', get_string('form_rule_label_this_request', 'local_extension')),
 
-        $mform->addGroup($actiongroup, 'actiongroup', get_string('form_rule_label_set_roles', 'local_extension'), array(' '), false);
+        );
+
+        $mform->addGroup(
+            $actiongroup,
+            'actiongroup',
+            get_string('form_rule_label_set_roles', 'local_extension'),
+            array(' '),
+            false
+        );
         $mform->addHelpButton('actiongroup', 'form_rule_label_set_roles', 'local_extension');
 
         // Email templates.
-        /*
-        $mform->addElement(
-            'text',
-            'template_notify_subject',
-            get_string('form_rule_label_template', 'local_extension'),
-            array('size' => '75')
+        $editornotify = $mform->addElement(
+            'editor',
+            'template_notify',
+            get_string('form_rule_label_template', 'local_extension')
         );
-        $mform->setDefault('template_notify_subject', get_string('template_notify_subject', 'local_extension'));
-
-        $mform->setType('template_notify_subject', PARAM_RAW);
-        */
-
-        $editornotify = $mform->addElement('editor', 'template_notify', get_string('form_rule_label_template', 'local_extension'));
         $mform->setType('template_notify', PARAM_RAW);
         $editornotify->setValue($editordata['template_notify']);
         $mform->addHelpButton('template_notify', 'form_rule_label_template', 'local_extension');
 
-        /*
-        $mform->addElement('text',
-            'template_user_subject',
-            get_string('form_rule_label_template_request', 'local_extension'),
-            array('size' => '75')
+        $editoruser = $mform->addElement(
+            'editor',
+            'template_user',
+            get_string('form_rule_label_template_request', 'local_extension')
         );
-        $mform->setDefault('template_user_subject', get_string('template_user_subject', 'local_extension'));
-        $mform->setType('template_user_subject', PARAM_RAW);
-        */
-
-        $editoruser = $mform->addElement('editor', 'template_user', get_string('form_rule_label_template_request', 'local_extension'));
         $mform->setType('template_user', PARAM_RAW);
         $editoruser->setValue($editordata['template_user']);
         $mform->addHelpButton('template_user', 'form_rule_label_template_request', 'local_extension');

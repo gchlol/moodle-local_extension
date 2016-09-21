@@ -94,7 +94,7 @@ class request implements \cache_data_source {
             'requestid' => $requestid
         );
 
-        list($handlers, $mods) = \local_extension\utility::get_activities($request->userid, $request->searchstart, $request->searchend, $options);
+        list($handlers, $mods) = utility::get_activities($request->userid, $request->searchstart, $request->searchend, $options);
         $this->mods = $mods;
 
         foreach ($mods as $id => $mod) {
@@ -111,7 +111,8 @@ class request implements \cache_data_source {
         }
 
         // Add to the $userids, a list of users that are subscribed to this request.
-        $fieldset = $DB->get_fieldset_select('local_extension_subscription', 'userid', 'requestid = :requestid', array('requestid' => $this->requestid));
+        $params = array('requestid' => $this->requestid);
+        $fieldset = $DB->get_fieldset_select('local_extension_subscription', 'userid', 'requestid = :requestid', $params);
 
         // Remove duplicate subscriber ids to prevent spamming them.
         $this->subscribedids = array_merge($this->subscribedids, array_unique($fieldset));
@@ -177,7 +178,7 @@ class request implements \cache_data_source {
         );
         $DB->insert_record('local_extension_comment', $comment);
 
-        // Update the lastmod
+        // Update the lastmod.
         $this->update_lastmod($from->id);
 
         return $comment;
@@ -289,7 +290,7 @@ class request implements \cache_data_source {
         foreach ($records as $record) {
             $mod = $this->mods[$record->localcmid];
 
-            /* @var \local_extension\cm $localcm */
+            /* @var \local_extension\cm $localcm IDE hinting. */
             $localcm = $mod['localcm'];
             $event   = $mod['event'];
             $course  = $mod['course'];
@@ -393,7 +394,7 @@ class request implements \cache_data_source {
             /** @var rule[] $rules */
             $rules = array();
 
-            // 1. Generate the template content for each mod item
+            // 1. Generate the template content for each mod item.
             foreach ($notifydata as $data) {
                 /** @var rule $rule */
                 $rule = $data->rule;
@@ -403,7 +404,7 @@ class request implements \cache_data_source {
                 $rules[$rule->id] = $rule;
             }
 
-            // 2. Join the template subjects and content together in one message
+            // 2. Join the template subjects and content together in one message.
             foreach ($templatedata as $ruleid => $templatecms) {
                 // If there are multiple cms in a request we need to concatenate them into the one message.
 
@@ -424,7 +425,7 @@ class request implements \cache_data_source {
                         }
 
                         // Setting the attributes to be empty if the template data is not found.
-                        // FIX for deleting moodle editor data, it leaves a <br> in the text after ctrl+a text deletion :(
+                        // FIX for deleting moodle editor data, it leaves a <br> in the text after ctrl+a text deletion :(.
                         if (empty(strip_tags($template[$templatekey]['text']))) {
                             $templates->$attribute = null;
                             continue;
@@ -432,7 +433,8 @@ class request implements \cache_data_source {
 
                         $content = $template[$templatekey]['text'];
 
-                        // Checks to see if the return attribute *_content is set, if is, then it appends a <hr> and the next template item.
+                        // Checks to see if the return attribute *_content is set.
+                        // If true then it appends a <hr> and the next template item.
                         if (!empty($templates->$attribute)) {
                             $templates->$attribute .= "<hr>" . $content;
                         } else {
@@ -550,7 +552,7 @@ class request implements \cache_data_source {
         $history = (object) $data;
         $history->message = get_string('status_file_attachment', 'local_extension', $filelink);
 
-        // Update the lastmod
+        // Update the lastmod.
         $this->update_lastmod($file->get_userid());
 
         return $history;
@@ -560,7 +562,8 @@ class request implements \cache_data_source {
      * Each comment, state change and file attachment will fire off a notification to all subscribed users.
      *
      * @param array $history
-     * @param int $postuserid The ID of the user that updated the request. This user will not receive an notification as they posted the content.
+     * @param int $postuserid The ID of the user that updated the request.
+     *   This user will not receive an notification as they posted the content.
      */
     public function notify_subscribers($history, $postuserid) {
         global $PAGE;

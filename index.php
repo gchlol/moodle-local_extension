@@ -81,7 +81,7 @@ $PAGE->add_body_class('local_extension');
 $PAGE->navbar->ignore_active();
 $PAGE->navbar->add(get_string('breadcrumb_nav_index', 'local_extension'), new moodle_url('/local/extension/index.php'));
 
-/* @var \local_extension_renderer $renderer */
+/* @var \local_extension_renderer $renderer IDE hinting */
 $renderer = $PAGE->get_renderer('local_extension');
 
 echo $OUTPUT->header();
@@ -147,11 +147,13 @@ if ($viewallrequests) {
     $joins[] = "JOIN {user} u ON u.id = r.userid";
 
 } else {
-    // Filtering the subscriptions to only those that belong to the $USER. If a rule has been triggered this will grant access to individuals to modify/view the requests.
+    // Filtering the subscriptions to only those that belong to the $USER.
+    // If a rule has been triggered this will grant access to individuals to modify/view the requests.
     $wheres[] = "s.userid = :subuserid";
     $params = array_merge($params, array('subuserid' => $USER->id), $params);
 
-    // This query obtains ALL local cm requests, that the $USER has a subscription to, with the possible filters: coursename, username, activityname.
+    // This query obtains ALL local cm requests, that the $USER has a subscription to with the possible filters:
+    // coursename, username, activityname.
     $select = "SELECT lcm.id AS lcmid,
                       lcm.name AS activity,
                       lcm.length,
@@ -224,10 +226,16 @@ if ($requestlist) {
     foreach ($requestlist as $request) {
         $usercontext = context_user::instance($request->userid);
 
-        if ($piclink = ($USER->id == $request->userid || has_capability('moodle/user:viewdetails', $context) || has_capability('moodle/user:viewdetails', $usercontext))) {
-            $profilelink = '<strong><a href="'.$CFG->wwwroot.'/user/view.php?id='.$request->userid.'&amp;course='.$course->id.'">'.fullname($request).'</a></strong>';
+        if ($piclink = ($USER->id == $request->userid ||
+            has_capability('moodle/user:viewdetails', $context) ||
+            has_capability('moodle/user:viewdetails', $usercontext))) {
+
+            $moodleurl = new \moodle_url('/user/view.php', array('id' => $request->userid, 'course' => $courseid));
+            $link = html_writer::link($moodleurl, fullname($request));
+
+            $profilelink = html_writer::tag('strong', $link);
         } else {
-            $profilelink = '<strong>'.fullname($request).'</strong>';
+            $profilelink = html_writer::tag('strong', fullname($request));
         }
 
         $lastmoduser = core_user::get_user($request->lastmodid);
@@ -251,8 +259,6 @@ if ($requestlist) {
 
         $lastmod  = html_writer::start_div('lastmodby');
         $lastmod .= html_writer::tag('span', $lastmodstring);
-        // $lastmod .= html_writer::empty_tag('br');
-        // $lastmod .= html_writer::tag('span', fullname($lastmoduser));
         $lastmod .= html_writer::end_div();
 
         $cmstate = \local_extension\state::instance()->get_state_name($request->state);

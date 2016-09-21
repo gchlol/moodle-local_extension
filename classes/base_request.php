@@ -91,7 +91,8 @@ abstract class base_request {
     abstract public function get_triggers();
 
     /**
-     * Sets the extension length to the requested date. This is called when the approve button is click when viewing the status forum.
+     * Sets the extension length to the requested date.
+     * This is called when the approve button is click when viewing the status forum.
      *
      * @param int $assignmentid
      * @param int $userid

@@ -94,7 +94,8 @@ class request extends \local_extension\base_request {
 
         $html = \html_writer::start_div('content');
         $coursestring = \html_writer::tag('b', $course->fullname . ' > ' . $event->name, array('class' => 'mod'));
-        $html .= \html_writer::tag('p', $coursestring . ' ' . get_string('dueon', 'extension_assign', \userdate($event->timestart)));
+        $str = get_string('dueon', 'extension_assign', \userdate($event->timestart));
+        $html .= \html_writer::tag('p', $coursestring . ' ' . $str);
 
         // Setup the mform due element id.
         if (!empty($mform)) {
@@ -139,7 +140,8 @@ class request extends \local_extension\base_request {
 
         $html = \html_writer::start_div('content');
         $coursestring = \html_writer::tag('b', $course->fullname . ' > ' . $event->name, array('class' => 'mod'));
-        $html .= \html_writer::tag('p', $coursestring . ' ' . get_string('dueon', 'extension_assign', \userdate($event->timestart)));
+        $str = get_string('dueon', 'extension_assign', \userdate($event->timestart));
+        $html .= \html_writer::tag('p', $coursestring . ' ' . $str);
 
         $status = \local_extension\state::instance()->get_state_name($localcm->cm->state);
 

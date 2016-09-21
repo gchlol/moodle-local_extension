@@ -255,10 +255,10 @@ class state {
     public function update_cm_state($request, $user, $data) {
 
         foreach ($request->mods as $id => $mod) {
-            /* @var \local_extension\base_request $handler */
+            /* @var \local_extension\base_request $handler IDE hinting */
             $handler = $mod['handler'];
 
-            /* @var \local_extension\cm $localcm */
+            /* @var \local_extension\cm $localcm IDE hinting */
             $localcm = $mod['localcm'];
             $event   = $mod['event'];
             $course  = $mod['course'];

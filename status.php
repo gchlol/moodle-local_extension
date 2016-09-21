@@ -31,7 +31,7 @@ require_login(true);
 $requestid = required_param('id', PARAM_INT);
 $request = \local_extension\utility::cache_get_request($requestid);
 
-// $request->user is an array of $userid=>$userobj associated to this request, eg. those that are subscribed, and the user.
+// Item $request->user is an array of $userid=>$userobj associated to this request, eg. those that are subscribed, and the user.
 // The list of subscribed users populated each time the request object is generated.
 // The request object is invalidated and regenerated after each comment, attachment added, or rule triggered.
 
@@ -70,8 +70,10 @@ $requestuser = core_user::get_user($request->request->userid);
 $PAGE->navbar->ignore_active();
 $PAGE->navbar->add(get_string('breadcrumb_nav_index', 'local_extension'), new moodle_url('/local/extension/index.php'));
 
-$obj = (object) ['id' => $requestid, 'name' => \fullname($requestuser)];
-$PAGE->navbar->add(get_string('breadcrumb_nav_status', 'local_extension', $obj), new moodle_url('/local/extension/status.php', array('id' => $request->requestid)));
+$obj = (object) array('id' => $requestid, 'name' => \fullname($requestuser));
+
+$pageurl = new moodle_url('/local/extension/status.php', array('id' => $request->requestid));
+$PAGE->navbar->add(get_string('breadcrumb_nav_status', 'local_extension', $obj), $pageurl);
 
 $mform = new \local_extension\form\update(null, $params);
 

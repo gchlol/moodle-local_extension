@@ -231,7 +231,7 @@ class utility {
         global $CFG;
         $urlinfo = parse_url($CFG->wwwroot);
 
-        // TODO REMOVE AS THIS IS USED FOR DEMO
+        // TODO REMOVE AS THIS IS USED FOR DEMO.
         if (!empty($CFG->wwwroots)) {
             $urlinfo = parse_url($CFG->wwwroots[0]);
         }

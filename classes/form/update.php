@@ -50,7 +50,7 @@ class update extends \moodleform {
         $mform    = $this->_form;
         $user     = $this->_customdata['user'];
         $request  = $this->_customdata['request'];
-        /* @var \local_extension_renderer $renderer */
+        /* @var \local_extension_renderer $renderer  IDE hinting */
         $renderer = $this->_customdata['renderer'];
         $mods     = $request->mods;
 
@@ -60,7 +60,7 @@ class update extends \moodleform {
             $handler = $mod['handler'];
             $handler->status_definition($mod, $mform);
 
-            /* @var $localcm \local_extension\cm */
+            /* @var \local_extension\cm $localcm IDE hinting */
             $localcm = $mod['localcm'];
             $course = $mod['course'];
             $id = $localcm->cmid;
@@ -69,10 +69,6 @@ class update extends \moodleform {
 
             // The capability 'local/extension:modifyrequeststatus' allows a user to force change the status.
             $context = \context_course::instance($course->id, MUST_EXIST);
-            $forcestatus = has_capability('local/extension:modifyrequeststatus', $context);
-
-            // If the users access is either approve or force, then they can see the approval buttons.
-            $approve = (\local_extension\rule::RULE_ACTION_APPROVE | \local_extension\rule::RULE_ACTION_FORCEAPPROVE);
             $forcestatus = has_capability('local/extension:modifyrequeststatus', $context);
 
             // If the users access is either approve or force, then they can see the approval buttons.

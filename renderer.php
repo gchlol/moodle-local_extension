@@ -196,7 +196,7 @@ class local_extension_renderer extends plugin_renderer_base {
         $out .= html_writer::start_tag('ul');
 
         foreach ($files as $file) {
-            /* @var stored_file $file */
+            /* @var stored_file $file IDE hinting */
 
             $f = $fs->get_file(
                 $file->get_contextid(),
@@ -524,8 +524,9 @@ class local_extension_renderer extends plugin_renderer_base {
         $controlstable->cellspacing = 0;
         $controlstable->data[] = new html_table_row();
 
-        // Display a list of categories.
-        // if (has_capability('moodle/category:manage', context_system::instance()) || $categoryid == 0) {
+        /* Display a list of categories.
+         * if (has_capability('moodle/category:manage', context_system::instance()) || $categoryid == 0) {
+         */
         if (true) {
             $categorylist = array();
             $categorylist[0] = coursecat::get(0)->get_formatted_name();
@@ -561,7 +562,8 @@ class local_extension_renderer extends plugin_renderer_base {
 
             if (has_capability('moodle/site:viewparticipants', $systemcontext)) {
                 unset($courselist[SITEID]);
-                $courselist = array(SITEID => format_string($SITE->fullname, true, array('context' => $systemcontext))) + $courselist;
+                $obj = array('context' => $systemcontext);
+                $courselist = array(SITEID => format_string($SITE->fullname, true, $obj)) + $courselist;
             }
 
             $popupurl = new moodle_url('/local/extension/index.php', array(
@@ -576,7 +578,7 @@ class local_extension_renderer extends plugin_renderer_base {
         }
 
         // Display a list of all courses to filter by
-        // TODO change this to categories that the user is enroled in
+        // TODO change this to categories that the user is enroled in.
         if (has_capability('local/extension:viewallrequests', $context)) {
             $options = array();
 
