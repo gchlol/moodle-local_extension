@@ -463,6 +463,49 @@ class local_extension_renderer extends plugin_renderer_base {
         $popupurl = new moodle_url('/local/extension/request.php', array(
             'course'  => $courseid,
             'cmid'    => $cmid,
+            'forward' => $searchforward,
+        ));
+
+        // Searching backward
+        $backwardlist = array();
+
+        for ($i = 1; $i <= $maxweeks; $i++) {
+
+            // Dont add 'weeks' that are less than the default searchforward length.
+            $defaultweeks = $searchforwarddefault / 7;
+
+            if ($i < $defaultweeks) {
+                continue;
+            }
+
+            $week  = get_string('week', 'local_extension', $i);
+            $weeks = get_string('week_plural', 'local_extension', $i);
+
+            $value = 7 * $i;
+
+            if ($i == 1) {
+                $backwardlist[$value] = $week;
+            } else {
+                $backwardlist[$value] = $weeks;
+            }
+        }
+
+        $select = new single_select($popupurl, 'back', $backwardlist, $searchback, null, 'requestform');
+        $select->set_label(get_string('page_request_searchbackward', 'local_extension'));
+
+        $html = $this->render($select);
+
+        $searchforwardcell = new html_table_cell();
+        $searchforwardcell->attributes['class'] = 'right';
+        $searchforwardcell->text = $html;
+
+        $controlstable->data[0]->cells[] = $searchforwardcell;
+
+        // Searcahing forward
+        $popupurl = new moodle_url('/local/extension/request.php', array(
+            'course'  => $courseid,
+            'cmid'    => $cmid,
+            'back'    => $searchback,
         ));
 
         $forwardlist = array();

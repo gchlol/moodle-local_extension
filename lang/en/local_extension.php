@@ -169,6 +169,7 @@ $string['page_request_notriggersdefined'] = 'No extension triggers have been def
 $string['page_request_outofrange'] = 'Please reduce the look ahead range.';
 $string['page_request_requestnewlink'] = 'Click here to make a new extension request for {$a}';
 $string['page_request_requeststatuslink'] = 'Click here to view the extension status {$a}';
+$string['page_request_searchbackward'] = 'Look behind for possible requests in the past';
 $string['page_request_searchforward'] = 'Look ahead for possible requests in the future';
 $string['pluginname'] = 'Activity extensions';
 $string['renderer_search_text'] = 'Search';
