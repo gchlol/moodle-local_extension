@@ -164,7 +164,7 @@ if ($mform->is_cancelled()) {
             'timestamp' => $now,
             'name' => $event->name,
             'cmid' => $cmid,
-            'state' => 0,
+            'state' => \local_extension\state::STATE_NEW,
             'data' => $data,
             'length' => $data - $event->timestart,
         );
