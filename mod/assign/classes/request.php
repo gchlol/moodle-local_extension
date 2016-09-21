@@ -231,7 +231,7 @@ class request extends \local_extension\base_request {
      */
     public function submit_extension($assignmentid, $userid, $duedate) {
         global $CFG;
-        require_once("$CFG->dirroot/mod/assign/locallib.php");
+        require_once($CFG->dirroot . '/mod/assign/locallib.php');
 
         $cm = get_coursemodule_from_instance('assign', $assignmentid, 0, false, MUST_EXIST);
         $context = \context_module::instance($cm->id);

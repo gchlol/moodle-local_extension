@@ -23,10 +23,8 @@
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
-require_once('../../../config.php');
+require_once(__DIR__ . '/../../../config.php');
 require_once($CFG->libdir . '/adminlib.php');
-
-use moodle_url;
 
 $delete = required_param('id', PARAM_INT);
 $confirm = optional_param('confirm', '', PARAM_ALPHANUM);   // MD5 confirmation hash.

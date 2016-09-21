@@ -23,7 +23,7 @@
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
-require_once('../../config.php');
+require_once(__DIR__ . '/../../config.php');
 global $PAGE, $USER;
 
 require_login(true);
@@ -70,7 +70,7 @@ $requestuser = core_user::get_user($request->request->userid);
 $PAGE->navbar->ignore_active();
 $PAGE->navbar->add(get_string('breadcrumb_nav_index', 'local_extension'), new moodle_url('/local/extension/index.php'));
 
-$obj = (object) array('id' => $requestid, 'name' => \fullname($requestuser));
+$obj = array('id' => $requestid, 'name' => \fullname($requestuser));
 
 $pageurl = new moodle_url('/local/extension/status.php', array('id' => $request->requestid));
 $PAGE->navbar->add(get_string('breadcrumb_nav_status', 'local_extension', $obj), $pageurl);
