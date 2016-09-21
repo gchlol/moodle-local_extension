@@ -82,7 +82,7 @@ class request extends \local_extension\base_request {
      * @param array $mod An array of event details
      * @param \moodleform $mform A moodle form object
      */
-    public function request_definition($mod, $mform) {
+    public function request_definition($mod, $mform = null) {
 
     }
 
@@ -92,7 +92,7 @@ class request extends \local_extension\base_request {
      * @param array $mod An array of event details
      * @param \moodleform $mform A moodle form object
      */
-    public function status_definition($mod, $mform) {
+    public function status_definition($mod, $mform = null) {
 
     }
 
