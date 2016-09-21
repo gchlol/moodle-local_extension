@@ -281,7 +281,16 @@ if ($requestlist) {
     $table->finish_html();
 }
 
-$url = new moodle_url("/local/extension/request.php");
+if ($courseid == SITEID) {
+    $courseid = 0;
+}
+
+$params = array(
+    'course'  => $courseid,
+);
+
+$url = new moodle_url("/local/extension/request.php", $params);
+
 echo $OUTPUT->single_button($url, get_string('button_request_extension', 'local_extension'));
 
 echo $OUTPUT->footer();

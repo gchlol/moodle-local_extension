@@ -524,10 +524,9 @@ class local_extension_renderer extends plugin_renderer_base {
         $controlstable->cellspacing = 0;
         $controlstable->data[] = new html_table_row();
 
-        /* Display a list of categories.
-         * if (has_capability('moodle/category:manage', context_system::instance()) || $categoryid == 0) {
-         */
-        if (true) {
+        // Display a list of categories.
+        if (has_capability('local/extension:viewallrequests', context_system::instance())) {
+
             $categorylist = array();
             $categorylist[0] = coursecat::get(0)->get_formatted_name();
             $categorylist += coursecat::make_categories_list();
@@ -549,7 +548,52 @@ class local_extension_renderer extends plugin_renderer_base {
             $controlstable->data[0]->cells[] = $categorycell;
         }
 
+        // Display a list of all courses to filter by
+        // TODO change this to categories that the user is enroled in.
+        if (has_capability('local/extension:viewallrequests', $context)) {
+            $options = array();
+            $options['1'] = get_string('page_index_all', 'local_extension');
+
+            if (!empty($categoryid)) {
+                $courses = coursecat::get($categoryid)->get_courses(array('recursive' => true));
+            } else {
+                $courses = coursecat::get(0)->get_courses(array('recursive' => true));
+
+            }
+
+            // Limit the number of courses in the select dropdown? Required?
+            if (count($courses) > 100) {
+                $options['0'] = get_string('page_index_toomanycourses', 'local_extension');
+
+            } else {
+
+                foreach ($courses as $course) {
+                    $options[$course->id] = $course->fullname;
+                }
+
+            }
+
+            $popupurl = new moodle_url('/local/extension/index.php', array(
+                'catid' => $categoryid
+            ));
+
+            $select = new single_select($popupurl, 'id', $options, $courseid, null, 'requestform');
+
+            $strcourses = get_string('page_index_courses', 'local_extension');
+            $html = html_writer::span($strcourses, '', array('id' => 'courses'));
+            $html .= $this->render($select);
+
+            $categorycell = new html_table_cell();
+            $categorycell->attributes['class'] = 'right';
+            $categorycell->text = $html;
+
+            $controlstable->data[0]->cells[] = $categorycell;
+        }
+
         // Display a list of enrolled courses to filter by.
+
+        // Or obtain courses that have active requests?
+
         if ($mycourses = enrol_get_my_courses()) {
             $courselist = array();
 
@@ -575,40 +619,6 @@ class local_extension_renderer extends plugin_renderer_base {
             $html  = html_writer::span(get_string('mycourses'), '', array('id' => 'courses'));
             $html .= $this->render($select);
             $controlstable->data[0]->cells[] = $html;
-        }
-
-        // Display a list of all courses to filter by
-        // TODO change this to categories that the user is enroled in.
-        if (has_capability('local/extension:viewallrequests', $context)) {
-            $options = array();
-
-            if (!empty($categoryid)) {
-                $courses = coursecat::get($categoryid)->get_courses(array('recursive' => true));
-            } else {
-                $courses = coursecat::get(0)->get_courses(array('recursive' => true));
-            }
-
-            $options['1'] = get_string('page_index_all', 'local_extension');
-
-            foreach ($courses as $course) {
-                $options[$course->id] = $course->fullname;
-            }
-
-            $popupurl = new moodle_url('/local/extension/index.php', array(
-                'catid' => $categoryid
-            ));
-
-            $select = new single_select($popupurl, 'id', $options, $courseid, null, 'requestform');
-
-            $strcourses = get_string('page_index_courses', 'local_extension');
-            $html = html_writer::span($strcourses, '', array('id' => 'courses'));
-            $html .= $this->render($select);
-
-            $categorycell = new html_table_cell();
-            $categorycell->attributes['class'] = 'right';
-            $categorycell->text = $html;
-
-            $controlstable->data[0]->cells[] = $categorycell;
         }
 
         $searchcoursecell = new html_table_cell();

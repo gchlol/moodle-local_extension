@@ -25,16 +25,15 @@
 
 $capabilities = array(
     'local/extension:viewallrequests' => array(
-        'riskbitmask' => RISK_SPAM | RISK_XSS | RISK_PERSONAL,
-
-        'captype' => 'write',
+        'riskbitmask'  => RISK_SPAM | RISK_XSS | RISK_PERSONAL,
+        'captype'      => 'write',
         'contextlevel' => CONTEXT_SYSTEM,
     ),
 
     'local/extension:modifyrequeststatus' => array(
-        'riskbitmask' => RISK_SPAM | RISK_XSS | RISK_PERSONAL,
-
-        'captype' => 'write',
+        'riskbitmask'  => RISK_SPAM | RISK_XSS | RISK_PERSONAL,
+        'captype'      => 'write',
         'contextlevel' => CONTEXT_SYSTEM,
     ),
+
 );

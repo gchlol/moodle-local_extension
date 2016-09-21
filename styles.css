@@ -13,7 +13,7 @@
 }
 
 .local_extension .comment .avatar {
-	left: 0;
+    left: 0;
     position: absolute;
     width: 100px;
 }
@@ -31,7 +31,7 @@
 }
 
 .local_extension span.statusdenied {
-	background-color: #ff224f
+    background-color: #ff224f
 }
 
 .local_extension span.statusapproved {
@@ -39,11 +39,11 @@
 }
 
 .local_extension span.statusreopened {
-	background-color: #fff800
+    background-color: #fff800
 }
 
 .local_extension span.statuscancel {
-	background-color: #00f1ff
+    background-color: #00f0ff
 }
 
 .local_extension .mform fieldset div {
