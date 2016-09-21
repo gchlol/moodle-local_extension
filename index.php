@@ -46,6 +46,8 @@ $PAGE->set_url('/local/extension/index.php', array(
     'search'    => $search,
 ));
 
+require_login();
+
 if ($contextid) {
     $context = context::instance_by_id($contextid, MUST_EXIST);
     if ($context->contextlevel != CONTEXT_COURSE) {
@@ -67,7 +69,6 @@ if ($categoryid) {
     $categorycontext = $context;
 }
 
-require_login($course);
 
 $systemcontext = context_system::instance();
 $isfrontpage = ($course->id == SITEID);

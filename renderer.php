@@ -565,22 +565,26 @@ class local_extension_renderer extends plugin_renderer_base {
             $options['1'] = get_string('page_index_all', 'local_extension');
 
             if (!empty($categoryid)) {
-                $courses = coursecat::get($categoryid)->get_courses(array('recursive' => true));
+                $cat = coursecat::get($categoryid);
+                $courses = $cat->get_courses(array('recursive' => true));
             } else {
                 $courses = coursecat::get(0)->get_courses(array('recursive' => true));
 
             }
 
+            /*
             // Limit the number of courses in the select dropdown? Required?
-            if (count($courses) > 100) {
+            // TODO find a good way to do this.
+            if (count($courses) > 500) {
                 $options['0'] = get_string('page_index_toomanycourses', 'local_extension');
 
             } else {
 
-                foreach ($courses as $course) {
-                    $options[$course->id] = $course->fullname;
-                }
 
+            }
+            */
+            foreach ($courses as $course) {
+                $options[$course->id] = $course->fullname;
             }
 
             $popupurl = new moodle_url('/local/extension/index.php', array(
