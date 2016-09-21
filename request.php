@@ -48,6 +48,9 @@ if (!empty($cmid)) {
     $maxweeks = get_config('local_extension', 'searchforwardmaxweeks');
     $searchforward = $maxweeks * 7;
 
+    $maxweeks = get_config('local_extension', 'searchbackwardmaxweeks');
+    $searchback = $maxweeks * 7;
+
 } else if (!empty($courseid)) {
     require_login($courseid);
     $context = context_course::instance($courseid);
