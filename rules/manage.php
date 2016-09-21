@@ -52,7 +52,7 @@ echo $OUTPUT->header();
 echo html_writer::tag('h2', get_string('page_heading_manage', 'local_extension'));
 
 // Display a table of all triggers when no id is present.
-$table = new \local_extension\table\rules();
+$table = new \local_extension\local\table\rules();
 $table->set_data($ordered);
 echo $table->finish_output();
 

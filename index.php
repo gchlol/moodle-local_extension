@@ -98,7 +98,7 @@ $baseurl = new moodle_url('/local/extension/index.php', array(
 // New filter functionality, searching and listing of requests.
 echo $renderer->render_index_search_controls($context, $categoryid, $courseid, $baseurl, $search);
 
-$table = new \local_extension\table\index($baseurl);
+$table = new \local_extension\local\table\index($baseurl);
 
 $joins = array();
 $wheres = array();
