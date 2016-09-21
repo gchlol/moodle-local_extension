@@ -525,8 +525,30 @@ class local_extension_renderer extends plugin_renderer_base {
         $controlstable->cellspacing = 0;
         $controlstable->data[] = new html_table_row();
 
+        $cats = coursecat::make_categories_list();
+        $viewallrequests = false;
+        $modifyrequeststatus = false;
+        foreach ($cats as $cid => $cat) {
+            $ctx = context_coursecat::instance($cid);
+            if (has_capability('local/extension:viewallrequests', $ctx)) {
+                $viewallrequests = true;
+            }
+
+            if (has_capability('local/extension:modifyrequeststatus', $ctx)) {
+                $modifyrequeststatus = true;
+            }
+        }
+
+        if (has_capability('local/extension:viewallrequests', $context)) {
+            $viewallrequests = true;
+        }
+
+        if (has_capability('local/extension:modifyrequeststatus', $context)) {
+            $modifyrequeststatus = true;
+        }
+
         // Display a list of categories.
-        if (has_capability('local/extension:viewallrequests', context_system::instance())) {
+        if ($viewallrequests) {
 
             $categorylist = array();
             $categorylist[0] = coursecat::get(0)->get_formatted_name();
@@ -551,7 +573,7 @@ class local_extension_renderer extends plugin_renderer_base {
 
         // Display a list of all courses to filter by
         // TODO change this to categories that the user is enroled in.
-        if (has_capability('local/extension:viewallrequests', $context)) {
+        if ($viewallrequests) {
             $options = array();
             $options['1'] = get_string('page_index_all', 'local_extension');
 
@@ -622,25 +644,29 @@ class local_extension_renderer extends plugin_renderer_base {
             $controlstable->data[0]->cells[] = $html;
         }
 
-        // Display a search filter for the status.
-        $state = \local_extension\state::instance();
+        if ($viewallrequests || $modifyrequeststatus) {
 
-        $statelist = array();
-        $statelist[0] = get_string('page_index_all', 'local_extension');
-        foreach ($state->statearray as $sid => $name) {
-            $statelist[$sid] = $state->get_state_name($sid);
+            // Display a search filter for the status.
+            $state = \local_extension\state::instance();
+
+            $statelist = array();
+            $statelist[0] = get_string('page_index_all', 'local_extension');
+            foreach ($state->statearray as $sid => $name) {
+                $statelist[$sid] = $state->get_state_name($sid);
+            }
+
+            $popupurl = new moodle_url('/local/extension/index.php', array(
+                'catid' => $categoryid,
+                'id' => $courseid
+            ));
+
+            $select = new single_select($popupurl, 'state', $statelist, $stateid, null, 'requestform');
+
+            $html  = html_writer::span(get_string('state', 'local_extension'), '', array('id' => 'courses'));
+            $html .= $this->render($select);
+            $controlstable->data[0]->cells[] = $html;
+
         }
-
-        $popupurl = new moodle_url('/local/extension/index.php', array(
-            'catid' => $categoryid,
-            'id' => $courseid
-        ));
-
-        $select = new single_select($popupurl, 'state', $statelist, $stateid, null, 'requestform');
-
-        $html  = html_writer::span(get_string('state', 'local_extension'), '', array('id' => 'courses'));
-        $html .= $this->render($select);
-        $controlstable->data[0]->cells[] = $html;
 
         $searchcoursecell = new html_table_cell();
         $searchcoursecell->attributes['class'] = 'right';
@@ -651,4 +677,3 @@ class local_extension_renderer extends plugin_renderer_base {
     }
 
 }
-

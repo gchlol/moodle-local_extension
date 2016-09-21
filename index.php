@@ -58,7 +58,7 @@ if ($contextid) {
 } else {
     $courseid = SITEID;
     $course = $DB->get_record('course', array('id' => $courseid), '*', MUST_EXIST);
-    $context = context_course::instance($course->id, MUST_EXIST);
+    $context = context_user::instance($USER->id, MUST_EXIST);
 }
 
 if ($categoryid) {
