@@ -32,6 +32,7 @@ $page       = optional_param('page', 0, PARAM_INT);
 $perpage    = optional_param('perpage', DEFAULT_PAGE_SIZE, PARAM_INT);
 $categoryid = optional_param('catid', 0, PARAM_INT);
 $courseid   = optional_param('id', 0, PARAM_INT);
+$stateid    = optional_param('state', 0, PARAM_INT);
 $contextid  = optional_param('contextid', 0, PARAM_INT);
 $search     = optional_param('search', '', PARAM_RAW); // Make sure it is processed with p() or s() when sending to output!
 
@@ -40,6 +41,7 @@ $PAGE->set_url('/local/extension/index.php', array(
     'perpage'   => $perpage,
     'contextid' => $contextid,
     'catid'     => $categoryid,
+    'state'     => $stateid,
     'id'        => $courseid,
     'search'    => $search,
 ));
@@ -96,7 +98,7 @@ $baseurl = new moodle_url('/local/extension/index.php', array(
 ));
 
 // New filter functionality, searching and listing of requests.
-echo $renderer->render_index_search_controls($context, $categoryid, $courseid, $baseurl, $search);
+echo $renderer->render_index_search_controls($context, $categoryid, $courseid, $stateid, $baseurl, $search);
 
 $table = new \local_extension\local\table\index($baseurl);
 
@@ -112,6 +114,11 @@ if ($courseid != 1) {
 if ($categoryid != 0) {
     $wheres[] = "c.category = :categoryid";
     $params = array_merge($params, array('categoryid' => $categoryid), $params);
+}
+
+if ($stateid != 0) {
+    $wheres[] = "lcm.state = :stateid";
+    $params = array_merge($params, array('stateid' => $stateid), $params);
 }
 
 $mainuserfields = user_picture::fields('u', array('username', 'email', 'city', 'country', 'lang', 'timezone', 'maildisplay'));

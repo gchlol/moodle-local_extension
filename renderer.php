@@ -509,11 +509,12 @@ class local_extension_renderer extends plugin_renderer_base {
      * @param \context $context
      * @param int $categoryid
      * @param int $courseid
+     * @param int $stateid
      * @param \moodle_url $baseurl
      * @param string $search
      * @return string
      */
-    public function render_index_search_controls($context, $categoryid, $courseid, $baseurl, $search) {
+    public function render_index_search_controls($context, $categoryid, $courseid, $stateid, $baseurl, $search) {
         global $SITE;
 
         $systemcontext = context_system::instance();
@@ -620,6 +621,26 @@ class local_extension_renderer extends plugin_renderer_base {
             $html .= $this->render($select);
             $controlstable->data[0]->cells[] = $html;
         }
+
+        // Display a search filter for the status.
+        $state = \local_extension\state::instance();
+
+        $statelist = array();
+        $statelist[0] = get_string('page_index_all', 'local_extension');
+        foreach ($state->statearray as $sid => $name) {
+            $statelist[$sid] = $state->get_state_name($sid);
+        }
+
+        $popupurl = new moodle_url('/local/extension/index.php', array(
+            'catid' => $categoryid,
+            'id' => $courseid
+        ));
+
+        $select = new single_select($popupurl, 'state', $statelist, $stateid, null, 'requestform');
+
+        $html  = html_writer::span(get_string('state', 'local_extension'), '', array('id' => 'courses'));
+        $html .= $this->render($select);
+        $controlstable->data[0]->cells[] = $html;
 
         $searchcoursecell = new html_table_cell();
         $searchcoursecell->attributes['class'] = 'right';

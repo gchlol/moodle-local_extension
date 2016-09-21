@@ -38,19 +38,19 @@ class state {
     private static $instance;
 
     /** @var int New request. */
-    const STATE_NEW = 0;
+    const STATE_NEW = 1;
 
     /** @var int Approved request. */
-    const STATE_APPROVED = 1;
+    const STATE_APPROVED = 2;
 
     /** @var int Denied request. */
-    const STATE_DENIED = 2;
+    const STATE_DENIED = 3;
 
     /** @var int Reopened request. */
-    const STATE_REOPENED = 3;
+    const STATE_REOPENED = 4;
 
     /** @var int Cancelled request. */
-    const STATE_CANCEL = 4;
+    const STATE_CANCEL = 5;
 
     /** @var array An array of state ids */
     public $statearray = array();
@@ -73,10 +73,11 @@ class state {
      */
     protected function __construct() {
         $this->statearray = array(
-            'approve' => self::STATE_APPROVED,
-            'deny'    => self::STATE_DENIED,
-            'cancel'  => self::STATE_CANCEL,
-            'reopen'  => self::STATE_REOPENED,
+            self::STATE_NEW => 'new',
+            self::STATE_APPROVED => 'approve',
+            self::STATE_DENIED => 'deny',
+            self::STATE_REOPENED => 'reopen',
+            self::STATE_CANCEL => 'cancel',
         );
     }
 
@@ -143,19 +144,20 @@ class state {
     public function render_approve_buttons(&$mform, $state, $id) {
         $buttonarray = array();
 
-        $approve = get_string('state_button_approve', 'local_extension');
-        $cancel = get_string('state_button_cancel', 'local_extension');
-        $deny = get_string('state_button_deny', 'local_extension');
-        $reopen = get_string('state_button_reopen', 'local_extension');
+        $approvestr = get_string('state_button_approve', 'local_extension');
+        $denystr = get_string('state_button_deny', 'local_extension');
+
+        $deny = $this->statearray[self::STATE_DENIED];
+        $approve = $this->statearray[self::STATE_APPROVED];
 
         switch ($state) {
             case self::STATE_NEW:
-                $buttonarray[] = $mform->createElement('submit', 'approve' . $id, $approve);
-                $buttonarray[] = $mform->createElement('submit', 'deny' . $id, $deny);
+                $buttonarray[] = $mform->createElement('submit', $approve . $id, $approvestr);
+                $buttonarray[] = $mform->createElement('submit', $deny . $id, $denystr);
                 break;
             case self::STATE_REOPENED:
-                $buttonarray[] = $mform->createElement('submit', 'approve' . $id, $approve);
-                $buttonarray[] = $mform->createElement('submit', 'deny' . $id, $deny);
+                $buttonarray[] = $mform->createElement('submit', $approve . $id, $approvestr);
+                $buttonarray[] = $mform->createElement('submit', $deny . $id, $denystr);
                 break;
             default:
                 break;
@@ -176,18 +178,21 @@ class state {
     public function render_owner_buttons(&$mform, $state, $id) {
         $buttonarray = array();
 
-        $cancel = get_string('state_button_cancel', 'local_extension');
-        $reopen = get_string('state_button_reopen', 'local_extension');
+        $cancelstr = get_string('state_button_cancel', 'local_extension');
+        $reopenstr = get_string('state_button_reopen', 'local_extension');
+
+        $cancel = $this->statearray[self::STATE_CANCEL];
+        $reopen = $this->statearray[self::STATE_REOPENED];
 
         switch ($state) {
             case self::STATE_NEW:
-                $buttonarray[] = $mform->createElement('submit', 'cancel' . $id, $cancel);
+                $buttonarray[] = $mform->createElement('submit', $cancel . $id, $cancelstr);
                 break;
             case self::STATE_REOPENED:
-                $buttonarray[] = $mform->createElement('submit', 'cancel' . $id, $cancel);
+                $buttonarray[] = $mform->createElement('submit', $cancel . $id, $cancelstr);
                 break;
             case self::STATE_CANCEL:
-                $buttonarray[] = $mform->createElement('submit', 'reopen' . $id, $reopen);
+                $buttonarray[] = $mform->createElement('submit', $reopen . $id, $reopenstr);
                 break;
             default:
                 break;
@@ -208,32 +213,37 @@ class state {
     public function render_force_buttons(&$mform, $state, $id) {
         $buttonarray = array();
 
-        $approve = get_string('state_button_approve', 'local_extension');
-        $cancel = get_string('state_button_cancel', 'local_extension');
-        $deny = get_string('state_button_deny', 'local_extension');
-        $reopen = get_string('state_button_reopen', 'local_extension');
+        $approvestr = get_string('state_button_approve', 'local_extension');
+        $cancelstr = get_string('state_button_cancel', 'local_extension');
+        $denystr = get_string('state_button_deny', 'local_extension');
+        $reopenstr = get_string('state_button_reopen', 'local_extension');
+
+        $deny = $this->statearray[self::STATE_DENIED];
+        $approve = $this->statearray[self::STATE_APPROVED];
+        $cancel = $this->statearray[self::STATE_CANCEL];
+        $reopen = $this->statearray[self::STATE_REOPENED];
 
         switch ($state) {
             case self::STATE_NEW:
-                $buttonarray[] = $mform->createElement('submit', 'approve' . $id, $approve);
-                $buttonarray[] = $mform->createElement('submit', 'deny' . $id, $deny);
-                $buttonarray[] = $mform->createElement('submit', 'cancel' . $id, $cancel);
+                $buttonarray[] = $mform->createElement('submit', $approve . $id, $approvestr);
+                $buttonarray[] = $mform->createElement('submit', $deny . $id, $denystr);
+                $buttonarray[] = $mform->createElement('submit', $cancel . $id, $cancelstr);
                 break;
             case self::STATE_REOPENED:
-                $buttonarray[] = $mform->createElement('submit', 'approve' . $id, $approve);
-                $buttonarray[] = $mform->createElement('submit', 'deny' . $id, $deny);
-                $buttonarray[] = $mform->createElement('submit', 'cancel' . $id, $cancel);
+                $buttonarray[] = $mform->createElement('submit', $approve . $id, $approvestr);
+                $buttonarray[] = $mform->createElement('submit', $deny . $id, $denystr);
+                $buttonarray[] = $mform->createElement('submit', $cancel . $id, $cancelstr);
                 break;
             case self::STATE_DENIED:
-                $buttonarray[] = $mform->createElement('submit', 'reopen' . $id, $reopen);
-                $buttonarray[] = $mform->createElement('submit', 'cancel' . $id, $cancel);
+                $buttonarray[] = $mform->createElement('submit', $reopen . $id, $reopenstr);
+                $buttonarray[] = $mform->createElement('submit', $cancel . $id, $cancelstr);
                 break;
             case self::STATE_CANCEL:
-                $buttonarray[] = $mform->createElement('submit', 'reopen' . $id, $reopen);
+                $buttonarray[] = $mform->createElement('submit', $reopen . $id, $reopenstr);
                 break;
             case self::STATE_APPROVED:
-                $buttonarray[] = $mform->createElement('submit', 'deny' . $id, $deny);
-                $buttonarray[] = $mform->createElement('submit', 'cancel' . $id, $cancel);
+                $buttonarray[] = $mform->createElement('submit', $deny . $id, $denystr);
+                $buttonarray[] = $mform->createElement('submit', $cancel . $id, $cancelstr);
                 break;
             default:
                 break;
@@ -267,13 +277,13 @@ class state {
              * Iterate over a list of states with their cmid concatenated eg. approve6
              * approve6: Would trigger the approve handler for cmid 6.
              */
-            foreach ($this->statearray as $name => $state) {
+            foreach ($this->statearray as $state => $name) {
                 $item = $name . $id;
 
                 if (!empty($data->$item)) {
 
                     // The extension has been approved. Lets hook into the handler and extend the items length.
-                    if ($name == 'approve') {
+                    if ($name == $this->statearray[self::STATE_APPROVED]) {
                         $handler->submit_extension($event->id, $request->request->userid, $localcm->cm->data);
                     }
 
