@@ -654,17 +654,6 @@ class local_extension_renderer extends plugin_renderer_base {
             $options = array();
             $options['1'] = get_string('page_index_all', 'local_extension');
 
-            /*
-            // Limit the number of courses in the select dropdown? Required?
-            // TODO find a good way to do this.
-            if (count($courses) > 500) {
-                $options['0'] = get_string('page_index_toomanycourses', 'local_extension');
-
-            } else {
-
-            }
-            */
-
             foreach ($courses as $course) {
 
                 if (!empty($faculty)) {
