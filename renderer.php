@@ -621,8 +621,9 @@ class local_extension_renderer extends plugin_renderer_base {
             $options = array();
             $options['0'] = get_string('page_index_all', 'local_extension');
 
+            // TODO add regex as configuration item.
             foreach ($courses as $course) {
-                $re = "/^([A-Z]+)[0-9]+/i";
+                $re = "/^([A-Z]+)[0-9]+_[0-9]+/i";
                 if (preg_match($re, $course->shortname, $matches)) {
                     $options[$matches[1]] = $matches[1];
                 }
