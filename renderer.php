@@ -706,8 +706,13 @@ class local_extension_renderer extends plugin_renderer_base {
                 $courselist = array(SITEID => format_string($SITE->fullname, true, $obj)) + $courselist;
             }
 
+            if (array_key_exists($courseid, $mycourses)) {
+                $categoryid = $mycourses[$courseid]->category;
+            }
+
             $popupurl = new moodle_url('/local/extension/index.php', array(
                 'catid' => $categoryid,
+                'faculty' => $faculty,
             ));
 
             $select = new single_select($popupurl, 'id', $courselist, $courseid, null, 'requestform');
