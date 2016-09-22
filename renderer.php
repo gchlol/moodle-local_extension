@@ -608,21 +608,21 @@ class local_extension_renderer extends plugin_renderer_base {
             $controlstable->data[0]->cells[] = $categorycell;
         }
 
+        // Obtain the list of courses.
+        if (!empty($categoryid)) {
+            $courses = coursecat::get($categoryid)->get_courses(array('recursive' => true));
+        } else {
+            $courses = coursecat::get(0)->get_courses(array('recursive' => true));
+
+        }
+
         // Display a list of faculties to filter by
         if (!empty($categorylist) || $viewallrequests || $modifyrequeststatus) {
             $options = array();
             $options['0'] = get_string('page_index_all', 'local_extension');
 
-            if (!empty($categoryid)) {
-                $cat = coursecat::get($categoryid);
-                $courses = $cat->get_courses(array('recursive' => true));
-            } else {
-                $courses = coursecat::get(0)->get_courses(array('recursive' => true));
-
-            }
-
             foreach ($courses as $course) {
-                $re = "/^([A-Z]+)/i";
+                $re = "/^([A-Z]+)[0-9]+/i";
                 if (preg_match($re, $course->shortname, $matches)) {
                     $options[$matches[1]] = $matches[1];
                 }
@@ -652,14 +652,6 @@ class local_extension_renderer extends plugin_renderer_base {
         if (!empty($categorylist) || $viewallrequests || $modifyrequeststatus) {
             $options = array();
             $options['1'] = get_string('page_index_all', 'local_extension');
-
-            if (!empty($categoryid)) {
-                $cat = coursecat::get($categoryid);
-                $courses = $cat->get_courses(array('recursive' => true));
-            } else {
-                $courses = coursecat::get(0)->get_courses(array('recursive' => true));
-
-            }
 
             /*
             // Limit the number of courses in the select dropdown? Required?
