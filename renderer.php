@@ -561,9 +561,10 @@ class local_extension_renderer extends plugin_renderer_base {
      * @param int $stateid
      * @param \moodle_url $baseurl
      * @param string $search
+     * @param string $faculty
      * @return string
      */
-    public function render_index_search_controls($context, $categoryid, $courseid, $stateid, $baseurl, $search) {
+    public function render_index_search_controls($context, $categoryid, $courseid, $stateid, $baseurl, $search, $faculty) {
         global $SITE;
 
         $systemcontext = context_system::instance();
@@ -607,6 +608,45 @@ class local_extension_renderer extends plugin_renderer_base {
             $controlstable->data[0]->cells[] = $categorycell;
         }
 
+        // Display a list of faculties to filter by
+        if (!empty($categorylist) || $viewallrequests || $modifyrequeststatus) {
+            $options = array();
+            $options['0'] = get_string('page_index_all', 'local_extension');
+
+            if (!empty($categoryid)) {
+                $cat = coursecat::get($categoryid);
+                $courses = $cat->get_courses(array('recursive' => true));
+            } else {
+                $courses = coursecat::get(0)->get_courses(array('recursive' => true));
+
+            }
+
+            foreach ($courses as $course) {
+                $re = "/^([A-Z]+)/i";
+                if (preg_match($re, $course->shortname, $matches)) {
+                    $options[$matches[1]] = $matches[1];
+                }
+
+            }
+
+            $popupurl = new moodle_url('/local/extension/index.php', array(
+                'catid' => $categoryid
+            ));
+
+            $select = new single_select($popupurl, 'faculty', $options, $faculty, null, 'requestform');
+
+            $strcourses = get_string('page_index_faculties', 'local_extension');
+            $html = html_writer::span($strcourses, '', array('id' => 'courses'));
+            $html .= $this->render($select);
+
+            $categorycell = new html_table_cell();
+            $categorycell->attributes['class'] = 'right';
+            $categorycell->text = $html;
+
+            $controlstable->data[0]->cells[] = $categorycell;
+
+        }
+
         // Display a list of all courses to filter by
         // TODO change this to categories that the user is enroled in. / has the cap to modify
         if (!empty($categorylist) || $viewallrequests || $modifyrequeststatus) {
@@ -629,15 +669,26 @@ class local_extension_renderer extends plugin_renderer_base {
 
             } else {
 
-
             }
             */
+
             foreach ($courses as $course) {
-                $options[$course->id] = $course->fullname;
+
+                if (!empty($faculty)) {
+                    $re = "/^$faculty/i";
+                    if (preg_match($re, $course->shortname)) {
+                        $options[$course->id] = $course->fullname;
+                    }
+
+                } else {
+                    $options[$course->id] = $course->fullname;
+
+                }
             }
 
             $popupurl = new moodle_url('/local/extension/index.php', array(
-                'catid' => $categoryid
+                'catid' => $categoryid,
+                'faculty' => $faculty,
             ));
 
             $select = new single_select($popupurl, 'id', $options, $courseid, null, 'requestform');
@@ -674,7 +725,7 @@ class local_extension_renderer extends plugin_renderer_base {
             }
 
             $popupurl = new moodle_url('/local/extension/index.php', array(
-                'catid' => $categoryid
+                'catid' => $categoryid,
             ));
 
             $select = new single_select($popupurl, 'id', $courselist, $courseid, null, 'requestform');
@@ -697,7 +748,8 @@ class local_extension_renderer extends plugin_renderer_base {
 
             $popupurl = new moodle_url('/local/extension/index.php', array(
                 'catid' => $categoryid,
-                'id' => $courseid
+                'id' => $courseid,
+                'faculty' => $faculty,
             ));
 
             $select = new single_select($popupurl, 'state', $statelist, $stateid, null, 'requestform');

@@ -35,6 +35,7 @@ $courseid   = optional_param('id', 0, PARAM_INT);
 $stateid    = optional_param('state', 0, PARAM_INT);
 $contextid  = optional_param('contextid', 0, PARAM_INT);
 $search     = optional_param('search', '', PARAM_RAW); // Make sure it is processed with p() or s() when sending to output!
+$faculty    = optional_param('faculty', '', PARAM_RAW); // Make sure it is processed with p() or s() when sending to output!
 
 $PAGE->set_url('/local/extension/index.php', array(
     'page'      => $page,
@@ -43,7 +44,8 @@ $PAGE->set_url('/local/extension/index.php', array(
     'catid'     => $categoryid,
     'state'     => $stateid,
     'id'        => $courseid,
-    'search'    => $search,
+    'search'    => s($search),
+    'faculty'   => s($faculty),
 ));
 
 require_login();
@@ -93,13 +95,14 @@ echo html_writer::tag('h2', get_string('page_h2_summary', 'local_extension'));
 
 // Should use this variable so that we don't break stuff every time a variable is added or changed.
 $baseurl = new moodle_url('/local/extension/index.php', array(
-    'id'     => $courseid,
-    'catid'  => $categoryid,
-    'search' => s($search)
+    'id'      => $courseid,
+    'catid'   => $categoryid,
+    'search'  => s($search),
+    'faculty' => s($faculty),
 ));
 
 // New filter functionality, searching and listing of requests.
-echo $renderer->render_index_search_controls($context, $categoryid, $courseid, $stateid, $baseurl, $search);
+echo $renderer->render_index_search_controls($context, $categoryid, $courseid, $stateid, $baseurl, $search, $faculty);
 
 $table = new \local_extension\local\table\index($baseurl);
 
@@ -200,6 +203,11 @@ if (!empty($search)) {
     $params['search1'] = "%$search%";
     $params['search2'] = "%$search%";
     $params['search3'] = "%$search%";
+}
+
+if (!empty($faculty)) {
+    $wheres[] = $DB->sql_like('c.shortname', ':faculty', false, false);
+    $params['faculty'] = "%$faculty%";
 }
 
 list($twhere, $tparams) = $table->get_sql_where();

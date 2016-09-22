@@ -164,6 +164,7 @@ $string['page_heading_summary'] = 'Extension summary list';
 $string['page_index_all'] = 'All';
 $string['page_index_categories'] = 'Categories';
 $string['page_index_courses'] = 'Courses';
+$string['page_index_faculties'] = 'Faculty';
 $string['page_index_toomanycourses'] = 'Too many courses, please search or filter by category.';
 $string['page_request_notriggersdefined'] = 'No extension triggers have been defined.';
 $string['page_request_outofrange'] = 'Please reduce the look ahead range.';
