@@ -610,7 +610,7 @@ class local_extension_renderer extends plugin_renderer_base {
 
         // Obtain the list of courses.
         if (!empty($categoryid)) {
-            $courses = coursecat::get($categoryid)->get_courses(array('recursive' => true));
+            $courses = coursecat::get($categoryid)->get_courses();
         } else {
             $courses = coursecat::get(0)->get_courses(array('recursive' => true));
 
