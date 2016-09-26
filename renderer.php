@@ -609,6 +609,7 @@ class local_extension_renderer extends plugin_renderer_base {
         }
 
         // Obtain the list of courses.
+        // TODO think about array('limit' => 1000).
         if (!empty($categoryid)) {
             $courses = coursecat::get($categoryid)->get_courses();
         } else {
@@ -716,30 +717,26 @@ class local_extension_renderer extends plugin_renderer_base {
             $controlstable->data[0]->cells[] = $html;
         }
 
-        if (!empty($categorylist) || $viewallrequests || $modifyrequeststatus) {
+        // Display a search filter for the status.
+        $state = \local_extension\state::instance();
 
-            // Display a search filter for the status.
-            $state = \local_extension\state::instance();
-
-            $statelist = array();
-            $statelist[0] = get_string('page_index_all', 'local_extension');
-            foreach ($state->statearray as $sid => $name) {
-                $statelist[$sid] = $state->get_state_name($sid);
-            }
-
-            $popupurl = new moodle_url('/local/extension/index.php', array(
-                'catid' => $categoryid,
-                'id' => $courseid,
-                'faculty' => $faculty,
-            ));
-
-            $select = new single_select($popupurl, 'state', $statelist, $stateid, null, 'requestform');
-
-            $html  = html_writer::span(get_string('state', 'local_extension'), '', array('id' => 'courses'));
-            $html .= $this->render($select);
-            $controlstable->data[0]->cells[] = $html;
-
+        $statelist = array();
+        $statelist[0] = get_string('page_index_all', 'local_extension');
+        foreach ($state->statearray as $sid => $name) {
+            $statelist[$sid] = $state->get_state_name($sid);
         }
+
+        $popupurl = new moodle_url('/local/extension/index.php', array(
+            'catid' => $categoryid,
+            'id' => $courseid,
+            'faculty' => $faculty,
+        ));
+
+        $select = new single_select($popupurl, 'state', $statelist, $stateid, null, 'requestform');
+
+        $html  = html_writer::span(get_string('state', 'local_extension'), '', array('id' => 'courses'));
+        $html .= $this->render($select);
+        $controlstable->data[0]->cells[] = $html;
 
         $searchcoursecell = new html_table_cell();
         $searchcoursecell->attributes['class'] = 'right';
