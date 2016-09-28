@@ -41,7 +41,7 @@ class local_extension_renderer extends plugin_renderer_base {
     /**
      * Extension status renderer.
      *
-     * @param request $req The extension request object.
+     * @param \local_extension\request $req The extension request object.
      * @return string $out The html output.
      */
     public function render_extension_status(\local_extension\request $req) {
@@ -50,7 +50,7 @@ class local_extension_renderer extends plugin_renderer_base {
     /**
      * Extension comment renderer.
      *
-     * @param request $req The extension request object.
+     * @param \local_extension\request $req The extension request object.
      * @param boolean $showdate If this is set, then print the full date instead of 'time ago'.
      * @return string $out The html output.
      */
@@ -473,7 +473,7 @@ class local_extension_renderer extends plugin_renderer_base {
             'forward' => $searchforward,
         ));
 
-        // Searching backward
+        // Searching backward.
         $backwardlist = array();
         for ($i = 1; $i <= $maxweeksbackward; $i++) {
 
@@ -507,7 +507,7 @@ class local_extension_renderer extends plugin_renderer_base {
 
         $controlstable->data[0]->cells[] = $searchforwardcell;
 
-        // Searcahing forward
+        // Searcahing forward.
         $popupurl = new moodle_url('/local/extension/request.php', array(
             'course'  => $courseid,
             'cmid'    => $cmid,
@@ -617,7 +617,7 @@ class local_extension_renderer extends plugin_renderer_base {
 
         }
 
-        // Display a list of faculties to filter by
+        // Display a list of faculties to filter by.
         if (!empty($categorylist) || $viewallrequests || $modifyrequeststatus) {
             $options = array();
             $options['0'] = get_string('page_index_all', 'local_extension');
@@ -650,7 +650,7 @@ class local_extension_renderer extends plugin_renderer_base {
         }
 
         // Display a list of all courses to filter by
-        // TODO change this to categories that the user is enroled in. / has the cap to modify
+        // TODO change this to categories that the user is enroled in. / has the cap to modify.
         if (!empty($categorylist) || $viewallrequests || $modifyrequeststatus) {
             $options = array();
             $options['1'] = get_string('page_index_all', 'local_extension');
