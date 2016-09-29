@@ -239,4 +239,10 @@ class cm {
         $this->cm->data = $data;
     }
 
+    public function update_data() {
+        global $DB;
+
+        $DB->update_record('local_extension_cm', $this->cm);
+    }
+
 }

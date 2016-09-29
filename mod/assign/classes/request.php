@@ -88,7 +88,6 @@ class request extends \local_extension\base_request {
      * @return string
      */
     public function request_definition($mod, $mform = null) {
-        $cm = $mod['cm'];
         $event = $mod['event'];
         $course = $mod['course'];
 
@@ -102,21 +101,7 @@ class request extends \local_extension\base_request {
             $html .= \html_writer::end_div(); // End .content.
             $mform->addElement('html', \html_writer::tag('p', $html));
 
-            $startyear = date('Y');
-
-            // TODO get assignment due date, if moves to next year, $startyear += 1.
-            $stopyear = date('Y');
-
-            $formid = 'due' . $cm->id;
-            $dateconfig = array(
-                'optional' => true,
-                'step' => 1,
-                'startyear' => $startyear,
-                'stopyear' => $stopyear,
-            );
-            $mform->addElement('date_time_selector', $formid, get_string('requestdue', 'extension_assign'), $dateconfig);
-
-            $mform->setDefault($formid, $event->timestart);
+            $this->date_selector($mod, $mform);
         }
 
         $html .= \html_writer::end_div(); // End .content.

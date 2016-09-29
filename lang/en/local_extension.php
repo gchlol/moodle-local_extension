@@ -31,6 +31,7 @@ $string['attachments'] = 'Attachments';
 $string['button_edit_rule'] = 'Add a new Rule';
 $string['button_request_extension'] = 'Request an Extension';
 $string['breadcrumb_nav_index'] = 'Extension Status';
+$string['breadcrumb_nav_modify'] = 'Modify extension length';
 $string['breadcrumb_nav_request'] = 'New Extension Request';
 $string['breadcrumb_nav_rule_edit'] = 'Edit Rule: {$a}';
 $string['breadcrumb_nav_rule_new'] = 'New Rule';

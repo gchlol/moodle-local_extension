@@ -100,4 +100,25 @@ abstract class base_request {
      * @return bool
      */
     abstract public function submit_extension($assignmentid, $userid, $duedate);
+
+    public function date_selector($mod, $mform, $optional = true) {
+        $event = $mod['event'];
+        $cm = $mod['cm'];
+
+        $startyear = date('Y');
+
+        // TODO get assignment due date, if moves to next year, $startyear += 1.
+        $stopyear = date('Y') + 1;
+
+        $formid = 'due' . $cm->id;
+        $dateconfig = array(
+            'optional' => $optional,
+            'step' => 1,
+            'startyear' => $startyear,
+            'stopyear' => $stopyear,
+        );
+        $mform->addElement('date_time_selector', $formid, get_string('requestdue', 'extension_assign'), $dateconfig);
+
+        $mform->setDefault($formid, $event->timestart);
+    }
 }

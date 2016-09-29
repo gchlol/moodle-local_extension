@@ -203,7 +203,11 @@ function local_extension_pluginfile($course, $cm, $context, $filearea, $args, $f
     // The list of subscribed users populated each time the request object is generated.
     // The request object is invalidated and regenerated after each comment, attachment added, or rule triggered.
     if (!array_key_exists($USER->id, $request->users)) {
-        return false;
+
+        if (!is_siteadmin()) {
+            return false;
+
+        }
     }
 
     if (!$args) {

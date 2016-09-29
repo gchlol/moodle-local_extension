@@ -25,6 +25,9 @@
 
 namespace local_extension\form;
 
+use html_writer;
+use moodle_url;
+
 if (!defined('MOODLE_INTERNAL')) {
     die('Direct access to this script is forbidden.'); // It must be included from a Moodle page.
 }
@@ -50,7 +53,7 @@ class update extends \moodleform {
         $mform    = $this->_form;
         $user     = $this->_customdata['user'];
         $request  = $this->_customdata['request'];
-        /* @var \local_extension_renderer $renderer  IDE hinting */
+        /* @var \local_extension_renderer $renderer IDE hinting */
         $renderer = $this->_customdata['renderer'];
         $mods     = $request->mods;
 
@@ -59,6 +62,15 @@ class update extends \moodleform {
         foreach ($mods as $id => $mod) {
             $handler = $mod['handler'];
             $handler->status_definition($mod, $mform);
+
+            // TODO
+            $params = array(
+                'id' => $request->request->id,
+                'cmid' => $id,
+            );
+            $modifyurl = new moodle_url('/local/extension/modify.php', $params);
+            $html = html_writer::link($modifyurl, 'edit');
+            $mform->addElement('html', $html);
 
             /* @var \local_extension\cm $localcm IDE hinting */
             $localcm = $mod['localcm'];

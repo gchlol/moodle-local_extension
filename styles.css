@@ -82,8 +82,8 @@
 }
 
 .local_extension .controls select {
-    max-width: 250px;
-    min-width: 250px;
+    max-width: 100px;
+    min-width: 100px;
 }
 
 .local_extension .label {
