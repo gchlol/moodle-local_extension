@@ -179,7 +179,15 @@ if ($viewallrequests) {
 
     $joins[] = "FROM {local_extension_cm} lcm";
 
-    $joins[] = "JOIN {local_extension_subscription} s ON s.localcmid = lcm.id";
+    // Sometimes invalid trigger setup will assign multiple subscription states. This queries the distinct possibilities.
+    $joins[] = "JOIN
+                    (
+                    SELECT DISTINCT localcmid,
+                    userid
+                    FROM {local_extension_subscription}
+                    ) s
+                ON s.localcmid = lcm.id";
+
     $joins[] = "JOIN {local_extension_request} r ON r.id = lcm.request";
     $joins[] = "JOIN {course} c ON c.id = lcm.course";
     $joins[] = "JOIN {user} u ON u.id = r.userid";

@@ -320,9 +320,16 @@ class rule {
             'localcmid' => $mod['localcm']->cm->id,
         );
 
-        $access = $DB->get_field('local_extension_subscription', 'access', $params);
+        $select = "userid = :userid AND localcmid = :localcmid";
+        $fields = $DB->get_fieldset_select('local_extension_subscription', 'access', $select, $params);
 
-        return $access;
+        rsort($fields);
+
+        if (!empty($fields)) {
+            return $fields[0];
+        }
+
+        return self::RULE_ACTION_DEFAULT;
     }
 
     /**
