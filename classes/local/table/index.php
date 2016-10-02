@@ -27,6 +27,8 @@ namespace local_extension\local\table;
 use flexible_table;
 use moodle_url;
 
+defined('MOODLE_INTERNAL') || die();
+
 require_once($CFG->libdir . '/tablelib.php');
 
 /**

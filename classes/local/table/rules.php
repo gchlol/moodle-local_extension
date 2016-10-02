@@ -30,6 +30,8 @@ use moodle_url;
 use html_writer;
 use local_extension\rule;
 
+defined('MOODLE_INTERNAL') || die();
+
 require_once($CFG->libdir . '/tablelib.php');
 
 /**

@@ -25,6 +25,8 @@
 
 namespace extension_assign;
 
+defined('MOODLE_INTERNAL') || die();
+
 /**
  * Extension assignment request class.
  *

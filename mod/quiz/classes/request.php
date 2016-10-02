@@ -25,6 +25,8 @@
 
 namespace extension_quiz;
 
+defined('MOODLE_INTERNAL') || die();
+
 /**
  * Extension quiz request class.
  *

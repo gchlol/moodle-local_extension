@@ -25,6 +25,8 @@
 
 namespace local_extension;
 
+defined('MOODLE_INTERNAL') || die();
+
 /**
  * History class.
  *
