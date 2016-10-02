@@ -103,6 +103,14 @@ abstract class base_request {
      */
     abstract public function submit_extension($assignmentid, $userid, $duedate);
 
+
+    /**
+     * Adds a date selector to the mform that it has been passed.
+     *
+     * @param array $mod
+     * @param \moodleform $mform
+     * @param bool $optional
+     */
     public function date_selector($mod, $mform, $optional = true) {
         $event = $mod['event'];
         $cm = $mod['cm'];

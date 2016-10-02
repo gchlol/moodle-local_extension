@@ -63,7 +63,7 @@ class update extends \moodleform {
             $handler = $mod['handler'];
             $handler->status_definition($mod, $mform);
 
-            // TODO
+            // TODO.
             $params = array(
                 'id' => $request->request->id,
                 'cmid' => $id,

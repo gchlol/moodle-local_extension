@@ -241,6 +241,9 @@ class cm {
         $this->cm->data = $data;
     }
 
+    /**
+     * Updates the database record of the local cm.
+     */
     public function update_data() {
         global $DB;
 

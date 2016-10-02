@@ -100,7 +100,7 @@ class modify extends \moodleform {
         $mods     = $request->mods;
 
         $mod = $mods[$cmid];
-        $handler =  $mod['handler'];
+        $handler = $mod['handler'];
 
         $cm = $mod['cm'];
         $event = $mod['event'];
