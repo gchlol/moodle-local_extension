@@ -89,6 +89,12 @@ class state {
     protected function __clone() {
     }
 
+    /**
+     * Returns true if the specified state is in the window for length modification.
+     *
+     * @param int $stateid
+     * @return bool
+     */
     public static function can_modify_length_state($stateid) {
         switch ($stateid) {
             case self::STATE_NEW:

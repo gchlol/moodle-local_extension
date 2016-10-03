@@ -153,7 +153,7 @@ if ($form = $mform->get_data()) {
 
 echo $OUTPUT->header();
 
-// TODO echo $renderer->display_modify_heading();
+// TODO echo $renderer->display_modify_heading();.
 
 $mform->display();
 

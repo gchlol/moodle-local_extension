@@ -109,6 +109,7 @@ abstract class base_request {
      *
      * @param array $mod
      * @param \MoodleQuickForm $mform
+     * @param bool $optional
      */
     public function date_selector($mod, $mform, $optional = true) {
         $event = $mod['event'];
