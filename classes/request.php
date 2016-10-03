@@ -83,7 +83,7 @@ class request implements \cache_data_source {
         global $DB;
 
         if (empty($this->requestid)) {
-            throw \coding_exception('No request id');
+            throw new \coding_exception('No request id');
         }
 
         $this->request  = $DB->get_record('local_extension_request', array('id' => $this->requestid), '*', MUST_EXIST);
@@ -292,12 +292,12 @@ class request implements \cache_data_source {
         foreach ($records as $record) {
             $mod = $this->mods[$record->localcmid];
 
-            /* @var \local_extension\cm $localcm IDE hinting. */
+            /* @var cm $localcm IDE hinting. */
             $localcm = $mod['localcm'];
             $event   = $mod['event'];
             $course  = $mod['course'];
 
-            $status = \local_extension\state::instance()->get_state_name($record->state);
+            $status = state::instance()->get_state_name($record->state);
 
             $log = new \stdClass();
             $log->status = $status;
@@ -381,7 +381,7 @@ class request implements \cache_data_source {
             $rules = $handler->get_triggers();
 
             // Creates a tree structure with the rules to process.
-            $ordered = \local_extension\utility::rule_tree($rules);
+            $ordered = utility::rule_tree($rules);
 
             foreach ($ordered as $rule) {
                 $return = $this->process_recursive($mod, $rule);
@@ -510,7 +510,7 @@ class request implements \cache_data_source {
         foreach ($this->cms as $cm) {
             $state = $cm->get_stateid();
 
-            if ($state != \local_extension\state::STATE_CANCEL) {
+            if ($state != state::STATE_CANCEL) {
                 return true;
             }
         }
@@ -612,7 +612,7 @@ class request implements \cache_data_source {
             $noreplyuser = \core_user::get_noreply_user();
             $noreplyuser->firstname = \fullname($userfrom, true);
 
-            \local_extension\utility::send_trigger_email($this, $subject, $content, $noreplyuser, $userto);
+            utility::send_trigger_email($this, $subject, $content, $noreplyuser, $userto);
         }
 
         // Increment the messageid to assist with inbox threading / message history.

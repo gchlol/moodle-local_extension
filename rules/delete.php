@@ -23,6 +23,9 @@
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
+use local_extension\rule;
+use local_extension\utility;
+
 require_once(__DIR__ . '/../../../config.php');
 require_once($CFG->libdir . '/adminlib.php');
 
@@ -49,8 +52,8 @@ $PAGE->add_body_class('local_extension');
 $renderer = $PAGE->get_renderer('local_extension');
 
 // TODO replace with load_branch from ruleid.
-$rules = \local_extension\rule::load_all();
-$ordered = \local_extension\utility::rule_tree($rules);
+$rules = rule::load_all();
+$ordered = utility::rule_tree($rules);
 
 if ($delete && confirm_sesskey()) {
 
@@ -66,7 +69,7 @@ if ($delete && confirm_sesskey()) {
         $deleteurl = new moodle_url($url, $params);
         $deletebutton = new single_button($deleteurl, get_string('delete'), 'post');
 
-        $branch = \local_extension\utility::rule_tree_branch($ordered, $delete);
+        $branch = utility::rule_tree_branch($ordered, $delete);
 
         echo $renderer->render_delete_rules(array($branch));
 

@@ -23,13 +23,16 @@
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
+use local_extension\rule;
+use local_extension\utility;
+
 require_once(__DIR__ . '/../../../config.php');
 require_once($CFG->libdir . '/adminlib.php');
 
 $url = new moodle_url('/local/extension/rules/manage.php');
 $PAGE->set_url($url);
 
-$context = \context_system::instance();
+$context = context_system::instance();
 require_login();
 
 \admin_externalpage_setup('local_extension_settings_rules');
@@ -44,8 +47,8 @@ $PAGE->add_body_class('local_extension');
 /* @var $renderer local_extension_renderer IDE hinting */
 $renderer = $PAGE->get_renderer('local_extension');
 
-$rules = \local_extension\rule::load_all();
-$ordered = \local_extension\utility::rule_tree($rules);
+$rules = rule::load_all();
+$ordered = utility::rule_tree($rules);
 
 echo $OUTPUT->header();
 

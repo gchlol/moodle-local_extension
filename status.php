@@ -23,13 +23,16 @@
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
+use local_extension\state;
+use local_extension\utility;
+
 require_once(__DIR__ . '/../../config.php');
 global $PAGE, $USER;
 
 require_login(true);
 
 $requestid = required_param('id', PARAM_INT);
-$request = \local_extension\utility::cache_get_request($requestid);
+$request = utility::cache_get_request($requestid);
 
 // Item $request->user is an array of $userid=>$userobj associated to this request, eg. those that are subscribed, and the user.
 // The list of subscribed users populated each time the request object is generated.
@@ -54,7 +57,7 @@ $PAGE->set_heading(get_string('page_heading_index', 'local_extension'));
 $PAGE->requires->css('/local/extension/styles.css');
 $PAGE->add_body_class('local_extension');
 
-$request = \local_extension\utility::cache_get_request($requestid);
+$request = utility::cache_get_request($requestid);
 $fileareaitemid = $request->request->timestamp . $requestid;
 
 $renderer = $PAGE->get_renderer('local_extension');
@@ -140,7 +143,7 @@ if ($form = $mform->get_data()) {
 
     // Parse the form data to see if any accept/deny/reopen/etc buttons have been clicked, and update the state accordingly.
     // If the state has been approved then it will call the handers->submit_extension method to extend the module.
-    $notifycontent[] = \local_extension\state::instance()->update_cm_state($request, $USER, $form);
+    $notifycontent[] = state::instance()->update_cm_state($request, $USER, $form);
 
     if (!empty($comment)) {
         $notifycontent[] = $request->add_comment($USER, $comment);

@@ -25,8 +25,8 @@
 
 namespace local_extension\form;
 
-use html_writer;
-use moodle_url;
+use local_extension\rule;
+use local_extension\state;
 
 if (!defined('MOODLE_INTERNAL')) {
     die('Direct access to this script is forbidden.'); // It must be included from a Moodle page.
@@ -57,7 +57,7 @@ class update extends \moodleform {
         $renderer = $this->_customdata['renderer'];
         $mods     = $request->mods;
 
-        $state = \local_extension\state::instance();
+        $state = state::instance();
 
         foreach ($mods as $id => $mod) {
             $handler = $mod['handler'];
@@ -75,8 +75,8 @@ class update extends \moodleform {
             $forcestatus = has_capability('local/extension:modifyrequeststatus', $context);
 
             // If the users access is either approve or force, then they can see the approval buttons.
-            $approve = (\local_extension\rule::RULE_ACTION_APPROVE | \local_extension\rule::RULE_ACTION_FORCEAPPROVE);
-            $access = \local_extension\rule::get_access($mod, $USER->id);
+            $approve = (rule::RULE_ACTION_APPROVE | rule::RULE_ACTION_FORCEAPPROVE);
+            $access = rule::get_access($mod, $USER->id);
 
             if ($forcestatus) {
                 $state->render_force_buttons($mform, $stateid, $id);
@@ -90,7 +90,7 @@ class update extends \moodleform {
             }
 
             // Only allow the abilitiy to modify request legnth if the state is not approved.
-            if ($stateid != \local_extension\state::STATE_APPROVED) {
+            if ($stateid != state::STATE_APPROVED) {
 
                 // And if the user has the capabilitiy to force the status or approve it.
                 if ($forcestatus || $access & $approve) {
@@ -99,9 +99,8 @@ class update extends \moodleform {
                         'id' => $request->request->id,
                         'cmid' => $id,
                     );
-
-                    $modifyurl = new moodle_url('/local/extension/modify.php', $params);
-                    $html = html_writer::link($modifyurl, 'Modify extension length');
+                    $modifyurl = new \moodle_url('/local/extension/modify.php', $params);
+                    $html = \html_writer::link($modifyurl, 'Modify extension length');
                     $mform->addElement('html', $html);
 
                 }
@@ -113,11 +112,12 @@ class update extends \moodleform {
         $html = '';
 
         if ($html .= $renderer->render_extension_attachments($request)) {
-            $html .= \html_writer::empty_tag('br');
+            $html .= \html_writer::start_tag('br');
         }
 
+        $html .= \html_writer::empty_tag('p');
         $html .= $renderer->render_extension_comments($request);
-        $html .= \html_writer::empty_tag('br');
+        $html .= \html_writer::start_tag('br');
         $mform->addElement('html', $html);
 
         $mform->addElement('hidden', 'id');

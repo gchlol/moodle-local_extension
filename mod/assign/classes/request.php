@@ -25,6 +25,9 @@
 
 namespace extension_assign;
 
+use local_extension\rule;
+use local_extension\state;
+
 defined('MOODLE_INTERNAL') || die();
 
 /**
@@ -37,7 +40,7 @@ defined('MOODLE_INTERNAL') || die();
  */
 class request extends \local_extension\base_request {
 
-    /** @var \local_extension\rule[] $rules */
+    /** @var rule[] $rules */
     public static $rules = null;
 
     /**
@@ -62,7 +65,7 @@ class request extends \local_extension\base_request {
      */
     public function get_triggers() {
         if (empty(self::$rules)) {
-            self::$rules = \local_extension\rule::load_all($this->get_data_type());
+            self::$rules = rule::load_all($this->get_data_type());
         }
         return self::$rules;
     }
@@ -130,7 +133,7 @@ class request extends \local_extension\base_request {
         $str = get_string('dueon', 'extension_assign', \userdate($event->timestart));
         $html .= \html_writer::tag('p', $coursestring . ' ' . $str);
 
-        $status = \local_extension\state::instance()->get_state_name($localcm->cm->state);
+        $status = state::instance()->get_state_name($localcm->cm->state);
 
         $obj = (object) array(
             'status' => $status,

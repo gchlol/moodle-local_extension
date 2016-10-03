@@ -25,6 +25,8 @@
 
 namespace local_extension\task;
 
+use local_extension\request;
+
 defined('MOODLE_INTERNAL') || die();
 
 /**
@@ -58,7 +60,7 @@ class process_rules extends \core\task\scheduled_task {
         $requestids = $DB->get_fieldset_sql($sql);
 
         foreach ($requestids as $requestid) {
-            $request = \local_extension\request::from_id($requestid);
+            $request = request::from_id($requestid);
             $request->process_triggers();
         }
     }

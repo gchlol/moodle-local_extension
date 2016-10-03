@@ -23,6 +23,8 @@
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
+use local_extension\utility;
+
 require_once(__DIR__ . '/../../config.php');
 global $PAGE, $USER;
 
@@ -31,7 +33,7 @@ require_login(true);
 $requestid = required_param('id', PARAM_INT);
 $cmid = required_param('cmid', PARAM_INT);
 
-$request = \local_extension\utility::cache_get_request($requestid);
+$request = utility::cache_get_request($requestid);
 
 // Item $request->user is an array of $userid=>$userobj associated to this request, eg. those that are subscribed, and the user.
 // The list of subscribed users populated each time the request object is generated.

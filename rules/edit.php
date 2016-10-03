@@ -23,6 +23,9 @@
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
+use local_extension\rule;
+use local_extension\utility;
+
 require_once(__DIR__ . '/../../../config.php');
 require_once($CFG->libdir . '/adminlib.php');
 
@@ -56,7 +59,7 @@ $editordata = array(
 );
 
 if (!empty($triggerid) && confirm_sesskey()) {
-    $data = \local_extension\rule::from_id($triggerid);
+    $data = rule::from_id($triggerid);
 
     // Set the saved serialised data as object properties, which will be loaded as default form values.
     // If and only if the form elements have the same name, and they have been saved to the data variable.
@@ -74,8 +77,8 @@ if (!empty($triggerid) && confirm_sesskey()) {
     }
 }
 
-$rules = \local_extension\rule::load_all($datatype);
-$sorted = \local_extension\utility::rule_tree($rules);
+$rules = rule::load_all($datatype);
+$sorted = utility::rule_tree($rules);
 
 $params = array(
     'ruleid' => $triggerid,
@@ -104,7 +107,7 @@ if ($mform->is_cancelled()) {
 
 } else if ($form = $mform->get_data()) {
 
-    $rule = new \local_extension\rule();
+    $rule = new rule();
 
     // Also saves template_ form items to the custom data variable.
     $rule->load_from_form($form);

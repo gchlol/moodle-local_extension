@@ -25,8 +25,6 @@
 
 namespace local_extension\form;
 
-use html_writer;
-
 if (!defined('MOODLE_INTERNAL')) {
     die('Direct access to this script is forbidden.'); // It must be included from a Moodle page.
 }
@@ -56,15 +54,15 @@ class modify extends \moodleform {
 
         $handler = $mod['handler'];
 
-        $html = html_writer::tag('h2', get_string('form_modify_original_status', 'local_extension'));
+        $html = \html_writer::tag('h2', get_string('form_modify_original_status', 'local_extension'));
         $mform->addElement('html', $html);
 
         $handler->status_definition($mod, $mform);
 
-        $html = html_writer::empty_tag('br');
+        $html = \html_writer::empty_tag('br');
         $mform->addElement('html', $html);
 
-        $html = html_writer::tag('h2', get_string('form_modify_request_header', 'local_extension'));
+        $html = \html_writer::tag('h2', get_string('form_modify_request_header', 'local_extension'));
         $mform->addElement('html', $html);
 
         $handler->request_definition($mod, $mform);

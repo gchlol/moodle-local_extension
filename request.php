@@ -23,6 +23,11 @@
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
+use local_extension\request;
+use local_extension\rule;
+use local_extension\state;
+use local_extension\utility;
+
 require_once(__DIR__ . '/../../config.php');
 require_once($CFG->dirroot . '/calendar/lib.php');
 global $CFG, $PAGE;
@@ -84,7 +89,7 @@ $options = array(
     'requestid' => 0
 );
 
-$triggers = \local_extension\rule::load_all();
+$triggers = rule::load_all();
 if (count($triggers) == 0) {
     // Check if admin capability and send to trigger config page.
     echo $OUTPUT->header();
@@ -92,7 +97,7 @@ if (count($triggers) == 0) {
     echo $OUTPUT->footer();
 }
 
-list($handlers, $mods) = \local_extension\utility::get_activities($user, $start, $end, $options);
+list($handlers, $mods) = utility::get_activities($user, $start, $end, $options);
 
 $available = array();
 $inprogress = array();
@@ -167,7 +172,7 @@ if ($mform->is_cancelled()) {
             'timestamp' => $now,
             'name' => $event->name,
             'cmid' => $cmid,
-            'state' => \local_extension\state::STATE_NEW,
+            'state' => state::STATE_NEW,
             'data' => $data,
             'length' => $data - $event->timestart,
         );
@@ -181,7 +186,7 @@ if ($mform->is_cancelled()) {
         $sub->requestid = $request['id'];
         $sub->lastmod = \time();
         $sub->trigger = null;
-        $sub->access = \local_extension\rule::RULE_ACTION_DEFAULT;
+        $sub->access = rule::RULE_ACTION_DEFAULT;
 
         $DB->insert_record('local_extension_subscription', $sub);
     }
@@ -210,7 +215,7 @@ if ($mform->is_cancelled()) {
     }
 
     // Initiate the trigger/rule logic notifications and subscriptions, file attachment history.
-    $req = \local_extension\request::from_id($request['id']);
+    $req = request::from_id($request['id']);
     $req->process_triggers();
 
     $url = new moodle_url('/local/extension/status.php', array('id' => $req->requestid));

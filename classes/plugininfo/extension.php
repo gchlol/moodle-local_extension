@@ -25,8 +25,6 @@
 
 namespace local_extension\plugininfo;
 
-use core\plugininfo\base;
-
 defined('MOODLE_INTERNAL') || die();
 
 /**
@@ -36,7 +34,7 @@ defined('MOODLE_INTERNAL') || die();
  * @copyright  Catalyst IT
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
-class extension extends base {
+class extension extends \core\plugininfo\base {
 
     /**
      * Return an array of instances each module request

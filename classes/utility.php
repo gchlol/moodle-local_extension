@@ -125,7 +125,7 @@ class utility {
             // If a requestid has been provided, obtain the local cm data for this mod.
             $localcm = null;
             if (!empty($requestid)) {
-                $localcm = \local_extension\cm::from_requestid($cm->id, $requestid);
+                $localcm = cm::from_requestid($cm->id, $requestid);
 
                 // A requestid has been specified, lets list the available local_cms.
 
@@ -136,7 +136,7 @@ class utility {
 
             } else {
                 // Try and obtain a request associated to this user for a course module.
-                $localcm = \local_extension\cm::from_userid($cm->id, $userid);
+                $localcm = cm::from_userid($cm->id, $userid);
             }
 
             $events[$cm->id] = array(

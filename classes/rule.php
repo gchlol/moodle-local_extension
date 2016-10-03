@@ -113,7 +113,7 @@ class rule {
      */
     public function __construct($ruleid = null) {
         $this->id = $ruleid;
-        $this->rolenames = \role_get_names(\context_system::instance(), ROLENAME_ALIAS, true);
+        $this->rolenames = role_get_names(\context_system::instance(), ROLENAME_ALIAS, true);
     }
 
     /**
@@ -138,7 +138,7 @@ class rule {
     /**
      * Unserialises and base64_decodes the saved custom data.
      *
-     * @return array
+     * @return bool
      */
     public function data_load() {
 
@@ -172,7 +172,7 @@ class rule {
         global $DB;
 
         if (empty($this->id)) {
-            throw \coding_exception('No rule id');
+            throw new \coding_exception('No rule id');
         }
 
         $ruleid = $this->id;
@@ -277,7 +277,7 @@ class rule {
      * Processes the rules associated with this object.
      * Returning a value of true will identify that notifications need to be sent out.
      *
-     * @param \local_extension\request $request
+     * @param request $request
      * @param array $mod
      * @return bool
      */
@@ -337,7 +337,7 @@ class rule {
     /**
      * Helper to send notifications for roles based on the rule and request. Used when processing rules.
      *
-     * @param \local_extension\request $request
+     * @param request $request
      * @param array $mod
      * @param array $templates
      */
@@ -354,14 +354,14 @@ class rule {
         // The email subject, for the moment a language string.
         $data = new \stdClass();
         $data->requestid = $request->requestid;
-        $data->fullname = \fullname($requestuser, true);
+        $data->fullname = fullname($requestuser, true);
         $subject = get_string('email_notification_subect', 'local_extension', $data);
 
         // Notifying the roles.
         $rolecontent = $templates->role_content;
 
         // The $noreplyuser has the full name of the requesting user.
-        $noreplyuser->firstname = \fullname($requestuser);
+        $noreplyuser->firstname = fullname($requestuser);
 
         $this->notify_roles($request, $subject, $rolecontent, $mod['course'], $noreplyuser);
 
@@ -409,7 +409,7 @@ class rule {
      * Using the current rule configuration, this will setup the users with specific roles to have view/modification
      * access to the localcm item.
      *
-     * @param \local_extension\request $request
+     * @param request $request
      * @param array $mod
      */
     private function setup_subscription(&$request, $mod) {
@@ -524,7 +524,7 @@ class rule {
             'localcmid' => $localcm->cm->id,
             'requestid' => $localcm->cm->request,
             'userid' => $localcm->cm->userid,
-            'state' => \local_extension\history::STATE_DEFAULT,
+            'state' => history::STATE_DEFAULT,
         );
 
         $sql = "SELECT id
@@ -562,7 +562,7 @@ class rule {
             'localcmid' => $localcm->cm->id,
             'requestid' => $localcm->cm->request,
             'userid' => $localcm->cm->userid,
-            'state' => \local_extension\history::STATE_DEFAULT
+            'state' => history::STATE_DEFAULT
         );
 
         $DB->insert_record('local_extension_history_trig', $history);
@@ -571,7 +571,7 @@ class rule {
     /**
      * Replaces the varaibles in each template with data and returns them.
      *
-     * @param \local_extension\request $request
+     * @param request $request
      * @param array $mod
      * @param \stdClass $contentchange An object with a single comment/statechange/attachment.
      * @return array
@@ -685,7 +685,7 @@ class rule {
             'localcmid' => $localcm->cm->id,
             'requestid' => $localcm->cm->request,
             'userid' => $localcm->cm->userid,
-            'state' => \local_extension\history::STATE_DEFAULT
+            'state' => history::STATE_DEFAULT
         );
 
         $record = $DB->get_record('local_extension_history_trig', $params);
@@ -755,7 +755,7 @@ class rule {
     /**
      * Checks the rule for elapsed lenth.
      *
-     * @param \local_extension\request $request
+     * @param request $request
      * @param array $mod
      * @return boolean
      */
@@ -783,13 +783,13 @@ class rule {
     /**
      * Notify all users in the course, with the role that this rule specifies.
      *
-     * @param \local_extension\request $request
+     * @param request $request
      * @param string $subject
      * @param string $content
      * @param \stdClass $course
      * @param \stdClass $userfrom
      */
-    private function notify_roles(\local_extension\request $request, $subject, $content, $course, $userfrom) {
+    private function notify_roles(request $request, $subject, $content, $course, $userfrom) {
         $role = $this->role;
         $users = $this->rule_get_role_users($course, $role);
 
@@ -802,13 +802,13 @@ class rule {
     /**
      * Notify the user that is assigned to this localcm based on the current rule.
      *
-     * @param \local_extension\request $request
+     * @param request $request
      * @param string $subject
      * @param string $content
      * @param \stdClass $userfrom
      * @param \stdClass $userto
      */
-    private function notify_user(\local_extension\request $request, $subject, $content, $userfrom, $userto) {
+    private function notify_user(request $request, $subject, $content, $userfrom, $userto) {
         \local_extension\utility::send_trigger_email($request, $subject, $content, $userfrom, $userto);
     }
 
@@ -854,7 +854,7 @@ class rule {
             ),
         );
 
-        \local_extension\event\trigger_create::create($eventdata)->trigger();
+        event\trigger_create::create($eventdata)->trigger();
 
     }
 
@@ -870,7 +870,7 @@ class rule {
             ),
         );
 
-        \local_extension\event\trigger_disable::create($eventdata)->trigger();
+        event\trigger_disable::create($eventdata)->trigger();
 
     }
 
@@ -886,7 +886,7 @@ class rule {
             ),
         );
 
-        \local_extension\event\trigger_update::create($eventdata)->trigger();
+        event\trigger_update::create($eventdata)->trigger();
 
     }
 }

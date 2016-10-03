@@ -234,7 +234,7 @@ class cm {
 
         $DB->update_record('local_extension_cm', $this->cm);
 
-        \local_extension\utility::cache_invalidate_request($this->requestid);
+        utility::cache_invalidate_request($this->requestid);
     }
 
     /**
@@ -254,7 +254,7 @@ class cm {
 
         $DB->update_record('local_extension_cm', $this->cm);
 
-        \local_extension\utility::cache_invalidate_request($this->requestid);
+        utility::cache_invalidate_request($this->requestid);
     }
 
 }
