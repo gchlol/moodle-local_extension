@@ -102,13 +102,12 @@ if ($form = $mform->get_data()) {
     // Prepend -+ signs to indicate a difference in length.
     $sign = $delta < 0 ? '-' : '+';
 
-    $obj = (object) [
-        'course' => $course->fullname,
-        'event' => $event->name,
-        'original' => userdate($originaldate),
-        'new' => userdate($newdate),
-        'diff' => $sign . $show,
-    ];
+    $obj = new stdClass();
+    $obj->course = $course->fullname;
+    $obj->event = $event->name;
+    $obj->original = userdate($originaldate);
+    $obj->new = userdate($newdate);
+    $obj->diff = $sign . $show;
 
     $datestring = get_string('page_modify_comment', 'local_extension', $obj);
 

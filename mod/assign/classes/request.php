@@ -135,13 +135,12 @@ class request extends \local_extension\base_request {
 
         $status = state::instance()->get_state_name($localcm->cm->state);
 
-        $obj = (object) array(
-            'status' => $status,
-            'date' => \userdate($localcm->cm->data),
-        );
+        $obj = new \stdClass();
+        $obj->status = $status;
+        $obj->date = userdate($localcm->cm->data);
         $statusline = get_string('status_status_line', 'local_extension', $obj);
 
-        $html .= \html_writer::tag('span', $statusline, array('class' => 'time'));
+        $html .= \html_writer::tag('p', $statusline, array('class' => 'time'));
         $html .= \html_writer::end_div(); // End .content.
 
         if (!empty($mform)) {

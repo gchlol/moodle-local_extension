@@ -152,20 +152,19 @@ class cm {
      * @param \stdClass $mod
      * @param int $state
      * @param int $userid
-     * @return array $history
+     * @return \stdClass $history
      */
     public function write_history($mod, $state, $userid) {
         global $DB;
 
         $localcm = $mod['localcm'];
 
-        $history = array(
-            'localcmid' => $localcm->cmid,
-            'requestid' => $localcm->requestid,
-            'timestamp' => time(),
-            'state' => $state,
-            'userid' => $userid,
-        );
+        $history = new \stdClass();
+        $history->localcmid = $localcm->cmid;
+        $history->requestid = $localcm->requestid;
+        $history->timestamp = time();
+        $history->state = $state;
+        $history->userid = $userid;
 
         $DB->insert_record('local_extension_his_state', $history);
 

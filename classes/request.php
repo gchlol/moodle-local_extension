@@ -166,18 +166,17 @@ class request implements \cache_data_source {
      * Adds a comment to the request
      *
      * @param \stdClass $from The user that has commented.
-     * @param string $comment The comment itself.
+     * @param string $msg The comment itself.
      * @return object|string
      */
-    public function add_comment($from, $comment) {
+    public function add_comment($from, $msg) {
         global $DB;
 
-        $comment = (object) array(
-            'request'       => $this->requestid,
-            'userid'        => $from->id,
-            'timestamp'     => time(),
-            'message'       => $comment,
-        );
+        $comment = new \stdClass();
+        $comment->request = $this->requestid;
+        $comment->userid = $from->id;
+        $comment->timestamp = time();
+        $comment->message = $msg;
         $DB->insert_record('local_extension_comment', $comment);
 
         // Update the lastmod.
@@ -531,12 +530,11 @@ class request implements \cache_data_source {
             return null;
         }
 
-        $data = array(
-            'requestid' => $this->requestid,
-            'timestamp' => time(),
-            'filehash'  => $file->get_pathnamehash(),
-            'userid'    => $file->get_userid(),
-        );
+        $data = new \stdClass();
+        $data->requestid = $this->requestid;
+        $data->timestamp = time();
+        $data->filehash = $file->get_pathnamehash();
+        $data->userid = $file->get_userid();
 
         $DB->insert_record('local_extension_history_file', $data);
 
@@ -551,13 +549,12 @@ class request implements \cache_data_source {
 
         $filelink = \html_writer::link($fileurl, $file->get_filename());
         // Add class property 'message' to interleave with the comment stream.
-        $history = (object) $data;
-        $history->message = get_string('status_file_attachment', 'local_extension', $filelink);
+        $data->message = get_string('status_file_attachment', 'local_extension', $filelink);
 
         // Update the lastmod.
         $this->update_lastmod($file->get_userid());
 
-        return $history;
+        return $data;
     }
 
     /**
