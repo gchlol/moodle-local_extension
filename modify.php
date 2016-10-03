@@ -32,11 +32,11 @@ global $PAGE, $USER;
 require_login(true);
 
 $requestid = required_param('id', PARAM_INT);
+$courseid = required_param('course', PARAM_INT);
 $cmid = required_param('cmid', PARAM_INT);
 
-$cm = get_fast_modinfo($courseid)->get_cm($cmid);
-require_login($courseid, null, $cm);
-$context = context_module::instance($cmid);
+// $cm = get_fast_modinfo($courseid)->get_cm($cmid);
+// require_login($courseid, null, $cm);
 
 $request = utility::cache_get_request($requestid);
 
@@ -47,12 +47,13 @@ $request = utility::cache_get_request($requestid);
 if (!array_key_exists($USER->id, $request->users)) {
 
     // Admin users will have this capability, or anyone that was subscribed.
+    $context = context_module::instance($cmid);
     if (!has_capability('local/extension:viewallrequests', $context)) {
         die();
     }
 }
 
-$url = new moodle_url('/local/extension/modify.php', array('id' => $requestid, 'cmid' => $cmid));
+$url = new moodle_url('/local/extension/modify.php', array('id' => $requestid, 'course' => $courseid, 'cmid' => $cmid));
 $PAGE->set_url($url);
 
 // TODO context could be user, course or module.
@@ -153,6 +154,7 @@ if ($form = $mform->get_data()) {
     $data->id = $requestid;
     $data->cmid = $cmid;
     $data->userid = $request->request->userid;
+    $data->course = $courseid;
     $mform->set_data($data);
 }
 

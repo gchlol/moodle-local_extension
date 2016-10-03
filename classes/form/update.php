@@ -86,6 +86,7 @@ class update extends \moodleform {
 
                     $params = array(
                         'id' => $request->request->id,
+                        'course' => $course->id,
                         'cmid' => $id,
                     );
                     $modifyurl = new \moodle_url('/local/extension/modify.php', $params);

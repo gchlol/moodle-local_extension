@@ -249,9 +249,9 @@ if ($requestlist) {
             $moodleurl = new moodle_url('/user/view.php', array('id' => $request->userid, 'course' => $courseid));
             $link = html_writer::link($moodleurl, fullname($request));
 
-            $profilelink = html_writer::tag('strong', $link);
+            $profilelink = html_writer::tag('b', $link);
         } else {
-            $profilelink = html_writer::tag('strong', fullname($request));
+            $profilelink = html_writer::tag('b', fullname($request));
         }
 
         $lastmoduser = core_user::get_user($request->lastmodid);
