@@ -89,6 +89,17 @@ class state {
     protected function __clone() {
     }
 
+    public static function can_modify_length_state($stateid) {
+        switch ($stateid) {
+            case self::STATE_NEW:
+                return true;
+            case self::STATE_REOPENED:
+                return true;
+            default:
+                return false;
+        }
+    }
+
     /**
      * Returns a human readable state name.
      *
@@ -294,7 +305,7 @@ class state {
                     $status = $this->get_state_name($localcm->cm->state);
 
                     // After writing the history it will return the ID of the new row.
-                    $history = (object) $localcm->write_history($mod, $state, $user->id);
+                    $history = $localcm->write_history($mod, $state, $user->id);
 
                     $log = new \stdClass();
                     $log->status = $status;

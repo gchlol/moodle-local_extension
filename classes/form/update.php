@@ -60,12 +60,10 @@ class update extends \moodleform {
         $state = state::instance();
 
         foreach ($mods as $id => $mod) {
-            $handler = $mod['handler'];
-            $handler->status_definition($mod, $mform);
-
             /* @var \local_extension\cm $localcm IDE hinting */
             $localcm = $mod['localcm'];
             $course = $mod['course'];
+            $handler = $mod['handler'];
             $id = $localcm->cmid;
             $stateid = $localcm->cm->state;
             $userid = $localcm->userid;
@@ -78,19 +76,10 @@ class update extends \moodleform {
             $approve = (rule::RULE_ACTION_APPROVE | rule::RULE_ACTION_FORCEAPPROVE);
             $access = rule::get_access($mod, $USER->id);
 
-            if ($forcestatus) {
-                $state->render_force_buttons($mform, $stateid, $id);
-
-            } else if ($USER->id == $userid) {
-                $state->render_owner_buttons($mform, $stateid, $id);
-
-            } else if ($access & $approve) {
-                $state->render_approve_buttons($mform, $stateid, $id);
-
-            }
+            $handler->status_definition($mod, $mform);
 
             // Only allow the abilitiy to modify request legnth if the state is not approved.
-            if ($stateid != state::STATE_APPROVED) {
+            if (state::can_modify_length_state($stateid)) {
 
                 // And if the user has the capabilitiy to force the status or approve it.
                 if ($forcestatus || $access & $approve) {
@@ -104,6 +93,17 @@ class update extends \moodleform {
                     $mform->addElement('html', $html);
 
                 }
+
+            }
+
+            if ($forcestatus) {
+                $state->render_force_buttons($mform, $stateid, $id);
+
+            } else if ($USER->id == $userid) {
+                $state->render_owner_buttons($mform, $stateid, $id);
+
+            } else if ($access & $approve) {
+                $state->render_approve_buttons($mform, $stateid, $id);
 
             }
 
