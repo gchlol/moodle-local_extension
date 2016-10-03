@@ -74,7 +74,7 @@ class cm {
         $cm = new cm($cmid, null, $requestid);
 
         $conditions = array('cmid' => $cm->cmid, 'request' => $cm->requestid);
-        $record = $DB->get_record('local_extension_cm', $conditions, 'cmid,course,data,id,request,state,userid');
+        $record = $DB->get_record('local_extension_cm', $conditions, 'cmid,course,data,id,request,state,length,userid');
 
         if (!empty($record)) {
             $cm->userid = $record->userid;
@@ -196,7 +196,12 @@ class cm {
      * @return mixed
      */
     public function get_data() {
-        return $this->cm->data;
+        if (!empty($this->cm)){
+            return $this->cm->data;
+
+        } else {
+            return null;
+        }
     }
 
     /**
@@ -248,6 +253,8 @@ class cm {
         global $DB;
 
         $DB->update_record('local_extension_cm', $this->cm);
+
+        \local_extension\utility::cache_invalidate_request($this->requestid);
     }
 
 }

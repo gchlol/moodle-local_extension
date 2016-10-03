@@ -66,6 +66,8 @@ $string['extensionpolicystatushelp'] = 'When viewing the status of a request, th
 $string['extension:modifyrequeststatus'] = 'Abilitiy to force a status change in a request';
 $string['extension:viewallrequests'] = 'View all extension requests';
 $string['externalrules'] = 'Manage Adapter Triggers';
+$string['form_modify_original_status'] = 'Original extension request details and status.';
+$string['form_modify_request_header'] = 'Please specify the new extension length.';
 $string['form_request_availablerequests'] = 'Available Requests';
 $string['form_request_requestsinprogress'] = 'Requests in progress';
 $string['form_rule_action'] = 'Action';
@@ -168,9 +170,13 @@ $string['page_index_categories'] = 'Categories';
 $string['page_index_courses'] = 'Unit';
 $string['page_index_faculties'] = 'Course';
 $string['page_index_toomanycourses'] = 'Too many courses, please search or filter by category.';
-$string['page_modify_comment'] = 'The extension length has been modified.
-Original extension date: {$a->original}
-New extension date: {$a->new}
+$string['page_modify_comment'] = '
+The extension length has been modified for:
+{$a->course}, {$a->event}
+
+Requested extension date: {$a->original}
+Modified extension date: {$a->new}
+
 Length difference: {$a->diff}';
 $string['page_request_notriggersdefined'] = 'No extension triggers have been defined.';
 $string['page_request_outofrange'] = 'Please reduce the look ahead range.';

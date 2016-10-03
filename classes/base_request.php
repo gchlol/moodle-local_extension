@@ -109,26 +109,33 @@ abstract class base_request {
      *
      * @param array $mod
      * @param \moodleform $mform
-     * @param bool $optional
      */
-    public function date_selector($mod, $mform, $optional = true) {
+    public function date_selector($mod, $mform) {
         $event = $mod['event'];
-        $cm = $mod['cm'];
+
+        /** @var $lcm \local_extension\cm */
+        $lcm = $mod['localcm'];
+
+        $defaultdate = $event->timestart;
+        $lcmdate = $lcm->get_data();
+
+        if (!empty($lcmdate)) {
+            $defaultdate = $lcmdate;
+        }
 
         $startyear = date('Y');
-
         // TODO get assignment due date, if moves to next year, $startyear += 1.
         $stopyear = date('Y') + 1;
 
-        $formid = 'due' . $cm->id;
         $dateconfig = array(
-            'optional' => $optional,
+            'optional' => true,
             'step' => 1,
             'startyear' => $startyear,
             'stopyear' => $stopyear,
         );
-        $mform->addElement('date_time_selector', $formid, get_string('requestdue', 'extension_assign'), $dateconfig);
 
-        $mform->setDefault($formid, $event->timestart);
+        $formid = 'due' . $lcm->cmid;
+        $mform->addElement('date_time_selector', $formid, get_string('requestdue', 'extension_assign'), $dateconfig);
+        $mform->setDefault($formid, $defaultdate);
     }
 }

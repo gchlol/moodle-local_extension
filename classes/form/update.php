@@ -63,15 +63,6 @@ class update extends \moodleform {
             $handler = $mod['handler'];
             $handler->status_definition($mod, $mform);
 
-            // TODO.
-            $params = array(
-                'id' => $request->request->id,
-                'cmid' => $id,
-            );
-            $modifyurl = new moodle_url('/local/extension/modify.php', $params);
-            $html = html_writer::link($modifyurl, 'edit');
-            $mform->addElement('html', $html);
-
             /* @var \local_extension\cm $localcm IDE hinting */
             $localcm = $mod['localcm'];
             $course = $mod['course'];
@@ -95,6 +86,17 @@ class update extends \moodleform {
 
             } else if ($access & $approve) {
                 $state->render_approve_buttons($mform, $stateid, $id);
+
+            }
+
+            if ($forcestatus || $access & $approve) {
+                $params = array(
+                    'id' => $request->request->id,
+                    'cmid' => $id,
+                );
+                $modifyurl = new moodle_url('/local/extension/modify.php', $params);
+                $html = html_writer::link($modifyurl, 'Modify extension length');
+                $mform->addElement('html', $html);
 
             }
 

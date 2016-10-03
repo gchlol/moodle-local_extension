@@ -80,21 +80,49 @@ $mform = new \local_extension\form\modify(null, $params);
 
 if ($form = $mform->get_data()) {
 
-    // TODO modify the extension length.
-    // Run triggers, update subscriptions.
-    // Edge cases with lowering the length beyond set triggers.
+    // TODO Edge cases with lowering the length beyond set triggers. Deal with changes / triggers.
     $cm = $request->cms[$cmid];
+    $event = $request->mods[$cmid]['event'];
+    $course  = $request->mods[$cmid]['course'];
 
     $due = 'due' . $cmid;
-    $cm->cm->data = $form->$due;
-    $cm->data_save();
 
+    $originaldate = $cm->cm->data;
+    $newdate = $form->$due;
+
+    $delta = $newdate - $originaldate;
+
+    $show = format_time($delta);
+    $num = strtok($show, ' ');
+    $unit = strtok(' ');
+    $show = "$num $unit";
+
+    // Prepend -+ signs to indicate a difference in length.
+    $sign = $delta < 0 ? '-' : '+';
+
+    $obj = (object) [
+        'course' => $course->fullname,
+        'event' => $event->name,
+        'original' => userdate($originaldate),
+        'new' => userdate($newdate),
+        'diff' => $sign . $show,
+    ];
+
+    $datestring = get_string('page_modify_comment', 'local_extension', $obj);
+
+    $cm->cm->data = $form->$due;
+    $cm->cm->length = $form->$due - $event->timestart;
     $cm->update_data();
+
+    $notifycontent = array();
+    $notifycontent[] = $request->add_comment($USER, $datestring);
+    $request->notify_subscribers($notifycontent, $USER->id);
 
     $request->get_data_cache()->delete($request->requestid);
 
     $statusurl = new moodle_url('/local/extension/status.php', array('id' => $requestid));
 
+    // TODO Run triggers, update subscriptions.
     redirect($statusurl);
 
 } else {

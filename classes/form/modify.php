@@ -25,6 +25,8 @@
 
 namespace local_extension\form;
 
+use html_writer;
+
 if (!defined('MOODLE_INTERNAL')) {
     die('Direct access to this script is forbidden.'); // It must be included from a Moodle page.
 }
@@ -54,15 +56,16 @@ class modify extends \moodleform {
 
         $handler = $mod['handler'];
 
-        $html = '<h2>Original extension request details and status.</h2>';
+
+        $html = html_writer::tag('h2', get_string('form_modify_original_status', 'local_extension'));
         $mform->addElement('html', $html);
 
         $handler->status_definition($mod, $mform);
 
-        $html = '<hr>';
+        $html = html_writer::empty_tag('br');
         $mform->addElement('html', $html);
 
-        $html = '<h2>Please specify the new extension length.</h2>';
+        $html = html_writer::tag('h2', get_string('form_modify_request_header', 'local_extension'));
         $mform->addElement('html', $html);
 
         $handler->request_definition($mod, $mform);
@@ -89,12 +92,10 @@ class modify extends \moodleform {
      * @return array of error messages
      */
     public function validation($data, $files) {
-        global $USER;
 
         $errors = parent::validation($data, $files);
 
         $mform    = $this->_form;
-        $user     = $this->_customdata['user'];
         $request  = $this->_customdata['request'];
         $cmid     = $this->_customdata['cmid'];
         $mods     = $request->mods;
@@ -102,13 +103,19 @@ class modify extends \moodleform {
         $mod = $mods[$cmid];
         $handler = $mod['handler'];
 
-        $cm = $mod['cm'];
-        $event = $mod['event'];
-        $formid = 'due' . $cm->id;
+        $lcm = $mod['localcm'];
+        $formid = 'due' . $lcm->cmid;
 
         $due[$formid] = $data[$formid];
 
         $errors += $handler->request_validation($mform, $mod, $data);
+
+        $request = $data[$formid];
+
+        if ($request == $lcm->cm->data) {
+            // Submit was clicked, the date is the same.
+            $errors[$formid] = get_string('error_same_date', 'local_extension');
+        }
 
         // The date selector has a checkbox. Ensure this is ticked.
         if (empty($data[$formid])) {
