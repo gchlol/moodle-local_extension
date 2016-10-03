@@ -56,7 +56,6 @@ class modify extends \moodleform {
 
         $handler = $mod['handler'];
 
-
         $html = html_writer::tag('h2', get_string('form_modify_original_status', 'local_extension'));
         $mform->addElement('html', $html);
 

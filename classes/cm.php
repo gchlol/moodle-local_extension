@@ -196,7 +196,7 @@ class cm {
      * @return mixed
      */
     public function get_data() {
-        if (!empty($this->cm)){
+        if (!empty($this->cm)) {
             return $this->cm->data;
 
         } else {
