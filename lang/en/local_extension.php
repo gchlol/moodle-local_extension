@@ -171,13 +171,14 @@ $string['page_index_courses'] = 'Unit';
 $string['page_index_faculties'] = 'Course';
 $string['page_index_toomanycourses'] = 'Too many courses, please search or filter by category.';
 $string['page_modify_comment'] = '
-The extension length has been modified for:
+The extension length has been modified.
+
 {$a->course}, {$a->event}
 
 Requested extension date: {$a->original}
 Modified extension date: {$a->new}
 
-Length difference: {$a->diff}';
+Time difference: {$a->diff}';
 $string['page_request_notriggersdefined'] = 'No extension triggers have been defined.';
 $string['page_request_outofrange'] = 'Please reduce the look ahead range.';
 $string['page_request_requestnewlink'] = 'Click here to make a new extension request for {$a}';

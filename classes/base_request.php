@@ -63,7 +63,7 @@ abstract class base_request {
      * Define parts of the request for for an event object
      *
      * @param array $mod An array of event detail
-     * @param \moodleform $mform A moodle form object
+     * @param \MoodleQuickForm $mform A moodle form object
      */
     abstract public function request_definition($mod, $mform);
 
@@ -71,14 +71,14 @@ abstract class base_request {
      * Define parts of the request for for an event object
      *
      * @param array $mod An array of event details
-     * @param \moodleform $mform A moodle form object
+     * @param \MoodleQuickForm $mform A moodle form object
      */
     abstract public function status_definition($mod, $mform);
 
     /**
      * Return data to be stored for the request
      *
-     * @param \moodleform $mform A moodle form object
+     * @param \MoodleQuickForm $mform A moodle form object
      * @param array $mod An array of event details
      * @param array $data An array of form data
      * @return string The data to be stored
@@ -108,7 +108,7 @@ abstract class base_request {
      * Adds a date selector to the mform that it has been passed.
      *
      * @param array $mod
-     * @param \moodleform $mform
+     * @param \MoodleQuickForm $mform
      */
     public function date_selector($mod, $mform) {
         $event = $mod['event'];

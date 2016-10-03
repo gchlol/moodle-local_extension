@@ -33,14 +33,12 @@ $perpage    = optional_param('perpage', DEFAULT_PAGE_SIZE, PARAM_INT);
 $categoryid = optional_param('catid', 0, PARAM_INT);
 $courseid   = optional_param('id', 0, PARAM_INT);
 $stateid    = optional_param('state', 0, PARAM_INT);
-$contextid  = optional_param('contextid', 0, PARAM_INT);
 $search     = optional_param('search', '', PARAM_RAW); // Make sure it is processed with p() or s() when sending to output!
 $faculty    = optional_param('faculty', '', PARAM_RAW); // Make sure it is processed with p() or s() when sending to output!
 
 $PAGE->set_url('/local/extension/index.php', array(
     'page'      => $page,
     'perpage'   => $perpage,
-    'contextid' => $contextid,
     'catid'     => $categoryid,
     'state'     => $stateid,
     'id'        => $courseid,
@@ -50,13 +48,7 @@ $PAGE->set_url('/local/extension/index.php', array(
 
 require_login();
 
-if ($contextid) {
-    $context = context::instance_by_id($contextid, MUST_EXIST);
-    if ($context->contextlevel != CONTEXT_COURSE) {
-        print_error('invalidcontext');
-    }
-    $course = $DB->get_record('course', array('id' => $context->instanceid), '*', MUST_EXIST);
-} else if ($courseid) {
+if ($courseid) {
     $course = $DB->get_record('course', array('id' => $courseid), '*', MUST_EXIST);
     $context = context_course::instance($course->id, MUST_EXIST);
 } else {

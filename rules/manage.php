@@ -35,7 +35,7 @@ $PAGE->set_url($url);
 $context = context_system::instance();
 require_login();
 
-\admin_externalpage_setup('local_extension_settings_rules');
+admin_externalpage_setup('local_extension_settings_rules');
 
 $PAGE->set_context($context);
 $PAGE->set_pagelayout('standard');
