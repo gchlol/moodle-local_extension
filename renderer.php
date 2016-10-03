@@ -39,15 +39,6 @@ if (!defined('MOODLE_INTERNAL')) {
 class local_extension_renderer extends plugin_renderer_base {
 
     /**
-     * Extension status renderer.
-     *
-     * @param \local_extension\request $req The extension request object.
-     * @return string $out The html output.
-     */
-    public function render_extension_status(\local_extension\request $req) {
-    }
-
-    /**
      * Extension comment renderer.
      *
      * @param \local_extension\request $req The extension request object.

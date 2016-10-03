@@ -49,6 +49,7 @@ $string['error_extension_lessthan'] = 'Less than days';
 $string['error_no_mods'] = 'The requested date range has no activities that will allow an extension request.
 {$a->startrange} - {$a->endrange}';
 $string['error_none_selected'] = 'Please select at least one item';
+$string['error_same_date'] = 'Please select a different date';
 $string['error_over_extension_limit'] = 'Your request of {$a->days} days is too long. Please make a shorter request.';
 $string['event_process_triggers'] = 'Processed triggers';
 $string['event_request_created'] = 'Request created';
@@ -167,6 +168,10 @@ $string['page_index_categories'] = 'Categories';
 $string['page_index_courses'] = 'Unit';
 $string['page_index_faculties'] = 'Course';
 $string['page_index_toomanycourses'] = 'Too many courses, please search or filter by category.';
+$string['page_modify_comment'] = 'The extension length has been modified.
+Original extension date: {$a->original}
+New extension date: {$a->new}
+Length difference: {$a->diff}';
 $string['page_request_notriggersdefined'] = 'No extension triggers have been defined.';
 $string['page_request_outofrange'] = 'Please reduce the look ahead range.';
 $string['page_request_requestnewlink'] = 'Click here to make a new extension request for {$a}';
