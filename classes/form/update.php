@@ -89,14 +89,22 @@ class update extends \moodleform {
 
             }
 
-            if ($forcestatus || $access & $approve) {
-                $params = array(
-                    'id' => $request->request->id,
-                    'cmid' => $id,
-                );
-                $modifyurl = new moodle_url('/local/extension/modify.php', $params);
-                $html = html_writer::link($modifyurl, 'Modify extension length');
-                $mform->addElement('html', $html);
+            // Only allow the abilitiy to modify request legnth if the state is not approved.
+            if ($stateid != \local_extension\state::STATE_APPROVED) {
+
+                // And if the user has the capabilitiy to force the status or approve it.
+                if ($forcestatus || $access & $approve) {
+
+                    $params = array(
+                        'id' => $request->request->id,
+                        'cmid' => $id,
+                    );
+
+                    $modifyurl = new moodle_url('/local/extension/modify.php', $params);
+                    $html = html_writer::link($modifyurl, 'Modify extension length');
+                    $mform->addElement('html', $html);
+
+                }
 
             }
 
@@ -105,12 +113,11 @@ class update extends \moodleform {
         $html = '';
 
         if ($html .= $renderer->render_extension_attachments($request)) {
-            $html .= \html_writer::start_tag('br');
+            $html .= \html_writer::empty_tag('br');
         }
 
-        $html .= \html_writer::empty_tag('p');
         $html .= $renderer->render_extension_comments($request);
-        $html .= \html_writer::start_tag('br');
+        $html .= \html_writer::empty_tag('br');
         $mform->addElement('html', $html);
 
         $mform->addElement('hidden', 'id');
