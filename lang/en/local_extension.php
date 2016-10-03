@@ -178,7 +178,8 @@ The extension length has been modified.
 Requested extension date: {$a->original}
 Modified extension date: {$a->new}
 
-Time difference: {$a->diff}';
+Time difference: {$a->diff}
+Extension length: {$a->length}';
 $string['page_request_notriggersdefined'] = 'No extension triggers have been defined.';
 $string['page_request_outofrange'] = 'Please reduce the look ahead range.';
 $string['page_request_requestnewlink'] = 'Click here to make a new extension request for {$a}';

@@ -118,6 +118,14 @@ if ($form = $mform->get_data()) {
     $obj->new = userdate($newdate);
     $obj->diff = $sign . $show;
 
+    $delta = $event->timestart - $newdate;
+    $show = format_time($delta);
+    $num = strtok($show, ' ');
+    $unit = strtok(' ');
+    $show = "$num $unit";
+
+    $obj->length = $show;
+
     $datestring = get_string('page_modify_comment', 'local_extension', $obj);
 
     $cm->cm->data = $newdate;
