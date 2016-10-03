@@ -54,18 +54,11 @@ class modify extends \moodleform {
 
         $handler = $mod['handler'];
 
-        $html = \html_writer::tag('h2', get_string('form_modify_original_status', 'local_extension'));
-        $mform->addElement('html', $html);
-
-        $handler->status_definition($mod, $mform);
-
-        $html = \html_writer::empty_tag('br');
-        $mform->addElement('html', $html);
-
         $html = \html_writer::tag('h2', get_string('form_modify_request_header', 'local_extension'));
         $mform->addElement('html', $html);
+        $handler->modify_definition($mod, $mform, $this->_customdata);
 
-        $handler->request_definition($mod, $mform);
+        $this->add_action_buttons(true, get_string('savechanges', 'assign'));
 
         $mform->addElement('hidden', 'id');
         $mform->setType('id', PARAM_INT);
@@ -73,12 +66,8 @@ class modify extends \moodleform {
         $mform->addElement('hidden', 'cmid');
         $mform->setType('cmid', PARAM_INT);
 
-        $buttonarray = array();
-        $buttonarray[] = &$mform->createElement('submit', 'submitmodification', 'Update extension');
-        $buttonarray[] = &$mform->createElement('submit', 'cancel', 'Cancel');
-        $mform->addGroup($buttonarray, 'buttonar', '', array(' '), false);
-        $mform->closeHeaderBefore('buttonar');
-
+        $mform->addElement('hidden', 'userid');
+        $mform->setType('userid', PARAM_INT);
     }
 
     /**

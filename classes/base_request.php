@@ -110,7 +110,7 @@ abstract class base_request {
      * @param array $mod
      * @param \MoodleQuickForm $mform
      */
-    public function date_selector($mod, $mform) {
+    public function date_selector($mod, $mform, $optional = true) {
         $event = $mod['event'];
 
         /* @var $lcm \local_extension\cm */
@@ -128,7 +128,7 @@ abstract class base_request {
         $stopyear = date('Y') + 1;
 
         $dateconfig = array(
-            'optional' => true,
+            'optional' => $optional,
             'step' => 1,
             'startyear' => $startyear,
             'stopyear' => $stopyear,

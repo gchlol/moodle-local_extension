@@ -98,7 +98,7 @@ class request extends \local_extension\base_request {
 
         $html = \html_writer::start_div('content');
         $coursestring = \html_writer::tag('b', $course->fullname . ' > ' . $event->name, array('class' => 'mod'));
-        $str = get_string('dueon', 'extension_assign', \userdate($event->timestart));
+        $str = get_string('dueon', 'extension_assign', userdate($event->timestart));
         $html .= \html_writer::tag('p', $coursestring . ' ' . $str);
 
         // Setup the mform due element id.
@@ -110,6 +110,46 @@ class request extends \local_extension\base_request {
         }
 
         $html .= \html_writer::end_div(); // End .content.
+
+        return $html;
+    }
+
+    /**
+     * Renders the modify extension details in a form with a date selector.
+     *
+     * @param array $mod An array of event details
+     * @param \MoodleQuickForm $mform A moodle form object
+     * @param array $customdata mform customdata
+     * @return string
+     */
+    public function modify_definition($mod, $mform, $customdata) {
+        $event = $mod['event'];
+        $course = $mod['course'];
+        $instance = $customdata['instance'];
+
+        $html = \html_writer::start_div('content');
+        $coursestring = \html_writer::tag('b', $course->fullname . ' > ' . $event->name, array('class' => 'mod'));
+        $str = get_string('dueon', 'extension_assign', userdate($event->timestart));
+        $html .= \html_writer::tag('p', $coursestring);
+        $html .= \html_writer::end_div(); // End .content.
+
+        $mform->addElement('html', \html_writer::tag('p', $html));
+        $html .= \html_writer::end_div(); // End .content.
+
+        if ($instance->allowsubmissionsfromdate) {
+            $mform->addElement('static', 'allowsubmissionsfromdate', get_string('allowsubmissionsfromdate', 'assign'),
+                userdate($instance->allowsubmissionsfromdate));
+        }
+        if ($instance->duedate) {
+            $mform->addElement('static', 'duedate', get_string('duedate', 'assign'), userdate($instance->duedate));
+            $finaldate = $instance->duedate;
+        }
+        if ($instance->cutoffdate) {
+            $mform->addElement('static', 'cutoffdate', get_string('cutoffdate', 'assign'), userdate($instance->cutoffdate));
+            $finaldate = $instance->cutoffdate;
+        }
+
+        $this->date_selector($mod, $mform, false);
 
         return $html;
     }
@@ -130,7 +170,7 @@ class request extends \local_extension\base_request {
 
         $html = \html_writer::start_div('content');
         $coursestring = \html_writer::tag('b', $course->fullname . ' > ' . $event->name, array('class' => 'mod'));
-        $str = get_string('dueon', 'extension_assign', \userdate($event->timestart));
+        $str = get_string('dueon', 'extension_assign', userdate($event->timestart));
         $html .= \html_writer::tag('p', $coursestring . ' ' . $str);
 
         $status = state::instance()->get_state_name($localcm->cm->state);
@@ -232,6 +272,17 @@ class request extends \local_extension\base_request {
         }
 
         return true;
+    }
+
+    /**
+     * If an extension was granted, but it was a mistake then this will revoke the extension length.
+     *
+     * @param int $assignmentinstance
+     * @param int $userid
+     * @return bool
+     */
+    public function cancel_extension($assignmentinstance, $userid) {
+        $this->submit_extension($assignmentinstance, $userid, 0);
     }
 
 }

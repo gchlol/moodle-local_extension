@@ -26,6 +26,7 @@
 use local_extension\utility;
 
 require_once(__DIR__ . '/../../config.php');
+require_once($CFG->dirroot . '/mod/assign/locallib.php');
 global $PAGE, $USER;
 
 require_login(true);
@@ -60,11 +61,19 @@ $PAGE->add_body_class('local_extension');
 
 $renderer = $PAGE->get_renderer('local_extension');
 
+$mod = $request->mods[$cmid];
+$course = $mod['course'];
+$cm = $mod['cm'];
+
+$context = \context_module::instance($cmid);
+
+$assign = new \assign($context, $cm, $course);
+$instance = $assign->get_instance();
+
 $params = array(
-    'user' => $OUTPUT->user_picture($USER),
     'request' => $request,
     'cmid' => $cmid,
-    'renderer' => $renderer,
+    'instance' => $assign->get_instance(),
 );
 
 $requestuser = core_user::get_user($request->request->userid);
@@ -111,8 +120,8 @@ if ($form = $mform->get_data()) {
 
     $datestring = get_string('page_modify_comment', 'local_extension', $obj);
 
-    $cm->cm->data = $form->$due;
-    $cm->cm->length = $form->$due - $event->timestart;
+    $cm->cm->data = $newdate;
+    $cm->cm->length = $newdate - $event->timestart;
     $cm->update_data();
 
     $notifycontent = array();
@@ -130,6 +139,7 @@ if ($form = $mform->get_data()) {
     $data = new stdClass();
     $data->id = $requestid;
     $data->cmid = $cmid;
+    $data->userid = $request->request->userid;
     $mform->set_data($data);
 }
 
