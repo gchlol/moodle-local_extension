@@ -210,17 +210,17 @@ class request extends \local_extension\base_request {
     /**
      * Grants an extension.
      *
-     * @param int $assignmentid
+     * @param int $assignmentinstance The instance id of the current assignment.
      * @param int $userid
      * @param int $duedate
      *
      * @return bool
      */
-    public function submit_extension($assignmentid, $userid, $duedate) {
+    public function submit_extension($assignmentinstance, $userid, $duedate) {
         global $CFG;
         require_once($CFG->dirroot . '/mod/assign/locallib.php');
 
-        $cm = get_coursemodule_from_instance('assign', $assignmentid, 0, false, MUST_EXIST);
+        $cm = get_coursemodule_from_instance('assign', $assignmentinstance, 0, false, MUST_EXIST);
         $context = \context_module::instance($cm->id);
 
         $assignment = new \assign($context, $cm, null);

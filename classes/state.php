@@ -286,7 +286,7 @@ class state {
 
                     // The extension has been approved. Lets hook into the handler and extend the items length.
                     if ($name == $this->statearray[self::STATE_APPROVED]) {
-                        $handler->submit_extension($event->id, $request->request->userid, $localcm->cm->data);
+                        $handler->submit_extension($event->instance, $request->request->userid, $localcm->cm->data);
                     }
 
                     $localcm->set_state($state);
