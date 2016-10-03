@@ -138,7 +138,7 @@ if (has_capability('local/extension:viewallrequests', $context)) {
 
 if ($viewallrequests) {
 
-    // This query obtains ALL local cm requests, with the possible filters: coursename, username, activityname.
+    // This query obtains ALL local cm requests, with the possible filters: coursename, username, activityname, status.
     $select = "SELECT lcm.id AS lcmid,
                       lcm.name AS activity,
                       lcm.length,
@@ -164,7 +164,7 @@ if ($viewallrequests) {
     $params = array_merge($params, array('subuserid' => $USER->id), $params);
 
     // This query obtains ALL local cm requests, that the $USER has a subscription to with the possible filters:
-    // coursename, username, activityname.
+    // coursename, username, activityname, status.
     $select = "SELECT lcm.id AS lcmid,
                       lcm.name AS activity,
                       lcm.length,
@@ -232,9 +232,9 @@ if ($wheres) {
 }
 
 if ($table->get_sql_sort()) {
-    $sort = ' ORDER BY '.$table->get_sql_sort();
+    $sort = " ORDER BY " . $table->get_sql_sort();
 } else {
-    $sort = '';
+    $sort = "";
 }
 
 $matchcount = $DB->count_records_sql("SELECT COUNT(u.id) $from $where", $params);
