@@ -34,19 +34,24 @@ require_login(true);
 $requestid = required_param('id', PARAM_INT);
 $cmid = required_param('cmid', PARAM_INT);
 
+$cm = get_fast_modinfo($courseid)->get_cm($cmid);
+require_login($courseid, null, $cm);
+$context = context_module::instance($cmid);
+
 $request = utility::cache_get_request($requestid);
 
 // Item $request->user is an array of $userid=>$userobj associated to this request, eg. those that are subscribed, and the user.
 // The list of subscribed users populated each time the request object is generated.
 // The request object is invalidated and regenerated after each comment, attachment added, or rule triggered.
 
-// Permissions checking
-/*
 if (!array_key_exists($USER->id, $request->users)) {
-    // TODO What should we print here?
-    die();
+
+    // Admin users will have this capability, or anyone that was subscribed.
+    if (!has_capability('local/extension:viewallrequests', $context)) {
+        die();
+    }
 }
-*/
+
 $url = new moodle_url('/local/extension/modify.php', array('id' => $requestid, 'cmid' => $cmid));
 $PAGE->set_url($url);
 

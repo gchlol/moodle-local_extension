@@ -29,6 +29,8 @@ use local_extension\utility;
 require_once(__DIR__ . '/../../../config.php');
 require_once($CFG->libdir . '/adminlib.php');
 
+admin_externalpage_setup('local_extension_settings_rules');
+
 $triggerid = optional_param('id', 0, PARAM_INT);
 $datatype = required_param('datatype', PARAM_ALPHANUM);
 
@@ -39,9 +41,6 @@ if (empty($datatype)) {
 $PAGE->set_url(new moodle_url('/local/extension/rules/edit.php'));
 
 $context = context_system::instance();
-require_login();
-
-admin_externalpage_setup('local_extension_settings_rules');
 
 $PAGE->set_context($context);
 $PAGE->set_pagelayout('standard');

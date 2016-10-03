@@ -38,13 +38,14 @@ $request = utility::cache_get_request($requestid);
 // The list of subscribed users populated each time the request object is generated.
 // The request object is invalidated and regenerated after each comment, attachment added, or rule triggered.
 
-// Permissions checking
-/*
 if (!array_key_exists($USER->id, $request->users)) {
-    // TODO What should we print here?
-    die();
+
+    // Admin users will have this capability, or anyone that was subscribed.
+    if (!has_capability('local/extension:viewallrequests', context_system::instance())) {
+        die();
+    }
 }
-*/
+
 $url = new moodle_url('/local/extension/status.php', array('id' => $requestid));
 $PAGE->set_url($url);
 

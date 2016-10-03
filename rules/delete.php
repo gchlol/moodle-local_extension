@@ -29,6 +29,8 @@ use local_extension\utility;
 require_once(__DIR__ . '/../../../config.php');
 require_once($CFG->libdir . '/adminlib.php');
 
+admin_externalpage_setup('local_extension_settings_rules');
+
 $delete = required_param('id', PARAM_INT);
 $confirm = optional_param('confirm', '', PARAM_ALPHANUM);   // MD5 confirmation hash.
 
@@ -36,10 +38,6 @@ $url = new moodle_url('/local/extension/rules/delete.php');
 $PAGE->set_url($url);
 
 $context = context_system::instance();
-
-require_login();
-
-admin_externalpage_setup('local_extension_settings_rules');
 
 $PAGE->set_context($context);
 $PAGE->set_pagelayout('standard');
