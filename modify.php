@@ -73,7 +73,7 @@ $PAGE->navbar->ignore_active();
 $PAGE->navbar->add(get_string('breadcrumb_nav_index', 'local_extension'), new moodle_url('/local/extension/index.php'));
 $PAGE->navbar->add(get_string('breadcrumb_nav_modify', 'local_extension'), $url);
 
-$obj = array('id' => $requestid, 'name' => \fullname($requestuser));
+$obj = array('id' => $requestid, 'name' => fullname($requestuser));
 
 $pageurl = new moodle_url('/local/extension/status.php', array('id' => $request->requestid));
 $PAGE->navbar->add(get_string('breadcrumb_nav_status', 'local_extension', $obj), $pageurl);

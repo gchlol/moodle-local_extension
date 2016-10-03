@@ -175,7 +175,7 @@ class request implements \cache_data_source {
         $comment = (object) array(
             'request'       => $this->requestid,
             'userid'        => $from->id,
-            'timestamp'     => \time(),
+            'timestamp'     => time(),
             'message'       => $comment,
         );
         $DB->insert_record('local_extension_comment', $comment);

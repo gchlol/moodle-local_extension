@@ -257,7 +257,7 @@ class local_extension_renderer extends plugin_renderer_base {
                     userdate($request->timestamp),
                     userdate($request->lastmod),
                     $status,
-                    \fullname(\core_user::get_user($request->userid)),
+                    fullname(\core_user::get_user($request->userid)),
                 );
                 $table->add_data($values);
 

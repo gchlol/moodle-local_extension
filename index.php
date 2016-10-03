@@ -254,7 +254,7 @@ if ($requestlist) {
             has_capability('moodle/user:viewdetails', $context) ||
             has_capability('moodle/user:viewdetails', $usercontext))) {
 
-            $moodleurl = new \moodle_url('/user/view.php', array('id' => $request->userid, 'course' => $courseid));
+            $moodleurl = new moodle_url('/user/view.php', array('id' => $request->userid, 'course' => $courseid));
             $link = html_writer::link($moodleurl, fullname($request));
 
             $profilelink = html_writer::tag('strong', $link);

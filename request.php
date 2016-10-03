@@ -184,7 +184,7 @@ if ($mform->is_cancelled()) {
         $sub->userid = $USER->id;
         $sub->localcmid = $cm['id'];
         $sub->requestid = $request['id'];
-        $sub->lastmod = \time();
+        $sub->lastmod = time();
         $sub->trigger = null;
         $sub->access = rule::RULE_ACTION_DEFAULT;
 

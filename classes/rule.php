@@ -444,7 +444,7 @@ class rule {
             $sub->userid = $user->id;
             $sub->localcmid = $localcm->cm->id;
             $sub->requestid = $localcm->requestid;
-            $sub->lastmod = \time();
+            $sub->lastmod = time();
             $sub->trigger = $this->id;
             $sub->access = $this->action;
 
@@ -493,7 +493,7 @@ class rule {
 
                 if ($sub->access != self::RULE_ACTION_SUBSCRIBE) {
                     $sub->access = self::RULE_ACTION_SUBSCRIBE;
-                    $sub->lastmod = \time();
+                    $sub->lastmod = time();
                     $DB->update_record('local_extension_subscription', $sub);
                 }
             }
@@ -604,13 +604,13 @@ class rule {
         $templatevars = array(
             '/{{course}}/' => $course->fullname,
             '/{{module}}/' => $cm->name,
-            '/{{student}}/' => \fullname($user),
+            '/{{student}}/' => fullname($user),
             '/{{student_first}}/' => $user->firstname,
             '/{{student_middle}}/' => $user->middlename,
             '/{{student_last}}/' => $user->lastname,
             '/{{student_alternate}}/' => $user->alternatename,
-            '/{{duedate}}/' => \userdate($event->timestart),
-            '/{{extensiondate}}/' => \userdate($localcm->cm->data),
+            '/{{duedate}}/' => userdate($event->timestart),
+            '/{{extensiondate}}/' => userdate($localcm->cm->data),
             '/{{requeststatusurl}}/' => $url,
             '/{{extensionlength}}/' => $this->get_request_time($mod),
             '/{{rulename}}/' => $this->name,
@@ -753,7 +753,7 @@ class rule {
     }
 
     /**
-     * Checks the rule for elapsed lenth.
+     * Checks the rule for elapsed length.
      *
      * @param request $request
      * @param array $mod
@@ -809,7 +809,7 @@ class rule {
      * @param \stdClass $userto
      */
     private function notify_user(request $request, $subject, $content, $userfrom, $userto) {
-        \local_extension\utility::send_trigger_email($request, $subject, $content, $userfrom, $userto);
+        utility::send_trigger_email($request, $subject, $content, $userfrom, $userto);
     }
 
     /**
