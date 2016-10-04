@@ -484,6 +484,7 @@ class rule {
                 $params = array(
                     'userid' => $user->id,
                     'localcmid' => $localcm->cm->id,
+                    'trigger' => $rule->id,
                 );
 
                 $sub = $DB->get_record('local_extension_subscription', $params);
