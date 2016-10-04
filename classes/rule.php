@@ -705,15 +705,7 @@ class rule {
      * @return string
      */
     private function get_request_time($mod) {
-        // The data is encoded when saving to the database, and decoded when loading from it.
-        // This value will be a timestamp.
-        $delta = $mod['localcm']->get_data() - $mod['event']->timestart;
-
-        $days = floor($delta / 60 / 60 / 24);
-        $hours = floor(($delta - ($days * 86400)) / 60 / 60);
-
-        // TODO lang string for this?
-        $str = "{$days} {$hours}";
+        $str = format_time($mod['localcm']->cm->length);
 
         return $str;
     }
@@ -727,7 +719,6 @@ class rule {
     private function check_request_length($mod) {
         $localcm = $mod['localcm'];
 
-        // The data is encoded when saving to the database, and decoded when loading from it.
         // This value will be a timestamp.
         $daterequested = $localcm->get_data();
         $datedue = $mod['event']->timestart;
