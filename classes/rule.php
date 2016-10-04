@@ -483,7 +483,7 @@ class rule {
             foreach ($users as $user) {
                 $params = array(
                     'userid' => $user->id,
-                    'localcmid' => $localcm->cm->cmid,
+                    'localcmid' => $localcm->cm->id,
                 );
 
                 $sub = $DB->get_record('local_extension_subscription', $params);

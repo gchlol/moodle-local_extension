@@ -89,6 +89,7 @@ class update extends \moodleform {
                         'course' => $course->id,
                         'cmid' => $id,
                     );
+
                     $modifyurl = new \moodle_url('/local/extension/modify.php', $params);
                     $html = \html_writer::link($modifyurl, 'Modify extension length');
                     $mform->addElement('html', $html);

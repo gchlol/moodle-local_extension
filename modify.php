@@ -140,10 +140,14 @@ if ($form = $mform->get_data()) {
 
     $notifycontent = array();
     $notifycontent[] = $request->add_comment($USER, $datestring);
+
+    // If the date has changed, we need to run the triggers to see if we alert new subscribers.
+    $request->process_triggers();
+
+    // Process the triggers before sending the notifications. New subscribers exist.
     $request->notify_subscribers($notifycontent, $USER->id);
 
     $request->get_data_cache()->delete($request->requestid);
-
     $statusurl = new moodle_url('/local/extension/status.php', array('id' => $requestid));
 
     // TODO Run triggers, update subscriptions.
