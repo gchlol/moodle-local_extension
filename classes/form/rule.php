@@ -84,12 +84,10 @@ class rule extends \moodleform {
         $mform->addHelpButton('parentgroup', 'form_rule_label_parent', 'local_extension');
 
         // And if the requested length is [lt/ge] [x] days long.
-        $lengthfromduedate = array();
-
         $lengthtypes = array(
+            \local_extension\rule::RULE_CONDITION_ANY => get_string('form_rule_any_value', 'local_extension'),
             \local_extension\rule::RULE_CONDITION_LT => get_string('form_rule_less_than', 'local_extension'),
             \local_extension\rule::RULE_CONDITION_GE => get_string('form_rule_greater_or_equal', 'local_extension'),
-            \local_extension\rule::RULE_CONDITION_ANY => get_string('form_rule_any_value', 'local_extension'),
         );
 
         $lengthfromduedategroup = array(
@@ -128,8 +126,6 @@ class rule extends \moodleform {
         $mform->addHelpButton('elapsedtimegroup', 'form_rule_label_elapsed_length', 'local_extension');
 
         // Then set all roles equal to [roletypes] to [action] this request.
-        $actionarray = array();
-
         $actiontypes = array(
             \local_extension\rule::RULE_ACTION_APPROVE   => get_string('form_rule_select_approve', 'local_extension'),
             \local_extension\rule::RULE_ACTION_SUBSCRIBE => get_string('form_rule_select_subscribe', 'local_extension'),
