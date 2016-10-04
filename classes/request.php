@@ -636,6 +636,37 @@ class request implements \cache_data_source {
     }
 
     /**
+     * Returns the highest subscription level of the specified userid.
+     *
+     * @param int $userid
+     * @return int
+     */
+    public function get_user_access($userid, $localcmid) {
+        global $DB;
+
+        $params = array(
+            'userid' => $userid,
+            'requestid' => $this->requestid,
+            'localcmid' => $localcmid,
+        );
+
+        $select = 'requestid = :requestid AND userid = :userid AND localcmid = :localcmid';
+
+        // Using fieldset as sometimes there is more than one result if triggers have been setup differently.
+        $fieldset = $DB->get_fieldset_select('local_extension_subscription', 'access', $select, $params);
+
+        $access = rule::RULE_ACTION_DEFAULT;
+
+        foreach ($fieldset as $item) {
+            if ($item > $access) {
+                $access = $item;
+            }
+        }
+
+        return $access;
+    }
+
+    /**
      * Returns the request cache.
      *
      * @return \cache_application|\cache_session|\cache_store

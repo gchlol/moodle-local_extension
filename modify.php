@@ -53,6 +53,12 @@ if (!array_key_exists($USER->id, $request->users)) {
     }
 }
 
+$access = $request->get_user_access($USER->id, $request->cms[$cmid]->cm->id);
+if ($access != \local_extension\rule::RULE_ACTION_APPROVE &&
+    $access != \local_extension\rule::RULE_ACTION_FORCEAPPROVE) {
+    die();
+}
+
 $url = new moodle_url('/local/extension/modify.php', array('id' => $requestid, 'course' => $courseid, 'cmid' => $cmid));
 $PAGE->set_url($url);
 
