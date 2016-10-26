@@ -578,7 +578,7 @@ class rule {
      * @return array
      */
     public function process_templates($request, $mod, $contentchange = null) {
-        global $PAGE;
+        global $PAGE, $CFG;
 
         $event   = $mod['event'];
         $cm      = $mod['cm'];
@@ -610,6 +610,8 @@ class rule {
             '/{{student_middle}}/' => $user->middlename,
             '/{{student_last}}/' => $user->lastname,
             '/{{student_alternate}}/' => $user->alternatename,
+            '/{{student_idnumber}}/' => $user->idnumber,
+            '/{{student_username}}/' => $user->username,
             '/{{duedate}}/' => userdate($event->timestart),
             '/{{extensiondate}}/' => userdate($localcm->cm->data),
             '/{{requeststatusurl}}/' => $url,
@@ -624,6 +626,19 @@ class rule {
             '/{{statuspage}}/' => null,
             '/{{contentchange}}/' => $contenttemplate,
         );
+
+        $showuseridentityfields = explode(',', $CFG->showuseridentity);
+        $protectedidentityfields = array (
+            '/{{student_idnumber}}/' => 'idnumber',
+            '/{{student_username}}/' => 'username',
+        );
+
+        // This will remove each token from template vars.
+        foreach ($protectedidentityfields as $key => $field) {
+            if (!in_array($field, $showuseridentityfields)) {
+                $templatevars[$key] = '';
+            }
+        }
 
         $patterns = array_keys($templatevars);
         $replacements = array_values($templatevars);

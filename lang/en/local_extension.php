@@ -108,6 +108,8 @@ $string['form_rule_label_template_help'] = 'An email notification be sent to all
 {{student_middle}} => Requesting users middle name<br />
 {{student_last}} => Requesting users last name<br />
 {{student_alternate}} => Requesting users alternate name<br />
+{{student_idnumber}} => Requesting users idnumber (Respects $CFG->showuseridentity)<br />
+{{student_username}} => Requesting users username (Respects $CFG->showuseridentity)<br />
 {{duedate}} => Due date of the course module<br />
 {{extensiondate}} => The date requested for length of the extension<br />
 {{requeststatusurl}} => URL for the request status page<br />
@@ -127,6 +129,8 @@ $string['form_rule_label_template_request_help'] = 'An email notification be sen
 {{student_middle}} => Requesting users middle name<br />
 {{student_last}} => Requesting users last name<br />
 {{student_alternate}} => Requesting users alternate name<br />
+{{student_idnumber}} => Requesting users idnumber (Respects $CFG->showuseridentity)<br />
+{{student_username}} => Requesting users username (Respects $CFG->showuseridentity)<br />
 {{duedate}} => Due date of the course module<br />
 {{extensiondate}} => The date requested for length of the extension<br />
 {{requeststatusurl}} => URL for the request status page<br />
@@ -257,13 +261,15 @@ $string['table_header_statushead'] = 'Status';
 $string['table_header_statusrow'] = '<a href="{$a}">Click to view request status</a>';
 $string['table_header_username'] = 'Requesting User';
 $string['task_process'] = 'Process Tiggers / Rules';
-$string['template_notify_content'] = "{{course}} => Course full name<br />
+$string['template_notify_content'] = '{{course}} => Course full name<br />
 {{module}} => Course module name<br />
 {{student}} => Requesting users full name<br />
 {{student_first}} => Requesting users first name<br />
 {{student_middle}} => Requesting users middle name<br />
 {{student_last}} => Requesting users last name<br />
 {{student_alternate}} => Requesting users alternate name<br />
+{{student_idnumber}} => Requesting users idnumber (Respects $CFG->showuseridentity)<br />
+{{student_username}} => Requesting users username (Respects $CFG->showuseridentity)<br />
 {{duedate}} => Due date of the course module<br />
 {{extensiondate}} => The date requested for length of the extension<br />
 {{requeststatusurl}} => URL for the request status page<br />
@@ -273,15 +279,17 @@ $string['template_notify_content'] = "{{course}} => Course full name<br />
 {{eventname}} => The name of the event<br />
 {{eventdescription}} => The description of the event<br />
 {{attachments}} => The list of attachments<br />
-{{fullhistory}} => The full comment stream for the request<br />";
+{{fullhistory}} => The full comment stream for the request<br />';
 $string['template_notify_subject'] = 'DEBUG: {{rulename}} {{rolename}}';
-$string['template_user_content'] = "{{course}} => Course full name<br />
+$string['template_user_content'] = '{{course}} => Course full name<br />
 {{module}} => Course module name<br />
 {{student}} => Requesting users full name<br />
 {{student_first}} => Requesting users first name<br />
 {{student_middle}} => Requesting users middle name<br />
 {{student_last}} => Requesting users last name<br />
 {{student_alternate}} => Requesting users alternate name<br />
+{{student_idnumber}} => Requesting users idnumber (Respects $CFG->showuseridentity)<br />
+{{student_username}} => Requesting users username (Respects $CFG->showuseridentity)<br />
 {{duedate}} => Due date of the course module<br />
 {{extensiondate}} => The date requested for length of the extension<br />
 {{requeststatusurl}} => URL for the request status page<br />
@@ -291,7 +299,7 @@ $string['template_user_content'] = "{{course}} => Course full name<br />
 {{eventname}} => The name of the event<br />
 {{eventdescription}} => The description of the event<br />
 {{attachments}} => The list of attachments<br />
-{{fullhistory}} => The full comment stream for the request<br />";
+{{fullhistory}} => The full comment stream for the request<br />';
 $string['template_user_subject'] = 'DEBUG {{student}} {{rulename}} {{rolename}}';
 $string['week'] = '{$a} week';
 $string['week_plural'] = '{$a} weeks';
