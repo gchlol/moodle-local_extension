@@ -171,8 +171,9 @@ $string['page_heading_manage'] = 'Extension trigger list';
 $string['page_heading_summary'] = 'Extension summary list';
 $string['page_index_all'] = 'All';
 $string['page_index_categories'] = 'Categories';
-$string['page_index_courses'] = 'Unit';
-$string['page_index_faculties'] = 'Course';
+$string['page_index_courses'] = 'Unit Code';
+$string['page_index_faculties'] = 'Unit Category';
+$string['page_index_mycourses'] = 'My Units';
 $string['page_index_toomanycourses'] = 'Too many courses, please search or filter by category.';
 $string['page_modify_comment'] = '
 The extension length has been modified.

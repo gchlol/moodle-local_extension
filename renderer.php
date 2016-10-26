@@ -706,7 +706,8 @@ class local_extension_renderer extends plugin_renderer_base {
 
             $select = new single_select($popupurl, 'id', $courselist, $courseid, null, 'requestform');
 
-            $html  = html_writer::span(get_string('mycourses'), '', array('id' => 'courses'));
+            $strcourses = get_string('page_index_mycourses', 'local_extension');
+            $html  = html_writer::span($strcourses, '', array('id' => 'courses'));
             $html .= $this->render($select);
             $controlstable->data[0]->cells[] = $html;
         }
