@@ -57,6 +57,7 @@ $PAGE->set_title(get_string('pluginname', 'local_extension'));
 $PAGE->set_heading(get_string('page_heading_index', 'local_extension'));
 $PAGE->requires->css('/local/extension/styles.css');
 $PAGE->add_body_class('local_extension');
+$PAGE->add_body_class('local_extension_status');
 
 $PAGE->navbar->ignore_active();
 $PAGE->navbar->add(get_string('breadcrumb_nav_index', 'local_extension'), new moodle_url('/local/extension/index.php'));
@@ -67,7 +68,6 @@ $fileareaitemid = $request->request->timestamp . $requestid;
 $renderer = $PAGE->get_renderer('local_extension');
 
 $params = array(
-    'user' => $OUTPUT->user_picture($USER),
     'request' => $request,
     'renderer' => $renderer,
 );

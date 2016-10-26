@@ -60,7 +60,6 @@
     min-height: 30px;
     position: relative;
 }
-
 .local_extension table tr.clearrow td {
     background-color: inherit;
     border: 1px none;
@@ -96,4 +95,21 @@
     text-align: center;
     vertical-align: baseline;
     white-space: nowrap;
+}
+
+.local_extension_status .mform fieldset div.fitemtitle {
+    width: 0;
+}
+
+.local_extension_status .mform fieldset div.felement {
+    margin-left: 0;
+    width: auto;
+}
+
+.local_extension_status .mform fieldset div.felement.ffilemanager {
+    width: 60%;
+}
+
+.local_extension_status .mform fieldset div.felement.ftextarea textarea {
+    width: 60%;
 }

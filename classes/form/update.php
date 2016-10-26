@@ -51,7 +51,6 @@ class update extends \moodleform {
         global $USER;
 
         $mform    = $this->_form;
-        $user     = $this->_customdata['user'];
         $request  = $this->_customdata['request'];
         /* @var \local_extension_renderer $renderer IDE hinting */
         $renderer = $this->_customdata['renderer'];
@@ -124,9 +123,6 @@ class update extends \moodleform {
 
         $mform->addElement('hidden', 'id');
         $mform->setType('id', PARAM_INT);
-
-        // To identify the current user, $user equals $OUTPUT->user_picture($USER).
-        $mform->addElement('html', $user);
 
         if ($USER->id == $request->request->userid) {
             $mform->addElement('filemanager', 'attachments', '', null, array('subdirs' => 0));
