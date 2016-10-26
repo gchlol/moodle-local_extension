@@ -104,8 +104,11 @@ $PAGE->navbar->add(get_string('breadcrumb_nav_status', 'local_extension', $obj),
 
 $mform = new \local_extension\form\modify(null, $params);
 
-if ($form = $mform->get_data()) {
+if ($mform->is_cancelled()) {
+    $statusurl = new moodle_url('/local/extension/status.php', array('id' => $requestid));
+    redirect($statusurl);
 
+} else if ($form = $mform->get_data()) {
     // TODO Edge cases with lowering the length beyond set triggers. Deal with changes / triggers.
     $cm = $request->cms[$cmid];
     $event = $request->mods[$cmid]['event'];
@@ -161,7 +164,6 @@ if ($form = $mform->get_data()) {
 
     // TODO Run triggers, update subscriptions.
     redirect($statusurl);
-
 } else {
     $data = new stdClass();
     $data->id = $requestid;
