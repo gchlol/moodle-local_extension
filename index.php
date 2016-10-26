@@ -117,7 +117,7 @@ if ($stateid != 0) {
     $params = array_merge($params, array('stateid' => $stateid), $params);
 }
 
-$mainuserfields = user_picture::fields('u', array('username', 'email', 'city', 'country', 'lang', 'timezone', 'maildisplay'));
+$mainuserfields = user_picture::fields('u', array('username', 'email', 'city', 'country', 'lang', 'timezone', 'maildisplay', 'idnumber'));
 
 $viewallrequests = false;
 if (has_capability('local/extension:viewallrequests', $categorycontext)) {
@@ -140,6 +140,7 @@ if ($viewallrequests) {
                       r.lastmod,
                       r.timestamp,
                       r.userid,
+                      u.idnumber,
                       c.fullname AS coursename,
                       $mainuserfields";
 
@@ -166,6 +167,7 @@ if ($viewallrequests) {
                       r.lastmod,
                       r.timestamp,
                       r.userid,
+                      u.idnumber,
                       c.fullname AS coursename,
                       $mainuserfields";
 
@@ -237,6 +239,7 @@ $requestlist = $DB->get_records_sql("$select $from $where $sort", $params, $tabl
 
 if ($requestlist) {
 
+    // Example: 'Wed, 26 Oct 2016 3:12PM'.
     $format = '%a, %e %b %Y %l:%M %p';
 
     foreach ($requestlist as $request) {
@@ -290,6 +293,16 @@ if ($requestlist) {
             html_writer::div($cmstate, 'lastmodby'),
             $lastmod,
         );
+
+        $showuseridentityfields = explode(',', $CFG->showuseridentity);
+        if (in_array('idnumber', $showuseridentityfields)) {
+            $moodleurl = new moodle_url('/user/view.php', array('id' => $request->userid, 'course' => $courseid));
+            $link = html_writer::link($moodleurl, $request->idnumber);
+
+            $div = html_writer::div($link, 'lastmodby');
+
+            array_splice($data, 3, 0, $div);
+        }
 
         $table->add_data($data);
     }
