@@ -124,9 +124,7 @@ class update extends \moodleform {
         $mform->addElement('hidden', 'id');
         $mform->setType('id', PARAM_INT);
 
-        if ($USER->id == $request->request->userid) {
-            $mform->addElement('filemanager', 'attachments', '', null, array('subdirs' => 0));
-        }
+        $mform->addElement('filemanager', 'attachments', '', null, array('subdirs' => 0));
 
         $mform->addElement('textarea', 'commentarea', '', 'wrap="virtual" rows="5" cols="70"');
 
