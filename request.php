@@ -126,8 +126,8 @@ $mform = new \local_extension\form\request(null, $params);
 $usercontext = context_user::instance($USER->id);
 
 if ($mform->is_cancelled()) {
-
-    redirect(new moodle_url('/'));
+    $indexurl = new moodle_url('/local/extension/index.php');
+    redirect($indexurl);
 
 } else if ($form = $mform->get_data()) {
 
