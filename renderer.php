@@ -51,10 +51,32 @@ class local_extension_renderer extends plugin_renderer_base {
         $out .= html_writer::start_tag('div', array('class' => 'comments'));
 
         // Fetch the comments, state changes and file attachments.
-        $comments = $req->get_history();
+        $indexed = array();
 
-        foreach ($comments as $comment) {
-            $out .= $this->render_single_comment($req, $comment, $showdate);
+        $history = $req->get_history();
+        foreach ($history as $comment) {
+            $indexed[$comment->timestamp][$comment->userid][] = $comment;
+        }
+
+        // Initial loop for items that have the same timestamp.
+        foreach ($indexed as $timestamp => $userid) {
+            // First inner loop for items that have the same userid.
+            foreach ($userid as $id => $items) {
+
+                $req->sort_history($items);
+
+                $comment = new stdClass();
+                $message = '';
+                // Second inner loop for collating the message content into one status item.
+                foreach ($items as $item) {
+                    $message .= html_writer::tag('p', $item->message);
+                }
+
+                $comment->timestamp = $items[0]->timestamp;
+                $comment->userid = $items[0]->userid;
+                $comment->message = $message;
+                $out .= $this->render_single_comment($req, $comment, $showdate);
+            }
         }
 
         $out .= html_writer::end_div(); // End .comments.
