@@ -159,6 +159,10 @@ class request implements \cache_data_source {
 
         $files = $fs->get_area_files($usercontext->id, 'local_extension', 'attachments', $request->id);
 
+        usort($files, function($a, $b) {
+            return $a->get_timecreated() - $b->get_timecreated();
+        });
+
         return array($fs, $files);
     }
 
