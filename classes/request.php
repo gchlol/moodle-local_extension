@@ -563,9 +563,14 @@ class request implements \cache_data_source {
      * @param array $history
      * @param int $postuserid The ID of the user that updated the request.
      *   This user will not receive an notification as they posted the content.
+     * @return bool
      */
     public function notify_subscribers($history, $postuserid) {
         global $PAGE;
+
+        if (empty($history)) {
+            return false;
+        }
 
         $this->sort_history($history);
 
@@ -614,6 +619,8 @@ class request implements \cache_data_source {
 
         // Increment the messageid to assist with inbox threading / message history.
         $this->increment_messageid();
+
+        return true;
     }
 
     /**
