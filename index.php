@@ -142,6 +142,7 @@ if ($viewallrequests) {
                       r.userid,
                       u.idnumber,
                       c.fullname AS coursename,
+                      c.id AS courseid,
                       $mainuserfields";
 
     $joins[] = "FROM {local_extension_cm} lcm";
@@ -169,6 +170,7 @@ if ($viewallrequests) {
                       r.userid,
                       u.idnumber,
                       c.fullname AS coursename,
+                      c.id AS courseid,
                       $mainuserfields";
 
     $joins[] = "FROM {local_extension_cm} lcm";
@@ -259,7 +261,7 @@ if ($requestlist) {
             has_capability('moodle/user:viewdetails', $context) ||
             has_capability('moodle/user:viewdetails', $usercontext))) {
 
-            $moodleurl = new moodle_url('/user/view.php', array('id' => $request->userid, 'course' => $courseid));
+            $moodleurl = new moodle_url('/user/view.php', array('id' => $request->userid, 'course' => $request->courseid));
             $link = html_writer::link($moodleurl, fullname($request));
 
             $profilelink = html_writer::tag('b', $link);
@@ -294,7 +296,7 @@ if ($requestlist) {
 
         $data = array(
             $requestlink,
-            $OUTPUT->user_picture($request, array('size' => 35, 'courseid' => $course->id)),
+            $OUTPUT->user_picture($request, array('size' => 35, 'courseid' => $request->courseid)),
             $profilelink,
             userdate($request->timestamp, $format),
             html_writer::div($requestlength, 'lastmodby'),
@@ -305,7 +307,7 @@ if ($requestlist) {
         );
 
         if (in_array('idnumber', $showuseridentityfields)) {
-            $moodleurl = new moodle_url('/user/view.php', array('id' => $request->userid, 'course' => $courseid));
+            $moodleurl = new moodle_url('/user/view.php', array('id' => $request->userid, 'course' => $request->courseid));
             $link = html_writer::link($moodleurl, $request->idnumber);
 
             $div = html_writer::div($link, 'lastmodby');
