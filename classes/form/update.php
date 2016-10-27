@@ -108,7 +108,11 @@ class update extends \moodleform {
 
         $mform->addElement('textarea', 'commentarea', '', 'wrap="virtual" rows="5" cols="70"');
 
-        $this->add_action_buttons(true,  get_string('submit_comment', 'local_extension'));
+        $buttonarray=array();
+        $buttonarray[] = &$mform->createElement('submit', 'submitbutton', get_string('submit_comment', 'local_extension'));
+        $buttonarray[] = &$mform->createElement('cancel', 'cancel', get_string('back'));
+        $mform->addGroup($buttonarray, 'buttonar', '', array(' '), false);
+        $mform->closeHeaderBefore('buttonar');
     }
 
     /**
