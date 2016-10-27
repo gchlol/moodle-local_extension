@@ -5,6 +5,7 @@ notifications:
   email:
     recipients:
     - brendan.heywood@gmail.com
+    - nicholashoobin@catalyst-au.net
 
 sudo: false
 
