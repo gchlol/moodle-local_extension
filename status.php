@@ -83,7 +83,11 @@ $PAGE->navbar->add(get_string('breadcrumb_nav_status', 'local_extension', $obj),
 
 $mform = new \local_extension\form\update(null, $params);
 
-if ($form = $mform->get_data()) {
+if ($mform->is_cancelled()) {
+    $indexurl = new moodle_url('/local/extension/index.php');
+    redirect($indexurl);
+
+} else if ($form = $mform->get_data()) {
     $comment = $form->commentarea;
 
     $draftcontext = context_user::instance($USER->id);

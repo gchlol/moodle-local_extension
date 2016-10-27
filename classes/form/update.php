@@ -77,10 +77,10 @@ class update extends \moodleform {
 
             $handler->status_definition($mod, $mform);
 
-            // Only allow the abilitiy to modify request legnth if the state is not approved.
+            // Only allow the abilitiy to modify request length if the state is not approved.
             if (state::can_modify_length_state($stateid)) {
 
-                // And if the user has the capabilitiy to force the status or approve it.
+                // And if the user has the capability to force the status or approve it.
                 if ($forcestatus || $access & $approve) {
 
                     $params = array(
@@ -128,7 +128,7 @@ class update extends \moodleform {
 
         $mform->addElement('textarea', 'commentarea', '', 'wrap="virtual" rows="5" cols="70"');
 
-        $mform->addElement('submit', 'submitcomment', get_string('submit_comment', 'local_extension'));
+        $this->add_action_buttons(true,  get_string('submit_comment', 'local_extension'));
     }
 
     /**
