@@ -280,14 +280,11 @@ if ($requestlist) {
         $requestlength = "$num $unit";
 
         $delta = $request->lastmod - time();
-
         $show = format_time($delta);
         $num = strtok($show, ' ');
         $unit = strtok(' ');
         $show = "$num $unit";
-
         $lastmodstring = get_string('ago', 'message', $show);
-
         $lastmod  = html_writer::start_div('lastmodby');
         $lastmod .= html_writer::tag('span', $lastmodstring);
         $lastmod .= html_writer::end_div();

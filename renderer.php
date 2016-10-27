@@ -74,15 +74,6 @@ class local_extension_renderer extends plugin_renderer_base {
         $class = 'content';
         $out = '';
 
-        // Add a css class to change background color for file attachments and state changes.
-        if (!empty($comment->filehash)) {
-            $class .= ' fileattachment';
-        }
-
-        if (!empty($comment->state)) {
-            $class .= ' statechange';
-        }
-
         if (array_key_exists($comment->userid, $req->users)) {
             $user = $req->users[$comment->userid];
         } else {
@@ -92,21 +83,20 @@ class local_extension_renderer extends plugin_renderer_base {
         $out .= html_writer::start_tag('div', array('class' => 'comment'));
 
         $out .= html_writer::start_tag('div', array('class' => 'avatar'));
-        $out .= $this->output->user_picture($user, array(
-            'size' => 50,
-        ));
+        $out .= $this->output->user_picture($user, array('size' => 50));
         $out .= html_writer::end_div(); // End .avatar.
 
         $out .= html_writer::start_tag('div', array('class' => $class));
         $out .= html_writer::tag('span', fullname($user), array('class' => 'name'));
-
         $out .= html_writer::tag('span', ' - ' . $this->render_role($req, $user->id), array('class' => 'role'));
         $out .= html_writer::tag('span', ' - ' . $this->render_time($comment->timestamp, $showdate), array('class' => 'time'));
 
         $out .= html_writer::start_tag('div', array('class' => 'message'));
         $out .= html_writer::div(format_text(trim($comment->message), FORMAT_MOODLE), 'comment');
         $out .= html_writer::end_div(); // End .message.
+
         $out .= html_writer::end_div(); // End .content.
+
         $out .= html_writer::end_div(); // End .comment.
 
         return $out;
