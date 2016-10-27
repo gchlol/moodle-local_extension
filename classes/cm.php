@@ -204,6 +204,24 @@ class cm {
     }
 
     /**
+     * Returns the cm items requested extension length as a string in its largest unit.
+     *
+     * @return bool|string
+     */
+    public function get_extension_length() {
+        if (!empty($this->cm)) {
+            $requestlength = format_time($this->cm->length);
+            $num = strtok($requestlength, ' ');
+            $unit = strtok(' ');
+            $requestlength = "$num $unit";
+
+            return $requestlength;
+        }
+
+        return false;
+    }
+
+    /**
      * Returns the cm state id
      *
      * @return integer

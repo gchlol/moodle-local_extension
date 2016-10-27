@@ -125,6 +125,7 @@ class request extends \local_extension\base_request {
     public function modify_definition($mod, $mform, $customdata) {
         $event = $mod['event'];
         $course = $mod['course'];
+        $lcm = $mod['localcm'];
         $instance = $customdata['instance'];
 
         $html = \html_writer::start_div('content');
@@ -147,6 +148,11 @@ class request extends \local_extension\base_request {
         if ($instance->cutoffdate) {
             $mform->addElement('static', 'cutoffdate', get_string('cutoffdate', 'assign'), userdate($instance->cutoffdate));
             $finaldate = $instance->cutoffdate;
+        }
+
+        $extensionlength = $lcm->get_extension_length();
+        if ($extensionlength) {
+            $mform->addElement('static', 'cutoffdate', 'Current extension length', $extensionlength);
         }
 
         $this->date_selector($mod, $mform, false);
