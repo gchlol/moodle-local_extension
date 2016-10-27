@@ -27,6 +27,7 @@
 $string['admin_settings_general'] = 'General settings';
 $string['admin_settings_template'] = 'Template settings';
 $string['and'] = 'and';
+$string['attachment_detail'] = '{$a->file} from {$a->user} on {$a->date}';
 $string['attachments'] = 'Attachments';
 $string['button_edit_rule'] = 'Add a new Rule';
 $string['button_request_extension'] = 'Request an Extension';

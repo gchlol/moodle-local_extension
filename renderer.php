@@ -211,10 +211,16 @@ class local_extension_renderer extends plugin_renderer_base {
                 $file->get_filename()
             );
 
+            $user = core_user::get_user($file->get_userid());
+
+            $obj = new stdClass();
+            $obj->file = $OUTPUT->pix_icon(file_file_icon($file, 16), get_mimetype_description($file)) .
+                ' ' . html_writer::link($fileurl, $f->get_filename());
+            $obj->user = fullname($user);
+            $obj->date = userdate($file->get_timecreated());
+
             $out .= html_writer::start_tag('li', array('class' => 'attachment'));
-            $out .= $OUTPUT->pix_icon(file_file_icon($file, 16), get_mimetype_description($file)) . ' ';
-            $out .= html_writer::link($fileurl, $f->get_filename()) . "  ";
-            $out .= userdate($file->get_timecreated());
+            $out .= get_string('attachment_detail', 'local_extension', $obj);
             $out .= html_writer::end_tag('li'); // End .attachment.
 
         }
