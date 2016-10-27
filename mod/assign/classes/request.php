@@ -184,12 +184,7 @@ class request extends \local_extension\base_request {
         $obj = new \stdClass();
         $obj->status = $status;
         $obj->date = userdate($localcm->cm->data);
-
-        $requestlength = format_time($localcm->cm->length);
-        $num = strtok($requestlength, ' ');
-        $unit = strtok(' ');
-        $requestlength = "$num $unit";
-        $obj->length =  $requestlength;
+        $obj->length = $localcm->get_extension_length();
         $statusline = get_string('status_status_line', 'local_extension', $obj);
 
         $html .= \html_writer::tag('p', $statusline, array('class' => 'time'));
