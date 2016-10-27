@@ -97,7 +97,7 @@ class state {
      */
     public static function can_modify_length_state($stateid) {
         switch ($stateid) {
-            case self::STATE_NEW:
+            case self::STATE_NEW;
                 return true;
             case self::STATE_REOPENED:
                 return true;
@@ -254,6 +254,7 @@ class state {
                 $buttonarray[] = $mform->createElement('submit', $cancel . $id, $cancelstr);
                 break;
             case self::STATE_DENIED:
+                $buttonarray[] = $mform->createElement('submit', $approve . $id, $approvestr);
                 $buttonarray[] = $mform->createElement('submit', $reopen . $id, $reopenstr);
                 $buttonarray[] = $mform->createElement('submit', $cancel . $id, $cancelstr);
                 break;
