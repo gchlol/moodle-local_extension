@@ -107,7 +107,7 @@ if ($mform->is_cancelled()) {
         // We need to add the existing files to the draft area so they are saved and merged with the new area.
         foreach ($oldfiles as $oldfile) {
             $filerecord = new stdClass();
-            $filerecord->contextid = $usercontext->id;
+            $filerecord->contextid = $draftcontext->id;
             $filerecord->component = 'user';
             $filerecord->filearea = 'draft';
             $filerecord->itemid = $draftitemid;
