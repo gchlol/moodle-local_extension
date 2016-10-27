@@ -168,11 +168,14 @@ class request extends \local_extension\base_request {
      * @return string
      */
     public function status_definition($mod, $mform = null) {
-        $cm = $mod['cm'];
+        global $USER;
+
         $event = $mod['event'];
         $course = $mod['course'];
-        $handler = $mod['handler'];
         $localcm = $mod['localcm'];
+
+        $requestid = $localcm->requestid;
+        $cmid = $localcm->cmid;
 
         $html = \html_writer::start_div('content');
         $coursestring = \html_writer::tag('b', $course->fullname . ' > ' . $event->name, array('class' => 'mod'));
@@ -185,9 +188,29 @@ class request extends \local_extension\base_request {
         $obj->status = $status;
         $obj->date = userdate($localcm->cm->data);
         $obj->length = $localcm->get_extension_length();
-        $statusline = get_string('status_status_line', 'local_extension', $obj);
 
-        $html .= \html_writer::tag('p', $statusline, array('class' => 'time'));
+        $status  = \html_writer::start_tag('p', array('class' => 'time'));
+        $status .= get_string('status_status_line', 'local_extension', $obj);
+
+        // If the users access is either approve or force, then they can modify the request length.
+        $context = \context_course::instance($course->id, MUST_EXIST);
+        $forcestatus = has_capability('local/extension:modifyrequeststatus', $context);
+        $approve = (rule::RULE_ACTION_APPROVE | rule::RULE_ACTION_FORCEAPPROVE);
+        $access = rule::get_access($mod, $USER->id);
+        if ($forcestatus || $access & $approve) {
+            $params = array(
+                'id' => $requestid,
+                'course' => $course->id,
+                'cmid' => $cmid,
+            );
+
+            $modifyurl = new \moodle_url('/local/extension/modify.php', $params);
+            $modlink = \html_writer::link($modifyurl, get_string('modifyextensionlength', 'local_extension'));
+            $status .= ' ' . $modlink;
+        }
+
+        $status .= \html_writer::end_tag('p');
+        $html .= $status;
         $html .= \html_writer::end_div(); // End .content.
 
         if (!empty($mform)) {

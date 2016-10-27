@@ -77,26 +77,6 @@ class update extends \moodleform {
 
             $handler->status_definition($mod, $mform);
 
-            // Only allow the abilitiy to modify request length if the state is not approved.
-            if (state::can_modify_length_state($stateid)) {
-
-                // And if the user has the capability to force the status or approve it.
-                if ($forcestatus || $access & $approve) {
-
-                    $params = array(
-                        'id' => $request->request->id,
-                        'course' => $course->id,
-                        'cmid' => $id,
-                    );
-
-                    $modifyurl = new \moodle_url('/local/extension/modify.php', $params);
-                    $html = \html_writer::link($modifyurl, 'Modify extension length');
-                    $mform->addElement('html', $html);
-
-                }
-
-            }
-
             if ($forcestatus) {
                 $state->render_force_buttons($mform, $stateid, $id);
 
