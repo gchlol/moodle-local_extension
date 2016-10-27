@@ -178,7 +178,14 @@ class request extends \local_extension\base_request {
         $cmid = $localcm->cmid;
 
         $html = \html_writer::start_div('content');
-        $coursestring = \html_writer::tag('b', $course->fullname . ' > ' . $event->name, array('class' => 'mod'));
+
+        $courseurl = new \moodle_url('/course/view.php', array('id' => $course->id));
+        $courselink = \html_writer::link($courseurl, $course->fullname);
+
+        $eventurl = new \moodle_url('/mod/' . $event->modulename . '/view.php', array('id' => $cmid));
+        $eventlink = \html_writer::link($eventurl, $event->name);
+
+        $coursestring = \html_writer::tag('b', $courselink. ' > ' . $eventlink, array('class' => 'mod'));
         $str = get_string('dueon', 'extension_assign', userdate($event->timestart));
         $html .= \html_writer::tag('p', $coursestring . ' ' . $str);
 
