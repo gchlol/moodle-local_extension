@@ -225,15 +225,22 @@ class cm {
      * Sets the state of this request.
      *
      * @param int $state
+     * @return bool
      */
     public function set_state($state) {
         global $DB;
+
+        if (empty($state)) {
+            return false;
+        }
 
         $this->set_stateid($state);
 
         $DB->update_record('local_extension_cm', $this->cm);
 
         utility::cache_invalidate_request($this->requestid);
+
+        return true;
     }
 
     /**

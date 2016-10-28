@@ -230,6 +230,52 @@ class request extends \local_extension\base_request {
     }
 
     /**
+     * Renders the request status in a form with indicators of the request state.
+     *
+     * @param array $mod An array of event details
+     * @param \MoodleQuickForm $mform A moodle form object
+     * @return string
+     */
+    public function status_change_definition($mod, $mform, $customdata) {
+        global $CFG;
+
+        $event = $mod['event'];
+        $course = $mod['course'];
+
+        /* @var \local_extension\cm $lcm IDE hinting. */
+        $lcm = $mod['localcm'];
+        $instance = $customdata['instance'];
+        $user = $customdata['user'];
+
+        $html = \html_writer::start_div('content');
+        $coursestring = \html_writer::tag('b', $course->fullname . ' > ' . $event->name, array('class' => 'mod'));
+        $html .= \html_writer::tag('p', $coursestring);
+        $html .= \html_writer::end_div(); // End .content.
+
+        $mform->addElement('html', \html_writer::tag('p', $html));
+        $html .= \html_writer::end_div(); // End .content.
+
+        $mform->addElement('static', 'cutoffdate', 'Requested by', fullname($user));
+
+        $showuseridentityfields = explode(',', $CFG->showuseridentity);
+        if (in_array('idnumber', $showuseridentityfields)) {
+            $mform->addElement('static', 'cutoffdate', 'ID number', $user->idnumber);
+        }
+
+        $mform->addElement('static', 'duedate', get_string('duedate', 'assign'), userdate($instance->duedate));
+
+        $extensionlength = utility::calculate_length($lcm->cm->length);
+        $mform->addElement('static', 'extensionlength', 'Extension length', $extensionlength);
+
+        $mform->addElement('static', 'currentstate', 'Current state', \local_extension\state::instance()->get_state_name($lcm->cm->state));
+
+        $mform->addElement('static', 'newstate', 'New state', \local_extension\state::instance()->get_state_name($customdata['state']));
+
+        return $html;
+    }
+
+
+    /**
      * Validate the parts of the request form for this module
      *
      * @param \MoodleQuickForm $mform A moodle form object

@@ -275,66 +275,95 @@ class state {
     }
 
     /**
+     * If the $data object contains a state change reference, redirect the page to an intermediate acknowledgement.
+     *
+     * @param \stdClass $data
+     * @param request $request
+     */
+    public function has_submitted_state($data, $request) {
+        // Iterate over the request mods to obtain the cmid.
+        foreach ($request->mods as $id => $mod) {
+            // Iterate over the possible states.
+            foreach ($this->statearray as $state => $name) {
+                // A state could be approve19.
+                $item = $name . $id;
+
+                // We found it! The state has changed.
+                if (!empty($data->$item)) {
+                    $cm = $mod['cm'];
+                    $params = array(
+                        'id' => $request->requestid,
+                        'course' => $cm->course,
+                        'cmid' => $cm->id,
+                        's' => $state,
+                    );
+
+                    redirect(new \moodle_url('/local/extension/state.php', $params));
+                }
+            }
+        }
+    }
+
+    /**
      * Updates the cm state with posted data.
      *
      * @param \local_extension\request $request
      * @param int $user
      * @param \stdClass $data
-     * @return object
+     * @return object|bool
      */
     public function update_cm_state($request, $user, $data) {
 
-        foreach ($request->mods as $id => $mod) {
-            /* @var \local_extension\base_request $handler IDE hinting */
-            $handler = $mod['handler'];
+        $mod = $request->mods[$data->cmid];
+        /* @var \local_extension\base_request $handler IDE hinting */
+        $handler = $mod['handler'];
 
-            /* @var \local_extension\cm $localcm IDE hinting */
-            $localcm = $mod['localcm'];
-            $event   = $mod['event'];
-            $course  = $mod['course'];
+        /* @var \local_extension\cm $localcm IDE hinting */
+        $localcm = $mod['localcm'];
+        $event   = $mod['event'];
+        $course  = $mod['course'];
 
-            /*
-             * Iterate over a list of states with their cmid concatenated eg. approve6
-             * approve6: Would trigger the approve handler for cmid 6.
-             */
-            foreach ($this->statearray as $state => $name) {
-                $item = $name . $id;
+        /*
+         * Iterate over a list of states with their cmid concatenated eg. approve6
+         * approve6: Would trigger the approve handler for cmid 6.
+         */
 
-                if (!empty($data->$item)) {
+        $state = $data->s;
 
-                    // The extension has been approved. Lets hook into the handler and extend the items length.
-                    if ($name == $this->statearray[self::STATE_APPROVED]) {
-                        $handler->submit_extension($event->instance, $request->request->userid, $localcm->cm->data);
-                    } else if ($name == $this->statearray[self::STATE_CANCEL] ||
-                               $name == $this->statearray[self::STATE_DENIED]) {
-                        $handler->cancel_extension($event->instance, $request->request->userid);
-                    }
+        // The extension has been approved. Lets hook into the handler and extend the items length.
+        if ($state == self::STATE_APPROVED) {
+            $handler->submit_extension($event->instance,
+                                       $request->request->userid,
+                                       $localcm->cm->data);
 
-                    $localcm->set_state($state);
-
-                    $status = $this->get_state_name($localcm->cm->state);
-
-                    // After writing the history it will return the ID of the new row.
-                    $history = $localcm->write_history($mod, $state, $user->id);
-
-                    $log = new \stdClass();
-                    $log->status = $status;
-                    $log->course = $course->fullname;
-                    $log->event = $event->name;
-
-                    $history->message = get_string('request_state_history_log', 'local_extension', $log);
-
-                    // Update the lastmod.
-                    $request->update_lastmod($user->id);
-
-                    // You can only edit one state at a time, returning here is ok!
-                    return $history;
-                }
-
-            }
-
+        } else if ($state == self::STATE_CANCEL ||
+                   $state == self::STATE_DENIED) {
+            $handler->cancel_extension($event->instance,
+                                       $request->request->userid);
         }
 
+        $ret = $localcm->set_state($state);
+        if (empty($ret)) {
+            return false;
+        }
+
+        $status = $this->get_state_name($localcm->cm->state);
+
+        // After writing the history it will return the ID of the new row.
+        $history = $localcm->write_history($mod, $state, $user->id);
+
+        $log = new \stdClass();
+        $log->status = $status;
+        $log->course = $course->fullname;
+        $log->event = $event->name;
+
+        $history->message = get_string('request_state_history_log', 'local_extension', $log);
+
+        // Update the lastmod.
+        $request->update_lastmod($user->id);
+
+        // You can only edit one state at a time, returning here is ok!
+        return $history;
     }
 
 }

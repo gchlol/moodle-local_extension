@@ -15,7 +15,7 @@
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
 /**
- * Status page in local_extension
+ * State change page in local_extension
  *
  * @package    local_extension
  * @author     Nicholas Hoobin <nicholashoobin@catalyst-au.net>
@@ -24,6 +24,8 @@
  */
 
 use local_extension\utility;
+use local_extension\state;
+use local_extension\rule;
 
 require_once(__DIR__ . '/../../config.php');
 require_once($CFG->dirroot . '/mod/assign/locallib.php');
@@ -34,6 +36,7 @@ require_login(true);
 $requestid = required_param('id', PARAM_INT);
 $courseid = required_param('course', PARAM_INT);
 $cmid = required_param('cmid', PARAM_INT);
+$stateid = required_param('s', PARAM_INT);
 
 $request = utility::cache_get_request($requestid);
 
@@ -47,8 +50,8 @@ if (!has_capability('local/extension:viewallrequests', $context)) {
     if (array_key_exists($USER->id, $request->users)) {
         // The user is part of the request, lets check their access.
         $access = $request->get_user_access($USER->id, $request->cms[$cmid]->cm->id);
-        if ($access != \local_extension\rule::RULE_ACTION_APPROVE &&
-            $access != \local_extension\rule::RULE_ACTION_FORCEAPPROVE) {
+        if ($access != rule::RULE_ACTION_APPROVE &&
+            $access != rule::RULE_ACTION_FORCEAPPROVE) {
             // The $USER belongs to the request user list, but does not have sufficient access.
             print_error('invalidaccess', 'local_extension');
         }
@@ -59,7 +62,8 @@ if (!has_capability('local/extension:viewallrequests', $context)) {
     }
 }
 
-$url = new moodle_url('/local/extension/modify.php', array('id' => $requestid, 'course' => $courseid, 'cmid' => $cmid));
+$params = array('id' => $requestid, 'course' => $courseid, 'cmid' => $cmid, 's' => $stateid);
+$url = new moodle_url('/local/extension/state.php', $params);
 $PAGE->set_url($url);
 
 // TODO context could be user, course or module.
@@ -82,13 +86,15 @@ $context = \context_module::instance($cmid);
 $assign = new \assign($context, $cm, $course);
 $instance = $assign->get_instance();
 
+$requestuser = core_user::get_user($request->request->userid);
+
 $params = array(
     'request' => $request,
     'cmid' => $cmid,
     'instance' => $assign->get_instance(),
+    'state' => $stateid,
+    'user' => $requestuser,
 );
-
-$requestuser = core_user::get_user($request->request->userid);
 
 $PAGE->navbar->ignore_active();
 $PAGE->navbar->add(get_string('breadcrumb_nav_index', 'local_extension'), new moodle_url('/local/extension/index.php'));
@@ -97,70 +103,59 @@ $obj = array('id' => $requestid, 'name' => fullname($requestuser));
 
 $pageurl = new moodle_url('/local/extension/status.php', array('id' => $request->requestid));
 $PAGE->navbar->add(get_string('breadcrumb_nav_status', 'local_extension', $obj), $pageurl);
-$PAGE->navbar->add(get_string('breadcrumb_nav_modify', 'local_extension'));
+$PAGE->navbar->add(get_string('breadcrumb_nav_modify_state', 'local_extension'));
 
-$mform = new \local_extension\form\modify(null, $params);
+$mform = new \local_extension\form\state(null, $params);
 
 if ($mform->is_cancelled()) {
     $statusurl = new moodle_url('/local/extension/status.php', array('id' => $requestid));
     redirect($statusurl);
 
 } else if ($form = $mform->get_data()) {
-    // TODO Edge cases with lowering the length beyond set triggers. Deal with changes / triggers.
-    $cm = $request->cms[$cmid];
-    $event = $request->mods[$cmid]['event'];
-    $course  = $request->mods[$cmid]['course'];
 
-    $due = 'due' . $cmid;
+    // Parse the form data to see if any accept/deny/reopen/etc buttons have been clicked, and update the state accordingly.
+    // If the state has been approved then it will call the handers->submit_extension method to extend the module.
+    $notifycontent[] = state::instance()->update_cm_state($request, $USER, $form);
 
-    $originaldate = $cm->cm->data;
-    $newdate = $form->$due;
+    $comment = $form->commentarea;
+    if (!empty($comment)) {
+        $notifycontent[] = $request->add_comment($USER, $comment);
+    }
 
-    $delta = $newdate - $originaldate;
-    // Prepend -+ signs to indicate a difference in length.
-    $sign = $delta < 0 ? '-' : '+';
-    $obj = new stdClass();
-    $obj->course = $course->fullname;
-    $obj->event = $event->name;
-    $obj->original = userdate($originaldate);
-    $obj->new = userdate($newdate);
-    $obj->diff = $sign . utility::calculate_length($delta);
+    // Cleaning up the array.
+    $notifycontent = array_filter($notifycontent, function($obj) {
+        return !is_null($obj);
+    });
 
-    $length = $event->timestart - $newdate;
-    $obj->length = utility::calculate_length($length);
-
-    $datestring = get_string('page_modify_comment', 'local_extension', $obj);
-
-    $cm->cm->data = $newdate;
-    $cm->cm->length = $newdate - $event->timestart;
-    $cm->update_data();
-
-    $notifycontent = array();
-    $notifycontent[] = $request->add_comment($USER, $datestring);
-
-    // If the date has changed, we need to run the triggers to see if we alert new subscribers.
-    $request->process_triggers();
-
-    // Process the triggers before sending the notifications. New subscribers exist.
     $request->notify_subscribers($notifycontent, $USER->id);
 
-    $request->get_data_cache()->delete($request->requestid);
-    $statusurl = new moodle_url('/local/extension/status.php', array('id' => $requestid));
+    // Update the lastmod.
+    $request->update_lastmod($USER->id);
 
-    // TODO Run triggers, update subscriptions.
-    redirect($statusurl);
+    // Invalidate the cache for this request. The content has changed.
+    $request->get_data_cache()->delete($request->requestid);
+
+    if (!empty($form->submitbutton_status)) {
+        $statusurl = new moodle_url('/local/extension/status.php', array('id' => $requestid));
+        redirect($statusurl);
+    }
+
+    if (!empty($form->submitbutton_list)) {
+        $index = new moodle_url('/local/extension/index.php');
+        redirect($index);
+    }
+
 } else {
     $data = new stdClass();
     $data->id = $requestid;
     $data->cmid = $cmid;
     $data->userid = $request->request->userid;
     $data->course = $courseid;
+    $data->s = $stateid;
     $mform->set_data($data);
 }
 
 echo $OUTPUT->header();
-
-// TODO echo $renderer->display_modify_heading();.
 
 $mform->display();
 
