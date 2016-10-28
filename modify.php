@@ -41,23 +41,23 @@ $request = utility::cache_get_request($requestid);
 // The list of subscribed users populated each time the request object is generated.
 // The request object is invalidated and regenerated after each comment, attachment added, or rule triggered.
 
-// Checking if the current user is not part of the request.
-if (!array_key_exists($USER->id, $request->users)) {
-    $context = context_module::instance($cmid);
-    // Admin users will have this capability, or anyone that was subscribed.
-    if (!has_capability('local/extension:viewallrequests', $context)) {
-        die();
-    }
+// Checking if the current user is not part of the request or does not have the capability to view all requests.
+$context = context_module::instance($cmid);
+if (!has_capability('local/extension:viewallrequests', $context)) {
+    if (array_key_exists($USER->id, $request->users)) {
+        // The user is part of the request, lets check their access.
+        $access = $request->get_user_access($USER->id, $request->cms[$cmid]->cm->id);
+        if ($access != \local_extension\rule::RULE_ACTION_APPROVE &&
+            $access != \local_extension\rule::RULE_ACTION_FORCEAPPROVE) {
+            // The $USER belongs to the request user list, but does not have sufficient access.
+            print_error('invalidaccess', 'local_extension');
+        }
 
-} else {
-    // The user is part of the request, lets check their access.
-    $access = $request->get_user_access($USER->id, $request->cms[$cmid]->cm->id);
-    if ($access != \local_extension\rule::RULE_ACTION_APPROVE &&
-        $access != \local_extension\rule::RULE_ACTION_FORCEAPPROVE) {
-        die();
+    } else {
+        // The user does not have the capability, nor is part of the request user list.
+        print_error('invalidaccess', 'local_extension');
     }
 }
-
 
 $url = new moodle_url('/local/extension/modify.php', array('id' => $requestid, 'course' => $courseid, 'cmid' => $cmid));
 $PAGE->set_url($url);

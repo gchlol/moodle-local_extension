@@ -156,6 +156,7 @@ $string['form_rule_validate_duplicate_files'] = 'You can not upload files with a
 $string['form_rule_validate_elapsed'] = 'You must enter a number that is less than the request length';
 $string['form_rule_validate_greater_equal_to_zero'] = 'You must enter a number equal or greater than zero here';
 $string['form_rule_validate_greater_than_zero'] = 'You must enter a number greater than zero here';
+$string['invalidaccess'] = 'Permission denied. Invalid access level.';
 $string['messageprovider:status'] = 'Activity extension notifications';
 $string['modifyextensionlength'] = 'Modify extension length';
 $string['modulecontext'] = 'Allow module context requests';
