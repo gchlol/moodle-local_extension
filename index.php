@@ -275,10 +275,7 @@ if ($requestlist) {
         $requesturl = new moodle_url('/local/extension/status.php', array('id' => $request->rid));
         $requestlink = html_writer::link($requesturl, $request->rid);
 
-        $requestlength = format_time($request->length);
-        $num = strtok($requestlength, ' ');
-        $unit = strtok(' ');
-        $requestlength = "$num $unit";
+        $requestlength = \local_extension\utility::calculate_length($request->length);
 
         $delta = $request->lastmod - time();
         $show = format_time($delta);

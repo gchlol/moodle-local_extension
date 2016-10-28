@@ -545,4 +545,35 @@ class utility {
         return array_reverse($idlist, true);
     }
 
+    /**
+     * Returns a string with the time format as days, hours, minutes.
+     *
+     * @param int $seconds
+     * @return string
+     */
+    public static function calculate_length($seconds) {
+        $seconds = abs($seconds);
+
+        $dtf = new \DateTime('@0');
+        $dtt = new \DateTime("@$seconds");
+        $diff = $dtf->diff($dtt);
+
+        $fmt = '';
+
+        if ($diff->d) {
+            $fmt = '%a day' . ($diff->d > 1 ? 's' : '');
+        }
+
+        if ($diff->h) {
+
+            $fmt .= (empty($fmt) ? '' : ', ') . '%h hour' . ($diff->h > 1 ? 's' : '');
+        }
+
+        if ($diff->i) {
+            $fmt .= (empty($fmt) ? '' : ', ') . '%i minute' . ($diff->i > 1 ? 's' : '');
+        }
+
+        return $diff->format($fmt);
+    }
+
 }

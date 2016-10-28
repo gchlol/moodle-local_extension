@@ -27,6 +27,7 @@ namespace extension_assign;
 
 use local_extension\rule;
 use local_extension\state;
+use local_extension\utility;
 
 defined('MOODLE_INTERNAL') || die();
 
@@ -125,6 +126,8 @@ class request extends \local_extension\base_request {
     public function modify_definition($mod, $mform, $customdata) {
         $event = $mod['event'];
         $course = $mod['course'];
+
+        /* @var \local_extension\cm $lcm IDE hinting. */
         $lcm = $mod['localcm'];
         $instance = $customdata['instance'];
 
@@ -149,7 +152,7 @@ class request extends \local_extension\base_request {
             $finaldate = $instance->cutoffdate;
         }
 
-        $extensionlength = $lcm->get_extension_length();
+        $extensionlength = utility::calculate_length($lcm->cm->length);
         if ($extensionlength) {
             $mform->addElement('static', 'cutoffdate', 'Current extension length', $extensionlength);
         }
@@ -193,7 +196,7 @@ class request extends \local_extension\base_request {
         $obj = new \stdClass();
         $obj->status = $status;
         $obj->date = userdate($localcm->cm->data);
-        $obj->length = $localcm->get_extension_length();
+        $obj->length = utility::calculate_length($localcm->cm->length);
 
         $status  = \html_writer::start_tag('p', array('class' => 'time'));
         $status .= get_string('status_status_line', 'local_extension', $obj);

@@ -117,29 +117,17 @@ if ($mform->is_cancelled()) {
     $newdate = $form->$due;
 
     $delta = $newdate - $originaldate;
-
-    $show = format_time($delta);
-    $num = strtok($show, ' ');
-    $unit = strtok(' ');
-    $show = "$num $unit";
-
     // Prepend -+ signs to indicate a difference in length.
     $sign = $delta < 0 ? '-' : '+';
-
     $obj = new stdClass();
     $obj->course = $course->fullname;
     $obj->event = $event->name;
     $obj->original = userdate($originaldate);
     $obj->new = userdate($newdate);
-    $obj->diff = $sign . $show;
+    $obj->diff = $sign . utility::calculate_length($delta);
 
-    $delta = $event->timestart - $newdate;
-    $show = format_time($delta);
-    $num = strtok($show, ' ');
-    $unit = strtok(' ');
-    $show = "$num $unit";
-
-    $obj->length = $show;
+    $length = $event->timestart - $newdate;
+    $obj->length = utility::calculate_length($length);
 
     $datestring = get_string('page_modify_comment', 'local_extension', $obj);
 

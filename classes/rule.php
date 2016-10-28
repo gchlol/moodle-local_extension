@@ -721,9 +721,7 @@ class rule {
      * @return string
      */
     private function get_request_time($mod) {
-        $str = format_time($mod['localcm']->cm->length);
-
-        return $str;
+        return utility::calculate_length($mod['localcm']->cm->length);
     }
 
     /**
