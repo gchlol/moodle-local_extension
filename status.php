@@ -42,7 +42,7 @@ if (!array_key_exists($USER->id, $request->users)) {
 
     // Admin users will have this capability, or anyone that was subscribed.
     if (!has_capability('local/extension:viewallrequests', context_system::instance())) {
-        die();
+        print_error('permissiondenied', 'local_extension');
     }
 }
 

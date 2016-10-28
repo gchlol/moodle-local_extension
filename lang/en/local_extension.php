@@ -194,6 +194,7 @@ $string['page_request_requestnewlink'] = 'Click here to make a new extension req
 $string['page_request_requeststatuslink'] = 'Click here to view the extension status {$a}';
 $string['page_request_searchbackward'] = 'Look behind for possible requests in the past';
 $string['page_request_searchforward'] = 'Look ahead for possible requests in the future';
+$string['permissiondenied'] = 'Permisison denied.';
 $string['pluginname'] = 'Activity extensions';
 $string['renderer_search_text'] = 'Search';
 $string['requestextension_status'] = 'Extension Status';
