@@ -35,9 +35,6 @@ $requestid = required_param('id', PARAM_INT);
 $courseid = required_param('course', PARAM_INT);
 $cmid = required_param('cmid', PARAM_INT);
 
-// $cm = get_fast_modinfo($courseid)->get_cm($cmid);
-// require_login($courseid, null, $cm);
-
 $request = utility::cache_get_request($requestid);
 
 // Item $request->user is an array of $userid=>$userobj associated to this request, eg. those that are subscribed, and the user.

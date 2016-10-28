@@ -73,7 +73,7 @@ class rule {
     /** @var int $action Action type */
     public $action = null;
 
-    /** @var int $priority Priortiy */
+    /** @var int $priority Priority */
     public $priority = null;
 
     /** @var int $parent Parent id */
@@ -339,7 +339,7 @@ class rule {
      *
      * @param request $request
      * @param array $mod
-     * @param array $templates
+     * @param \stdClass $templates
      */
     public function send_notifications($request, $mod, $templates) {
         // TODO check if there is any content and not notify roles/users.
@@ -355,7 +355,7 @@ class rule {
         $data = new \stdClass();
         $data->requestid = $request->requestid;
         $data->fullname = fullname($requestuser, true);
-        $subject = get_string('email_notification_subect', 'local_extension', $data);
+        $subject = get_string('email_notification_subject', 'local_extension', $data);
 
         // Notifying the roles.
         $rolecontent = $templates->role_content;
@@ -384,7 +384,7 @@ class rule {
      * Returns the list of users with the input role for the scope of this category, course, cm.
      *
      * @param \stdClass $course
-     * @param \stdClass $role
+     * @param int $role
      * @return array $users
      */
     private function rule_get_role_users($course, $role) {

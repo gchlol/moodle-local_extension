@@ -104,7 +104,7 @@ class request implements \cache_data_source {
             $this->cms[$cm->cmid] = $cm;
         }
 
-        // By deafult add the user that has initiated the request to the list of ids associated with this request.
+        // By default add the user that has initiated the request to the list of ids associated with this request.
         $userids = array($request->userid => $request->userid);
 
         // Obtain a unique list of userids that have been commenting.
@@ -603,7 +603,7 @@ class request implements \cache_data_source {
             $data->requestid = $this->requestid;
             $data->fullname = $fullname;
 
-            $subject = get_string('email_notification_subect', 'local_extension', $data);
+            $subject = get_string('email_notification_subject', 'local_extension', $data);
 
             $statusurl = new \moodle_url("/local/extension/status.php", array('id' => $this->requestid));
 
@@ -650,6 +650,7 @@ class request implements \cache_data_source {
      * Returns the highest subscription level of the specified userid.
      *
      * @param int $userid
+     * @param $localcmid
      * @return int
      */
     public function get_user_access($userid, $localcmid) {

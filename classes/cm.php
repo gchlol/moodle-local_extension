@@ -39,7 +39,7 @@ class cm {
     /** @var int The local_extension_cm id */
     public $cmid = null;
 
-    /** @var int The user id assocaited with this cm, should be the userid of the request */
+    /** @var int The user id associated with this cm, should be the userid of the request */
     public $userid = null;
 
     /** @var int The request id associated with this cm */
@@ -190,7 +190,7 @@ class cm {
     }
 
     /**
-     * Retuns the cm data.
+     * Returns the cm data.
      *
      * @return mixed
      */

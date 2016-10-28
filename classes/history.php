@@ -36,7 +36,7 @@ defined('MOODLE_INTERNAL') || die();
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 class history {
-    /** @var integer Defalt/Active history entry. */
+    /** @var integer Default/Active history entry. */
     const STATE_DEFAULT = 0;
 
     /** @var integer Disabled history entry. */

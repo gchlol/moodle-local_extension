@@ -117,7 +117,8 @@ if ($stateid != 0) {
 }
 
 $showuseridentityfields = explode(',', $CFG->showuseridentity);
-$mainuserfields = user_picture::fields('u', array('username', 'email', 'city', 'country', 'lang', 'timezone', 'maildisplay', 'idnumber'));
+$ufields = array('username', 'email', 'city', 'country', 'lang', 'timezone', 'maildisplay', 'idnumber');
+$mainuserfields = user_picture::fields('u', $ufields);
 
 $viewallrequests = false;
 if (has_capability('local/extension:viewallrequests', $categorycontext)) {

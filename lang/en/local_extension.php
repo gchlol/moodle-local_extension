@@ -43,7 +43,7 @@ $string['coursecontext'] = 'Allow course context requests';
 $string['coursecontexthelp'] = 'Allow multiple activity modules to be selected when making a request in the course context.';
 $string['emaildisable'] = 'Disable Email notifications';
 $string['emaildisablehelp'] = 'This prevents the plugin from sending any email notifications.';
-$string['email_notification_subect'] = 'Extension request #{$a->requestid} for {$a->fullname}.';
+$string['email_notification_subject'] = 'Extension request #{$a->requestid} for {$a->fullname}.';
 $string['emailtemplate'] = 'Email Template';
 $string['emailtemplatehelp'] = '';
 $string['error_extension_lessthan'] = 'Less than days';
@@ -99,7 +99,7 @@ $string['form_rule_label_set_roles_help'] = 'There are three options possible. I
 <br />
 Approve: Can approve / deny the request status.<br />
 Subscribe: View and comment on the request only.<br />
-Force approve: Mainitain the ability to approve / deny the status.';
+Force approve: Maintain the ability to approve / deny the status.';
 $string['form_rule_label_template'] = 'And notify that role with';
 $string['form_rule_label_template_help'] = 'An email notification be sent to all roles specified with this content. If this is blank, an email will not be sent. These are the possible template items <br />
 {{course}} => Course full name<br />

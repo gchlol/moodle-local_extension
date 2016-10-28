@@ -320,7 +320,7 @@ class request extends \local_extension\base_request {
      */
     public function cancel_extension($assignmentinstance, $userid) {
         // TODO: Discussion regarding how and when an extension will be removed if a date has been set.
-        // requires 'mod/assign:grantextension'.
+        // Requires 'mod/assign:grantextension'.
         // $this->submit_extension($assignmentinstance, $userid, 0);
     }
 

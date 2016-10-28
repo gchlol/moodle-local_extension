@@ -37,15 +37,15 @@ require_once($CFG->dirroot . '/mod/assign/locallib.php');
  */
 class local_extension_rule_testcase extends advanced_testcase {
 
-    /** @var Default number of students to create */
+    /** @var int number of students to create */
     const DEFAULT_STUDENT_COUNT = 3;
-    /** @var Default number of teachers to create */
+    /** @var int number of teachers to create */
     const DEFAULT_TEACHER_COUNT = 2;
-    /** @var Default number of editing teachers to create */
+    /** @var int number of editing teachers to create */
     const DEFAULT_EDITING_TEACHER_COUNT = 2;
-    /** @var Default number of mangers to create */
+    /** @var int number of mangers to create */
     const DEFAULT_MANAGER_COUNT = 2;
-    /** @var Number of groups to create */
+    /** @var int of groups to create */
     const GROUP_COUNT = 6;
 
     /** @var stdClass $course New course created to hold the assignments */

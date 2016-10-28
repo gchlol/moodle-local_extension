@@ -59,7 +59,11 @@ class trigger_update extends \core\event\base {
      * @see \core\event\base::get_description()
      */
     public function get_description() {
-        return "The user with the id '{$this->data['userid']}' has updated the trigger id {$this->data['objectid']} for type '{$this->other['datatype']}'.";
+        $uid = $this->data['userid'];
+        $oid = $this->data['objectid'];
+        $dt  = $this->other['datatype'];
+        $str = "The user with the id '$uid' has updated the trigger id $oid for type '$dt'.";
+        return $str;
     }
 
     /**

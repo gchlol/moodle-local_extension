@@ -391,7 +391,7 @@ class utility {
     /**
      * Returns the input rules in sorted order.
      *
-     * Sorted based on the priorty and grouped with parents.
+     * Sorted based on the priority and grouped with parents.
      *
      * @param \local_extension\rule[] $rules
      * @return array
