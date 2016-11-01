@@ -79,14 +79,82 @@ Enforce the requirement for providing supporting documentation when creating a r
 
 - requireattachment: Enabling this setting will enforce that a user attaches supporting documentation.
 
+### Capabilities ###
+
+- local/extension:viewallrequests
+
+This allows the user to view all requests in the system and act upon them.
+
+- local/extension:modifyrequeststatus
+
+This allows the user to modify the request length regardless of their access level.
+
 ### Manage Adapter Triggers ###
 
 - Rule name
+
+This is used to identify the rule.
+
 - Priority [1-10]
+
+When rules are at the root level or on child branches in the tree, this is the order of execution for the rules.
+
 - Only activate if [rule name] has triggered
-- And the requested length is [any/le/ge] [x days] long
-- And the request is [any/le/ge] [x days] old
+
+This allows rules to be nested in a parent/child relationship. A rule will not be considered for execution unless its parent has been triggered.
+
+- And the requested length is [any/lt/ge] [x days] long
+
+This is the length of the request in days.
+
+- And the request is [any/lt/ge] [x days] old
+
+This is how long the request has existed in the system. Useful for providing update notifications after an amount of days.
+
 - Then set all roles equal to [role] to [Approve/Subscribe/Force Approve] this request
+
+Approve: Grants the roles specified the ability to approve the status of the request or modify the legnth.
+
+Subscribe: Grants the roles specified to read and comment on the request only.
+
+Force Approve: This option is used when nested rules have been setup. Each time a child rule is triggered, it will downgrade the previous roles from Approval to Subscribe. When this setting is enabled those roles will not have their access level downgraded.
+
+- And notify that role with [email notification template]
+
+Send the roles that have been subscribed to this request with the specified template. A notification will not be sent if this is empty.
+
+- And notify the requesting user with [email notification template]
+
+Send the user that has made the request with the specified template. A notification will not be sent if this is empty.
+
+#### Example Trigger Configuration ####
+
+Rule 1
+- Rule Name: Notify Teachers
+- Priority: 1
+- Only activate if [N/A] has triggered
+- And the requested length is [lt] [5 days] long
+- And the request is [any] [0 days] old
+- Then set all roles equal to [Teacher] to [Approve] this request
 - And notify that role with [email notification template]
 - And notify the requesting user with [email notification template]
 
+Rule 2
+- Rule Name: Notify Managers
+- Priority: 1
+- Only activate if [Notify Teachers] has triggered
+- And the requested length is [ge] [10 days] long
+- And the request is [any] [0 days] old
+- Then set all roles equal to [Manager] to [Approve] this request
+- And notify that role with [email notification template]
+- And notify the requesting user with [empty email notification template]
+
+An overview of these two rules.
+
+When a request is made that is less than 5 days in length, Teachers will be subscribed with approval access and notified. Rule1.
+
+When a request is made that is greater or equal to 10 days in length, initially nothing will happen as the parent rule does not trigger. Rule2.
+
+If the request was less than 5 days in length but one of the approval roles modified the length to be greater than 10 days, then Rule2 will trigger.
+
+If Rule2 triggers, then the existing Teacher roles will have their access downgraded to being a subscriber only. Manager roles will be added with approval access.
