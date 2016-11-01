@@ -552,6 +552,15 @@ class utility {
      * @return string
      */
     public static function calculate_length($seconds) {
+        // Partial extract of $str from format_time().
+        $str = new \stdClass();
+        $str->day   = get_string('day');
+        $str->days  = get_string('days');
+        $str->hour  = get_string('hour');
+        $str->hours = get_string('hours');
+        $str->min   = get_string('min');
+        $str->mins  = get_string('mins');
+
         $seconds = abs($seconds);
 
         $dtf = new \DateTime('@0');
@@ -561,16 +570,20 @@ class utility {
         $fmt = '';
 
         if ($diff->d) {
-            $fmt = '%a day' . ($diff->d > 1 ? 's' : '');
+            $fmt  = '%a ';
+            $fmt .= ($diff->d == 1 ? $str->day : $str->days);
         }
 
         if ($diff->h) {
-
-            $fmt .= (empty($fmt) ? '' : ', ') . '%h hour' . ($diff->h > 1 ? 's' : '');
+            $fmt .= (empty($fmt) ? '' : ', ');
+            $fmt .= '%h ';
+            $fmt .= ($diff->h == 1 ? $str->hour : $str->hours);
         }
 
         if ($diff->i) {
-            $fmt .= (empty($fmt) ? '' : ', ') . '%i minute' . ($diff->i > 1 ? 's' : '');
+            $fmt .= (empty($fmt) ? '' : ', ');
+            $fmt .= '%i ';
+            $fmt .= ($diff->i == 1 ? $str->min : $str->mins);
         }
 
         return $diff->format($fmt);
