@@ -569,9 +569,10 @@ class utility {
 
         $fmt = '';
 
-        if ($diff->d) {
-            $fmt  = '%a ';
-            $fmt .= ($diff->d == 1 ? $str->day : $str->days);
+        // The DateTime object $diff is created with diff() so it contains the days property.
+        if ($diff->days) {
+            $fmt = '%a ';
+            $fmt .= ($diff->days == 1 ? $str->day : $str->days);
         }
 
         if ($diff->h) {
