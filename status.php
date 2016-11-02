@@ -39,7 +39,6 @@ $request = utility::cache_get_request($requestid);
 // The request object is invalidated and regenerated after each comment, attachment added, or rule triggered.
 
 if (!array_key_exists($USER->id, $request->users)) {
-
     // Admin users will have this capability, or anyone that was subscribed.
     if (!has_capability('local/extension:viewallrequests', context_system::instance())) {
         print_error('permissiondenied', 'local_extension');
