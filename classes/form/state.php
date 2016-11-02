@@ -51,7 +51,6 @@ class state extends \moodleform {
         $state    = $this->_customdata['state'];
         $mods     = $request->mods;
 
-
         $mform->addElement('hidden', 'id');
         $mform->setType('id', PARAM_INT);
 
@@ -81,8 +80,11 @@ class state extends \moodleform {
         $extensionlength = \local_extension\utility::calculate_length($lcm->cm->length);
         $mform->addElement('static', 'extensionlength', 'Extension length', $extensionlength);
 
-        $mform->addElement('static', 'currentstate', 'Current state', \local_extension\state::instance()->get_state_name($lcm->cm->state));
-        $mform->addElement('static', 'newstate', 'New state', \local_extension\state::instance()->get_state_name($state));
+        $currentstate = \local_extension\state::instance()->get_state_name($lcm->cm->state);
+        $mform->addElement('static', 'currentstate', 'Current state', $currentstate);
+
+        $newstate = \local_extension\state::instance()->get_state_name($state);
+        $mform->addElement('static', 'newstate', 'New state', $newstate);
 
         $mform->addElement('textarea', 'commentarea', get_string('comments'), 'wrap="virtual" rows="5" cols="70"');
         $mform->addElement('html', \html_writer::empty_tag('br'));
