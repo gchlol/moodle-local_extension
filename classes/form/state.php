@@ -48,7 +48,9 @@ class state extends \moodleform {
         $mform    = $this->_form;
         $request  = $this->_customdata['request'];
         $cmid     = $this->_customdata['cmid'];
+        $state    = $this->_customdata['state'];
         $mods     = $request->mods;
+
 
         $mform->addElement('hidden', 'id');
         $mform->setType('id', PARAM_INT);
@@ -68,10 +70,19 @@ class state extends \moodleform {
         $mod = $mods[$cmid];
         $handler = $mod['handler'];
 
+        /* @var \local_extension\cm $lcm IDE hinting. */
+        $lcm = $mod['localcm'];
+
         $html = \html_writer::tag('h2', 'State change confirmation');
         $mform->addElement('html', $html);
 
         $handler->status_change_definition($mod, $mform, $this->_customdata);
+
+        $extensionlength = \local_extension\utility::calculate_length($lcm->cm->length);
+        $mform->addElement('static', 'extensionlength', 'Extension length', $extensionlength);
+
+        $mform->addElement('static', 'currentstate', 'Current state', \local_extension\state::instance()->get_state_name($lcm->cm->state));
+        $mform->addElement('static', 'newstate', 'New state', \local_extension\state::instance()->get_state_name($state));
 
         $mform->addElement('textarea', 'commentarea', get_string('comments'), 'wrap="virtual" rows="5" cols="70"');
         $mform->addElement('html', \html_writer::empty_tag('br'));
@@ -93,6 +104,7 @@ class state extends \moodleform {
      * @return array of error messages
      */
     public function validation($data, $files) {
+        global $USER;
 
         $errors = parent::validation($data, $files);
 
@@ -102,10 +114,30 @@ class state extends \moodleform {
         $mods     = $request->mods;
 
         $mod = $mods[$cmid];
-        $handler = $mod['handler'];
-
         $lcm = $mod['localcm'];
-        //$formid = 'due' . $lcm->cmid;
+
+        $approved = false;
+
+        // Checking if the user has the ability to approve.
+        $access = $request->get_user_access($USER->id, $request->cms[$cmid]->cm->id);
+        if ($access == \local_extension\rule::RULE_ACTION_APPROVE ||
+            $access == \local_extension\rule::RULE_ACTION_FORCEAPPROVE) {
+
+            $approved = true;
+        }
+
+        // Checking for capabilities or admin access.
+        $context = \context_module::instance($cmid);
+        if (has_capability('local/extension:viewallrequests', $context)) {
+            $approved = true;
+        }
+
+        // Checking to see if the new state is a possible transition.
+        $possible = \local_extension\state::instance()->state_is_possible($lcm->cm->state, $data['s'], $approved);
+
+        if (!$possible) {
+            $errors['newstate'] = get_string('invalidstate', 'local_extension');
+        }
 
         return $errors;
     }

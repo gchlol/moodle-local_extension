@@ -242,8 +242,6 @@ class request extends \local_extension\base_request {
         $event = $mod['event'];
         $course = $mod['course'];
 
-        /* @var \local_extension\cm $lcm IDE hinting. */
-        $lcm = $mod['localcm'];
         $instance = $customdata['instance'];
         $user = $customdata['user'];
 
@@ -263,13 +261,6 @@ class request extends \local_extension\base_request {
         }
 
         $mform->addElement('static', 'duedate', get_string('duedate', 'assign'), userdate($instance->duedate));
-
-        $extensionlength = utility::calculate_length($lcm->cm->length);
-        $mform->addElement('static', 'extensionlength', 'Extension length', $extensionlength);
-
-        $mform->addElement('static', 'currentstate', 'Current state', \local_extension\state::instance()->get_state_name($lcm->cm->state));
-
-        $mform->addElement('static', 'newstate', 'New state', \local_extension\state::instance()->get_state_name($customdata['state']));
 
         return $html;
     }

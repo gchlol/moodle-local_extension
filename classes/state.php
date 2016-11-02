@@ -366,4 +366,69 @@ class state {
         return $history;
     }
 
+    /**
+     * Checks the current state and returns true if the requested state is possible.
+     *
+     * @param $currentstate
+     * @param $requestedstate
+     * @param $approved
+     * @return bool
+     */
+    public function state_is_possible($currentstate, $requestedstate, $approved) {
+
+        $states = array();
+
+        switch ($currentstate) {
+            case self::STATE_NEW:
+                $states = array(self::STATE_CANCEL);
+
+                if ($approved) {
+                    $states[] = self::STATE_APPROVED;
+                    $states[] = self::STATE_DENIED;
+                }
+                break;
+
+            case self::STATE_REOPENED:
+                $states = array(self::STATE_CANCEL);
+
+                if ($approved) {
+                    $states[] = self::STATE_DENIED;
+                    $states[] = self::STATE_APPROVED;
+                }
+                break;
+
+            case self::STATE_DENIED:
+                if ($approved) {
+                    $states = array(
+                        self::STATE_APPROVED,
+                        self::STATE_REOPENED,
+                        self::STATE_CANCEL,
+                    );
+                }
+                break;
+
+            case self::STATE_CANCEL:
+                $states = array(self::STATE_REOPENED);
+                break;
+
+            case self::STATE_APPROVED:
+                if ($approved) {
+                    $states = array(
+                        self::STATE_CANCEL,
+                        self::STATE_DENIED,
+                    );
+                }
+                break;
+
+            default:
+                break;
+        }
+
+        if (in_array($requestedstate, $states)) {
+            return true;
+        }
+
+        return false;
+    }
+
 }
