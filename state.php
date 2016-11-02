@@ -47,9 +47,12 @@ $request = utility::cache_get_request($requestid);
 // Checking if the current user is not part of the request or does not have the capability to view all requests.
 $context = context_module::instance($cmid);
 if (!has_capability('local/extension:viewallrequests', $context)) {
-    if (array_key_exists($USER->id, $request->users)) {
+    if ($USER->id == $request->request->userid) {
+        // Allow the user to modify their own request.
+    } else if (array_key_exists($USER->id, $request->users)) {
         // The user is part of the request, lets check their access.
         $access = $request->get_user_access($USER->id, $request->cms[$cmid]->cm->id);
+
         if ($access != rule::RULE_ACTION_APPROVE &&
             $access != rule::RULE_ACTION_FORCEAPPROVE) {
             // The $USER belongs to the request user list, but does not have sufficient access.
