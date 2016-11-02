@@ -139,7 +139,6 @@ class rule extends \moodleform {
             $mform->createElement('static', 'to', '', get_string('form_rule_label_to', 'local_extension')),
             $mform->createElement('select', 'action', null, $actiontypes),
             $mform->createElement('static', 'approve', '', get_string('form_rule_label_this_request', 'local_extension')),
-
         );
 
         $mform->addGroup(

@@ -62,6 +62,7 @@ class update extends \moodleform {
             /* @var \local_extension\cm $localcm IDE hinting */
             $localcm = $mod['localcm'];
             $course = $mod['course'];
+            /* @var \local_extension\base_request $handler IDE hinting */
             $handler = $mod['handler'];
             $id = $localcm->cmid;
             $stateid = $localcm->cm->state;

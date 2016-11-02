@@ -476,7 +476,7 @@ class rule {
         $localcm = $mod['localcm'];
         $course = $mod['course'];
 
-        // If the rule has specified that the roles will be forced to approve, we skip dowgrading the acccess.
+        // If the rule has specified that the roles will be forced to approve, we skip downgrading the access.
         if ($rule->action != self::RULE_ACTION_FORCEAPPROVE) {
 
             $users = $this->rule_get_role_users($course, $rule->role);

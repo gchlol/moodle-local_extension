@@ -38,7 +38,7 @@ class extension extends \core\plugininfo\base {
 
     /**
      * Return an array of instances each module request
-     * @return array map of modules types to a handler object.
+     * @return \local_extension\base_request[] map of modules types to a handler object.
      */
     public static function get_enabled_request() {
 

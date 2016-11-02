@@ -37,6 +37,8 @@ defined('MOODLE_INTERNAL') || die();
  */
 class request extends \local_extension\base_request {
 
+    /** @var rule[] $rules */
+    public static $rules = null;
 
     /**
      * {@inheritDoc}
