@@ -25,7 +25,7 @@ Moodle plugin directory, or you can use git to clone it into your source:
     If you have issues please log them in github here:
     https://github.com/central-queensland-uni/moodle-local_extension/issues
 
-1. Initally please review the two main configurable pages.
+1. Initially please review the two main configurable pages.
 
     `Dashboard ► Site administration ► Plugins ► Local Plugins ► Activity extensions ►`
     - `General settings`
@@ -113,7 +113,7 @@ This is how long the request has existed in the system. Useful for providing upd
 
 - Then set all roles equal to [role] to [Approve/Subscribe/Force Approve] this request
 
-Approve: Grants the roles specified the ability to approve the status of the request or modify the legnth.
+Approve: Grants the roles specified the ability to approve the status of the request or modify the length.
 
 Subscribe: Grants the roles specified to read and comment on the request only.
 
@@ -133,28 +133,37 @@ Rule 1
 - Rule Name: Notify Teachers
 - Priority: 1
 - Only activate if [N/A] has triggered
-- And the requested length is [lt] [5 days] long
+- And the requested length is [lt] [15 days] long
 - And the request is [any] [0 days] old
 - Then set all roles equal to [Teacher] to [Approve] this request
 - And notify that role with [email notification template]
 - And notify the requesting user with [email notification template]
 
 Rule 2
-- Rule Name: Notify Managers
+- Rule Name: Teachers subscribe
 - Priority: 1
 - Only activate if [Notify Teachers] has triggered
-- And the requested length is [ge] [10 days] long
+- And the requested length is [ge] [15 days] long
+- And the request is [any] [0 days] old
+- Then set all roles equal to [Teachers] to [Subscribe] this request
+- And notify that role with [email notification template]
+- And notify the requesting user with [empty email notification template]
+
+Rule 3
+- Rule Name: Notify Managers
+- Priority: 1
+- Only activate if [N/A] has triggered
+- And the requested length is [ge] [15 days] long
 - And the request is [any] [0 days] old
 - Then set all roles equal to [Manager] to [Approve] this request
 - And notify that role with [email notification template]
 - And notify the requesting user with [empty email notification template]
 
-An overview of these two rules.
+An overview of these rules.
 
-When a request is made that is less than 5 days in length, Teachers will be subscribed with approval access and notified. Rule1.
+Rule 1. When a request is made that is less than 15 days in length, Teachers will be subscribed with approval access and notified. 
+If the request was less than 15 days in length but one of the approval roles modified the length to be greater than 15 days, then Rule 2 will trigger.
 
-When a request is made that is greater or equal to 10 days in length, initially nothing will happen as the parent rule does not trigger. Rule2.
+Rule 2. Due to the request now being 15 days or greater in length and the parent Rule 1 has been triggered then the Teacher roles will have their access downgraded to Subscribe only.
 
-If the request was less than 5 days in length but one of the approval roles modified the length to be greater than 10 days, then Rule2 will trigger.
-
-If Rule2 triggers, then the existing Teacher roles will have their access downgraded to being a subscriber only. Manager roles will be added with approval access.
+Rule 3. When a request is made that is greater or equal to 15 days in length, Managers will be subscribed with approval access and notified.
