@@ -85,15 +85,15 @@ $PAGE->add_body_class('local_extension');
 $renderer = $PAGE->get_renderer('local_extension');
 
 $mod = $request->mods[$cmid];
-$course = $mod['course'];
-$cm = $mod['cm'];
+$course = $mod->course;
+$cm = $mod->cm;
 
 $requestuser = core_user::get_user($request->request->userid);
 
 $params = array(
     'request' => $request,
     'cmid' => $cmid,
-    'instance' => $mod['handler']->get_instance($mod),
+    'instance' => $mod->handler->get_instance($mod),
     'state' => $stateid,
     'user' => $requestuser,
 );

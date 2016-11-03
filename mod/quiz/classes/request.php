@@ -96,8 +96,8 @@ class request extends \local_extension\base_request {
      * @return string
      */
     public function request_definition($mod, $mform = null) {
-        $event = $mod['event'];
-        $course = $mod['course'];
+        $event = $mod->event;
+        $course = $mod->course;
 
         $html = \html_writer::start_div('content');
         $coursestring = \html_writer::tag('b', $course->fullname . ' > ' . $event->name, array('class' => 'mod'));
@@ -127,10 +127,10 @@ class request extends \local_extension\base_request {
     public function status_definition($mod, $mform = null) {
         global $USER, $DB;
 
-        $event = $mod['event'];
-        $course = $mod['course'];
-        $localcm = $mod['localcm'];
-        $cm = $mod['cm'];
+        $event = $mod->event;
+        $course = $mod->course;
+        $localcm = $mod->localcm;
+        $cm = $mod->cm;
 
         $requestid = $localcm->requestid;
         $cmid = $localcm->cmid;
@@ -197,8 +197,8 @@ class request extends \local_extension\base_request {
     public function status_change_definition($mod, $mform, $customdata) {
         global $CFG;
 
-        $event = $mod['event'];
-        $course = $mod['course'];
+        $event = $mod->event;
+        $course = $mod->course;
 
         $user = $customdata['user'];
 
@@ -233,12 +233,12 @@ class request extends \local_extension\base_request {
     public function modify_definition($mod, $mform, $customdata) {
         global $DB;
 
-        $event = $mod['event'];
-        $course = $mod['course'];
-        $cm = $mod['cm'];
+        $event = $mod->event;
+        $course = $mod->course;
+        $cm = $mod->cm;
 
         /* @var \local_extension\cm $lcm IDE hinting. */
-        $lcm = $mod['localcm'];
+        $lcm = $mod->localcm;
         $instance = $customdata['instance'];
 
         $quiz =  $quiz = $DB->get_record('quiz', array('id' => $cm->instance), 'timeclose');
@@ -276,8 +276,8 @@ class request extends \local_extension\base_request {
     public function request_validation($mform, $mod, $data) {
 
         $errors = array();
-        $event = $mod['event'];
-        $cm = $mod['cm'];
+        $event = $mod->event;
+        $cm = $mod->cm;
         $formid = 'due' . $cm->id;
         $now = time();
 
@@ -314,7 +314,7 @@ class request extends \local_extension\base_request {
      * @return string|bool The data to be stored
      */
     public function request_data($mform, $mod, $data) {
-        $cm = $mod['cm'];
+        $cm = $mod->cm;
         $formid = 'due' . $cm->id;
         if (!empty($data->$formid)) {
             return $data->$formid;

@@ -113,10 +113,10 @@ abstract class base_request {
      * @param bool $optional
      */
     public function date_selector($mod, $mform, $optional = true) {
-        $event = $mod['event'];
+        $event = $mod->event;
 
         /* @var $lcm \local_extension\cm IDE hinting */
-        $lcm = $mod['localcm'];
+        $lcm = $mod->localcm;
 
         $defaultdate = $event->timestart;
         $lcmdate = $lcm->get_data();

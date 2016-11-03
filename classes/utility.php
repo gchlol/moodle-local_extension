@@ -47,7 +47,7 @@ class utility {
      * @param int $start  Start of search period
      * @param int $end End of search period
      * @param array $options Optional arguments.
-     * @return array An array of candidates. array($mods, $events)
+     * @return mod_data[] An array of candidates.
      *
      */
     public static function get_activities($userid, $start, $end, $options = null) {
@@ -139,16 +139,17 @@ class utility {
                 $localcm = cm::from_userid($cm->id, $userid);
             }
 
-            $events[$cm->id] = array(
-                'event' => $event,
-                'cm' => $cm,
-                'localcm' => $localcm,
-                'course' => $courses[$courseid],
-                'handler' => $handler,
-            );
+            $data = new \local_extension\mod_data();
+            $data->event = $event;
+            $data->cm = $cm;
+            $data->localcm = $localcm;
+            $data->course = $courses[$courseid];
+            $data->handler = $handler;
+
+            $events[$cm->id] = $data;
         }
 
-        return array($mods, $events);
+        return $events;
     }
 
     /**

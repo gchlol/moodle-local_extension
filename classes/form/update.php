@@ -60,10 +60,10 @@ class update extends \moodleform {
 
         foreach ($mods as $id => $mod) {
             /* @var \local_extension\cm $localcm IDE hinting */
-            $localcm = $mod['localcm'];
-            $course = $mod['course'];
+            $localcm = $mod->localcm;
+            $course = $mod->course;
             /* @var \local_extension\base_request $handler IDE hinting */
-            $handler = $mod['handler'];
+            $handler = $mod->handler;
             $id = $localcm->cmid;
             $stateid = $localcm->cm->state;
             $userid = $localcm->userid;

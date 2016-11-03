@@ -157,7 +157,7 @@ class cm {
     public function write_history($mod, $state, $userid) {
         global $DB;
 
-        $localcm = $mod['localcm'];
+        $localcm = $mod->localcm;
 
         $history = new \stdClass();
         $history->localcmid = $localcm->cmid;

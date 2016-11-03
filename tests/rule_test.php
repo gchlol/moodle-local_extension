@@ -260,7 +260,7 @@ class local_extension_rule_testcase extends advanced_testcase {
 
         $user = $this->students[0];
 
-        list($handlers, $mods) = \local_extension\utility::get_activities($user->id, $start, $end);
+        $activities = \local_extension\utility::get_activities($user->id, $start, $end);
 
         $request = array(
             'userid' => $user->id,
@@ -274,8 +274,8 @@ class local_extension_rule_testcase extends advanced_testcase {
         $request['id'] = $DB->insert_record('local_extension_request', $request);
 
         foreach ($mods as $cmid => $mod) {
-            $course = $mod['course'];
-            $handler = $mod['handler'];
+            $course = $mod->course;
+            $handler = $mod->handler;
 
             $data = time() + $day;
 
@@ -284,7 +284,7 @@ class local_extension_rule_testcase extends advanced_testcase {
                 'userid' => $user->id,
                 'course' => $course->id,
                 'timestamp' => $now,
-                'name' => $mod['event']->name,
+                'name' => $mod->event->name,
                 'cmid' => $cmid,
                 'state' => 0,
                 'data' => $data,

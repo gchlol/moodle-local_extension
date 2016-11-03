@@ -96,11 +96,11 @@ class request implements \cache_data_source {
             'requestid' => $requestid
         );
 
-        list($handlers, $mods) = utility::get_activities($request->userid, $request->searchstart, $request->searchend, $options);
-        $this->mods = $mods;
+        $activities = utility::get_activities($request->userid, $request->searchstart, $request->searchend, $options);
+        $this->mods = $activities;
 
-        foreach ($mods as $id => $mod) {
-            $cm = $mod['localcm'];
+        foreach ($activities as $id => $mod) {
+            $cm = $mod->localcm;
             $this->cms[$cm->cmid] = $cm;
         }
 
@@ -296,9 +296,9 @@ class request implements \cache_data_source {
             $mod = $this->mods[$record->localcmid];
 
             /* @var cm $localcm IDE hinting. */
-            $localcm = $mod['localcm'];
-            $event   = $mod['event'];
-            $course  = $mod['course'];
+            $localcm = $mod->localcm;
+            $event   = $mod->event;
+            $course  = $mod->course;
 
             $status = state::instance()->get_state_name($record->state);
 
@@ -376,7 +376,7 @@ class request implements \cache_data_source {
 
         // There can only be one request per course module.
         foreach ($this->mods as $mod) {
-            $handler = $mod['handler'];
+            $handler = $mod->handler;
 
             // Obtains all rules based on the handlers datatype. eg. assign/quiz.
             $rules = $handler->get_triggers();
@@ -493,7 +493,7 @@ class request implements \cache_data_source {
             $item->rule = $rule;
             $item->role = $rule->role;
             $item->mod = $mod;
-            $item->cmid = $mod['localcm']->cm->cmid;
+            $item->cmid = $mod->localcm->cm->cmid;
 
             $data[] = $item;
         }
@@ -694,7 +694,7 @@ class request implements \cache_data_source {
 
         // Iterate over all the cms for this request, if there is an open state, return true.
         foreach ($this->mods as $id => $mod) {
-            $stateid = $mod['localcm']->cm->state;
+            $stateid = $mod->localcm->cm->state;
             $result = state::instance()->is_open_state($stateid);
 
             if ($result) {

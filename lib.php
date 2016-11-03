@@ -142,7 +142,7 @@ function local_extension_extends_navigation(global_navigation $nav) {
                     // Display the request status for this module.
                     $url = new moodle_url('/local/extension/status.php', array('id' => $request->requestid));
 
-                    $localcm = $request->mods[$id]['localcm'];
+                    $localcm = $request->mods[$id]->localcm;
 
                     $result = \local_extension\state::instance()->get_state_result($localcm->get_stateid());
 

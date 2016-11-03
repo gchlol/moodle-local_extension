@@ -319,7 +319,7 @@ class rule {
 
         $params = array(
             'userid' => $userid,
-            'localcmid' => $mod['localcm']->cm->id,
+            'localcmid' => $mod->localcm->cm->id,
         );
 
         $select = "userid = :userid AND localcmid = :localcmid";
@@ -362,7 +362,7 @@ class rule {
         $noreplyuser->firstname = fullname($requestuser);
 
         if (!empty($rolecontent)) {
-            $this->notify_roles($request, $subject, $rolecontent, $mod['course'], $noreplyuser);
+            $this->notify_roles($request, $subject, $rolecontent, $mod->course, $noreplyuser);
         }
 
         // Notifying the user.
@@ -415,8 +415,8 @@ class rule {
     private function setup_subscription(&$request, $mod) {
         global $DB;
 
-        $localcm = $mod['localcm'];
-        $course = $mod['course'];
+        $localcm = $mod->localcm;
+        $course = $mod->course;
 
         $role = $this->role;
 
@@ -473,8 +473,8 @@ class rule {
     private function downgrade_status($mod, $rule) {
         global $DB;
 
-        $localcm = $mod['localcm'];
-        $course = $mod['course'];
+        $localcm = $mod->localcm;
+        $course = $mod->course;
 
         // If the rule has specified that the roles will be forced to approve, we skip downgrading the access.
         if ($rule->action != self::RULE_ACTION_FORCEAPPROVE) {
@@ -518,7 +518,7 @@ class rule {
     private function check_history($mod) {
         global $DB;
 
-        $localcm = $mod['localcm'];
+        $localcm = $mod->localcm;
 
         $params = array(
             'trigger' => $this->id,
@@ -555,7 +555,7 @@ class rule {
     public function write_history($mod) {
         global $DB;
 
-        $localcm = $mod['localcm'];
+        $localcm = $mod->localcm;
 
         $history = array(
             'trigger' => $this->id,
@@ -580,17 +580,17 @@ class rule {
     public function process_templates($request, $mod, $contentchange = null) {
         global $PAGE, $CFG;
 
-        $event   = $mod['event'];
-        $cm      = $mod['cm'];
-        $localcm = $mod['localcm'];
-        $course  = $mod['course'];
-        $handler = $mod['handler'];
+        $event   = $mod->event;
+        $cm      = $mod->cm;
+        $localcm = $mod->localcm;
+        $course  = $mod->course;
+        $handler = $mod->handler;
 
         // A url to the status page.
         $url = new \moodle_url('/local/extension/status.php', array('id' => $localcm->cm->request));
 
         // The user details for obtaining the full name.
-        $userid = $mod['localcm']->userid;
+        $userid = $mod->localcm->userid;
 
         $user = \core_user::get_user($userid);
 
@@ -694,7 +694,7 @@ class rule {
             return true;
         }
 
-        $localcm = $mod['localcm'];
+        $localcm = $mod->localcm;
 
         $params = array(
             'trigger' => $parent,
@@ -721,7 +721,7 @@ class rule {
      * @return string
      */
     private function get_request_time($mod) {
-        return utility::calculate_length($mod['localcm']->cm->length);
+        return utility::calculate_length($mod->localcm->cm->length);
     }
 
     /**
@@ -731,11 +731,11 @@ class rule {
      * @return boolean
      */
     private function check_request_length($mod) {
-        $localcm = $mod['localcm'];
+        $localcm = $mod->localcm;
 
         // This value will be a timestamp.
         $daterequested = $localcm->get_data();
-        $datedue = $mod['event']->timestart;
+        $datedue = $mod->event->timestart;
 
         $delta = $daterequested - $datedue;
 

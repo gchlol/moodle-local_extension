@@ -52,7 +52,7 @@ class modify extends \moodleform {
 
         $mod = $mods[$cmid];
 
-        $handler = $mod['handler'];
+        $handler = $mod->handler;
 
         $html = \html_writer::tag('h2', get_string('form_modify_request_header', 'local_extension'));
         $mform->addElement('html', $html);
@@ -90,9 +90,9 @@ class modify extends \moodleform {
         $mods     = $request->mods;
 
         $mod = $mods[$cmid];
-        $handler = $mod['handler'];
+        $handler = $mod->handler;
 
-        $lcm = $mod['localcm'];
+        $lcm = $mod->localcm;
         $formid = 'due' . $lcm->cmid;
 
         $due[$formid] = $data[$formid];

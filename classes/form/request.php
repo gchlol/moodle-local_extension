@@ -68,15 +68,15 @@ class request extends \moodleform {
 
             // Iterate over the current request items.
             foreach ($inprogress as $id => $mod) {
-                $handler = $mod['handler'];
-                $handler->status_definition($mod, $mform);
+                $handler   = $mod->handler;
+                $requestid = $mod->localcm->requestid;
 
-                $requestid = $mod['localcm']->requestid;
+                $handler->status_definition($mod, $mform);
 
                 $params = array('id' => $requestid);
                 $url = new \moodle_url('/local/extension/status.php', $params);
 
-                $name = $mod['event']->name;
+                $name = $mod->event->name;
                 $text = get_string('page_request_requeststatuslink', 'local_extension', $name);
                 $link = \html_writer::link($url, $text);
 
@@ -94,7 +94,7 @@ class request extends \moodleform {
 
             // Iterate over remaining available request items.
             foreach ($available as $id => $mod) {
-                $handler = $mod['handler'];
+                $handler = $mod->handler;
                 $handler->request_definition($mod, $mform);
             }
 
@@ -150,9 +150,9 @@ class request extends \moodleform {
 
         $due = array();
         foreach ($mods as $id => $mod) {
-            $handler = $mod['handler'];
-            $cm = $mod['cm'];
-            $event = $mod['event'];
+            $handler = $mod->handler;
+            $cm = $mod->cm;
+            $event = $mod->event;
             $formid = 'due' . $cm->id;
 
             $due[$formid] = $data[$formid];

@@ -314,7 +314,7 @@ class state {
 
                 // We found it! The state has changed.
                 if (!empty($data->$item)) {
-                    $cm = $mod['cm'];
+                    $cm = $mod->cm;
                     $params = array(
                         'id' => $request->requestid,
                         'course' => $cm->course,
@@ -340,12 +340,12 @@ class state {
 
         $mod = $request->mods[$data->cmid];
         /* @var \local_extension\base_request $handler IDE hinting */
-        $handler = $mod['handler'];
+        $handler = $mod->handler;
 
         /* @var \local_extension\cm $localcm IDE hinting */
-        $localcm = $mod['localcm'];
-        $event   = $mod['event'];
-        $course  = $mod['course'];
+        $localcm = $mod->localcm;
+        $event   = $mod->event;
+        $course  = $mod->course;
 
         /*
          * Iterate over a list of states with their cmid concatenated eg. approve6

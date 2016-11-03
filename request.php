@@ -97,15 +97,14 @@ if (count($triggers) == 0) {
     echo $OUTPUT->footer();
 }
 
-list($handlers, $mods) = utility::get_activities($user, $start, $end, $options);
+$activities = utility::get_activities($user, $start, $end, $options);
 
 $available = array();
 $inprogress = array();
 
-foreach ($mods as $mod) {
-
+foreach ($activities as $mod) {
     // If a local cm object does not exist, then we can make a request for this module.
-    if (empty($mod['localcm']->cm)) {
+    if (empty($mod->localcm->cm)) {
         $available[] = $mod;
     } else {
         $inprogress[] = $mod;
@@ -154,9 +153,9 @@ if ($mform->is_cancelled()) {
 
     foreach ($mods as $cmid => $mod) {
 
-        $course = $mod['course'];
-        $handler = $mod['handler'];
-        $event = $mod['event'];
+        $course = $mod->course;
+        $handler = $mod->handler;
+        $event = $mod->event;
 
         $data = $handler->request_data($mform, $mod, $form);
 
@@ -265,14 +264,14 @@ foreach ($contextlevels as $contextlevel => $cfg) {
 
             // If the configuration contexts are disabled then provide links to make individual requests.
             foreach ($inprogress as $mod) {
-                echo $mod['handler']->status_definition($mod);
+                echo $mod->handler->status_definition($mod);
 
-                $requestid = $mod['localcm']->requestid;
+                $requestid = $mod->localcm->requestid;
 
                 $params = array('id' => $requestid);
                 $url = new moodle_url('/local/extension/status.php', $params);
 
-                $name = $mod['event']->name;
+                $name = $mod->event->name;
                 $text = get_string('page_request_requeststatuslink', 'local_extension', $name);
                 $link = html_writer::link($url, $text);
 
@@ -284,15 +283,15 @@ foreach ($contextlevels as $contextlevel => $cfg) {
             }
 
             foreach ($available as $mod) {
-                echo $mod['handler']->request_definition($mod);
+                echo $mod->handler->request_definition($mod);
 
-                $course = $mod['cm']->course;
-                $cmid = $mod['cm']->id;
+                $course = $mod->cm->course;
+                $cmid = $mod->cm->id;
 
                 $params = array('course' => $course, 'cmid' => $cmid);
                 $url = new moodle_url('/local/extension/request.php', $params);
 
-                $name = $mod['event']->name;
+                $name = $mod->event->name;
                 $text = get_string('page_request_requestnewlink', 'local_extension', $name);
                 $link = html_writer::link($url, $text);
 
