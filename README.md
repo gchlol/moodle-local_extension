@@ -79,6 +79,14 @@ Enforce the requirement for providing supporting documentation when creating a r
 
 - requireattachment: Enabling this setting will enforce that a user attaches supporting documentation.
 
+### Scheduled Tasks ###
+
+- \local_extension\task\process_rules
+
+This task is scheduled to run every hour. It will process the rules for each request in an open state.
+
+For a request to be in an open state, there must be at least one course module item in the state 'New' or 'Reopened'.
+
 ### Capabilities ###
 
 - local/extension:viewallrequests
