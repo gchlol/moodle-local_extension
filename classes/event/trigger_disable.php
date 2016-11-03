@@ -59,11 +59,12 @@ class trigger_disable extends \core\event\base {
      * @see \core\event\base::get_description()
      */
     public function get_description() {
-        $uid = $this->data['userid'];
-        $oid = $this->data['objectid'];
-        $dt  = $this->other['datatype'];
-        $str = "The user with the id '$uid' has disabled the trigger id $oid for type '$dt'.";
-        return $str;
+        $obj = new \stdClass();
+        $obj->userid = $this->data['userid'];
+        $obj->objectid = $this->data['objectid'];
+        $obj->datatype = $this->other['datatype'];
+
+        return get_string('event_trigger_disable_desc', 'local_extension', $obj);
     }
 
     /**

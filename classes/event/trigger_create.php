@@ -59,7 +59,11 @@ class trigger_create extends \core\event\base {
      * @see \core\event\base::get_description()
      */
     public function get_description() {
-        return "The user with the id '{$this->data['userid']}' has created a trigger for type '{$this->other['datatype']}'.";
+        $obj = new \stdClass();
+        $obj->userid = $this->data['userid'];
+        $obj->datatype = $this->other['datatype'];
+
+        return get_string('event_trigger_create_desc', 'local_extension', $obj);
     }
 
     /**
