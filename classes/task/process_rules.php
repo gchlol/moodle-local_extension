@@ -52,8 +52,6 @@ class process_rules extends \core\task\scheduled_task {
     public function execute() {
         global $DB;
 
-        // TODO add request status, closed? to filter this query. When is a request closed?
-
         $sql = "SELECT id
                   FROM {local_extension_request}";
 
@@ -61,7 +59,11 @@ class process_rules extends \core\task\scheduled_task {
 
         foreach ($requestids as $requestid) {
             $request = request::from_id($requestid);
-            $request->process_triggers();
+
+            if($request->is_open_request()) {
+                $request->process_triggers();
+            }
+
         }
     }
 

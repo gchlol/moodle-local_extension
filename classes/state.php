@@ -154,6 +154,30 @@ class state {
     }
 
     /**
+     * Returns true if the state is open/pending for a given $stateid.
+     *
+     * @param $stateid
+     * @return bool
+     */
+    public function is_open_state($stateid) {
+
+        switch ($stateid) {
+            case self::STATE_NEW:
+            case self::STATE_REOPENED:
+                return true;
+
+            case self::STATE_DENIED:
+            case self::STATE_APPROVED:
+            case self::STATE_CANCEL:
+                return false;
+
+            default:
+                return false;
+        }
+
+    }
+
+    /**
      * Renders the approve buttons for a standard user that can approve or deny an extension.
      *
      * @param \MoodleQuickForm $mform
