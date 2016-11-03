@@ -234,6 +234,7 @@ class request extends \local_extension\base_request {
      *
      * @param array $mod An array of event details
      * @param \MoodleQuickForm $mform A moodle form object
+     * @param array $customdata
      * @return string
      */
     public function status_change_definition($mod, $mform, $customdata) {

@@ -403,8 +403,8 @@ class request implements \cache_data_source {
     /**
      * Process the notification data and send emails based on the templates.
      *
-     * @param $notifydata
-     * @param $mod
+     * @param array $notifydata
+     * @param array $mod
      */
     public function process_notification_data($notifydata, $mod) {
         /** @var rule[] $rules */
@@ -656,7 +656,7 @@ class request implements \cache_data_source {
      * Returns the highest subscription level of the specified userid.
      *
      * @param int $userid
-     * @param $localcmid
+     * @param int $localcmid
      * @return int
      */
     public function get_user_access($userid, $localcmid) {

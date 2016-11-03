@@ -117,22 +117,6 @@ class update extends \moodleform {
     }
 
     /**
-     * This is used to update the $mform comment list after a post.
-     * definition_after_data() is not suitable for this.
-     *
-     * $mform->_definition_finalized is set to true on the first page load.
-     * After $mform->get_data() the definition_after_data() function will not be called.
-     */
-    public function update_comments() {
-        $mform    = $this->_form;
-        $request  = $this->_customdata['request'];
-        $renderer = $this->_customdata['renderer'];
-
-        $commentidx = $mform->_elementIndex['comments'];
-        $mform->_elements[$commentidx]->_text = $renderer->render_extension_comments($request) . \html_writer::start_tag('br');
-    }
-
-    /**
      * Validate the parts of the request form for this module
      *
      * @param array $data An array of form data

@@ -79,6 +79,7 @@ class index extends flexible_table {
             get_string('lastmodified'),
         );
 
+        // If idnumber exists in showuseridentity, we splice it into the header and columns.
         $showuseridentityfields = explode(',', $CFG->showuseridentity);
         if (in_array('idnumber', $showuseridentityfields)) {
             array_splice($columns, 3, 0, 'idnumber');

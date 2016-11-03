@@ -60,7 +60,7 @@ class process_rules extends \core\task\scheduled_task {
         foreach ($requestids as $requestid) {
             $request = request::from_id($requestid);
 
-            if($request->is_open_request()) {
+            if ($request->is_open_request()) {
                 $request->process_triggers();
             }
 

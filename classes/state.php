@@ -156,7 +156,7 @@ class state {
     /**
      * Returns true if the state is open/pending for a given $stateid.
      *
-     * @param $stateid
+     * @param int $stateid
      * @return bool
      */
     public function is_open_state($stateid) {
@@ -393,9 +393,9 @@ class state {
     /**
      * Checks the current state and returns true if the requested state is possible.
      *
-     * @param $currentstate
-     * @param $requestedstate
-     * @param $approved
+     * @param int $currentstate
+     * @param int $requestedstate
+     * @param bool $approved
      * @return bool
      */
     public function state_is_possible($currentstate, $requestedstate, $approved) {
