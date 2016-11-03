@@ -147,7 +147,6 @@ if ($mform->is_cancelled()) {
     $request->get_data_cache()->delete($request->requestid);
     $statusurl = new moodle_url('/local/extension/status.php', array('id' => $requestid));
 
-    // TODO Run triggers, update subscriptions.
     redirect($statusurl);
 } else {
     $data = new stdClass();
@@ -159,8 +158,6 @@ if ($mform->is_cancelled()) {
 }
 
 echo $OUTPUT->header();
-
-// TODO echo $renderer->display_modify_heading();.
 
 $mform->display();
 

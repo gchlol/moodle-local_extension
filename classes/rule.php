@@ -342,8 +342,6 @@ class rule {
      * @param \stdClass $templates
      */
     public function send_notifications($request, $mod, $templates) {
-        // TODO check if there is any content and not notify roles/users.
-
         // Sets the request users fullname to the email from name, only for roles that get triggered.
         $noreplyuser = \core_user::get_noreply_user();
         $requestuser = \core_user::get_user($request->request->userid);
@@ -363,7 +361,9 @@ class rule {
         // The $noreplyuser has the full name of the requesting user.
         $noreplyuser->firstname = fullname($requestuser);
 
-        $this->notify_roles($request, $subject, $rolecontent, $mod['course'], $noreplyuser);
+        if (!empty($rolecontent)) {
+            $this->notify_roles($request, $subject, $rolecontent, $mod['course'], $noreplyuser);
+        }
 
         // Notifying the user.
         $usercontent = $templates->user_content;
