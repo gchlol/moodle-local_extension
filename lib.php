@@ -51,7 +51,6 @@ function local_extension_extends_navigation(global_navigation $nav) {
     if (isloggedin() and !isguestuser()) {
 
         // If there are no triggers setup then we should not show these links at all.
-        // TODO change this? cache it?
         $triggers = \local_extension\rule::load_all();
         if (count($triggers) == 0) {
             return;
@@ -127,6 +126,10 @@ function local_extension_extends_navigation(global_navigation $nav) {
                 list($request, $cm) = \local_extension\utility::find_module_requests($courseid, $cmid);
 
                 // TODO check if it is possible to even extend the cm in focus.
+
+                if (empty($courseid)) {
+                    return;
+                }
 
                 $modinfo = get_fast_modinfo($courseid);
                 $cmdata = $modinfo->cms[$cmid];

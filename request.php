@@ -161,7 +161,7 @@ if ($mform->is_cancelled()) {
         $data = $handler->request_data($mform, $mod, $form);
 
         // If no data is present then an extension request date has not been specified.
-        if ($data == '') {
+        if (empty($data)) {
             continue;
         }
 

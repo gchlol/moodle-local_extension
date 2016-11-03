@@ -77,15 +77,10 @@ $mod = $request->mods[$cmid];
 $course = $mod['course'];
 $cm = $mod['cm'];
 
-$context = \context_module::instance($cmid);
-
-$assign = new \assign($context, $cm, $course);
-$instance = $assign->get_instance();
-
 $params = array(
     'request' => $request,
     'cmid' => $cmid,
-    'instance' => $assign->get_instance(),
+    'instance' => $mod['handler']->get_instance($mod),
 );
 
 $requestuser = core_user::get_user($request->request->userid);

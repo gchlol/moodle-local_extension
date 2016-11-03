@@ -103,6 +103,7 @@ abstract class base_request {
      */
     abstract public function submit_extension($assignmentid, $userid, $duedate);
 
+    abstract public function get_instance($mod);
 
     /**
      * Adds a date selector to the mform that it has been passed.
@@ -125,7 +126,6 @@ abstract class base_request {
         }
 
         $startyear = date('Y');
-        // TODO get assignment due date, if moves to next year, $startyear += 1.
         $stopyear = date('Y') + 1;
 
         $dateconfig = array(

@@ -31,6 +31,8 @@ use local_extension\utility;
 
 defined('MOODLE_INTERNAL') || die();
 
+require_once($CFG->dirroot . '/mod/assign/locallib.php');
+
 /**
  * Extension assignment request class.
  *
@@ -266,7 +268,6 @@ class request extends \local_extension\base_request {
         return $html;
     }
 
-
     /**
      * Validate the parts of the request form for this module
      *
@@ -313,17 +314,16 @@ class request extends \local_extension\base_request {
      * @param \MoodleQuickForm $mform A moodle form object
      * @param array $mod An array of event details
      * @param array $data An array of form data
-     * @return string The data to be stored
+     * @return string|bool The data to be stored
      */
     public function request_data($mform, $mod, $data) {
         $cm = $mod['cm'];
         $formid = 'due' . $cm->id;
         if (!empty($data->$formid)) {
-            $request = $data->$formid;
-            return $request;
-        } else {
-            return '';
+            return $data->$formid;
         }
+
+        return false;
     }
 
     /**
@@ -351,6 +351,15 @@ class request extends \local_extension\base_request {
         return true;
     }
 
+    public function get_instance($mod) {
+        $cm = $mod['cm'];
+        $course = $cm->course;
+        $context = \context_module::instance($cm->id);
+        $assign = new \assign($context, $cm, $course);
+
+        return $assign->get_instance();
+    }
+
     /**
      * If an extension was granted, but it was a mistake then this will revoke the extension length.
      *
@@ -363,5 +372,4 @@ class request extends \local_extension\base_request {
         // Requires 'mod/assign:grantextension'.
         // $this->submit_extension($assignmentinstance, $userid, 0);
     }
-
 }
