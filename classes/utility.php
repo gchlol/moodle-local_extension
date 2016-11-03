@@ -381,7 +381,7 @@ class utility {
 
         foreach ($requests as $request) {
             foreach ($request->cms as $cm) {
-                if ($courseid == $cm->get_courseid() && $moduleid == $cm->get_cmid()) {
+                if ($courseid == $cm->get_courseid() && $moduleid == $cm->cmid) {
                     return array($request, $cm);
                 }
             }

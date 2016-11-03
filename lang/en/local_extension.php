@@ -172,6 +172,7 @@ $string['na'] = 'N/A';
 $string['nav_course_request'] = 'extension request';
 $string['nav_course_request_plural'] = 'extension requests';
 $string['nav_request'] = 'Request Extension';
+$string['nav_status'] = '{$a} Extension';
 $string['notification_footer'] = '{$a->content}<hr /><p>Notification update for extension request #{$a->id}: {$a->fullname}.
 <a href="{$a->statusurl}">Click here view the full status page for this request.</a></p>';
 $string['page_h2_summary'] = 'Extension status list';

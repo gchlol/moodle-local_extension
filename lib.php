@@ -75,7 +75,7 @@ function local_extension_extends_navigation(global_navigation $nav) {
             // Adding a nagivation string nested in the course that provides a count and status of the requests.
             $courseid = optional_param('id', 0, PARAM_INT);
             if (empty($courseid)) {
-                $courseid = optional_param('course', 0, PARAM_INT);
+                return;
             }
 
             $url = new moodle_url('/local/extension/request.php', array('course' => $courseid));
@@ -105,34 +105,26 @@ function local_extension_extends_navigation(global_navigation $nav) {
             }
 
         } else if ($contextlevel == CONTEXT_MODULE) {
+            // Adding a navigation string nested in the course module that provides a status update.
+            $id = optional_param('id', 0, PARAM_INT);
+
+            if (empty($id)) {
+                return;
+            }
+
             // If the user is not enrolled, do not provide an extension request link in the course/mod context.
             if (!is_enrolled($context, $USER->id)) {
                 return;
             }
 
-             // Adding a navigation string nested in the course module that provides a status update and the extension length.
-
-            $id = optional_param('id', 0, PARAM_INT);
-            $courseid = optional_param('course', 0, PARAM_INT);
-            $cmid = optional_param('cmid', 0, PARAM_INT);
-
-            if (empty($cmid)) {
-                $courseid = $PAGE->course->id;
-                $cmid = $id;
-            }
-
-            $modulenode = $nav->find($cmid, navigation_node::TYPE_ACTIVITY);
+            $modulenode = $nav->find($id, navigation_node::TYPE_ACTIVITY);
             if (!empty($modulenode)) {
-                list($request, $cm) = \local_extension\utility::find_module_requests($courseid, $cmid);
+                $courseid = $PAGE->course->id;
 
-                // TODO check if it is possible to even extend the cm in focus.
-
-                if (empty($courseid)) {
-                    return;
-                }
+                list($request, $cm) = \local_extension\utility::find_module_requests($courseid, $id);
 
                 $modinfo = get_fast_modinfo($courseid);
-                $cmdata = $modinfo->cms[$cmid];
+                $cmdata = $modinfo->cms[$id];
 
                 // Eg. assign, quiz.
                 $modname = $cmdata->modname;
@@ -144,25 +136,20 @@ function local_extension_extends_navigation(global_navigation $nav) {
 
                 if (empty($cm)) {
                     // Display the request extension link.
-                    $url = new moodle_url('/local/extension/request.php', array('course' => $courseid, 'cmid' => $cmid));
+                    $url = new moodle_url('/local/extension/request.php', array('course' => $courseid, 'cmid' => $id));
                     $node = $modulenode->add(get_string('nav_request', 'local_extension'), $url);
                 } else {
                     // Display the request status for this module.
                     $url = new moodle_url('/local/extension/status.php', array('id' => $request->requestid));
 
-                    $event = $request->mods[$cmid]['event'];
-                    $localcm = $request->mods[$cmid]['localcm'];
+                    $localcm = $request->mods[$id]['localcm'];
 
-                    $result = \local_extension\state::instance()->get_state_result($localcm->cm->state);
-
-                    $delta = $cm->get_data() - $event->timestart;
-
-                    // TODO format time differently.
-                    $extensionlength = format_time($delta);
+                    $result = \local_extension\state::instance()->get_state_result($localcm->get_stateid());
 
                     // The function block_nagivation->trim will truncate the navagation item to 25/50 characters.
-                    $node = $modulenode->add($result . ' ' .$extensionlength . ' extension', $url);
+                    $node = $modulenode->add(get_string('nav_status', 'local_extension', $result), $url);
                 }
+
             }
 
         }
