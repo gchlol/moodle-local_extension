@@ -372,9 +372,7 @@ class request implements \cache_data_source {
      * Each cm may have a different set of rules that will need to be processed.
      */
     public function process_triggers() {
-
         $notifydata = array();
-        $templatedata = array();
 
         // There can only be one request per course module.
         foreach ($this->mods as $mod) {
@@ -395,71 +393,79 @@ class request implements \cache_data_source {
 
         // We have processed the triggers, lets send some emails!
         if (!empty($notifydata)) {
-
-            /** @var rule[] $rules */
-            $rules = array();
-
-            // 1. Generate the template content for each mod item.
-            foreach ($notifydata as $data) {
-                /** @var rule $rule */
-                $rule = $data->rule;
-
-                // For the rule is that triggered, here is a list of cm templates that are generated.
-                $templatedata[$rule->id][] = $rule->process_templates($this, $data->mod);
-                $rules[$rule->id] = $rule;
-            }
-
-            // 2. Join the template subjects and content together in one message.
-            foreach ($templatedata as $ruleid => $templatecms) {
-                // If there are multiple cms in a request we need to concatenate them into the one message.
-
-                $templates = new \stdClass();
-
-                foreach ($templatecms as $template) {
-
-                    $types = array(
-                        'template_user'   => 'user_content',
-                        'template_notify' => 'role_content',
-                    );
-
-                    foreach ($types as $templatekey => $attribute) {
-
-                        // Checking if the form editor 'text' content has not been found.
-                        if (!array_key_exists('text', $template[$templatekey])) {
-                            continue;
-                        }
-
-                        // Setting the attributes to be empty if the template data is not found.
-                        // FIX for deleting moodle editor data, it leaves a <br> in the text after ctrl+a text deletion :(.
-                        if (empty(strip_tags($template[$templatekey]['text']))) {
-                            $templates->$attribute = null;
-                            continue;
-                        }
-
-                        $content = $template[$templatekey]['text'];
-
-                        // Checks to see if the return attribute *_content is set.
-                        // If true then it appends a <hr> and the next template item.
-                        if (!empty($templates->$attribute)) {
-                            $templates->$attribute .= "<hr>" . $content;
-                        } else {
-                            $templates->$attribute = $content;
-                        }
-
-                    }
-
-                }
-
-                // 3. Notify the roles / user for each rule returned.
-                $rules[$ruleid]->send_notifications($this, $mod, $templates);
-            }
-
-            // Notifications have been sent out. Increment the messageid to thread messages.
-            $this->increment_messageid();
+            $this->process_notification_data($notifydata, $mod);
         }
 
         // Invalidate the cache for this request, there may be new users subscribed.
         $this->invalidate_request();
+    }
+
+    /**
+     * Process the notification data and send emails based on the templates.
+     *
+     * @param $notifydata
+     * @param $mod
+     */
+    public function process_notification_data($notifydata, $mod) {
+        /** @var rule[] $rules */
+        $rules = array();
+        $templatedata = array();
+
+        // 1. Generate the template content for each mod item.
+        foreach ($notifydata as $data) {
+            /** @var rule $rule */
+            $rule = $data->rule;
+
+            // For the rule is that triggered, here is a list of cm templates that are generated.
+            $templatedata[$rule->id][] = $rule->process_templates($this, $data->mod);
+            $rules[$rule->id] = $rule;
+        }
+
+        // 2. Join the template subjects and content together in one message.
+        foreach ($templatedata as $ruleid => $templatecms) {
+            // If there are multiple cms in a request we need to concatenate them into the one message.
+            $templates = new \stdClass();
+
+            foreach ($templatecms as $template) {
+                $types = array(
+                    'template_user'   => 'user_content',
+                    'template_notify' => 'role_content',
+                );
+
+                foreach ($types as $templatekey => $attribute) {
+                    // Checking if the form editor 'text' content has not been found.
+                    if (!array_key_exists('text', $template[$templatekey])) {
+                        continue;
+                    }
+
+                    // Setting the attributes to be empty if the template data is not found.
+                    // FIX for deleting moodle editor data, it leaves a <br> in the text after ctrl+a text deletion :(.
+                    if (empty(strip_tags($template[$templatekey]['text']))) {
+                        $templates->$attribute = null;
+                        continue;
+                    }
+
+                    $content = $template[$templatekey]['text'];
+
+                    // Checks to see if the return attribute *_content is set.
+                    // If true then it appends a <hr> and the next template item.
+                    if (!empty($templates->$attribute)) {
+                        $templates->$attribute .= "<hr>" . $content;
+                    } else {
+                        $templates->$attribute = $content;
+                    }
+
+                } // End foreach $types.
+
+            } // End foreach $templatecms.
+
+            // 3. Notify the roles / user for each rule returned.
+            $rules[$ruleid]->send_notifications($this, $mod, $templates);
+
+        } // End foreach $templatedata.
+
+        // Notifications have been sent out. Increment the messageid to thread messages.
+        $this->increment_messageid();
     }
 
     /**
@@ -676,6 +682,27 @@ class request implements \cache_data_source {
         }
 
         return $access;
+    }
+
+    /**
+     * Returns true if there are some cm items in an open/pending state.
+     *
+     * @return bool
+     */
+    public function is_open_request() {
+        $open = false;
+
+        // Iterate over all the cms for this request, if there is an open state, return true.
+        foreach ($this->mods as $id => $mod) {
+            $stateid = $mod['localcm']->cm->state;
+            $result = state::instance()->is_open_state($stateid);
+
+            if ($result) {
+                $open = true;
+            }
+        }
+
+        return $open;
     }
 
     /**
