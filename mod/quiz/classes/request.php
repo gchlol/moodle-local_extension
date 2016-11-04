@@ -81,6 +81,8 @@ class request extends \local_extension\base_request {
      * @return boolean True if should be handled
      */
     public function is_candidate($event, $cm) {
+        // Allow quiz calendar items that have a close date. This means we can extend the due date.
+        // Quiz items that have passed the submission date will not show up for extension as calendar items are not present.
         if ($event->eventtype == "close") {
             return true;
         }
@@ -341,6 +343,36 @@ class request extends \local_extension\base_request {
         $obj->userid = $userid;
         $obj->timeclose = $timeclose;
 
+        $conditions = array(
+            'quiz' => $quizid,
+            'userid' => $userid,
+            'groupid' => null,
+        );
+
+        $params = array(
+            'context' => \context_system::instance(), // TODO change to quiz context
+            'other' => array(
+                'quizid' => $quizid
+            )
+        );
+
+        $oldoverride = $DB->get_record('quiz_overrides', $conditions);
+        if ($oldoverride) {
+            $params['relateduserid'] = $userid;
+            $params['objectid'] = $oldoverride->id;
+            $obj->id = $oldoverride->id;
+            $DB->update_record('quiz_overrides', $obj);
+            $event = \mod_quiz\event\user_override_updated::create($params);
+        } else {
+            $params['relateduserid'] = $userid;
+            $params['objectid'] = $quizid;
+            $DB->insert_record('quiz_overrides', $obj);
+            $event = \mod_quiz\event\user_override_created::create($params);
+        }
+
+        $event->trigger();
+
+
         quiz_update_open_attempts(array('quizid'=>$quizid));
         quiz_update_events($quiz, $obj);
     }
@@ -354,6 +386,10 @@ class request extends \local_extension\base_request {
      */
     public function cancel_extension($quizid, $userid) {
         // TODO: Discussion regarding how and when an extension will be removed if a date has been set.
+        // Set the course module id before calling quiz_delete_override().
+        // overrideedit.php
+        // $quiz->cmid = $cm->id;
+        // quiz_delete_override($quiz, $oldoverride->id);
     }
 
     public function get_instance($mod) {
