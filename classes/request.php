@@ -594,9 +594,34 @@ class request implements \cache_data_source {
             $userto = \core_user::get_user($userid);
 
             $comments = '';
-            foreach ($history as $item) {
-                $comments .= $PAGE->get_renderer('local_extension')->render_single_comment($this, $item, true);
+
+            $indexed = array();
+            foreach ($history as $comment) {
+                $indexed[$comment->timestamp][$comment->userid][] = $comment;
             }
+
+            // Initial loop for items that have the same timestamp.
+            foreach ($indexed as $timestamp => $userid) {
+                // First inner loop for items that have the same userid.
+                foreach ($userid as $id => $items) {
+
+                    $this->sort_history($items);
+
+                    $comment = new \stdClass();
+                    $message = '';
+                    // Second inner loop for collating the message content into one status item.
+                    foreach ($items as $item) {
+                        $message .= \html_writer::tag('p', $item->message);
+                    }
+
+                    $comment->timestamp = $items[0]->timestamp;
+                    $comment->userid = $items[0]->userid;
+                    $comment->message = $message;
+                    $comments .= $PAGE->get_renderer('local_extension')->render_single_comment($this, $comment, true);
+                }
+            }
+
+
 
             // The update is sent from who modified the history.
             // There will always be at least one history item.
