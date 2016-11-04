@@ -200,6 +200,10 @@ class rule {
         $sql = "SELECT id
                   FROM {local_extension_triggers}";
 
+        if (get_config('local_extension', 'ruleignoredatatype')) {
+            $type = null;
+        }
+
         if (!empty($type)) {
             $params = array('datatype' => $type);
 
