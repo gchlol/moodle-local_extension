@@ -86,6 +86,18 @@ class utility {
                 continue;
             }
 
+            // Next check to see if there are any rules for the module type. Without any rules, we cannot make a request.
+            $ruleignoredatatype = get_config('local_extension', 'ruleignoredatatype');
+            if ($ruleignoredatatype) {
+                $rules = \local_extension\rule::load_all();
+            } else {
+                $rules = \local_extension\rule::load_all($modtype);
+            }
+
+            if (empty($rules)) {
+                continue;
+            }
+
             $handler = $mods[$modtype];
 
             if (!$cm = get_coursemodule_from_instance($event->modulename, $event->instance)) {
