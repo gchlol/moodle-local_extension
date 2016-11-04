@@ -273,7 +273,7 @@ class local_extension_rule_testcase extends advanced_testcase {
 
         $request['id'] = $DB->insert_record('local_extension_request', $request);
 
-        foreach ($mods as $cmid => $mod) {
+        foreach ($activities as $cmid => $mod) {
             $course = $mod->course;
             $handler = $mod->handler;
 
