@@ -151,7 +151,7 @@ if ($mform->is_cancelled()) {
     );
     $comment['id'] = $DB->insert_record('local_extension_comment', $comment);
 
-    foreach ($mods as $cmid => $mod) {
+    foreach ($activities as $cmid => $mod) {
 
         $course = $mod->course;
         $handler = $mod->handler;
@@ -227,7 +227,7 @@ if ($mform->is_cancelled()) {
 
 echo $OUTPUT->header();
 
-if (count($mods) == 0) {
+if (count($activities) == 0) {
     $obj = new stdClass();
     $obj->startrange = userdate($start);
     $obj->endrange = userdate($end);

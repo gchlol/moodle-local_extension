@@ -103,8 +103,8 @@ if ($mform->is_cancelled()) {
 } else if ($form = $mform->get_data()) {
     // TODO Edge cases with lowering the length beyond set triggers. Deal with changes / triggers.
     $cm = $request->cms[$cmid];
-    $event = $request->mods[$cmid]['event'];
-    $course  = $request->mods[$cmid]['course'];
+    $event = $request->mods[$cmid]->event;
+    $course  = $request->mods[$cmid]->course;
 
     $due = 'due' . $cmid;
 
