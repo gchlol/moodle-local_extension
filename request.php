@@ -95,6 +95,7 @@ if (count($triggers) == 0) {
     echo $OUTPUT->header();
     echo html_writer::tag('p', get_string('page_request_notriggersdefined', 'local_extension'));
     echo $OUTPUT->footer();
+    die();
 }
 
 $activities = utility::get_activities($user, $start, $end, $options);
