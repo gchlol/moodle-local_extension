@@ -138,7 +138,7 @@ class local_extension_renderer extends plugin_renderer_base {
 
         // Roles are scoped to the enrollment status in courses.
         foreach ($req->mods as $cmid => $mod) {
-            $course = $mod['course'];
+            $course = $mod->course;
             $context = \context_course::instance($course->id);
             $roles = get_user_roles($context, $userid, true);
 
@@ -293,7 +293,9 @@ class local_extension_renderer extends plugin_renderer_base {
      * @return string $html The html output.
      */
     public function render_trigger_rule_text($rule, $parentstr) {
-           $html  = html_writer::start_tag('div');
+        $html  = html_writer::start_tag('div');
+
+        $html .= html_writer::tag('p', $rule->name);
 
         if (empty($parentstr)) {
             $activate = get_string('form_rule_label_parent_allways', 'local_extension');

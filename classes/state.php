@@ -154,6 +154,30 @@ class state {
     }
 
     /**
+     * Returns true if the state is open/pending for a given $stateid.
+     *
+     * @param int $stateid
+     * @return bool
+     */
+    public function is_open_state($stateid) {
+
+        switch ($stateid) {
+            case self::STATE_NEW:
+            case self::STATE_REOPENED:
+                return true;
+
+            case self::STATE_DENIED:
+            case self::STATE_APPROVED:
+            case self::STATE_CANCEL:
+                return false;
+
+            default:
+                return false;
+        }
+
+    }
+
+    /**
      * Renders the approve buttons for a standard user that can approve or deny an extension.
      *
      * @param \MoodleQuickForm $mform
@@ -290,7 +314,7 @@ class state {
 
                 // We found it! The state has changed.
                 if (!empty($data->$item)) {
-                    $cm = $mod['cm'];
+                    $cm = $mod->cm;
                     $params = array(
                         'id' => $request->requestid,
                         'course' => $cm->course,
@@ -316,12 +340,12 @@ class state {
 
         $mod = $request->mods[$data->cmid];
         /* @var \local_extension\base_request $handler IDE hinting */
-        $handler = $mod['handler'];
+        $handler = $mod->handler;
 
         /* @var \local_extension\cm $localcm IDE hinting */
-        $localcm = $mod['localcm'];
-        $event   = $mod['event'];
-        $course  = $mod['course'];
+        $localcm = $mod->localcm;
+        $event   = $mod->event;
+        $course  = $mod->course;
 
         /*
          * Iterate over a list of states with their cmid concatenated eg. approve6
@@ -369,9 +393,9 @@ class state {
     /**
      * Checks the current state and returns true if the requested state is possible.
      *
-     * @param $currentstate
-     * @param $requestedstate
-     * @param $approved
+     * @param int $currentstate
+     * @param int $requestedstate
+     * @param bool $approved
      * @return bool
      */
     public function state_is_possible($currentstate, $requestedstate, $approved) {

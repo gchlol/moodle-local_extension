@@ -50,7 +50,7 @@ class process_triggers extends \core\event\base {
      * @return string
      */
     public static function get_name() {
-        return get_string('event_process_triggers', 'local_extension');
+        return get_string('event_trigger_process', 'local_extension');
     }
 
     /**
@@ -58,6 +58,6 @@ class process_triggers extends \core\event\base {
      * @see \core\event\base::get_description()
      */
     public function get_description() {
-        return "Process the triggers for all active requests";
+        return get_string('event_trigger_process_desc', 'local_extension');
     }
 }

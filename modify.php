@@ -74,18 +74,13 @@ $PAGE->add_body_class('local_extension');
 $renderer = $PAGE->get_renderer('local_extension');
 
 $mod = $request->mods[$cmid];
-$course = $mod['course'];
-$cm = $mod['cm'];
-
-$context = \context_module::instance($cmid);
-
-$assign = new \assign($context, $cm, $course);
-$instance = $assign->get_instance();
+$course = $mod->course;
+$cm = $mod->cm;
 
 $params = array(
     'request' => $request,
     'cmid' => $cmid,
-    'instance' => $assign->get_instance(),
+    'instance' => $mod->handler->get_instance($mod),
 );
 
 $requestuser = core_user::get_user($request->request->userid);
@@ -108,8 +103,8 @@ if ($mform->is_cancelled()) {
 } else if ($form = $mform->get_data()) {
     // TODO Edge cases with lowering the length beyond set triggers. Deal with changes / triggers.
     $cm = $request->cms[$cmid];
-    $event = $request->mods[$cmid]['event'];
-    $course  = $request->mods[$cmid]['course'];
+    $event = $request->mods[$cmid]->event;
+    $course  = $request->mods[$cmid]->course;
 
     $due = 'due' . $cmid;
 
@@ -147,7 +142,6 @@ if ($mform->is_cancelled()) {
     $request->get_data_cache()->delete($request->requestid);
     $statusurl = new moodle_url('/local/extension/status.php', array('id' => $requestid));
 
-    // TODO Run triggers, update subscriptions.
     redirect($statusurl);
 } else {
     $data = new stdClass();
@@ -159,8 +153,6 @@ if ($mform->is_cancelled()) {
 }
 
 echo $OUTPUT->header();
-
-// TODO echo $renderer->display_modify_heading();.
 
 $mform->display();
 

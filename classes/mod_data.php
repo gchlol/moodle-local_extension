@@ -15,7 +15,7 @@
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
 /**
- * Task: Process rules.
+ * Mod data class.
  *
  * @package    local_extension
  * @author     Nicholas Hoobin <nicholashoobin@catalyst-au.net>
@@ -23,48 +23,32 @@
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
-namespace local_extension\task;
-
-use local_extension\request;
+namespace local_extension;
 
 defined('MOODLE_INTERNAL') || die();
 
 /**
- * Process rules task.
+ * Mod data class.
  *
+ * @package    local_extension
  * @author     Nicholas Hoobin <nicholashoobin@catalyst-au.net>
  * @copyright  Catalyst IT
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
-class process_rules extends \core\task\scheduled_task {
-    /**
-     * {@inheritDoc}
-     * @see \core\task\scheduled_task::get_name()
-     */
-    public function get_name() {
-        return get_string('task_process', 'local_extension');
-    }
+class mod_data {
 
-    /**
-     * {@inheritDoc}
-     * @see \core\task\task_base::execute()
-     */
-    public function execute() {
-        global $DB;
+    /** @var \calendar_event */
+    public $event;
 
-        $sql = "SELECT id
-                  FROM {local_extension_request}";
+    /** @var \course_modinfo */
+    public $cm;
 
-        $requestids = $DB->get_fieldset_sql($sql);
+    /** @var \local_extension\cm The local_extension_cm class */
+    public $localcm;
 
-        foreach ($requestids as $requestid) {
-            $request = request::from_id($requestid);
+    /** @var \stdClass The course database object */
+    public $course;
 
-            if ($request->is_open_request()) {
-                $request->process_triggers();
-            }
-
-        }
-    }
-
+    /** @var \local_extension\base_request */
+    public $handler;
 }

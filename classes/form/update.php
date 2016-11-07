@@ -60,10 +60,10 @@ class update extends \moodleform {
 
         foreach ($mods as $id => $mod) {
             /* @var \local_extension\cm $localcm IDE hinting */
-            $localcm = $mod['localcm'];
-            $course = $mod['course'];
+            $localcm = $mod->localcm;
+            $course = $mod->course;
             /* @var \local_extension\base_request $handler IDE hinting */
-            $handler = $mod['handler'];
+            $handler = $mod->handler;
             $id = $localcm->cmid;
             $stateid = $localcm->cm->state;
             $userid = $localcm->userid;
@@ -114,22 +114,6 @@ class update extends \moodleform {
         $buttonarray[] = &$mform->createElement('cancel', 'cancel', get_string('back'));
         $mform->addGroup($buttonarray, 'buttonar', '', array(' '), false);
         $mform->closeHeaderBefore('buttonar');
-    }
-
-    /**
-     * This is used to update the $mform comment list after a post.
-     * definition_after_data() is not suitable for this.
-     *
-     * $mform->_definition_finalized is set to true on the first page load.
-     * After $mform->get_data() the definition_after_data() function will not be called.
-     */
-    public function update_comments() {
-        $mform    = $this->_form;
-        $request  = $this->_customdata['request'];
-        $renderer = $this->_customdata['renderer'];
-
-        $commentidx = $mform->_elementIndex['comments'];
-        $mform->_elements[$commentidx]->_text = $renderer->render_extension_comments($request) . \html_writer::start_tag('br');
     }
 
     /**

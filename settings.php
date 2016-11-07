@@ -108,4 +108,8 @@ if ($hassiteconfig) {
     $settings->add(new admin_setting_configselect('local_extension/requireattachment',
         new lang_string('requireattachment',      'local_extension'),
         new lang_string('requireattachmenthelp',  'local_extension'), 1, $options));
+
+    $settings->add(new admin_setting_configselect('local_extension/ruleignoredatatype',
+        new lang_string('ruleignoredatatype',     'local_extension'),
+        new lang_string('ruleignoredatatypehelp', 'local_extension'), 0, $options));
 }

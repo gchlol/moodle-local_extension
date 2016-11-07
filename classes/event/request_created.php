@@ -50,7 +50,7 @@ class request_created extends \core\event\base {
      * @return string
      */
     public static function get_name() {
-        return get_string('event_request_created', 'local_extension');
+        return get_string('event_trigger_request', 'local_extension');
     }
 
     /**
@@ -58,6 +58,6 @@ class request_created extends \core\event\base {
      * @see \core\event\base::get_description()
      */
     public function get_description() {
-        return "A request has been created";
+        return get_string('event_trigger_request_desc', 'local_extension');
     }
 }

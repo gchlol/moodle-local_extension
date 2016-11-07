@@ -103,6 +103,7 @@ abstract class base_request {
      */
     abstract public function submit_extension($assignmentid, $userid, $duedate);
 
+    abstract public function get_instance($mod);
 
     /**
      * Adds a date selector to the mform that it has been passed.
@@ -112,10 +113,10 @@ abstract class base_request {
      * @param bool $optional
      */
     public function date_selector($mod, $mform, $optional = true) {
-        $event = $mod['event'];
+        $event = $mod->event;
 
         /* @var $lcm \local_extension\cm IDE hinting */
-        $lcm = $mod['localcm'];
+        $lcm = $mod->localcm;
 
         $defaultdate = $event->timestart;
         $lcmdate = $lcm->get_data();
@@ -125,7 +126,6 @@ abstract class base_request {
         }
 
         $startyear = date('Y');
-        // TODO get assignment due date, if moves to next year, $startyear += 1.
         $stopyear = date('Y') + 1;
 
         $dateconfig = array(

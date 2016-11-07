@@ -52,7 +52,6 @@ $renderer = $PAGE->get_renderer('local_extension');
 // TODO replace with load_branch from ruleid.
 $rules = rule::load_all();
 $ordered = utility::rule_tree($rules);
-
 if ($delete && confirm_sesskey()) {
 
     if ($confirm != md5($delete)) {
@@ -71,6 +70,7 @@ if ($delete && confirm_sesskey()) {
 
         echo $renderer->render_delete_rules(array($branch));
 
+        $url = new moodle_url('/local/extension/rules/manage.php');
         echo $OUTPUT->confirm('', $deletebutton, $url);
         echo $OUTPUT->footer();
 
@@ -98,8 +98,6 @@ if ($delete && confirm_sesskey()) {
 
         redirect(new moodle_url('/local/extension/rules/manage.php'));
 
-    } else {
-
-        redirect(new moodle_url('/local/extension/rules/manage.php'));
     }
+
 }

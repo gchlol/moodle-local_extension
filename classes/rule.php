@@ -200,6 +200,10 @@ class rule {
         $sql = "SELECT id
                   FROM {local_extension_triggers}";
 
+        if (get_config('local_extension', 'ruleignoredatatype')) {
+            $type = null;
+        }
+
         if (!empty($type)) {
             $params = array('datatype' => $type);
 
@@ -319,7 +323,7 @@ class rule {
 
         $params = array(
             'userid' => $userid,
-            'localcmid' => $mod['localcm']->cm->id,
+            'localcmid' => $mod->localcm->cm->id,
         );
 
         $select = "userid = :userid AND localcmid = :localcmid";
@@ -342,8 +346,6 @@ class rule {
      * @param \stdClass $templates
      */
     public function send_notifications($request, $mod, $templates) {
-        // TODO check if there is any content and not notify roles/users.
-
         // Sets the request users fullname to the email from name, only for roles that get triggered.
         $noreplyuser = \core_user::get_noreply_user();
         $requestuser = \core_user::get_user($request->request->userid);
@@ -363,7 +365,9 @@ class rule {
         // The $noreplyuser has the full name of the requesting user.
         $noreplyuser->firstname = fullname($requestuser);
 
-        $this->notify_roles($request, $subject, $rolecontent, $mod['course'], $noreplyuser);
+        if (!empty($rolecontent)) {
+            $this->notify_roles($request, $subject, $rolecontent, $mod->course, $noreplyuser);
+        }
 
         // Notifying the user.
         $usercontent = $templates->user_content;
@@ -415,8 +419,8 @@ class rule {
     private function setup_subscription(&$request, $mod) {
         global $DB;
 
-        $localcm = $mod['localcm'];
-        $course = $mod['course'];
+        $localcm = $mod->localcm;
+        $course = $mod->course;
 
         $role = $this->role;
 
@@ -473,8 +477,8 @@ class rule {
     private function downgrade_status($mod, $rule) {
         global $DB;
 
-        $localcm = $mod['localcm'];
-        $course = $mod['course'];
+        $localcm = $mod->localcm;
+        $course = $mod->course;
 
         // If the rule has specified that the roles will be forced to approve, we skip downgrading the access.
         if ($rule->action != self::RULE_ACTION_FORCEAPPROVE) {
@@ -518,7 +522,7 @@ class rule {
     private function check_history($mod) {
         global $DB;
 
-        $localcm = $mod['localcm'];
+        $localcm = $mod->localcm;
 
         $params = array(
             'trigger' => $this->id,
@@ -555,7 +559,7 @@ class rule {
     public function write_history($mod) {
         global $DB;
 
-        $localcm = $mod['localcm'];
+        $localcm = $mod->localcm;
 
         $history = array(
             'trigger' => $this->id,
@@ -580,17 +584,17 @@ class rule {
     public function process_templates($request, $mod, $contentchange = null) {
         global $PAGE, $CFG;
 
-        $event   = $mod['event'];
-        $cm      = $mod['cm'];
-        $localcm = $mod['localcm'];
-        $course  = $mod['course'];
-        $handler = $mod['handler'];
+        $event   = $mod->event;
+        $cm      = $mod->cm;
+        $localcm = $mod->localcm;
+        $course  = $mod->course;
+        $handler = $mod->handler;
 
         // A url to the status page.
         $url = new \moodle_url('/local/extension/status.php', array('id' => $localcm->cm->request));
 
         // The user details for obtaining the full name.
-        $userid = $mod['localcm']->userid;
+        $userid = $mod->localcm->userid;
 
         $user = \core_user::get_user($userid);
 
@@ -694,7 +698,7 @@ class rule {
             return true;
         }
 
-        $localcm = $mod['localcm'];
+        $localcm = $mod->localcm;
 
         $params = array(
             'trigger' => $parent,
@@ -721,7 +725,7 @@ class rule {
      * @return string
      */
     private function get_request_time($mod) {
-        return utility::calculate_length($mod['localcm']->cm->length);
+        return utility::calculate_length($mod->localcm->cm->length);
     }
 
     /**
@@ -731,11 +735,11 @@ class rule {
      * @return boolean
      */
     private function check_request_length($mod) {
-        $localcm = $mod['localcm'];
+        $localcm = $mod->localcm;
 
         // This value will be a timestamp.
         $daterequested = $localcm->get_data();
-        $datedue = $mod['event']->timestart;
+        $datedue = $mod->event->timestart;
 
         $delta = $daterequested - $datedue;
 

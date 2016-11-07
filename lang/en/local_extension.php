@@ -24,8 +24,7 @@
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
-$string['admin_settings_general'] = 'General settings';
-$string['admin_settings_template'] = 'Template settings';
+$string['admin_settings_general'] = 'Extension settings';
 $string['and'] = 'and';
 $string['attachment_detail'] = '{$a->file} from {$a->user} on {$a->date}';
 $string['attachments'] = 'Attached documents:';
@@ -53,11 +52,16 @@ $string['error_no_mods'] = 'The requested date range has no activities that will
 $string['error_none_selected'] = 'Please select at least one item';
 $string['error_same_date'] = 'Please select a different date';
 $string['error_over_extension_limit'] = 'Your request of {$a->days} days is too long. Please make a shorter request.';
-$string['event_process_triggers'] = 'Processed triggers';
-$string['event_request_created'] = 'Request created';
 $string['event_trigger_create'] = 'Trigger created';
+$string['event_trigger_create_desc'] = 'The user with the id \'{$a->userid}\' has created a trigger for type \'{$a->datatype}\'.';
 $string['event_trigger_disable'] = 'Trigger disabled';
+$string['event_trigger_disable_desc'] = 'The user with the id \'{$a->userid}\' has disabled the trigger id \'{$a->objectid}\' for type \'{$a->datatype}\'.';
+$string['event_trigger_process'] = 'Processed triggers';
+$string['event_trigger_process_desc'] = 'Process the triggers for all active requests';
+$string['event_trigger_request'] = 'Request created';
+$string['event_trigger_request_desc'] = 'A request has been created';
 $string['event_trigger_update'] = 'Trigger updated';
+$string['event_trigger_update_desc'] = 'The user with the id \'{$a->userid}\' has updated the trigger id \'{$a->objectid}\' for type \'{$a->datatype}\'.';
 $string['extensionlimitdefault'] = '28';
 $string['extensionlimit'] = 'Extension length limit in days';
 $string['extensionlimithelp'] = 'This is a hard limit which restricts the length that a student can initially request an extension for.';
@@ -167,6 +171,7 @@ $string['na'] = 'N/A';
 $string['nav_course_request'] = 'extension request';
 $string['nav_course_request_plural'] = 'extension requests';
 $string['nav_request'] = 'Request Extension';
+$string['nav_status'] = '{$a} Extension';
 $string['notification_footer'] = '{$a->content}<hr /><p>Notification update for extension request #{$a->id}: {$a->fullname}.
 <a href="{$a->statusurl}">Click here view the full status page for this request.</a></p>';
 $string['page_h2_summary'] = 'Extension status list';
@@ -207,6 +212,8 @@ $string['requireattachmenthelp'] = 'When making a new request, enabling this set
 $string['rolehelp'] = '';
 $string['rolelist'] = 'Roles to notify';
 $string['rules_page_heading'] = 'Rules management';
+$string['ruleignoredatatype'] = 'Rules ignore datatype';
+$string['ruleignoredatatypehelp'] = 'Ignore the datatype restriction and run every rule against each request.';
 $string['searchbackhelp'] = 'How many days to search back from today when requesting an extension.';
 $string['searchback'] = 'Search backward';
 $string['searchforwardhelp'] = 'How many days to search forward from today when requesting an extension.';

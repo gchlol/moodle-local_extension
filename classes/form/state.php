@@ -67,10 +67,10 @@ class state extends \moodleform {
         $mform->setType('s', PARAM_INT);
 
         $mod = $mods[$cmid];
-        $handler = $mod['handler'];
+        $handler = $mod->handler;
 
         /* @var \local_extension\cm $lcm IDE hinting. */
-        $lcm = $mod['localcm'];
+        $lcm = $mod->localcm;
 
         $html = \html_writer::tag('h2', 'State change confirmation');
         $mform->addElement('html', $html);
@@ -116,7 +116,7 @@ class state extends \moodleform {
         $mods     = $request->mods;
 
         $mod = $mods[$cmid];
-        $lcm = $mod['localcm'];
+        $lcm = $mod->localcm;
 
         $approved = false;
 

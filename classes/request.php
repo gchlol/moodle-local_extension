@@ -96,11 +96,11 @@ class request implements \cache_data_source {
             'requestid' => $requestid
         );
 
-        list($handlers, $mods) = utility::get_activities($request->userid, $request->searchstart, $request->searchend, $options);
-        $this->mods = $mods;
+        $activities = utility::get_activities($request->userid, $request->searchstart, $request->searchend, $options);
+        $this->mods = $activities;
 
-        foreach ($mods as $id => $mod) {
-            $cm = $mod['localcm'];
+        foreach ($activities as $id => $mod) {
+            $cm = $mod->localcm;
             $this->cms[$cm->cmid] = $cm;
         }
 
@@ -296,9 +296,9 @@ class request implements \cache_data_source {
             $mod = $this->mods[$record->localcmid];
 
             /* @var cm $localcm IDE hinting. */
-            $localcm = $mod['localcm'];
-            $event   = $mod['event'];
-            $course  = $mod['course'];
+            $localcm = $mod->localcm;
+            $event   = $mod->event;
+            $course  = $mod->course;
 
             $status = state::instance()->get_state_name($record->state);
 
@@ -372,13 +372,11 @@ class request implements \cache_data_source {
      * Each cm may have a different set of rules that will need to be processed.
      */
     public function process_triggers() {
-
         $notifydata = array();
-        $templatedata = array();
 
         // There can only be one request per course module.
         foreach ($this->mods as $mod) {
-            $handler = $mod['handler'];
+            $handler = $mod->handler;
 
             // Obtains all rules based on the handlers datatype. eg. assign/quiz.
             $rules = $handler->get_triggers();
@@ -395,71 +393,79 @@ class request implements \cache_data_source {
 
         // We have processed the triggers, lets send some emails!
         if (!empty($notifydata)) {
-
-            /** @var rule[] $rules */
-            $rules = array();
-
-            // 1. Generate the template content for each mod item.
-            foreach ($notifydata as $data) {
-                /** @var rule $rule */
-                $rule = $data->rule;
-
-                // For the rule is that triggered, here is a list of cm templates that are generated.
-                $templatedata[$rule->id][] = $rule->process_templates($this, $data->mod);
-                $rules[$rule->id] = $rule;
-            }
-
-            // 2. Join the template subjects and content together in one message.
-            foreach ($templatedata as $ruleid => $templatecms) {
-                // If there are multiple cms in a request we need to concatenate them into the one message.
-
-                $templates = new \stdClass();
-
-                foreach ($templatecms as $template) {
-
-                    $types = array(
-                        'template_user'   => 'user_content',
-                        'template_notify' => 'role_content',
-                    );
-
-                    foreach ($types as $templatekey => $attribute) {
-
-                        // Checking if the form editor 'text' content has not been found.
-                        if (!array_key_exists('text', $template[$templatekey])) {
-                            continue;
-                        }
-
-                        // Setting the attributes to be empty if the template data is not found.
-                        // FIX for deleting moodle editor data, it leaves a <br> in the text after ctrl+a text deletion :(.
-                        if (empty(strip_tags($template[$templatekey]['text']))) {
-                            $templates->$attribute = null;
-                            continue;
-                        }
-
-                        $content = $template[$templatekey]['text'];
-
-                        // Checks to see if the return attribute *_content is set.
-                        // If true then it appends a <hr> and the next template item.
-                        if (!empty($templates->$attribute)) {
-                            $templates->$attribute .= "<hr>" . $content;
-                        } else {
-                            $templates->$attribute = $content;
-                        }
-
-                    }
-
-                }
-
-                // 3. Notify the roles / user for each rule returned.
-                $rules[$ruleid]->send_notifications($this, $mod, $templates);
-            }
-
-            // Notifications have been sent out. Increment the messageid to thread messages.
-            $this->increment_messageid();
+            $this->process_notification_data($notifydata, $mod);
         }
 
         // Invalidate the cache for this request, there may be new users subscribed.
         $this->invalidate_request();
+    }
+
+    /**
+     * Process the notification data and send emails based on the templates.
+     *
+     * @param array $notifydata
+     * @param array $mod
+     */
+    public function process_notification_data($notifydata, $mod) {
+        /** @var rule[] $rules */
+        $rules = array();
+        $templatedata = array();
+
+        // 1. Generate the template content for each mod item.
+        foreach ($notifydata as $data) {
+            /** @var rule $rule */
+            $rule = $data->rule;
+
+            // For the rule is that triggered, here is a list of cm templates that are generated.
+            $templatedata[$rule->id][] = $rule->process_templates($this, $data->mod);
+            $rules[$rule->id] = $rule;
+        }
+
+        // 2. Join the template subjects and content together in one message.
+        foreach ($templatedata as $ruleid => $templatecms) {
+            // If there are multiple cms in a request we need to concatenate them into the one message.
+            $templates = new \stdClass();
+
+            foreach ($templatecms as $template) {
+                $types = array(
+                    'template_user'   => 'user_content',
+                    'template_notify' => 'role_content',
+                );
+
+                foreach ($types as $templatekey => $attribute) {
+                    // Checking if the form editor 'text' content has not been found.
+                    if (!array_key_exists('text', $template[$templatekey])) {
+                        continue;
+                    }
+
+                    // Setting the attributes to be empty if the template data is not found.
+                    // FIX for deleting moodle editor data, it leaves a <br> in the text after ctrl+a text deletion :(.
+                    if (empty(strip_tags($template[$templatekey]['text']))) {
+                        $templates->$attribute = null;
+                        continue;
+                    }
+
+                    $content = $template[$templatekey]['text'];
+
+                    // Checks to see if the return attribute *_content is set.
+                    // If true then it appends a <hr> and the next template item.
+                    if (!empty($templates->$attribute)) {
+                        $templates->$attribute .= "<hr>" . $content;
+                    } else {
+                        $templates->$attribute = $content;
+                    }
+
+                } // End foreach $types.
+
+            } // End foreach $templatecms.
+
+            // 3. Notify the roles / user for each rule returned.
+            $rules[$ruleid]->send_notifications($this, $mod, $templates);
+
+        } // End foreach $templatedata.
+
+        // Notifications have been sent out. Increment the messageid to thread messages.
+        $this->increment_messageid();
     }
 
     /**
@@ -487,7 +493,7 @@ class request implements \cache_data_source {
             $item->rule = $rule;
             $item->role = $rule->role;
             $item->mod = $mod;
-            $item->cmid = $mod['localcm']->cm->cmid;
+            $item->cmid = $mod->localcm->cm->cmid;
 
             $data[] = $item;
         }
@@ -588,9 +594,34 @@ class request implements \cache_data_source {
             $userto = \core_user::get_user($userid);
 
             $comments = '';
-            foreach ($history as $item) {
-                $comments .= $PAGE->get_renderer('local_extension')->render_single_comment($this, $item, true);
+
+            $indexed = array();
+            foreach ($history as $comment) {
+                $indexed[$comment->timestamp][$comment->userid][] = $comment;
             }
+
+            // Initial loop for items that have the same timestamp.
+            foreach ($indexed as $timestamp => $userid) {
+                // First inner loop for items that have the same userid.
+                foreach ($userid as $id => $items) {
+
+                    $this->sort_history($items);
+
+                    $comment = new \stdClass();
+                    $message = '';
+                    // Second inner loop for collating the message content into one status item.
+                    foreach ($items as $item) {
+                        $message .= \html_writer::tag('p', $item->message);
+                    }
+
+                    $comment->timestamp = $items[0]->timestamp;
+                    $comment->userid = $items[0]->userid;
+                    $comment->message = $message;
+                    $comments .= $PAGE->get_renderer('local_extension')->render_single_comment($this, $comment, true);
+                }
+            }
+
+
 
             // The update is sent from who modified the history.
             // There will always be at least one history item.
@@ -650,7 +681,7 @@ class request implements \cache_data_source {
      * Returns the highest subscription level of the specified userid.
      *
      * @param int $userid
-     * @param $localcmid
+     * @param int $localcmid
      * @return int
      */
     public function get_user_access($userid, $localcmid) {
@@ -676,6 +707,27 @@ class request implements \cache_data_source {
         }
 
         return $access;
+    }
+
+    /**
+     * Returns true if there are some cm items in an open/pending state.
+     *
+     * @return bool
+     */
+    public function is_open_request() {
+        $open = false;
+
+        // Iterate over all the cms for this request, if there is an open state, return true.
+        foreach ($this->mods as $id => $mod) {
+            $stateid = $mod->localcm->cm->state;
+            $result = state::instance()->is_open_state($stateid);
+
+            if ($result) {
+                $open = true;
+            }
+        }
+
+        return $open;
     }
 
     /**
