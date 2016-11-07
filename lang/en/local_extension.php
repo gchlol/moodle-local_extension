@@ -24,8 +24,7 @@
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
-$string['admin_settings_general'] = 'General settings';
-$string['admin_settings_template'] = 'Template settings';
+$string['admin_settings_general'] = 'Extension settings';
 $string['and'] = 'and';
 $string['attachment_detail'] = '{$a->file} from {$a->user} on {$a->date}';
 $string['attachments'] = 'Attached documents:';
