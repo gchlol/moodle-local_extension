@@ -196,9 +196,9 @@ function local_extension_pluginfile($course, $cm, $context, $filearea, $args, $f
     // The request object is invalidated and regenerated after each comment, attachment added, or rule triggered.
     if (!array_key_exists($USER->id, $request->users)) {
 
-        if (!is_siteadmin()) {
+        // If the user does not have the capability to view all requests, return false.
+        if (!has_capability('local/extension:viewallrequests', $context)) {
             return false;
-
         }
     }
 
