@@ -442,7 +442,6 @@ class local_extension_renderer extends plugin_renderer_base {
         $policy = get_config('local_extension', 'extensionpolicyrequest');
 
         // Moodle rich text editor may leave a <br> in an empty editor.
-        $policy = strip_tags($policy);
 
         if (!empty($policy)) {
             return html_writer::div($policy, 'policy');
