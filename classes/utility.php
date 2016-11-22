@@ -209,11 +209,11 @@ class utility {
         $userfrom->customheaders[] = "Thread-Topic: $subject";
         $userfrom->customheaders[] = "Thread-Index: " . substr($rootid, 1, 28);
 
-        $message = new \stdClass();
+        $message = new \core\message\message();
         $message->component         = 'local_extension';
         $message->name              = 'status';
         $message->userfrom          = $userfrom;
-        $message->userto            = $userto;
+        $message->userto            = \core_user::get_user($userto->id);
         $message->subject           = $subject;
         $message->fullmessage       = html_to_text($content);;
         $message->fullmessageformat = FORMAT_PLAIN;
