@@ -644,6 +644,21 @@ class rule {
             }
         }
 
+        $allroles = get_all_roles();
+        foreach ($allroles as $id => $role) {
+            $var = '/{{course_role_' . $role->shortname . '}}/';
+            $ctx = \context_course::instance($course->id);
+            $users = get_role_users($role->id, $ctx);
+
+            $templatevars[$var] = '';
+            foreach ($users as $user) {
+                $url = new \moodle_url('/user/view.php', array('id' => $user->id, 'course' => $course->id));
+                $templatevars[$var] .= '<a href="' . $url->out(false) . '">' . fullname($user) . '</a>, ';
+            }
+
+            $templatevars[$var] = rtrim($templatevars[$var], ", ");
+        }
+
         $patterns = array_keys($templatevars);
         $replacements = array_values($templatevars);
 
