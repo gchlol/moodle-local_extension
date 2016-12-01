@@ -26,6 +26,8 @@
 
 $string['admin_settings_general'] = 'Extension settings';
 $string['and'] = 'and';
+$string['attachmentpolicy'] = 'File attachment policy';
+$string['attachmentpolicyhelp'] = 'This policy will be displayed above the attachment field.';
 $string['attachment_detail'] = '{$a->file} from {$a->user} on {$a->date}';
 $string['attachments'] = 'Attached documents:';
 $string['button_edit_rule'] = 'Add a new Rule';

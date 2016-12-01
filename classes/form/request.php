@@ -101,6 +101,13 @@ class request extends \moodleform {
             $mform->addElement('textarea', 'comment', get_string('comment', 'local_extension'), 'rows="5" cols="70"');
             $mform->addRule('comment', 'Required', 'required', null, 'client');
 
+            $policy = get_config('local_extension', 'attachmentpolicy');
+            // Moodle rich text editor may leave a <br> in an empty editor.
+            if (!empty($policy)) {
+                $html = \html_writer::div($policy, '');
+                $mform->addElement('static', 'policy', '', $html);
+            }
+
             $mform->addElement('filemanager', 'attachments', get_string('attachments', 'local_extension'), null, array(
                 'subdirs' => 0,
             ));

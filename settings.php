@@ -83,6 +83,11 @@ if ($hassiteconfig) {
         new lang_string('extensionpolicystatushelp',    'local_extension'),
         ''));
 
+    $settings->add(new admin_setting_confightmleditor('local_extension/attachmentpolicy',
+        new lang_string('attachmentpolicy',           'local_extension'),
+        new lang_string('attachmentpolicyhelp',       'local_extension'),
+        ''));
+
     $options = array(
         0 => get_string('no'),
         1 => get_string('yes')
