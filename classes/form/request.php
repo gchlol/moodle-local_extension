@@ -169,8 +169,26 @@ class request extends \moodleform {
                 $hours = ($requestlength / 3600) % 24;
 
                 if ($days > $extensionlimit) {
-                    $obj = (object) ['days' => intval($days)];
-                    $errors[$formid] = get_string('error_over_extension_limit', 'local_extension', $obj);
+
+                    $templatevars = array(
+                        '/{{maxweeks}}/' => floor($extensionlimit / 7),
+                        '/{{lengthweeks}}/' => floor($days / 7),
+                        '/{{maxdays}}/' => $extensionlimit,
+                        '/{{lengthdays}}/' => $days,
+                    );
+
+                    $patterns = array_keys($templatevars);
+                    $replacements = array_values($templatevars);
+
+                    $warningstring = get_config('local_extension', 'extensionlimitwanring');
+                    if (empty($warningstring)) {
+                        $obj = (object) ['days' => intval($days)];
+                        $resultstr = get_string('error_over_extension_limit', 'local_extension', $obj);
+
+                    } else {
+                        $resultstr = preg_replace($patterns, $replacements, $warningstring);
+                    }
+                    $errors[$formid] = $resultstr;
                 }
             }
 
