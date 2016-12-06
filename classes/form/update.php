@@ -105,6 +105,13 @@ class update extends \moodleform {
         $mform->addElement('hidden', 'id');
         $mform->setType('id', PARAM_INT);
 
+        $policy = get_config('local_extension', 'attachmentpolicy');
+        // Moodle rich text editor may leave a <br> in an empty editor.
+        if (!empty($policy)) {
+            $html = \html_writer::div($policy, '');
+            $mform->addElement('html', $html);
+        }
+
         $mform->addElement('filemanager', 'attachments', '', null, array('subdirs' => 0));
 
         $mform->addElement('textarea', 'commentarea', '', 'wrap="virtual" rows="5" cols="70"');

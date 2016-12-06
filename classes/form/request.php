@@ -101,6 +101,13 @@ class request extends \moodleform {
             $mform->addElement('textarea', 'comment', get_string('comment', 'local_extension'), 'rows="5" cols="70"');
             $mform->addRule('comment', 'Required', 'required', null, 'client');
 
+            $policy = get_config('local_extension', 'attachmentpolicy');
+            // Moodle rich text editor may leave a <br> in an empty editor.
+            if (!empty($policy)) {
+                $html = \html_writer::div($policy, '');
+                $mform->addElement('static', 'policy', '', $html);
+            }
+
             $mform->addElement('filemanager', 'attachments', get_string('attachments', 'local_extension'), null, array(
                 'subdirs' => 0,
             ));
@@ -169,8 +176,26 @@ class request extends \moodleform {
                 $hours = ($requestlength / 3600) % 24;
 
                 if ($days > $extensionlimit) {
-                    $obj = (object) ['days' => intval($days)];
-                    $errors[$formid] = get_string('error_over_extension_limit', 'local_extension', $obj);
+
+                    $templatevars = array(
+                        '/{{maxweeks}}/' => floor($extensionlimit / 7),
+                        '/{{lengthweeks}}/' => floor($days / 7),
+                        '/{{maxdays}}/' => $extensionlimit,
+                        '/{{lengthdays}}/' => $days,
+                    );
+
+                    $patterns = array_keys($templatevars);
+                    $replacements = array_values($templatevars);
+
+                    $warningstring = get_config('local_extension', 'extensionlimitwanring');
+                    if (empty($warningstring)) {
+                        $obj = (object) ['days' => intval($days)];
+                        $resultstr = get_string('error_over_extension_limit', 'local_extension', $obj);
+
+                    } else {
+                        $resultstr = preg_replace($patterns, $replacements, $warningstring);
+                    }
+                    $errors[$formid] = $resultstr;
                 }
             }
 

@@ -71,7 +71,7 @@ if ($hassiteconfig) {
     $settings->add(new admin_setting_configtext('local_extension/supportusername',
         new lang_string('supportusername',        'local_extension'),
         new lang_string('supportusernamehelp',    'local_extension'),
-        new lang_string('supportusernamedefault', 'local_extension')));
+        new lang_string('supportusernamedefault', 'local_extension'), PARAM_TEXT, 100));
 
     $settings->add(new admin_setting_confightmleditor('local_extension/extensionpolicyrequest',
         new lang_string('extensionpolicyrequest',        'local_extension'),
@@ -81,6 +81,11 @@ if ($hassiteconfig) {
     $settings->add(new admin_setting_confightmleditor('local_extension/extensionpolicystatus',
         new lang_string('extensionpolicystatus',        'local_extension'),
         new lang_string('extensionpolicystatushelp',    'local_extension'),
+        ''));
+
+    $settings->add(new admin_setting_confightmleditor('local_extension/attachmentpolicy',
+        new lang_string('attachmentpolicy',           'local_extension'),
+        new lang_string('attachmentpolicyhelp',       'local_extension'),
         ''));
 
     $options = array(
@@ -104,6 +109,11 @@ if ($hassiteconfig) {
         new lang_string('extensionlimit',        'local_extension'),
         new lang_string('extensionlimithelp',    'local_extension'),
         new lang_string('extensionlimitdefault', 'local_extension'), PARAM_INT));
+
+    $settings->add(new admin_setting_configtext('local_extension/extensionlimitwanring',
+        new lang_string('extensionlimitwarning',        'local_extension'),
+        new lang_string('extensionlimitwarninghelp',    'local_extension'),
+        new lang_string('extensionlimitwarningdefault', 'local_extension'), PARAM_RAW, 100));
 
     $settings->add(new admin_setting_configselect('local_extension/requireattachment',
         new lang_string('requireattachment',      'local_extension'),
