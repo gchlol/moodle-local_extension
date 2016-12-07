@@ -184,7 +184,7 @@ if ($mform->is_cancelled()) {
 
 echo $OUTPUT->header();
 
-echo $renderer->render_policy();
+echo $renderer->render_status_policy();
 
 $mform->display();
 

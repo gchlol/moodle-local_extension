@@ -451,6 +451,25 @@ class local_extension_renderer extends plugin_renderer_base {
     }
 
     /**
+     * Renders the request policy that has been defined in the administration configuration.
+     *
+     * @return null|string
+     */
+    public function render_status_policy() {
+
+        $policy = get_config('local_extension', 'extensionpolicystatus');
+
+        // Moodle rich text editor may leave a <br> in an empty editor.
+
+        if (!empty($policy)) {
+            return html_writer::div($policy, 'policy');
+        }
+
+        return null;
+    }
+
+
+    /**
      * Renders a 'weeks' selection box allowing someone to search for requests in the future.
      *
      * @param int $courseid
