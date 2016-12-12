@@ -263,6 +263,7 @@ $string['table_header_dateextension'] = 'Extended until';
 $string['table_header_index_activity'] = 'Activity';
 $string['table_header_index_course'] = 'Course';
 $string['table_header_index_lastmod'] = 'Last updated';
+$string['table_header_index_newduedate'] = 'New due date';
 $string['table_header_index_requestdate'] = 'Creation date';
 $string['table_header_index_requestlength'] = 'Request length';
 $string['table_header_index_requestid'] = 'ID';
