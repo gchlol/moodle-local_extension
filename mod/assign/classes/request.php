@@ -301,8 +301,6 @@ class request extends \local_extension\base_request {
 
         if ($request <= $due + $toosoon * 60 * 6) {
             $errors[$formid] = get_string('dueerrortoosoon', 'extension_assign', $toosoon);
-        } else if ($request <= $now) {
-            $errors[$formid] = get_string('dueerrorinpast', 'extension_assign');
         }
 
         return $errors;
