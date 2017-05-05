@@ -213,13 +213,16 @@ if (!empty($search)) {
         $params['search3'] = "%$search%";
     }
 
-    $wherestr .= " OR ". $DB->sql_like('lcm.name', ':search4', false, false) .") ";
+    $wherestr .= " OR ". $DB->sql_like('lcm.name', ':search4', false, false);
+
+    $wherestr .= " OR r.id = :search5) ";
 
     $wheres[] = $wherestr;
 
     $params['search1'] = "%$search%";
     $params['search2'] = "%$search%";
     $params['search4'] = "%$search%";
+    $params['search5'] = $search;
 }
 
 if (!empty($faculty)) {
