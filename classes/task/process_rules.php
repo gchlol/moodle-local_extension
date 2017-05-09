@@ -26,6 +26,7 @@
 namespace local_extension\task;
 
 use local_extension\request;
+use local_extension\state;
 
 defined('MOODLE_INTERNAL') || die();
 
@@ -52,18 +53,23 @@ class process_rules extends \core\task\scheduled_task {
     public function execute() {
         global $DB;
 
-        $sql = "SELECT id
-                  FROM {local_extension_request}";
+        $sql = "SELECT DISTINCT request
+                  FROM {local_extension_cm}
+                 WHERE state = :newreq
+                    OR state = :reopened";
 
-        $requestids = $DB->get_fieldset_sql($sql);
+        $params = [
+            'newreq'   => state::STATE_NEW,
+            'reopened' => state::STATE_REOPENED,
+        ];
 
+        // Obtain the distinct list of requestids that have open cms.
+        $requestids = $DB->get_fieldset_sql($sql, $params);
+
+        // Process them!
         foreach ($requestids as $requestid) {
             $request = request::from_id($requestid);
-
-            if ($request->is_open_request()) {
-                $request->process_triggers();
-            }
-
+            $request->process_triggers();
         }
     }
 
