@@ -652,7 +652,6 @@ class local_extension_renderer extends plugin_renderer_base {
         // Display a list of faculties to filter by.
         if (!empty($categorylist) || $viewallrequests || $modifyrequeststatus) {
             $options = array();
-            $options['0'] = get_string('page_index_all', 'local_extension');
 
             // TODO add regex as configuration item.
             foreach ($courses as $course) {
@@ -667,6 +666,8 @@ class local_extension_renderer extends plugin_renderer_base {
                 'catid' => $categoryid
             ));
 
+            asort($options);
+            $options = ['0' => get_string('page_index_all', 'local_extension')] + $options;
             $select = new single_select($popupurl, 'faculty', $options, $faculty, null, 'requestform');
 
             $strcourses = get_string('page_index_faculties', 'local_extension');
@@ -685,7 +686,6 @@ class local_extension_renderer extends plugin_renderer_base {
         // TODO change this to categories that the user is enroled in. / has the cap to modify.
         if (!empty($categorylist) || $viewallrequests || $modifyrequeststatus) {
             $options = array();
-            $options['1'] = get_string('page_index_all', 'local_extension');
 
             foreach ($courses as $course) {
 
@@ -706,6 +706,8 @@ class local_extension_renderer extends plugin_renderer_base {
                 'faculty' => $faculty,
             ));
 
+            asort($options);
+            $options = ['1' => get_string('page_index_all', 'local_extension')] + $options;
             $select = new single_select($popupurl, 'id', $options, $courseid, null, 'requestform');
 
             $strcourses = get_string('page_index_courses', 'local_extension');
