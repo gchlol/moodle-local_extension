@@ -88,6 +88,7 @@ echo html_writer::tag('h2', get_string('page_h2_summary', 'local_extension'));
 $baseurl = new moodle_url('/local/extension/index.php', array(
     'id'      => $courseid,
     'catid'   => $categoryid,
+    'state'   => $stateid,
     'search'  => s($search),
     'faculty' => s($faculty),
 ));
