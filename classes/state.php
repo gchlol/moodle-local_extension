@@ -391,6 +391,48 @@ class state {
     }
 
     /**
+     * When a cm has been approved and the length has been updated then we must call the handler and update the extension.
+     *
+     * @param \local_extension\request $request
+     * @param int $user
+     * @param \stdClass $data
+     * @return object|bool
+     */
+    public function extend_cm_length($request, $user, $data) {
+
+        $mod = $request->mods[$data->cmid];
+        /* @var \local_extension\base_request $handler IDE hinting */
+        $handler = $mod->handler;
+
+        /* @var \local_extension\cm $localcm IDE hinting */
+        $localcm = $mod->localcm;
+        $event   = $mod->event;
+        $course  = $mod->course;
+
+        $handler->cancel_extension($event->instance, $request->request->userid);
+        $handler->submit_extension($event->instance, $request->request->userid, $localcm->cm->data);
+
+        $state = $localcm->get_stateid();
+        $status = $this->get_state_name($state);
+
+        // After writing the history it will return the ID of the new row.
+        $history = $localcm->write_history($mod, $state, $user->id);
+
+        $log = new \stdClass();
+        $log->status = $status;
+        $log->course = $course->fullname;
+        $log->event = $event->name;
+
+        $history->message = get_string('request_state_history_log', 'local_extension', $log);
+
+        // Update the lastmod.
+        $request->update_lastmod($user->id);
+
+        // You can only edit one state at a time, returning here is ok!
+        return $history;
+    }
+
+    /**
      * Checks the current state and returns true if the requested state is possible.
      *
      * @param int $currentstate

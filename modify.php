@@ -130,6 +130,8 @@ if ($mform->is_cancelled()) {
     $cm->cm->length = $newdate - $event->timestart;
     $cm->update_data();
 
+    \local_extension\state::instance()->extend_cm_length($request, $USER, $form);
+
     $notifycontent = array();
     $notifycontent[] = $request->add_comment($USER, $datestring);
 
