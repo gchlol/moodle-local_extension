@@ -599,6 +599,14 @@ class local_extension_renderer extends plugin_renderer_base {
     public function render_index_search_controls($context, $categoryid, $courseid, $stateid, $baseurl, $search, $faculty) {
         global $SITE;
 
+        $popupurl = new moodle_url('/local/extension/index.php', array(
+            'id'      => $courseid,
+            'catid' => $categoryid,
+            'state'   => $stateid,
+            'faculty' => s($faculty),
+            'search'  => s($search),
+        ));
+
         $systemcontext = context_system::instance();
 
         // Print a filter row across the top of the page.
@@ -625,8 +633,6 @@ class local_extension_renderer extends plugin_renderer_base {
             $catl[0] = coursecat::get(0)->get_formatted_name();
             $catl += $categorylist;
 
-            $popupurl = new moodle_url('/local/extension/index.php');
-
             $select = new single_select($popupurl, 'catid', $catl, $categoryid, null, 'requestform');
 
             $strcategories = get_string('page_index_categories', 'local_extension');
@@ -646,7 +652,6 @@ class local_extension_renderer extends plugin_renderer_base {
             $courses = coursecat::get($categoryid)->get_courses();
         } else {
             $courses = coursecat::get(0)->get_courses(array('recursive' => true));
-
         }
 
         // Display a list of faculties to filter by.
@@ -662,12 +667,9 @@ class local_extension_renderer extends plugin_renderer_base {
 
             }
 
-            $popupurl = new moodle_url('/local/extension/index.php', array(
-                'catid' => $categoryid
-            ));
-
             asort($options);
             $options = ['0' => get_string('page_index_all', 'local_extension')] + $options;
+
             $select = new single_select($popupurl, 'faculty', $options, $faculty, null, 'requestform');
 
             $strcourses = get_string('page_index_faculties', 'local_extension');
@@ -701,13 +703,9 @@ class local_extension_renderer extends plugin_renderer_base {
                 }
             }
 
-            $popupurl = new moodle_url('/local/extension/index.php', array(
-                'catid' => $categoryid,
-                'faculty' => $faculty,
-            ));
-
             asort($options);
             $options = ['1' => get_string('page_index_all', 'local_extension')] + $options;
+
             $select = new single_select($popupurl, 'id', $options, $courseid, null, 'requestform');
 
             $strcourses = get_string('page_index_courses', 'local_extension');
@@ -741,9 +739,6 @@ class local_extension_renderer extends plugin_renderer_base {
                 $courselist = array(SITEID => format_string($SITE->fullname, true, $obj)) + $courselist;
             }
 
-            $popupurl = new moodle_url('/local/extension/index.php', array(
-            ));
-
             $select = new single_select($popupurl, 'id', $courselist, $courseid, null, 'requestform');
 
             $strcourses = get_string('page_index_mycourses', 'local_extension');
@@ -760,12 +755,6 @@ class local_extension_renderer extends plugin_renderer_base {
         foreach ($state->statearray as $sid => $name) {
             $statelist[$sid] = $state->get_state_name($sid);
         }
-
-        $popupurl = new moodle_url('/local/extension/index.php', array(
-            'catid' => $categoryid,
-            'id' => $courseid,
-            'faculty' => $faculty,
-        ));
 
         $select = new single_select($popupurl, 'state', $statelist, $stateid, null, 'requestform');
 
