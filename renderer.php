@@ -595,18 +595,24 @@ class local_extension_renderer extends plugin_renderer_base {
 
         // Categories.
         $categoryselect = $this->render_category_select($categorylist, $categoryid, $baseurl, $hascapability);
-        $strcategories = get_string('page_index_categories', 'local_extension');
-        $searchelements[$strcategories] = $categoryselect;
+        if ($categoryselect) {
+            $strcategories = get_string('page_index_categories', 'local_extension');
+            $searchelements[$strcategories] = $categoryselect;
+        }
 
         // Faculties.
         $facultyselect = $this->render_faculty_select($categorylist, $courselist, $faculty, $baseurl, $hascapability);
-        $strfaculties = get_string('page_index_faculties', 'local_extension');
-        $searchelements[$strfaculties] = $facultyselect;
+        if ($facultyselect) {
+            $strfaculties = get_string('page_index_faculties', 'local_extension');
+            $searchelements[$strfaculties] = $facultyselect;
+        }
 
         // Courses.
         $courseselect = $this->render_all_courses_select($categorylist, $faculty, $courselist, $courseid, $baseurl, $hascapability);
-        $strcourses = get_string('page_index_courses', 'local_extension');
-        $searchelements[$strcourses] = $courseselect;
+        if ($courseselect) {
+            $strcourses = get_string('page_index_courses', 'local_extension');
+            $searchelements[$strcourses] = $courseselect;
+        }
 
         // The users enrolled courses.
         if ($mycourses) {
@@ -684,13 +690,13 @@ class local_extension_renderer extends plugin_renderer_base {
                 }
             }
 
-            // If the faculty has changed, remove it from the post parameters.
-            if (!array_key_exists($faculty, $options)) {
-                $baseurl->remove_params('faculty');
-            }
-
             $newurl = clone $baseurl;
             $newurl->remove_params('id');
+
+            // If the faculty has changed, remove it from the post parameters.
+            if (!array_key_exists($faculty, $options)) {
+                $newurl->remove_params('faculty');
+            }
 
             asort($options);
 
