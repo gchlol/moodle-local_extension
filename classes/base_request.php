@@ -103,6 +103,16 @@ abstract class base_request {
      */
     abstract public function submit_extension($assignmentid, $userid, $duedate);
 
+    /**
+     * Cancel an extension.
+     * This is called when the approve button is click when viewing the status forum.
+     *
+     * @param int $assignmentid
+     * @param int $userid
+     * @return bool
+     */
+    abstract public function cancel_extension($assignmentid, $userid);
+
     abstract public function get_instance($mod);
 
     /**
