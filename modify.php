@@ -135,8 +135,11 @@ if ($mform->is_cancelled()) {
     $notifycontent = array();
     $notifycontent[] = $request->add_comment($USER, $datestring);
 
-    // If the date has changed, we need to run the triggers to see if we alert new subscribers.
-    $request->process_triggers();
+    // The request should have been accepted. There is no requirement to process the ruleset.
+    if ($cm->get_stateid() != \local_extension\state::STATE_APPROVED) {
+        // If the date has changed, we need to run the triggers to see if we alert new subscribers.
+        $request->process_triggers();
+    }
 
     // Process the triggers before sending the notifications. New subscribers exist.
     $request->notify_subscribers($notifycontent, $USER->id);
