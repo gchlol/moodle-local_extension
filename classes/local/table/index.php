@@ -96,7 +96,7 @@ class index extends flexible_table {
         $this->set_attribute('cellspacing', '0');
 
         $this->no_sorting('userpic');
-        $this->sortable(true, 'lastmod', SORT_DESC);
+        $this->sortable(true, 'timestamp', SORT_DESC);
 
         $this->setup();
     }
