@@ -81,11 +81,21 @@ class request extends \local_extension\base_request {
      * @return boolean True if should be handled
      */
     public function is_candidate($event, $cm) {
+        global $DB;
         // Allow quiz calendar items that have a close date. This means we can extend the due date.
         // Quiz items that have passed the submission date will not show up for extension as calendar items are not present.
         if ($event->eventtype == "close") {
             return true;
         }
+
+        if ($event->eventtype == "open" && $event->timeduration > 0) {
+            $quiz = $DB->get_record('quiz', ['id' => $cm->instance], '*');
+            $event->timeclose = $quiz->timeclose;
+
+            return true;
+        }
+
+        // Look for a possible end date.
 
         return false;
     }
@@ -103,7 +113,7 @@ class request extends \local_extension\base_request {
 
         $html = \html_writer::start_div('content');
         $coursestring = \html_writer::tag('b', $course->fullname . ' > ' . $event->name, array('class' => 'mod'));
-        $str = get_string('dueon', 'extension_assign', userdate($event->timestart + $event->timeduration));
+        $str = get_string('dueon', 'extension_assign', userdate($event->timeclose));
         $html .= \html_writer::tag('p', $coursestring . ' ' . $str);
 
         // Setup the mform due element id.
@@ -127,16 +137,14 @@ class request extends \local_extension\base_request {
      * @return string
      */
     public function status_definition($mod, $mform = null) {
-        global $USER, $DB;
+        global $USER;
 
         $event = $mod->event;
         $course = $mod->course;
         $localcm = $mod->localcm;
-        $cm = $mod->cm;
 
         $requestid = $localcm->requestid;
         $cmid = $localcm->cmid;
-        $quiz =  $quiz = $DB->get_record('quiz', array('id' => $cm->instance), 'timeclose');
 
         $html = \html_writer::start_div('content');
 
@@ -147,7 +155,7 @@ class request extends \local_extension\base_request {
         $eventlink = \html_writer::link($eventurl, $event->name);
 
         $coursestring = \html_writer::tag('b', $courselink. ' > ' . $eventlink, array('class' => 'mod'));
-        $str = get_string('dueon', 'extension_assign', userdate($quiz->timeclose));
+        $str = get_string('dueon', 'extension_assign', userdate($event->timeclose));
         $html .= \html_writer::tag('p', $coursestring . ' ' . $str);
 
         $status = state::instance()->get_state_name($localcm->cm->state);
@@ -219,7 +227,7 @@ class request extends \local_extension\base_request {
             $mform->addElement('static', 'cutoffdate', 'ID number', $user->idnumber);
         }
 
-        $mform->addElement('static', 'timeclose', get_string('duedate', 'assign'), userdate($event->timestart + $event->timeduration));
+        $mform->addElement('static', 'timeclose', get_string('duedate', 'assign'), userdate($event->timeclose));
 
         return $html;
     }
@@ -369,7 +377,6 @@ class request extends \local_extension\base_request {
 
         $event->trigger();
 
-
         quiz_update_open_attempts(array('quizid'=>$quizid));
         quiz_update_events($quiz, $obj);
     }
@@ -391,6 +398,34 @@ class request extends \local_extension\base_request {
 
     public function get_instance($mod) {
         return false;
+    }
+
+    public function date_selector($mod, $mform, $optional = true) {
+        $event = $mod->event;
+
+        /* @var $lcm \local_extension\cm IDE hinting */
+        $lcm = $mod->localcm;
+
+        $defaultdate = $event->timeclose;
+        $lcmdate = $lcm->get_data();
+
+        if (!empty($lcmdate)) {
+            $defaultdate = $lcmdate;
+        }
+
+        $startyear = date('Y');
+        $stopyear = date('Y') + 1;
+
+        $dateconfig = array(
+            'optional' => $optional,
+            'step' => 1,
+            'startyear' => $startyear,
+            'stopyear' => $stopyear,
+        );
+
+        $formid = 'due' . $lcm->cmid;
+        $mform->addElement('date_time_selector', $formid, get_string('requestdue', 'extension_assign'), $dateconfig);
+        $mform->setDefault($formid, $defaultdate);
     }
 
 }
