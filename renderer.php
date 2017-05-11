@@ -398,41 +398,6 @@ class local_extension_renderer extends plugin_renderer_base {
     }
 
     /**
-     * Renders a search input form element that is used with filtering the requests based on course.
-     *
-     * @param \moodle_url $url
-     * @param string $name
-     * @param string $search
-     * @return string
-     */
-    public function render_search_course($url, $name, $search) {
-        $id = html_writer::random_id('search_course_f');
-
-        $inputattributes = array(
-            'type' => 'text',
-            'id' => 'search',
-            'name' => 'search',
-            'value' => s($search),
-        );
-
-        $formattributes = array(
-            'method' => 'get',
-            'action' => $url,
-            'id' => $id,
-            'class' => 'searchform'
-        );
-        $html  = html_writer::input_hidden_params($url, array('search'));
-        $html .= html_writer::tag('input', null, $inputattributes);
-
-        $form = html_writer::tag('form', $html, $formattributes);
-
-        $label = html_writer::span(get_string('renderer_search_text', 'local_extension'));
-        $output = $label . html_writer::div($form, 'coursesearch');
-
-        return $output;
-    }
-
-    /**
      * Renders the request policy that has been defined in the administration configuration.
      *
      * @return null|string
@@ -597,177 +562,316 @@ class local_extension_renderer extends plugin_renderer_base {
      * @return string
      */
     public function render_index_search_controls($context, $categoryid, $courseid, $stateid, $baseurl, $search, $faculty) {
-        global $SITE;
+        global $PAGE;
 
-        $popupurl = new moodle_url('/local/extension/index.php', array(
-            'id'      => $courseid,
-            'catid' => $categoryid,
-            'state'   => $stateid,
-            'faculty' => s($faculty),
-            'search'  => s($search),
-        ));
-
-        $systemcontext = context_system::instance();
-
-        // Print a filter row across the top of the page.
-        $controlstable = new html_table();
-        $controlstable->attributes['class'] = 'controls';
-        $controlstable->cellspacing = 0;
-        $controlstable->data[] = new html_table_row();
-
-        $viewallrequests = false;
-        $modifyrequeststatus = false;
+//        $courseid = empty($courseid) ? 1 : $courseid;
+        $courselist = [];
+        $hascapability = false;
 
         if (has_capability('local/extension:viewallrequests', $context)) {
-            $viewallrequests = true;
+            $hascapability = true;
         }
 
         if (has_capability('local/extension:modifyrequeststatus', $context)) {
-            $modifyrequeststatus = true;
+            $hascapability = true;
         }
 
         $categorylist = coursecat::make_categories_list('local/extension:viewallrequests');
-        // Display a list of categories.
-        if (!empty($categorylist) || $viewallrequests || $modifyrequeststatus) {
-            $catl = array();
-            $catl[0] = coursecat::get(0)->get_formatted_name();
-            $catl += $categorylist;
+        if (!empty($categoryid)) {
+            $courselist = coursecat::get($categoryid)->get_courses();
+        } else {
+            $courselist = coursecat::get(0)->get_courses(array('recursive' => true));
+        }
 
-            $select = new single_select($popupurl, 'catid', $catl, $categoryid, null, 'requestform');
+        $mycourses = enrol_get_my_courses();
 
-            $strcategories = get_string('page_index_categories', 'local_extension');
-            $html  = html_writer::span($strcategories, '', array('id' => 'categories'));
-            $html .= $this->render($select);
+        // Check if the courseid exists in the list of options, we may have changed the faculty filter.
+        if (!array_key_exists($courseid, $courselist)) {
+            $baseurl->remove_params('id');
+            $PAGE->set_url($baseurl);
+        }
 
+        $searchelements = [];
+
+        // Categories.
+        $categoryselect = $this->render_category_select($categorylist, $categoryid, $baseurl, $hascapability);
+        $strcategories = get_string('page_index_categories', 'local_extension');
+        $searchelements[$strcategories] = $categoryselect;
+
+        // Faculties.
+        $facultyselect = $this->render_faculty_select($categorylist, $courselist, $faculty, $baseurl, $hascapability);
+        $strfaculties = get_string('page_index_faculties', 'local_extension');
+        $searchelements[$strfaculties] = $facultyselect;
+
+        // Courses.
+        $courseselect = $this->render_all_courses_select($categorylist, $faculty, $courselist, $courseid, $baseurl, $hascapability);
+        $strcourses = get_string('page_index_courses', 'local_extension');
+        $searchelements[$strcourses] = $courseselect;
+
+        // The users enrolled courses.
+        if ($mycourses) {
+            $mycoursesselect = $this->render_my_enrolled_courses_select($categorylist, $courselist, $mycourses, $courseid, $faculty, $baseurl);
+            $strmycourses = get_string('page_index_mycourses', 'local_extension');
+            $searchelements[$strmycourses] = $mycoursesselect;
+        }
+
+        // State select.
+        $stateselect = $this->render_state_select($stateid, $baseurl);
+        $strstate = get_string('state', 'local_extension');
+        $searchelements[$strstate] = $stateselect;
+
+        // Search field.
+        $searchfield = $this->render_search_course($search, $baseurl);
+        $strsearch = get_string('renderer_search_text', 'local_extension');
+        $searchelements[$strsearch] = $searchfield;
+
+        // Prints the resulting filter row as a table.
+        $controlstable = new html_table();
+        $controlstable->attributes['class'] = 'controls';
+        $controlstable->data[] = new html_table_row();
+
+        foreach ($searchelements as $string => $select) {
+            $html  = html_writer::span($string, '', ['id' => $string]);
+            $html .= $select;
             $categorycell = new html_table_cell();
             $categorycell->attributes['class'] = 'right';
             $categorycell->text = $html;
-
             $controlstable->data[0]->cells[] = $categorycell;
         }
 
-        // Obtain the list of courses.
-        // TODO think about array('limit' => 1000).
-        if (!empty($categoryid)) {
-            $courses = coursecat::get($categoryid)->get_courses();
-        } else {
-            $courses = coursecat::get(0)->get_courses(array('recursive' => true));
-        }
+        return html_writer::table($controlstable);
+    }
 
+    public function render_category_select($categorylist, $categoryid, $baseurl, $hascapability) {
+        // Display a list of categories only with requirements.
+        // 1. Has the capability local/extension:viewallrequests and 'categories' exist.
+        // 2. OR has the capability local/extension:viewallrequests.
+        // 3. OR has the capability local/extension:modifyrequeststatus.
+        if (!empty($categorylist) || $hascapability) {
+
+            $cats = [];
+
+            // Add the top level 'Top' element.
+            $cats[0] = coursecat::get(0)->get_formatted_name();
+
+            $cats += $categorylist;
+
+            $newurl = clone $baseurl;
+            $newurl->remove_params('id');
+
+            $select = new single_select($newurl, 'catid', $cats, $categoryid, null, 'catform');
+
+            return $this->render($select);
+        }
+    }
+
+    public function render_faculty_select($categorylist, $courselist, $faculty, $baseurl, $hascapability) {
         // Display a list of faculties to filter by.
-        if (!empty($categorylist) || $viewallrequests || $modifyrequeststatus) {
-            $options = array();
+        if (!empty($categorylist) || $hascapability) {
+
+            $options =[];
 
             // TODO add regex as configuration item.
-            foreach ($courses as $course) {
-                $re = "/^([A-Z]+)[0-9]+_[0-9]+/i";
+            $re = "/^([A-Z]+)[0-9]+_[0-9]+/i";
+
+            // Create an array of faculties that should match the regular expression.
+            // This ends up distinct as we overwrite keys.
+            foreach ($courselist as $course) {
+
                 if (preg_match($re, $course->shortname, $matches)) {
+
                     $options[$matches[1]] = $matches[1];
                 }
-
             }
 
+            // If the faculty has changed, remove it from the post parameters.
+            if (!array_key_exists($faculty, $options)) {
+                $baseurl->remove_params('faculty');
+            }
+
+            $newurl = clone $baseurl;
+            $newurl->remove_params('id');
+
             asort($options);
+
             $options = ['0' => get_string('page_index_all', 'local_extension')] + $options;
 
-            $select = new single_select($popupurl, 'faculty', $options, $faculty, null, 'requestform');
+            $select = new single_select($newurl, 'faculty', $options, $faculty, null, 'facultyform');
 
-            $strcourses = get_string('page_index_faculties', 'local_extension');
-            $html = html_writer::span($strcourses, '', array('id' => 'courses'));
-            $html .= $this->render($select);
-
-            $categorycell = new html_table_cell();
-            $categorycell->attributes['class'] = 'right';
-            $categorycell->text = $html;
-
-            $controlstable->data[0]->cells[] = $categorycell;
-
+            return $this->render($select);
         }
+    }
 
+    /**
+     * @param array $categorylist
+     * @param string $faculty
+     * @param array $courselist
+     * @param integer $courseid
+     * @param \moodle_url $baseurl
+     * @param boolean $hascapability
+     * @return string
+     */
+    public function render_all_courses_select($categorylist, $faculty, $courselist, $courseid, $baseurl, $hascapability) {
         // Display a list of all courses to filter by
-        // TODO change this to categories that the user is enroled in. / has the cap to modify.
-        if (!empty($categorylist) || $viewallrequests || $modifyrequeststatus) {
-            $options = array();
+        if (!empty($categorylist) || $hascapability) {
 
-            foreach ($courses as $course) {
+            $options = [];
 
+            foreach ($courselist as $course) {
+
+                // If a faculty has been set then we will filter the results.
                 if (!empty($faculty)) {
+
                     $re = "/^$faculty/i";
+
                     if (preg_match($re, $course->shortname)) {
+
                         $options[$course->id] = $course->fullname;
                     }
 
                 } else {
-                    $options[$course->id] = $course->fullname;
 
+                    $options[$course->id] = $course->fullname;
                 }
             }
 
             asort($options);
+
             $options = ['1' => get_string('page_index_all', 'local_extension')] + $options;
 
-            $select = new single_select($popupurl, 'id', $options, $courseid, null, 'requestform');
+            $select = new single_select($baseurl, 'id', $options, $courseid, null, 'courseform');
 
-            $strcourses = get_string('page_index_courses', 'local_extension');
-            $html = html_writer::span($strcourses, '', array('id' => 'courses'));
-            $html .= $this->render($select);
-
-            $categorycell = new html_table_cell();
-            $categorycell->attributes['class'] = 'right';
-            $categorycell->text = $html;
-
-            $controlstable->data[0]->cells[] = $categorycell;
+            return $this->render($select);
         }
+    }
 
-        // Display a list of enrolled courses to filter by.
+    /**
+     * @param array $categorylist
+     * @param array $courselist
+     * @param array $mycourses
+     * @param integer $courseid
+     * @param \moodle_url $baseurl
+     * @return string
+     */
+    public function render_my_enrolled_courses_select($categorylist, $courselist, $mycourses, $courseid, $faculty, $baseurl) {
+//        global $SITE;
 
-        // Or obtain courses that have active requests?
+        if ($mycourses) {
 
-        if ($mycourses = enrol_get_my_courses()) {
-            $courselist = array();
+//            $systemcontext = context_system::instance();
 
-            $courselist['1'] = get_string('page_index_all', 'local_extension');
+            $mycourselist = [];
+
+            $mycourselist['1'] = get_string('page_index_all', 'local_extension');
 
             foreach ($mycourses as $mycourse) {
+
                 $coursecontext = context_course::instance($mycourse->id);
-                $courselist[$mycourse->id] = format_string($mycourse->fullname, true, array('context' => $coursecontext));
+
+                $mycourselist[$mycourse->id] = format_string($mycourse->fullname, true, ['context' => $coursecontext]);
             }
 
-            if (has_capability('moodle/site:viewparticipants', $systemcontext)) {
-                unset($courselist[SITEID]);
-                $obj = array('context' => $systemcontext);
-                $courselist = array(SITEID => format_string($SITE->fullname, true, $obj)) + $courselist;
+//            if (has_capability('moodle/site:viewparticipants', $systemcontext)) {
+//
+//                unset($courselist[SITEID]);
+//
+//                $obj = ['context' => $systemcontext];
+//
+//                $courselist = [SITEID => format_string($SITE->fullname, true, $obj)] + $courselist;
+//            }
+
+            $facultylist =[];
+            foreach ($courselist as $course) {
+
+                // If a faculty has been set then we will filter the results.
+                if (!empty($faculty)) {
+
+                    $re = "/^$faculty/i";
+
+                    if (preg_match($re, $course->shortname)) {
+
+                        $facultylist[$course->id] = $course->fullname;
+                    }
+
+                } else {
+
+                    $facultylist[$course->id] = $course->fullname;
+                }
             }
 
-            $select = new single_select($popupurl, 'id', $courselist, $courseid, null, 'requestform');
+            $newurl = clone $baseurl;
+            $newurl->remove_params('id');
+            $newurl->param('catid', $mycourse->category);
 
-            $strcourses = get_string('page_index_mycourses', 'local_extension');
-            $html  = html_writer::span($strcourses, '', array('id' => 'courses'));
-            $html .= $this->render($select);
-            $controlstable->data[0]->cells[] = $html;
+            $params = [
+                'faculty' => $facultylist,
+                'catid' => $categorylist,
+            ];
+
+            foreach ($params as $param => $list) {
+                $key = $baseurl->get_param($param);
+                if (!array_key_exists($key, $list)) {
+                    $newurl->param($param, $key);
+                }
+            }
+
+            $select = new single_select($newurl, 'id', $mycourselist, $courseid, null, 'mycourseform');
+
+            return $this->render($select);
         }
+    }
 
+    public function render_state_select($stateid, $baseurl) {
         // Display a search filter for the status.
         $state = \local_extension\state::instance();
 
-        $statelist = array();
+        $statelist = [];
+
         $statelist[0] = get_string('page_index_all', 'local_extension');
+
         foreach ($state->statearray as $sid => $name) {
+
             $statelist[$sid] = $state->get_state_name($sid);
         }
 
-        $select = new single_select($popupurl, 'state', $statelist, $stateid, null, 'requestform');
+        $select = new single_select($baseurl, 'state', $statelist, $stateid, null, 'stateform');
 
-        $html  = html_writer::span(get_string('state', 'local_extension'), '', array('id' => 'courses'));
-        $html .= $this->render($select);
-        $controlstable->data[0]->cells[] = $html;
+        return $this->render($select);
+    }
 
-        $searchcoursecell = new html_table_cell();
-        $searchcoursecell->attributes['class'] = 'right';
-        $searchcoursecell->text = $this->render_search_course($baseurl, 'id', $search);
-        $controlstable->data[0]->cells[] = $searchcoursecell;
+    /**
+     * Renders a search input form element that is used with filtering the requests based on course.
+     *
+     * @param \moodle_url $baseurl
+     * @param string $search
+     * @return string
+     */
+    public function render_search_course($search, $baseurl) {
+        $id = html_writer::random_id('search_course_f');
 
-        return html_writer::table($controlstable);
+        $inputattributes = [
+            'type' => 'text',
+            'id' => 'search',
+            'name' => 'search',
+            'value' => s($search),
+        ];
+
+        $formattributes = [
+            'method' => 'get',
+            'action' => $baseurl,
+            'id' => $id,
+            'class' => 'searchform'
+        ];
+
+        $html  = html_writer::input_hidden_params($baseurl, array('search'));
+
+        $html .= html_writer::tag('input', null, $inputattributes);
+
+        $form = html_writer::tag('form', $html, $formattributes);
+
+        $output = html_writer::div($form, 'coursesearch');
+
+        return $output;
     }
 
 }

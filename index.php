@@ -36,17 +36,17 @@ $stateid    = optional_param('state', 0, PARAM_INT);
 $search     = optional_param('search', '', PARAM_RAW); // Make sure it is processed with p() or s() when sending to output!
 $faculty    = optional_param('faculty', '', PARAM_RAW); // Make sure it is processed with p() or s() when sending to output!
 
+require_login();
+
 $PAGE->set_url('/local/extension/index.php', array(
     'page'      => $page,
     'perpage'   => $perpage,
-    'catid'     => $categoryid,
-    'state'     => $stateid,
-    'id'        => $courseid,
-    'search'    => s($search),
-    'faculty'   => s($faculty),
+//    'catid'     => $categoryid,
+//    'state'     => $stateid,
+//    'id'        => $courseid,
+//    'search'    => s($search),
+//    'faculty'   => s($faculty),
 ));
-
-require_login();
 
 if ($courseid) {
     $course = $DB->get_record('course', array('id' => $courseid), '*', MUST_EXIST);
