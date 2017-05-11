@@ -84,14 +84,14 @@ class request extends \local_extension\base_request {
         global $DB;
         // Allow quiz calendar items that have a close date. This means we can extend the due date.
         // Quiz items that have passed the submission date will not show up for extension as calendar items are not present.
+        $quiz = $DB->get_record('quiz', ['id' => $cm->instance], '*');
+        $event->timeclose = $quiz->timeclose;
+
         if ($event->eventtype == "close") {
             return true;
         }
 
         if ($event->eventtype == "open" && $event->timeduration > 0) {
-            $quiz = $DB->get_record('quiz', ['id' => $cm->instance], '*');
-            $event->timeclose = $quiz->timeclose;
-
             return true;
         }
 
