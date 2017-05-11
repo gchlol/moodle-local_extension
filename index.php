@@ -206,15 +206,15 @@ $totalcount = $DB->count_records_sql("SELECT COUNT(u.id) $from $where", $params)
 if (!empty($search)) {
     $fullname = $DB->sql_fullname('u.firstname', 'u.lastname');
 
-    $wherestr  = "(". $DB->sql_like($fullname, ':search1', false, false);
-    $wherestr .= " OR ". $DB->sql_like('c.fullname', ':search2', false, false);
+    $wherestr  = "(" . $DB->sql_like($fullname, ':search1', false, false);
+    $wherestr .= " OR " . $DB->sql_like('c.fullname', ':search2', false, false);
 
     if (in_array('idnumber', $showuseridentityfields)) {
-        $wherestr .= " OR ". $DB->sql_like('u.idnumber', ':search3', false, false);
+        $wherestr .= " OR " . $DB->sql_like('u.idnumber', ':search3', false, false);
         $params['search3'] = "%$search%";
     }
 
-    $wherestr .= " OR ". $DB->sql_like('lcm.name', ':search4', false, false);
+    $wherestr .= " OR " . $DB->sql_like('lcm.name', ':search4', false, false);
 
     $wherestr .= " OR r.id = :search5) ";
 
@@ -223,7 +223,7 @@ if (!empty($search)) {
     $params['search1'] = "%$search%";
     $params['search2'] = "%$search%";
     $params['search4'] = "%$search%";
-    $params['search5'] = $search;
+    $params['search5'] = intval($search);
 }
 
 if (!empty($faculty)) {
