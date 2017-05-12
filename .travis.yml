@@ -14,29 +14,32 @@ cache:
     - $HOME/.composer/cache
 
 php:
- # - 5.4
- # - 5.5
- - 5.6
- # - 7.0
+  - 5.6
+# - 7.0
+
+addons:
+  postgresql: "9.3"
 
 matrix:
- allow_failures:
-  - php: 7.0
+  allow_failures:
+    - php: 7.0
 
 env:
- matrix:
-  - DB=pgsql MOODLE_BRANCH=MOODLE_27_STABLE
-  - DB=pgsql MOODLE_BRANCH=MOODLE_28_STABLE
-  - DB=pgsql MOODLE_BRANCH=MOODLE_29_STABLE
-  - DB=pgsql MOODLE_BRANCH=MOODLE_30_STABLE
-  - DB=pgsql MOODLE_BRANCH=MOODLE_31_STABLE
-  - DB=pgsql MOODLE_BRANCH=master
-  - DB=mysqli MOODLE_BRANCH=MOODLE_27_STABLE
-  - DB=mysqli MOODLE_BRANCH=MOODLE_28_STABLE
-  - DB=mysqli MOODLE_BRANCH=MOODLE_29_STABLE
-  - DB=mysqli MOODLE_BRANCH=MOODLE_30_STABLE
-  - DB=mysqli MOODLE_BRANCH=MOODLE_31_STABLE
-  - DB=mysqli MOODLE_BRANCH=master
+  matrix:
+    - DB=pgsql MOODLE_BRANCH=MOODLE_27_STABLE
+    - DB=pgsql MOODLE_BRANCH=MOODLE_28_STABLE
+    - DB=pgsql MOODLE_BRANCH=MOODLE_29_STABLE
+    - DB=pgsql MOODLE_BRANCH=MOODLE_30_STABLE
+    - DB=pgsql MOODLE_BRANCH=MOODLE_31_STABLE
+    - DB=pgsql MOODLE_BRANCH=MOODLE_32_STABLE
+    - DB=pgsql MOODLE_BRANCH=master
+    - DB=mysqli MOODLE_BRANCH=MOODLE_27_STABLE
+    - DB=mysqli MOODLE_BRANCH=MOODLE_28_STABLE
+    - DB=mysqli MOODLE_BRANCH=MOODLE_29_STABLE
+    - DB=mysqli MOODLE_BRANCH=MOODLE_30_STABLE
+    - DB=mysqli MOODLE_BRANCH=MOODLE_31_STABLE
+    - DB=mysqli MOODLE_BRANCH=MOODLE_32_STABLE
+    - DB=mysqli MOODLE_BRANCH=master
 
 matrix:
   include:
@@ -45,15 +48,20 @@ matrix:
     - php: 7.0
       env: DB=pgsql MOODLE_BRANCH=MOODLE_31_STABLE
     - php: 7.0
+      env: DB=pgsql MOODLE_BRANCH=MOODLE_32_STABLE
+    - php: 7.0
       env: DB=pgsql MOODLE_BRANCH=master
     - php: 7.0
       env: DB=mysqli MOODLE_BRANCH=MOODLE_30_STABLE
     - php: 7.0
       env: DB=mysqli MOODLE_BRANCH=MOODLE_31_STABLE
     - php: 7.0
+      env: DB=mysqli MOODLE_BRANCH=MOODLE_32_STABLE
+    - php: 7.0
       env: DB=mysqli MOODLE_BRANCH=master
 
 before_install:
+  - phpenv config-rm xdebug.ini
   - cd ../..
   - composer selfupdate
   - composer create-project -n --no-dev moodlerooms/moodle-plugin-ci ci ^1
@@ -72,5 +80,5 @@ script:
   - moodle-plugin-ci jshint
   - moodle-plugin-ci validate
   - moodle-plugin-ci phpunit
-  - moodle-plugin-ci behat
+# - moodle-plugin-ci behat
 
