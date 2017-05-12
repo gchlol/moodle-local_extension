@@ -251,7 +251,7 @@ class request extends \local_extension\base_request {
         $lcm = $mod->localcm;
         $instance = $customdata['instance'];
 
-        $quiz =  $quiz = $DB->get_record('quiz', array('id' => $cm->instance), 'timeclose');
+        $quiz = $DB->get_record('quiz', ['id' => $cm->instance], 'timeclose');
 
         $html = \html_writer::start_div('content');
         $coursestring = \html_writer::tag('b', $course->fullname . ' > ' . $event->name, array('class' => 'mod'));
@@ -348,18 +348,16 @@ class request extends \local_extension\base_request {
         $obj->userid = $userid;
         $obj->timeclose = $timeclose;
 
-        $conditions = array(
+        $conditions = [
             'quiz' => $quizid,
             'userid' => $userid,
             'groupid' => null,
-        );
+        ];
 
-        $params = array(
+        $params = [
             'context' => \context_system::instance(), // TODO change to quiz context
-            'other' => array(
-                'quizid' => $quizid
-            )
-        );
+            'other' => ['quizid' => $quizid]
+        ];
 
         $oldoverride = $DB->get_record('quiz_overrides', $conditions);
         if ($oldoverride) {
@@ -377,7 +375,7 @@ class request extends \local_extension\base_request {
 
         $event->trigger();
 
-        quiz_update_open_attempts(array('quizid'=>$quizid));
+        quiz_update_open_attempts(['quizid' => $quizid]);
         quiz_update_events($quiz, $obj);
     }
 
