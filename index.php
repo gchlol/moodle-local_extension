@@ -328,6 +328,8 @@ $params = array(
 
 $url = new moodle_url("/local/extension/request.php", $params);
 
+echo html_writer::empty_tag('br');
+
 echo $OUTPUT->single_button($url, get_string('button_request_extension', 'local_extension'));
 
 echo $OUTPUT->footer();
