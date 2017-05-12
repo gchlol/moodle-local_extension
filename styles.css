@@ -27,7 +27,7 @@
 }
 
 .local_extension span.statusnew {
-    background-color: #7FDBFF;
+    background-color: #39CCCC;
 }
 
 .local_extension span.statusdenied {
@@ -73,7 +73,8 @@
 }
 
 .local_extension div .coursesearch {
-    margin-top: 5px;
+    height: 43px;
+    margin-top: 0px;
 }
 
 .local_extension div .lastmodby {
