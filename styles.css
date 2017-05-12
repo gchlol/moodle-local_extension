@@ -27,23 +27,23 @@
 }
 
 .local_extension span.statusnew {
-    background-color: #fff801;
+    background-color: #7FDBFF;
 }
 
 .local_extension span.statusdenied {
-    background-color: #ff224f
+    background-color: #FF4136;
 }
 
 .local_extension span.statusapproved {
-    background-color: #AFFF44
+    background-color: #2ECC40;
 }
 
 .local_extension span.statusreopened {
-    background-color: #fff800
+    background-color: #FF851B;
 }
 
 .local_extension span.statuscancel {
-    background-color: #00f0ff
+    background-color: #0074D9;
 }
 
 .local_extension .mform fieldset div {
