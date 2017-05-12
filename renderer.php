@@ -48,10 +48,10 @@ class local_extension_renderer extends plugin_renderer_base {
     public function render_extension_comments(\local_extension\request $req, $showdate = false) {
         $out = '';
 
-        $out .= html_writer::start_tag('div', array('class' => 'comments'));
+        $out .= html_writer::start_tag('div', ['class' => 'comments']);
 
         // Fetch the comments, state changes and file attachments.
-        $indexed = array();
+        $indexed = [];
 
         $history = $req->get_history();
         foreach ($history as $comment) {
@@ -102,18 +102,18 @@ class local_extension_renderer extends plugin_renderer_base {
             $user = \core_user::get_user($comment->userid);
         }
 
-        $out .= html_writer::start_tag('div', array('class' => 'comment'));
+        $out .= html_writer::start_tag('div', ['class' => 'comment']);
 
-        $out .= html_writer::start_tag('div', array('class' => 'avatar'));
-        $out .= $this->output->user_picture($user, array('size' => 50));
+        $out .= html_writer::start_tag('div', ['class' => 'avatar']);
+        $out .= $this->output->user_picture($user, ['size' => 50]);
         $out .= html_writer::end_div(); // End .avatar.
 
-        $out .= html_writer::start_tag('div', array('class' => $class));
-        $out .= html_writer::tag('span', fullname($user), array('class' => 'name'));
-        $out .= html_writer::tag('span', ' - ' . $this->render_role($req, $user->id), array('class' => 'role'));
-        $out .= html_writer::tag('span', ' - ' . $this->render_time($comment->timestamp, $showdate), array('class' => 'time'));
+        $out .= html_writer::start_tag('div', ['class' => $class]);
+        $out .= html_writer::tag('span', fullname($user), ['class' => 'name']);
+        $out .= html_writer::tag('span', ' - ' . $this->render_role($req, $user->id), ['class' => 'role']);
+        $out .= html_writer::tag('span', ' - ' . $this->render_time($comment->timestamp, $showdate), ['class' => 'time']);
 
-        $out .= html_writer::start_tag('div', array('class' => 'message'));
+        $out .= html_writer::start_tag('div', ['class' => 'message']);
         $out .= html_writer::div(format_text(trim($comment->message), FORMAT_MOODLE), 'comment');
         $out .= html_writer::end_div(); // End .message.
 
@@ -134,7 +134,7 @@ class local_extension_renderer extends plugin_renderer_base {
     public function render_role($req, $userid) {
         $details = '';
         $rolename = '';
-        $roles = array();
+        $roles = [];
 
         // Roles are scoped to the enrollment status in courses.
         foreach ($req->mods as $cmid => $mod) {
@@ -150,7 +150,7 @@ class local_extension_renderer extends plugin_renderer_base {
             }
         }
 
-        return html_writer::tag('abbr', $rolename, array('title' => $details) );
+        return html_writer::tag('abbr', $rolename, ['title' => $details]);
 
     }
 
@@ -178,7 +178,7 @@ class local_extension_renderer extends plugin_renderer_base {
         if ($showdate) {
             return html_writer::tag('abbr', $fulldate);
         } else {
-            return html_writer::tag('abbr', $show, array('title' => $fulldate));
+            return html_writer::tag('abbr', $show, ['title' => $fulldate]);
         }
 
     }
@@ -194,7 +194,7 @@ class local_extension_renderer extends plugin_renderer_base {
 
         list($fs, $files) = $req->fetch_attachments();
 
-        $out  = html_writer::start_tag('div', array('class' => 'attachments'));
+        $out  = html_writer::start_tag('div', ['class' => 'attachments']);
         $out .= html_writer::tag('p', get_string('attachments', 'local_extension'));
         $out .= html_writer::start_tag('ul');
 
@@ -231,7 +231,7 @@ class local_extension_renderer extends plugin_renderer_base {
             $obj->user = fullname($user);
             $obj->date = userdate($file->get_timecreated());
 
-            $out .= html_writer::start_tag('li', array('class' => 'attachment'));
+            $out .= html_writer::start_tag('li', ['class' => 'attachment']);
             $out .= get_string('attachment_detail', 'local_extension', $obj);
             $out .= html_writer::end_tag('li'); // End .attachment.
 
@@ -266,17 +266,17 @@ class local_extension_renderer extends plugin_renderer_base {
         if (!empty($requests)) {
 
             foreach ($requests as $request) {
-                $statusurl = new moodle_url("/local/extension/status.php", array('id' => $request->id));
+                $statusurl = new moodle_url("/local/extension/status.php", ['id' => $request->id]);
                 $status = get_string("table_header_statusrow", "local_extension", $statusurl->out());
 
-                $values = array(
+                $values = [
                     $request->id,
                     $request->count,
                     userdate($request->timestamp),
                     userdate($request->lastmod),
                     $status,
                     fullname(\core_user::get_user($request->userid)),
-                );
+                ];
                 $table->add_data($values);
 
             }
@@ -301,41 +301,41 @@ class local_extension_renderer extends plugin_renderer_base {
             $activate = get_string('form_rule_label_parent_allways', 'local_extension');
             $html .= html_writer::tag('p', $activate);
         } else {
-            $activate = array(
+            $activate = [
                 get_string('form_rule_label_parent', 'local_extension'),
                 $parentstr,
                 get_string('form_rule_label_parent_end', 'local_extension'),
-            );
+            ];
             $html .= html_writer::tag('p', implode(' ', $activate));
         }
 
         $lengthtype = $rule->rule_type($rule->lengthtype);
 
-        $reqlength = array(
+        $reqlength = [
             get_string('form_rule_label_request_length', 'local_extension'),
             $lengthtype,
             $rule->lengthfromduedate,
             get_string('form_rule_label_days_long', 'local_extension'),
-        );
+        ];
         $html .= html_writer::tag('p', implode(' ', $reqlength));
 
         $elapsedtype = $rule->rule_type($rule->elapsedtype);
 
-        $elapsedlength = array(
+        $elapsedlength = [
             get_string('form_rule_label_elapsed_length', 'local_extension'),
             $elapsedtype,
             $rule->elapsedfromrequest,
             get_string('form_rule_label_days_old', 'local_extension'),
-        );
+        ];
         $html .= html_writer::tag('p', implode(' ', $elapsedlength));
 
-        $setroles = array(
+        $setroles = [
             get_string('form_rule_label_set_roles', 'local_extension'),
             $rule->get_role_name(),
             get_string('form_rule_label_to', 'local_extension'),
             $rule->get_action_name(),
             get_string('form_rule_label_this_request', 'local_extension'),
-        );
+        ];
         $html .= html_writer::tag('p', implode(' ', $setroles));
 
         $html .= html_writer::end_div();
@@ -354,13 +354,13 @@ class local_extension_renderer extends plugin_renderer_base {
     public function render_manage_new_rule($mods, $url) {
         $stredit = get_string('button_edit_rule', 'local_extension');
 
-        $options = array();
+        $options = [];
 
         foreach ($mods as $mod) {
             $options[$mod->get_data_type()] = $mod->get_name();
         }
 
-        $html = $this->single_select($url, 'datatype', $options, '', array('' => $stredit), 'newfieldform');
+        $html = $this->single_select($url, 'datatype', $options, '', ['' => $stredit], 'newfieldform');
 
         return $html;
     }
@@ -464,14 +464,14 @@ class local_extension_renderer extends plugin_renderer_base {
         $controlstable->cellspacing = 0;
         $controlstable->data[] = new html_table_row();
 
-        $popupurl = new moodle_url('/local/extension/request.php', array(
+        $popupurl = new moodle_url('/local/extension/request.php', [
             'course'  => $courseid,
             'cmid'    => $cmid,
             'forward' => $searchforward,
-        ));
+        ]);
 
         // Searching backward.
-        $backwardlist = array();
+        $backwardlist = [];
         for ($i = 1; $i <= $maxweeksbackward; $i++) {
 
             // Dont add 'weeks' that are less than the default search length.
@@ -505,13 +505,13 @@ class local_extension_renderer extends plugin_renderer_base {
         $controlstable->data[0]->cells[] = $searchforwardcell;
 
         // Searcahing forward.
-        $popupurl = new moodle_url('/local/extension/request.php', array(
+        $popupurl = new moodle_url('/local/extension/request.php', [
             'course'  => $courseid,
             'cmid'    => $cmid,
             'back'    => $searchback,
-        ));
+        ]);
 
-        $forwardlist = array();
+        $forwardlist = [];
 
         for ($i = 1; $i <= $maxweeksforward; $i++) {
 
@@ -564,7 +564,7 @@ class local_extension_renderer extends plugin_renderer_base {
     public function render_index_search_controls($context, $categoryid, $courseid, $stateid, $baseurl, $search, $faculty) {
         global $PAGE;
 
-//        $courseid = empty($courseid) ? 1 : $courseid;
+        // $courseid = empty($courseid) ? 1 : $courseid;
         $courselist = [];
         $hascapability = false;
 
@@ -580,7 +580,7 @@ class local_extension_renderer extends plugin_renderer_base {
         if (!empty($categoryid)) {
             $courselist = coursecat::get($categoryid)->get_courses();
         } else {
-            $courselist = coursecat::get(0)->get_courses(array('recursive' => true));
+            $courselist = coursecat::get(0)->get_courses(['recursive' => true]);
         }
 
         $mycourses = enrol_get_my_courses();
@@ -694,7 +694,7 @@ class local_extension_renderer extends plugin_renderer_base {
         // Display a list of faculties to filter by.
         if (!empty($categorylist) || $hascapability) {
 
-            $options =[];
+            $options = [];
 
             // TODO add regex as configuration item.
             $re = "/^([A-Z]+)[0-9]+_[0-9]+/i";
@@ -784,11 +784,11 @@ class local_extension_renderer extends plugin_renderer_base {
      * @return string
      */
     public function render_my_enrolled_courses_select($categorylist, $courselist, $mycourses, $courseid, $faculty, $baseurl) {
-//        global $SITE;
+        // global $SITE;
 
         if ($mycourses) {
 
-//            $systemcontext = context_system::instance();
+            // $systemcontext = context_system::instance();
 
             $mycourselist = [];
 
@@ -801,16 +801,18 @@ class local_extension_renderer extends plugin_renderer_base {
                 $mycourselist[$mycourse->id] = format_string($mycourse->fullname, true, ['context' => $coursecontext]);
             }
 
-//            if (has_capability('moodle/site:viewparticipants', $systemcontext)) {
-//
-//                unset($courselist[SITEID]);
-//
-//                $obj = ['context' => $systemcontext];
-//
-//                $courselist = [SITEID => format_string($SITE->fullname, true, $obj)] + $courselist;
-//            }
+            /*
+            if (has_capability('moodle/site:viewparticipants', $systemcontext)) {
 
-            $facultylist =[];
+                unset($courselist[SITEID]);
+
+                $obj = ['context' => $systemcontext];
+
+                $courselist = [SITEID => format_string($SITE->fullname, true, $obj)] + $courselist;
+            }
+            */
+
+            $facultylist = [];
             foreach ($courselist as $course) {
 
                 // If a faculty has been set then we will filter the results.
@@ -900,7 +902,7 @@ class local_extension_renderer extends plugin_renderer_base {
             'class' => 'searchform'
         ];
 
-        $html  = html_writer::input_hidden_params($baseurl, array('search'));
+        $html  = html_writer::input_hidden_params($baseurl, ['search']);
 
         $html .= html_writer::tag('input', null, $inputattributes);
 
