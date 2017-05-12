@@ -38,15 +38,10 @@ $faculty    = optional_param('faculty', '', PARAM_RAW); // Make sure it is proce
 
 require_login();
 
-$PAGE->set_url('/local/extension/index.php', array(
+$PAGE->set_url('/local/extension/index.php', [
     'page'      => $page,
     'perpage'   => $perpage,
-//    'catid'     => $categoryid,
-//    'state'     => $stateid,
-//    'id'        => $courseid,
-//    'search'    => s($search),
-//    'faculty'   => s($faculty),
-));
+]);
 
 if ($courseid) {
     $course = $DB->get_record('course', array('id' => $courseid), '*', MUST_EXIST);

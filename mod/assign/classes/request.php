@@ -349,6 +349,12 @@ class request extends \local_extension\base_request {
         return true;
     }
 
+    /**
+     * Obtains an instance of the mod.
+     *
+     * @param array $mod
+     * @return bool
+     */
     public function get_instance($mod) {
         $cm = $mod->cm;
         $course = $cm->course;
@@ -371,6 +377,13 @@ class request extends \local_extension\base_request {
         // $this->submit_extension($assignmentinstance, $userid, 0);
     }
 
+    /**
+     * Adds a date selector to the mform that it has been passed.
+     *
+     * @param array $mod
+     * @param \MoodleQuickForm $mform
+     * @param bool $optional
+     */
     public function date_selector($mod, $mform, $optional = true) {
         $event = $mod->event;
 

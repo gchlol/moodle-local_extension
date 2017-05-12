@@ -113,6 +113,11 @@ abstract class base_request {
      */
     abstract public function cancel_extension($assignmentid, $userid);
 
+    /**
+     * Obtains an instance of the mod.
+     *
+     * @param array $mod
+     */
     abstract public function get_instance($mod);
 
     /**
@@ -122,5 +127,5 @@ abstract class base_request {
      * @param \MoodleQuickForm $mform
      * @param bool $optional
      */
-    abstract function date_selector($mod, $mform, $optional = true);
+    abstract public function date_selector($mod, $mform, $optional = true);
 }

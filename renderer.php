@@ -648,6 +648,15 @@ class local_extension_renderer extends plugin_renderer_base {
         return html_writer::table($controlstable);
     }
 
+    /**
+     * Renders the category select.
+     *
+     * @param array $categorylist
+     * @param integer $categoryid
+     * @param \moodle_url $baseurl
+     * @param boolean $hascapability
+     * @return string
+     */
     public function render_category_select($categorylist, $categoryid, $baseurl, $hascapability) {
         // Display a list of categories only with requirements.
         // 1. Has the capability local/extension:viewallrequests and 'categories' exist.
@@ -671,6 +680,16 @@ class local_extension_renderer extends plugin_renderer_base {
         }
     }
 
+    /**
+     * Renders the faculty select.
+     *
+     * @param array $categorylist
+     * @param array $courselist
+     * @param string $faculty
+     * @param \moodle_url $baseurl
+     * @param boolean $hascapability
+     * @return string
+     */
     public function render_faculty_select($categorylist, $courselist, $faculty, $baseurl, $hascapability) {
         // Display a list of faculties to filter by.
         if (!empty($categorylist) || $hascapability) {
@@ -709,6 +728,8 @@ class local_extension_renderer extends plugin_renderer_base {
     }
 
     /**
+     * Renders the list of all courses.
+     *
      * @param array $categorylist
      * @param string $faculty
      * @param array $courselist
@@ -752,10 +773,13 @@ class local_extension_renderer extends plugin_renderer_base {
     }
 
     /**
+     * Renders the list of the users current enrolled courses.
+     *
      * @param array $categorylist
      * @param array $courselist
      * @param array $mycourses
      * @param integer $courseid
+     * @param string $faculty
      * @param \moodle_url $baseurl
      * @return string
      */
@@ -827,6 +851,13 @@ class local_extension_renderer extends plugin_renderer_base {
         }
     }
 
+    /**
+     * Renders the state selection.
+     *
+     * @param integer $stateid
+     * @param \moodle_url $baseurl
+     * @return string
+     */
     public function render_state_select($stateid, $baseurl) {
         // Display a search filter for the status.
         $state = \local_extension\state::instance();
@@ -848,8 +879,8 @@ class local_extension_renderer extends plugin_renderer_base {
     /**
      * Renders a search input form element that is used with filtering the requests based on course.
      *
-     * @param \moodle_url $baseurl
      * @param string $search
+     * @param \moodle_url $baseurl
      * @return string
      */
     public function render_search_course($search, $baseurl) {

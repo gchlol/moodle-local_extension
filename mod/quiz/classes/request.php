@@ -396,10 +396,27 @@ class request extends \local_extension\base_request {
         // quiz_delete_override($quiz, $oldoverride->id);
     }
 
+    /**
+     * Obtains an instance of the mod.
+     *
+     * Unused.
+     *
+     * @param array $mod
+     * @return bool
+     */
     public function get_instance($mod) {
         return false;
     }
 
+    /**
+     * Adds a date selector to the mform that it has been passed.
+     *
+     * This uses an extra parameter too the $event object, timeclose.
+     *
+     * @param array $mod
+     * @param \MoodleQuickForm $mform
+     * @param bool $optional
+     */
     public function date_selector($mod, $mform, $optional = true) {
         $event = $mod->event;
 

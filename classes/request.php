@@ -653,7 +653,6 @@ class request implements \cache_data_source {
                 $noreplyuser->firstname = \fullname($userfrom, true);
             }
 
-
             utility::send_trigger_email($this, $subject, $content, $noreplyuser, $userto);
         }
 
