@@ -220,6 +220,7 @@ class utility {
         $message->fullmessagehtml   = $content;
         $message->smallmessage      = '';
         $message->notification      = 1;
+        $message->courseid          = SITEID;
         message_send($message);
     }
 
