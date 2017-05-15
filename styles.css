@@ -74,7 +74,7 @@
 
 .local_extension div .coursesearch {
     height: 43px;
-    margin-top: 0px;
+    margin-top: 0;
 }
 
 .local_extension div .lastmodby {
@@ -82,8 +82,8 @@
 }
 
 .local_extension .controls select {
-    max-width: 100px;
-    min-width: 100px;
+    max-width: 130px;
+    min-width: 130px;
 }
 
 .local_extension .label {

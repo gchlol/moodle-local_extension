@@ -45,7 +45,7 @@ class cm {
     /** @var int The request id associated with this cm */
     public $requestid = null;
 
-    /** @var \stdClass The local_extension_cm database object */
+    /** @var cm_data The local_extension_cm database object */
     public $cm = null;
 
     /**

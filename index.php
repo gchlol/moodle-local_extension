@@ -26,22 +26,18 @@
 require_once(__DIR__ . '/../../config.php');
 require_once($CFG->libdir . '/coursecatlib.php');
 
-define('DEFAULT_PAGE_SIZE', 20);
+$defaultcategoryid = get_config('local_extension', 'defaultcategory');
 
-$page       = optional_param('page', 0, PARAM_INT);
-$perpage    = optional_param('perpage', DEFAULT_PAGE_SIZE, PARAM_INT);
-$categoryid = optional_param('catid', 0, PARAM_INT);
+$categoryid = optional_param('catid', $defaultcategoryid, PARAM_INT);
 $courseid   = optional_param('id', 0, PARAM_INT);
 $stateid    = optional_param('state', 0, PARAM_INT);
 $search     = optional_param('search', '', PARAM_RAW); // Make sure it is processed with p() or s() when sending to output!
 $faculty    = optional_param('faculty', '', PARAM_RAW); // Make sure it is processed with p() or s() when sending to output!
+$download   = optional_param('download', '', PARAM_ALPHA);
 
 require_login();
 
-$PAGE->set_url('/local/extension/index.php', [
-    'page'      => $page,
-    'perpage'   => $perpage,
-]);
+$PAGE->set_url('/local/extension/index.php', []);
 
 if ($courseid) {
     $course = $DB->get_record('course', array('id' => $courseid), '*', MUST_EXIST);
@@ -56,6 +52,20 @@ if ($categoryid) {
     $categorycontext = context_coursecat::instance($categoryid);
 } else {
     $categorycontext = $context;
+}
+
+$viewallrequests = false;
+if (has_capability('local/extension:viewallrequests', $categorycontext)) {
+    $viewallrequests = true;
+}
+
+if (has_capability('local/extension:viewallrequests', $context)) {
+    $viewallrequests = true;
+}
+
+// The user cannot view all requests and select the caregories.
+if (!$viewallrequests) {
+    $categoryid = 0;
 }
 
 $systemcontext = context_system::instance();
@@ -75,10 +85,6 @@ $PAGE->navbar->add(get_string('breadcrumb_nav_index', 'local_extension'), new mo
 /* @var \local_extension_renderer $renderer IDE hinting */
 $renderer = $PAGE->get_renderer('local_extension');
 
-echo $OUTPUT->header();
-
-echo html_writer::tag('h2', get_string('page_h2_summary', 'local_extension'));
-
 // Should use this variable so that we don't break stuff every time a variable is added or changed.
 $baseurl = new moodle_url('/local/extension/index.php', array(
     'id'      => $courseid,
@@ -88,248 +94,41 @@ $baseurl = new moodle_url('/local/extension/index.php', array(
     'faculty' => s($faculty),
 ));
 
-// New filter functionality, searching and listing of requests.
-echo $renderer->render_index_search_controls($context, $categoryid, $courseid, $stateid, $baseurl, $search, $faculty);
-
-$table = new \local_extension\local\table\index($baseurl);
-
-$joins = array();
-$wheres = array();
-$params = array();
-
-if ($courseid != 1) {
-    $wheres[] = "lcm.course = :courseid";
-    $params = array_merge($params, array('courseid' => $courseid), $params);
-}
-
-if ($categoryid != 0) {
-    $wheres[] = "c.category = :categoryid";
-    $params = array_merge($params, array('categoryid' => $categoryid), $params);
-}
-
-if ($stateid != 0) {
-    $wheres[] = "lcm.state = :stateid";
-    $params = array_merge($params, array('stateid' => $stateid), $params);
-}
-
-$showuseridentityfields = explode(',', $CFG->showuseridentity);
-$ufields = array('username', 'email', 'city', 'country', 'lang', 'timezone', 'maildisplay', 'idnumber');
-$mainuserfields = user_picture::fields('u', $ufields);
-
-$viewallrequests = false;
-if (has_capability('local/extension:viewallrequests', $categorycontext)) {
-    $viewallrequests = true;
-}
-
-if (has_capability('local/extension:viewallrequests', $context)) {
-    $viewallrequests = true;
-}
-
+// If the user can view all requests, display the administrator table.
 if ($viewallrequests) {
-
-    // This query obtains ALL local cm requests, with the possible filters: coursename, username, activityname, status.
-    $select = "SELECT lcm.id AS lcmid,
-                      lcm.name AS activity,
-                      lcm.length,
-                      lcm.state,
-                      lcm.data as newduedate,
-                      r.id AS rid,
-                      r.lastmodid,
-                      r.lastmod,
-                      r.timestamp,
-                      r.userid,
-                      u.idnumber,
-                      c.fullname AS coursename,
-                      c.id AS courseid,
-                      $mainuserfields";
-
-    $joins[] = "FROM {local_extension_cm} lcm";
-
-    $joins[] = "JOIN {local_extension_request} r ON r.id = lcm.request";
-    $joins[] = "JOIN {course} c ON c.id = lcm.course";
-    $joins[] = "JOIN {user} u ON u.id = r.userid";
-
+    $table = new \local_extension\local\table\requests\administrator($baseurl);
 } else {
-    // Filtering the subscriptions to only those that belong to the $USER.
-    // If a rule has been triggered this will grant access to individuals to modify/view the requests.
-    $wheres[] = "s.userid = :subuserid";
-    $params = array_merge($params, array('subuserid' => $USER->id), $params);
-
-    // This query obtains ALL local cm requests, that the $USER has a subscription to with the possible filters:
-    // coursename, username, activityname, status.
-    $select = "SELECT lcm.id AS lcmid,
-                      lcm.name AS activity,
-                      lcm.length,
-                      lcm.state,
-                      lcm.data as newduedate,
-                      r.id AS rid,
-                      r.lastmodid,
-                      r.lastmod,
-                      r.timestamp,
-                      r.userid,
-                      u.idnumber,
-                      c.fullname AS coursename,
-                      c.id AS courseid,
-                      $mainuserfields";
-
-    $joins[] = "FROM {local_extension_cm} lcm";
-
-    // Sometimes invalid trigger setup will assign multiple subscription states. This queries the distinct possibilities.
-    $joins[] = "JOIN
-                    (
-                    SELECT DISTINCT localcmid,
-                    userid
-                    FROM {local_extension_subscription}
-                    ) s
-                ON s.localcmid = lcm.id";
-
-    $joins[] = "JOIN {local_extension_request} r ON r.id = lcm.request";
-    $joins[] = "JOIN {course} c ON c.id = lcm.course";
-    $joins[] = "JOIN {user} u ON u.id = r.userid";
-
+    $table = new \local_extension\local\table\requests\student($baseurl);
 }
 
-$from = implode("\n", $joins);
-if ($wheres) {
-    $where = "WHERE " . implode(" AND ", $wheres);
-} else {
-    $where = "";
+$table->generate_query($categoryid, $courseid, $stateid, $search, $faculty);
+
+$table->is_downloading($download, 'AES_export', 'AES_export');
+
+if (!$table->is_downloading()) {
+    echo $OUTPUT->header();
+
+    echo html_writer::tag('h2', get_string('page_h2_summary', 'local_extension'));
+
+    // New filter functionality, searching and listing of requests.
+    echo $renderer->render_index_search_controls($context, $categoryid, $courseid, $stateid, $baseurl, $search, $faculty);
+
+    echo html_writer::tag('h2', get_string('page_h2_summary', 'local_extension'));
 }
 
-$totalcount = $DB->count_records_sql("SELECT COUNT(u.id) $from $where", $params);
+$table->out(30, false);
 
-if (!empty($search)) {
-    $fullname = $DB->sql_fullname('u.firstname', 'u.lastname');
+if (!$table->is_downloading()) {
 
-    $wherestr  = "(" . $DB->sql_like($fullname, ':search1', false, false);
-    $wherestr .= " OR " . $DB->sql_like('c.fullname', ':search2', false, false);
+    echo html_writer::empty_tag('br');
 
-    if (in_array('idnumber', $showuseridentityfields)) {
-        $wherestr .= " OR " . $DB->sql_like('u.idnumber', ':search3', false, false);
-        $params['search3'] = "%$search%";
+    if ($courseid == SITEID) {
+        $courseid = 0;
     }
 
-    $wherestr .= " OR " . $DB->sql_like('lcm.name', ':search4', false, false);
+    $url = new moodle_url("/local/extension/request.php", ['course'  => $courseid]);
 
-    $wherestr .= " OR r.id = :search5) ";
+    echo $OUTPUT->single_button($url, get_string('button_request_extension', 'local_extension'));
 
-    $wheres[] = $wherestr;
-
-    $params['search1'] = "%$search%";
-    $params['search2'] = "%$search%";
-    $params['search4'] = "%$search%";
-    $params['search5'] = intval($search);
+    echo $OUTPUT->footer();
 }
-
-if (!empty($faculty)) {
-    $wheres[] = $DB->sql_like('c.shortname', ':faculty', false, false);
-    $params['faculty'] = "%$faculty%";
-}
-
-list($twhere, $tparams) = $table->get_sql_where();
-if ($twhere) {
-    $wheres[] = $twhere;
-    $params = array_merge($params, $tparams);
-}
-
-$from = implode("\n", $joins);
-if ($wheres) {
-    $where = "WHERE " . implode(" AND ", $wheres);
-} else {
-    $where = "";
-}
-
-if ($table->get_sql_sort()) {
-    $sort = " ORDER BY " . $table->get_sql_sort();
-} else {
-    $sort = "";
-}
-
-$matchcount = $DB->count_records_sql("SELECT COUNT(u.id) $from $where", $params);
-
-$table->pagesize($perpage, $matchcount);
-
-$requestlist = $DB->get_records_sql("$select $from $where $sort", $params, $table->get_page_start(), $table->get_page_size());
-
-if ($requestlist) {
-
-    // Example: 'Wed, 26 Oct 2016 3:12PM'.
-    $format = '%a, %e %b %Y %l:%M %p';
-
-    foreach ($requestlist as $request) {
-        $usercontext = context_user::instance($request->userid);
-
-        if ($piclink = ($USER->id == $request->userid ||
-            has_capability('moodle/user:viewdetails', $context) ||
-            has_capability('moodle/user:viewdetails', $usercontext))) {
-
-            $moodleurl = new moodle_url('/user/view.php', array('id' => $request->userid, 'course' => $request->courseid));
-            $link = html_writer::link($moodleurl, fullname($request));
-
-            $profilelink = html_writer::tag('b', $link);
-        } else {
-            $profilelink = html_writer::tag('b', fullname($request));
-        }
-
-        $lastmoduser = core_user::get_user($request->lastmodid);
-
-        $requesturl = new moodle_url('/local/extension/status.php', array('id' => $request->rid));
-        $requestlink = html_writer::link($requesturl, $request->rid);
-
-        $requestlength = \local_extension\utility::calculate_length($request->length);
-
-        $delta = $request->lastmod - time();
-        $show = format_time($delta);
-        $num = strtok($show, ' ');
-        $unit = strtok(' ');
-        $show = "$num $unit";
-        $lastmodstring = get_string('ago', 'message', $show);
-        $lastmod  = html_writer::start_div('lastmodby');
-        $lastmod .= html_writer::tag('span', $lastmodstring);
-        $lastmod .= html_writer::end_div();
-
-        $cmstate = \local_extension\state::instance()->get_state_name($request->state);
-
-        $data = array(
-            $requestlink,
-            $OUTPUT->user_picture($request, array('size' => 35, 'courseid' => $request->courseid)),
-            $profilelink,
-            userdate($request->timestamp, $format),
-            html_writer::div($requestlength, 'lastmodby'),
-            userdate($request->newduedate, $format),
-            html_writer::link($requesturl, $request->coursename),
-            html_writer::link($requesturl, $request->activity),
-            html_writer::div($cmstate, 'lastmodby'),
-            $lastmod,
-        );
-
-        if (in_array('idnumber', $showuseridentityfields)) {
-            $moodleurl = new moodle_url('/user/view.php', array('id' => $request->userid, 'course' => $request->courseid));
-            $link = html_writer::link($moodleurl, $request->idnumber);
-
-            $div = html_writer::div($link, 'lastmodby');
-
-            array_splice($data, 3, 0, $div);
-        }
-
-        $table->add_data($data);
-    }
-
-    $table->finish_html();
-}
-
-if ($courseid == SITEID) {
-    $courseid = 0;
-}
-
-$params = array(
-    'course'  => $courseid,
-);
-
-$url = new moodle_url("/local/extension/request.php", $params);
-
-echo html_writer::empty_tag('br');
-
-echo $OUTPUT->single_button($url, get_string('button_request_extension', 'local_extension'));
-
-echo $OUTPUT->footer();

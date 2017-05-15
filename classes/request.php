@@ -61,7 +61,7 @@ class request implements \cache_data_source {
     /** @var array An array of attached files that exist for this request id */
     public $files = array();
 
-    /** @var array An array of mods that are used */
+    /** @var mod_data[] An array of mods that are used */
     public $mods = array();
 
     /** @var array A list of subscribed user ids */

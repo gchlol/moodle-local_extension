@@ -25,6 +25,9 @@
 
 namespace local_extension;
 
+use coding_exception;
+use html_writer;
+
 defined('MOODLE_INTERNAL') || die();
 
 /**
@@ -110,23 +113,54 @@ class state {
      * Returns a human readable state name.
      *
      * @param int $stateid State id.
+     * @param boolean $raw If true, return the string only.
      * @throws \coding_exception
      * @return string the human-readable status name.
      */
-    public function get_state_name($stateid) {
+    public function get_state_name($stateid, $raw = false) {
         switch ($stateid) {
             case self::STATE_NEW:
-                return \get_string('state_new',      'local_extension');
+                $str = get_string('state_new',      'local_extension');
+                if ($raw) {
+                    return $str;
+                }
+
+                return html_writer::span($str, 'statusnew label');
+
             case self::STATE_DENIED:
-                return \get_string('state_denied',   'local_extension');
+                $str = get_string('state_denied',   'local_extension');
+                if ($raw) {
+                    return $str;
+                }
+
+                return html_writer::span($str, 'statusdenied label');
+
             case self::STATE_APPROVED:
-                return \get_string('state_approved', 'local_extension');
+                $str = get_string('state_approved', 'local_extension');
+                if ($raw) {
+                    return $str;
+                }
+
+                return html_writer::span($str, 'statusapproved label');
+
             case self::STATE_REOPENED:
-                return \get_string('state_reopened', 'local_extension');
+                $str = get_string('state_reopened', 'local_extension');
+                if ($raw) {
+                    return $str;
+                }
+
+                return html_writer::span($str, 'statusreopened label');
+
             case self::STATE_CANCEL:
-                return \get_string('state_cancel',   'local_extension');
+                $str = get_string('state_cancel',   'local_extension');
+                if ($raw) {
+                    return $str;
+                }
+
+                return html_writer::span($str, 'statuscancel label');
+
             default:
-                throw new \coding_exception('Unknown cm state.');
+                throw new coding_exception('Unknown cm state.');
         }
     }
 
@@ -347,11 +381,7 @@ class state {
         $event   = $mod->event;
         $course  = $mod->course;
 
-        /*
-         * Iterate over a list of states with their cmid concatenated eg. approve6
-         * approve6: Would trigger the approve handler for cmid 6.
-         */
-
+        // The form data passed through contains the state.
         $state = $data->s;
 
         // The extension has been approved. Lets hook into the handler and extend the items length.
@@ -394,17 +424,15 @@ class state {
      * When a cm has been approved and the length has been updated then we must call the handler and update the extension.
      *
      * @param \local_extension\request $request
-     * @param int $user
+     * @param int $user The user that has called this operation.
      * @param \stdClass $data
      * @return object|bool
      */
     public function extend_cm_length($request, $user, $data) {
 
         $mod = $request->mods[$data->cmid];
-        /* @var \local_extension\base_request $handler IDE hinting */
         $handler = $mod->handler;
 
-        /* @var \local_extension\cm $localcm IDE hinting */
         $localcm = $mod->localcm;
         $event   = $mod->event;
         $course  = $mod->course;

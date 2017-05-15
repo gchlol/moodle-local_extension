@@ -282,7 +282,7 @@ class rule {
      * Returning a value of true will identify that notifications need to be sent out.
      *
      * @param request $request
-     * @param array $mod
+     * @param mod_data $mod
      * @return bool
      */
     public function process(&$request, $mod) {
@@ -314,7 +314,7 @@ class rule {
     /**
      * Obtains the level of access from the table local_extension_subscription.
      *
-     * @param array $mod
+     * @param mod_data $mod
      * @param int $userid
      * @return mixed|boolean
      */
@@ -342,7 +342,7 @@ class rule {
      * Helper to send notifications for roles based on the rule and request. Used when processing rules.
      *
      * @param request $request
-     * @param array $mod
+     * @param mod_data $mod
      * @param \stdClass $templates
      */
     public function send_notifications($request, $mod, $templates) {
@@ -410,7 +410,7 @@ class rule {
      * access to the localcm item.
      *
      * @param request $request
-     * @param array $mod
+     * @param mod_data $mod
      */
     private function setup_subscription(&$request, $mod) {
         global $DB;
@@ -467,7 +467,7 @@ class rule {
      * When a rule is triggered that has parent items, we will revoke approval status to the earlier roles.
      * Unless that rule is set for FORCE_APPROVE.
      *
-     * @param array $mod
+     * @param mod_data $mod
      * @param rule $rule
      */
     private function downgrade_status($mod, $rule) {
@@ -512,7 +512,7 @@ class rule {
      *
      * We do not want to fire the trigger multiple times.
      *
-     * @param array $mod
+     * @param mod_data $mod
      * @return boolean
      */
     private function check_history($mod) {
@@ -550,7 +550,7 @@ class rule {
      * The final stage when processing a rule. This will record an entry in the local_extension_history_trig table
      * so that when processing the rule during a cron task will return false and not trigger anything.
      *
-     * @param array $mod
+     * @param mod_data $mod
      */
     public function write_history($mod) {
         global $DB;
@@ -573,7 +573,7 @@ class rule {
      * Replaces the varaibles in each template with data and returns them.
      *
      * @param request $request
-     * @param array $mod
+     * @param mod_data $mod
      * @param \stdClass $contentchange An object with a single comment/statechange/attachment.
      * @return array
      */
@@ -697,7 +697,7 @@ class rule {
     /**
      * If this rule has a parent value, we will check the history to see if that has been processed or not.
      *
-     * @param array $mod
+     * @param mod_data $mod
      * @param int $parent
      * @return boolean
      */
@@ -732,7 +732,7 @@ class rule {
     /**
      * Returns the request length.
      *
-     * @param array $mod
+     * @param mod_data $mod
      * @return string
      */
     private function get_request_time($mod) {
@@ -742,7 +742,7 @@ class rule {
     /**
      * Checks the rule for request list.
      *
-     * @param array $mod
+     * @param mod_data $mod
      * @return boolean
      */
     private function check_request_length($mod) {
@@ -776,7 +776,7 @@ class rule {
      * Checks the rule for elapsed length.
      *
      * @param request $request
-     * @param array $mod
+     * @param mod_data $mod
      * @return boolean
      */
     private function check_elapsed_length($request, $mod) {

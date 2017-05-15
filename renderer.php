@@ -831,21 +831,21 @@ class local_extension_renderer extends plugin_renderer_base {
                 }
             }
 
-            $newurl = clone $baseurl;
-            $newurl->remove_params('id');
-            $newurl->param('catid', $mycourse->category);
-
             $params = [
                 'faculty' => $facultylist,
                 'catid' => $categorylist,
             ];
 
+            $newurl = clone $baseurl;
             foreach ($params as $param => $list) {
                 $key = $baseurl->get_param($param);
                 if (!array_key_exists($key, $list)) {
                     $newurl->param($param, $key);
                 }
             }
+
+            $newurl->remove_params('id');
+            $newurl->remove_params('catid');
 
             $select = new single_select($newurl, 'id', $mycourselist, $courseid, null, 'mycourseform');
 
