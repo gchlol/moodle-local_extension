@@ -43,7 +43,7 @@ class mod_data {
     /** @var \course_modinfo */
     public $cm;
 
-    /** @var \local_extension\cm The local_extension_cm class */
+    /** @var cm The local_extension_cm class */
     public $localcm;
 
     /** @var \stdClass The course database object */
