@@ -521,10 +521,10 @@ class rule {
         $localcm = $mod->localcm;
 
         $params = array(
-            'trigger' => $this->id,
-            'localcmid' => $localcm->cm->id,
-            'requestid' => $localcm->cm->request,
-            'userid' => $localcm->cm->userid,
+            'trigger' => intval($this->id),
+            'localcmid' => intval($localcm->cm->id),
+            'requestid' => intval($localcm->cm->request),
+            'userid' => intval($localcm->cm->userid),
             'state' => history::STATE_DEFAULT,
         );
 
