@@ -174,6 +174,8 @@ class utility {
      * @param \stdClass $userto
      */
     public static function send_trigger_email(\local_extension\request $request, $subject, $content, $userfrom, $userto) {
+        global $CFG;
+
         $emaildisable = get_config('local_extension', 'emaildisable');
         if ($emaildisable == true) {
             return;
@@ -220,7 +222,11 @@ class utility {
         $message->fullmessagehtml   = $content;
         $message->smallmessage      = '';
         $message->notification      = 1;
-        $message->courseid          = SITEID;
+
+        // Moodle 3.2 has introduced the courseid parameter to the message object.
+        if ($CFG->version >= 2016120500) {
+            $message->courseid = SITEID;
+        }
         message_send($message);
     }
 
