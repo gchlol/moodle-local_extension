@@ -211,11 +211,19 @@ class utility {
         $userfrom->customheaders[] = "Thread-Topic: $subject";
         $userfrom->customheaders[] = "Thread-Index: " . substr($rootid, 1, 28);
 
-        $message = new \core\message\message();
+        // Moodle 2.9 has introcuded a new message api.
+        if ($CFG->version >= 2015051100) {
+            $message = new \core\message\message();
+            $message->userto = \core_user::get_user($userto->id);
+        } else {
+            // Moodle 2.7, 2.8.
+            $message = new \stdClass();
+            $message->userto = $userto->id;
+        }
+
         $message->component         = 'local_extension';
         $message->name              = 'status';
         $message->userfrom          = $userfrom;
-        $message->userto            = \core_user::get_user($userto->id);
         $message->subject           = $subject;
         $message->fullmessage       = html_to_text($content);;
         $message->fullmessageformat = FORMAT_PLAIN;
