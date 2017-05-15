@@ -520,23 +520,15 @@ class rule {
 
         $localcm = $mod->localcm;
 
-        $params = array(
-            'trigger' => intval($this->id),
-            'localcmid' => intval($localcm->cm->id),
-            'requestid' => intval($localcm->cm->request),
-            'userid' => intval($localcm->cm->userid),
+        $params = [
+            'trigger' => $this->id,
+            'localcmid' => $localcm->cm->id,
+            'requestid' => $localcm->cm->request,
+            'userid' => $localcm->cm->userid,
             'state' => history::STATE_DEFAULT,
-        );
+        ];
 
-        $sql = "SELECT id
-                  FROM {local_extension_history_trig}
-                 WHERE trigger = :trigger
-                   AND localcmid = :localcmid
-                   AND requestid = :requestid
-                   AND userid = :userid
-                   AND state = :state";
-
-        $record = $DB->get_record_sql($sql, $params);
+        $record = $DB->get_record('local_extension_history_trig', $params);
 
         // A record has been found. Return false to stop processing the trigger.
         if (!empty($record)) {
@@ -566,7 +558,7 @@ class rule {
             'state' => history::STATE_DEFAULT
         ];
 
-        $DB->insert_record('local_extension_history_trig', $history);
+        $DB->insert_record('local_extension_history_trig', (object)$history);
     }
 
     /**
