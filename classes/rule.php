@@ -205,7 +205,7 @@ class rule {
         }
 
         if (!empty($type)) {
-            $params = array('datatype' => $type);
+            $params = ['datatype' => $type];
 
             $compare = $DB->sql_compare_text('datatype') . " = " . $DB->sql_compare_text(':datatype');
             $sql .= " WHERE $compare";
@@ -321,10 +321,10 @@ class rule {
     public static function get_access($mod, $userid) {
         global $DB;
 
-        $params = array(
+        $params = [
             'userid' => $userid,
             'localcmid' => $mod->localcm->cm->id,
-        );
+        ];
 
         $select = "userid = :userid AND localcmid = :localcmid";
         $fields = $DB->get_fieldset_select('local_extension_subscription', 'access', $select, $params);
@@ -481,11 +481,11 @@ class rule {
 
             $users = $this->rule_get_role_users($course, $rule->role);
             foreach ($users as $user) {
-                $params = array(
+                $params = [
                     'userid' => $user->id,
                     'localcmid' => $localcm->cm->id,
                     'trigger' => $rule->id,
-                );
+                ];
 
                 $sub = $DB->get_record('local_extension_subscription', $params);
                 if (empty($sub)) {
@@ -557,14 +557,14 @@ class rule {
 
         $localcm = $mod->localcm;
 
-        $history = array(
+        $history = [
             'trigger' => $this->id,
             'timestamp' => time(),
             'localcmid' => $localcm->cm->id,
             'requestid' => $localcm->cm->request,
             'userid' => $localcm->cm->userid,
             'state' => history::STATE_DEFAULT
-        );
+        ];
 
         $DB->insert_record('local_extension_history_trig', $history);
     }
@@ -587,7 +587,7 @@ class rule {
         $handler = $mod->handler;
 
         // A url to the status page.
-        $url = new \moodle_url('/local/extension/status.php', array('id' => $localcm->cm->request));
+        $url = new \moodle_url('/local/extension/status.php', ['id' => $localcm->cm->request]);
 
         // The user details for obtaining the full name.
         $userid = $mod->localcm->userid;
@@ -602,7 +602,7 @@ class rule {
             $contenttemplate = null;
         }
 
-        $templatevars = array(
+        $templatevars = [
             '/{{course}}/' => $course->fullname,
             '/{{module}}/' => $cm->name,
             '/{{student}}/' => fullname($user),
@@ -625,13 +625,13 @@ class rule {
             '/{{statechanges}}/' => null,
             '/{{statuspage}}/' => null,
             '/{{contentchange}}/' => $contenttemplate,
-        );
+        ];
 
         $showuseridentityfields = explode(',', $CFG->showuseridentity);
-        $protectedidentityfields = array (
+        $protectedidentityfields = [
             '/{{student_idnumber}}/' => 'idnumber',
             '/{{student_username}}/' => 'username',
-        );
+        ];
 
         // This will remove each token from template vars.
         foreach ($protectedidentityfields as $key => $field) {
@@ -675,10 +675,10 @@ class rule {
         $templates = array();
 
         // These array items are the names of form elements that are submitted and saved to the rule data.
-        $items = array (
+        $items = [
             'template_notify',
             'template_user',
-        );
+        ];
 
         if (!empty($this->data)) {
 
@@ -711,13 +711,13 @@ class rule {
 
         $localcm = $mod->localcm;
 
-        $params = array(
+        $params = [
             'trigger' => $parent,
             'localcmid' => $localcm->cm->id,
             'requestid' => $localcm->cm->request,
             'userid' => $localcm->cm->userid,
             'state' => history::STATE_DEFAULT
-        );
+        ];
 
         $record = $DB->get_record('local_extension_history_trig', $params);
 
@@ -866,13 +866,13 @@ class rule {
      * @param int $id
      */
     public function trigger_create_event($id) {
-        $eventdata = array(
+        $eventdata = [
             'context' => \context_system::instance(),
             'objectid' => $id,
-            'other' => array(
+            'other' => [
                 'datatype' => $this->datatype,
-            ),
-        );
+            ],
+        ];
 
         event\trigger_create::create($eventdata)->trigger();
 
@@ -882,13 +882,13 @@ class rule {
      * Fire off the trigger disable event.
      */
     public function trigger_disable_event() {
-        $eventdata = array(
+        $eventdata = [
             'context' => \context_system::instance(),
             'objectid' => $this->id,
-            'other' => array(
+            'other' => [
                 'datatype' => $this->datatype,
-            ),
-        );
+            ],
+        ];
 
         event\trigger_disable::create($eventdata)->trigger();
 
@@ -898,13 +898,13 @@ class rule {
      * Fire off the triger update event.
      */
     public function trigger_update_event() {
-        $eventdata = array(
+        $eventdata = [
             'context' => \context_system::instance(),
             'objectid' => $this->id,
-            'other' => array(
+            'other' => [
                 'datatype' => $this->datatype,
-            ),
-        );
+            ],
+        ];
 
         event\trigger_update::create($eventdata)->trigger();
 
