@@ -108,8 +108,6 @@ $table->is_downloading($download, 'AES_export', 'AES_export');
 if (!$table->is_downloading()) {
     echo $OUTPUT->header();
 
-    echo html_writer::tag('h2', get_string('page_h2_summary', 'local_extension'));
-
     // New filter functionality, searching and listing of requests.
     echo $renderer->render_index_search_controls($context, $categoryid, $courseid, $stateid, $baseurl, $search, $faculty);
 
