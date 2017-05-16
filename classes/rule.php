@@ -445,7 +445,7 @@ class rule {
             $sub->localcmid = $localcm->cm->id;
             $sub->requestid = $localcm->requestid;
             $sub->lastmod = time();
-            $sub->trigger = $this->id;
+            $sub->trig = $this->id;
             $sub->access = $this->action;
 
             if (empty($sub->id)) {
@@ -484,7 +484,7 @@ class rule {
                 $params = [
                     'userid' => $user->id,
                     'localcmid' => $localcm->cm->id,
-                    'trigger' => $rule->id,
+                    'trig' => $rule->id,
                 ];
 
                 $sub = $DB->get_record('local_extension_subscription', $params);
@@ -521,14 +521,14 @@ class rule {
         $localcm = $mod->localcm;
 
         $params = [
-            'trigger' => $this->id,
+            'trig' => $this->id,
             'localcmid' => $localcm->cm->id,
             'requestid' => $localcm->cm->request,
             'userid' => $localcm->cm->userid,
             'state' => history::STATE_DEFAULT,
         ];
 
-        $record = $DB->get_record('local_extension_history_trig', $params);
+        $record = $DB->get_record('local_extension_hist_trig', $params);
 
         // A record has been found. Return false to stop processing the trigger.
         if (!empty($record)) {
@@ -539,7 +539,7 @@ class rule {
     }
 
     /**
-     * The final stage when processing a rule. This will record an entry in the local_extension_history_trig table
+     * The final stage when processing a rule. This will record an entry in the local_extension_hist_trig table
      * so that when processing the rule during a cron task will return false and not trigger anything.
      *
      * @param mod_data $mod
@@ -550,7 +550,7 @@ class rule {
         $localcm = $mod->localcm;
 
         $history = [
-            'trigger' => $this->id,
+            'trig' => $this->id,
             'timestamp' => time(),
             'localcmid' => $localcm->cm->id,
             'requestid' => $localcm->cm->request,
@@ -558,7 +558,7 @@ class rule {
             'state' => history::STATE_DEFAULT
         ];
 
-        $DB->insert_record('local_extension_history_trig', (object)$history);
+        $DB->insert_record('local_extension_hist_trig', (object)$history);
     }
 
     /**
@@ -704,14 +704,14 @@ class rule {
         $localcm = $mod->localcm;
 
         $params = [
-            'trigger' => $parent,
+            'trig' => $parent,
             'localcmid' => $localcm->cm->id,
             'requestid' => $localcm->cm->request,
             'userid' => $localcm->cm->userid,
             'state' => history::STATE_DEFAULT
         ];
 
-        $record = $DB->get_record('local_extension_history_trig', $params);
+        $record = $DB->get_record('local_extension_hist_trig', $params);
 
         // A record has been found. Return true, the parent has previously been activated!
         if (!empty($record)) {

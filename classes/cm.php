@@ -147,7 +147,7 @@ class cm {
     }
 
     /**
-     * Writes an state change entry to local_extension_his_state. Returns the history object.
+     * Writes an state change entry to local_extension_hist_state. Returns the history object.
      *
      * @param \stdClass $mod
      * @param int $state
@@ -166,7 +166,7 @@ class cm {
         $history->state = $state;
         $history->userid = $userid;
 
-        $DB->insert_record('local_extension_his_state', $history);
+        $DB->insert_record('local_extension_hist_state', $history);
 
         return $history;
     }

@@ -287,7 +287,7 @@ class request implements \cache_data_source {
                        timestamp,
                        state,
                        userid
-                  FROM {local_extension_his_state}
+                  FROM {local_extension_hist_state}
                  WHERE requestid = :requestid";
 
         $records = $DB->get_records_sql($sql, array('requestid' => $this->requestid));
@@ -336,7 +336,7 @@ class request implements \cache_data_source {
                        timestamp,
                        filehash,
                        userid
-                  FROM {local_extension_history_file}
+                  FROM {local_extension_hist_file}
                  WHERE requestid = :requestid";
 
         $records = $DB->get_records_sql($sql, array('requestid' => $this->requestid));
@@ -546,7 +546,7 @@ class request implements \cache_data_source {
         $data->filehash = $file->get_pathnamehash();
         $data->userid = $file->get_userid();
 
-        $DB->insert_record('local_extension_history_file', $data);
+        $DB->insert_record('local_extension_hist_file', $data);
 
         $fileurl = \moodle_url::make_pluginfile_url(
             $file->get_contextid(),

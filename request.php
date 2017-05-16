@@ -185,7 +185,7 @@ if ($mform->is_cancelled()) {
         $sub->localcmid = $cm['id'];
         $sub->requestid = $request['id'];
         $sub->lastmod = time();
-        $sub->trigger = null;
+        $sub->trig = null;
         $sub->access = rule::RULE_ACTION_DEFAULT;
 
         $DB->insert_record('local_extension_subscription', $sub);
@@ -211,7 +211,7 @@ if ($mform->is_cancelled()) {
             'userid' => $file->get_userid(),
         );
 
-        $DB->insert_record('local_extension_history_file', $data);
+        $DB->insert_record('local_extension_hist_file', $data);
     }
 
     // Initiate the trigger/rule logic notifications and subscriptions, file attachment history.
