@@ -29,6 +29,8 @@ if (!defined('MOODLE_INTERNAL')) {
     die('Direct access to this script is forbidden.'); // It must be included from a Moodle page.
 }
 
+require_once($CFG->libdir.'/tablelib.php');
+
 use html_writer;
 use local_extension\state;
 use local_extension\utility;
