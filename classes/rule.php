@@ -25,6 +25,8 @@
 
 namespace local_extension;
 
+use stdClass;
+
 defined('MOODLE_INTERNAL') || die();
 
 /**
@@ -91,7 +93,7 @@ class rule {
     /** @var int $elapsedtype Time elapsed from request date type (LT/GE) */
     public $elapsedtype = null;
 
-    /** @var \stdClass $data Custom data assocaited with this object, serialised base64 */
+    /** @var stdClass $data Custom data assocaited with this object, serialised base64 */
     public $data = null;
 
     /** @var array $rolenames Role names lookup */
@@ -119,7 +121,7 @@ class rule {
     /**
      * Parses submitted form data and sets the properties of this class to match.
      *
-     * @param \stdClass $form
+     * @param stdClass $form
      */
     public function load_from_form($form) {
 
@@ -237,7 +239,7 @@ class rule {
     /**
      * Obtain a rule object with after applying the moodle data object values.
      *
-     * @param \stdClass $object
+     * @param stdClass $object
      * @return \local_extension\rule
      */
     public static function from_db($object) {
@@ -343,7 +345,7 @@ class rule {
      *
      * @param request $request
      * @param mod_data $mod
-     * @param \stdClass $templates
+     * @param stdClass $templates
      */
     public function send_notifications($request, $mod, $templates) {
         // Sets the request users fullname to the email from name, only for roles that get triggered.
@@ -354,7 +356,7 @@ class rule {
         $userto = $requestuser;
 
         // The email subject, for the moment a language string.
-        $data = new \stdClass();
+        $data = new stdClass();
         $data->requestid = $request->requestid;
         $data->fullname = fullname($requestuser, true);
         $subject = get_string('email_notification_subject', 'local_extension', $data);
@@ -383,7 +385,7 @@ class rule {
     /**
      * Returns the list of users with the input role for the scope of this category, course, cm.
      *
-     * @param \stdClass $course
+     * @param stdClass $course
      * @param int $role
      * @return array $users
      */
@@ -432,7 +434,7 @@ class rule {
             $sub = $DB->get_record('local_extension_subscription', $params);
 
             if (empty($sub)) {
-                $sub = new \stdClass();
+                $sub = new stdClass();
                 $sub->access = self::RULE_ACTION_DEFAULT;
             }
 
@@ -566,7 +568,7 @@ class rule {
      *
      * @param request $request
      * @param mod_data $mod
-     * @param \stdClass $contentchange An object with a single comment/statechange/attachment.
+     * @param stdClass $contentchange An object with a single comment/statechange/attachment.
      * @return array
      */
     public function process_templates($request, $mod, $contentchange = null) {
@@ -798,8 +800,8 @@ class rule {
      * @param request $request
      * @param string $subject
      * @param string $content
-     * @param \stdClass $course
-     * @param \stdClass $userfrom
+     * @param stdClass $course
+     * @param stdClass $userfrom
      */
     private function notify_roles(request $request, $subject, $content, $course, $userfrom) {
         $role = $this->role;
@@ -817,8 +819,8 @@ class rule {
      * @param request $request
      * @param string $subject
      * @param string $content
-     * @param \stdClass $userfrom
-     * @param \stdClass $userto
+     * @param stdClass $userfrom
+     * @param stdClass $userto
      */
     private function notify_user(request $request, $subject, $content, $userfrom, $userto) {
         utility::send_trigger_email($request, $subject, $content, $userfrom, $userto);

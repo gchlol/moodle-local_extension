@@ -25,9 +25,14 @@
 
 namespace extension_quiz;
 
+use html_writer;
+use local_extension\mod_data;
 use local_extension\rule;
 use local_extension\state;
 use local_extension\utility;
+use moodleform;
+use MoodleQuickForm;
+use stdClass;
 
 defined('MOODLE_INTERNAL') || die();
 
@@ -111,28 +116,28 @@ class request extends \local_extension\base_request {
     /**
      * Define parts of the request for for an event object
      *
-     * @param array $mod An array of event details
-     * @param \moodleform $mform A moodle form object
+     * @param mod_data $mod Local mod_data object with event details
+     * @param moodleform $mform A moodle form object
      * @return string
      */
     public function request_definition($mod, $mform = null) {
         $event = $mod->event;
         $course = $mod->course;
 
-        $html = \html_writer::start_div('content');
-        $coursestring = \html_writer::tag('b', $course->fullname . ' > ' . $event->name, array('class' => 'mod'));
+        $html = html_writer::start_div('content');
+        $coursestring = html_writer::tag('b', $course->fullname . ' > ' . $event->name, array('class' => 'mod'));
         $str = get_string('dueon', 'extension_assign', userdate($event->timeclose));
-        $html .= \html_writer::tag('p', $coursestring . ' ' . $str);
+        $html .= html_writer::tag('p', $coursestring . ' ' . $str);
 
         // Setup the mform due element id.
         if (!empty($mform)) {
-            $html .= \html_writer::end_div(); // End .content.
-            $mform->addElement('html', \html_writer::tag('p', $html));
+            $html .= html_writer::end_div(); // End .content.
+            $mform->addElement('html', html_writer::tag('p', $html));
 
             $this->date_selector($mod, $mform);
         }
 
-        $html .= \html_writer::end_div(); // End .content.
+        $html .= html_writer::end_div(); // End .content.
 
         return $html;
     }
@@ -140,8 +145,8 @@ class request extends \local_extension\base_request {
     /**
      * Define parts of the request for for an event object
      *
-     * @param array $mod An array of event details
-     * @param \moodleform $mform A moodle form object
+     * @param mod_data $mod Local mod_data object with event details
+     * @param moodleform $mform A moodle form object
      * @return string
      */
     public function status_definition($mod, $mform = null) {
@@ -154,26 +159,26 @@ class request extends \local_extension\base_request {
         $requestid = $localcm->requestid;
         $cmid = $localcm->cmid;
 
-        $html = \html_writer::start_div('content');
+        $html = html_writer::start_div('content');
 
         $courseurl = new \moodle_url('/course/view.php', array('id' => $course->id));
-        $courselink = \html_writer::link($courseurl, $course->fullname);
+        $courselink = html_writer::link($courseurl, $course->fullname);
 
         $eventurl = new \moodle_url('/mod/' . $event->modulename . '/view.php', array('id' => $cmid));
-        $eventlink = \html_writer::link($eventurl, $event->name);
+        $eventlink = html_writer::link($eventurl, $event->name);
 
-        $coursestring = \html_writer::tag('b', $courselink. ' > ' . $eventlink, array('class' => 'mod'));
+        $coursestring = html_writer::tag('b', $courselink. ' > ' . $eventlink, array('class' => 'mod'));
         $str = get_string('dueon', 'extension_assign', userdate($event->timeclose));
-        $html .= \html_writer::tag('p', $coursestring . ' ' . $str);
+        $html .= html_writer::tag('p', $coursestring . ' ' . $str);
 
         $status = state::instance()->get_state_name($localcm->cm->state);
 
-        $obj = new \stdClass();
+        $obj = new stdClass();
         $obj->status = $status;
         $obj->date = userdate($localcm->cm->data);
         $obj->length = utility::calculate_length($localcm->cm->length);
 
-        $status  = \html_writer::start_tag('p', array('class' => 'time'));
+        $status  = html_writer::start_tag('p', array('class' => 'time'));
         $status .= get_string('status_status_line', 'local_extension', $obj);
 
         // If the users access is either approve or force, then they can modify the request length.
@@ -189,13 +194,13 @@ class request extends \local_extension\base_request {
             );
 
             $modifyurl = new \moodle_url('/local/extension/modify.php', $params);
-            $modlink = \html_writer::link($modifyurl, get_string('modifyextensionlength', 'local_extension'));
+            $modlink = html_writer::link($modifyurl, get_string('modifyextensionlength', 'local_extension'));
             $status .= ' ' . $modlink;
         }
 
-        $status .= \html_writer::end_tag('p');
+        $status .= html_writer::end_tag('p');
         $html .= $status;
-        $html .= \html_writer::end_div(); // End .content.
+        $html .= html_writer::end_div(); // End .content.
 
         if (!empty($mform)) {
             $mform->addElement('html', $html);
@@ -207,8 +212,8 @@ class request extends \local_extension\base_request {
     /**
      * Renders the request status in a form with indicators of the request state.
      *
-     * @param array $mod An array of event details
-     * @param \MoodleQuickForm $mform A moodle form object
+     * @param mod_data $mod Local mod_data object with event details
+     * @param MoodleQuickForm $mform A moodle form object
      * @param array $customdata
      * @return string
      */
@@ -220,13 +225,13 @@ class request extends \local_extension\base_request {
 
         $user = $customdata['user'];
 
-        $html = \html_writer::start_div('content');
-        $coursestring = \html_writer::tag('b', $course->fullname . ' > ' . $event->name, array('class' => 'mod'));
-        $html .= \html_writer::tag('p', $coursestring);
-        $html .= \html_writer::end_div(); // End .content.
+        $html = html_writer::start_div('content');
+        $coursestring = html_writer::tag('b', $course->fullname . ' > ' . $event->name, array('class' => 'mod'));
+        $html .= html_writer::tag('p', $coursestring);
+        $html .= html_writer::end_div(); // End .content.
 
-        $mform->addElement('html', \html_writer::tag('p', $html));
-        $html .= \html_writer::end_div(); // End .content.
+        $mform->addElement('html', html_writer::tag('p', $html));
+        $html .= html_writer::end_div(); // End .content.
 
         $mform->addElement('static', 'cutoffdate', 'Requested by', fullname($user));
 
@@ -243,8 +248,8 @@ class request extends \local_extension\base_request {
     /**
      * Renders the modify extension details in a form with a date selector.
      *
-     * @param array $mod An array of event details
-     * @param \MoodleQuickForm $mform A moodle form object
+     * @param mod_data $mod Local mod_data object with event details
+     * @param MoodleQuickForm $mform A moodle form object
      * @param array $customdata mform customdata
      * @return string
      */
@@ -254,20 +259,19 @@ class request extends \local_extension\base_request {
         $event = $mod->event;
         $course = $mod->course;
         $cm = $mod->cm;
-
-        /* @var \local_extension\cm $lcm IDE hinting. */
         $lcm = $mod->localcm;
+
         $instance = $customdata['instance'];
 
         $quiz = $DB->get_record('quiz', ['id' => $cm->instance], 'timeclose');
 
-        $html = \html_writer::start_div('content');
-        $coursestring = \html_writer::tag('b', $course->fullname . ' > ' . $event->name, array('class' => 'mod'));
-        $html .= \html_writer::tag('p', $coursestring);
-        $html .= \html_writer::end_div(); // End .content.
+        $html = html_writer::start_div('content');
+        $coursestring = html_writer::tag('b', $course->fullname . ' > ' . $event->name, array('class' => 'mod'));
+        $html .= html_writer::tag('p', $coursestring);
+        $html .= html_writer::end_div(); // End .content.
 
-        $mform->addElement('html', \html_writer::tag('p', $html));
-        $html .= \html_writer::end_div(); // End .content.
+        $mform->addElement('html', html_writer::tag('p', $html));
+        $html .= html_writer::end_div(); // End .content.
 
         if ($quiz->timeclose) {
             $mform->addElement('static', 'duedate', get_string('duedate', 'assign'), userdate($quiz->timeclose));
@@ -286,8 +290,8 @@ class request extends \local_extension\base_request {
     /**
      * Validate the parts of the request form for this module
      *
-     * @param \moodleform $mform A moodle form object
-     * @param array $mod An array of event details
+     * @param moodleform $mform A moodle form object
+     * @param mod_data $mod Local mod_data object with event details
      * @param array $data An array of form data
      * @return array of error messages
      */
@@ -298,7 +302,7 @@ class request extends \local_extension\base_request {
         $cm = $mod->cm;
         $formid = 'due' . $cm->id;
 
-        $due = $event->timestart;
+        $due = $event->timeclose;
 
         if (!array_key_exists($formid, $data)) {
             // Data not set.
@@ -323,8 +327,8 @@ class request extends \local_extension\base_request {
     /**
      * Return data to be stored for the request
      *
-     * @param \moodleform $mform A moodle form object
-     * @param array $mod An array of event details
+     * @param moodleform $mform A moodle form object
+     * @param mod_data $mod An array of event details
      * @param array $data An array of form data
      * @return string|bool The data to be stored
      */
@@ -351,7 +355,7 @@ class request extends \local_extension\base_request {
 
         $quiz = $DB->get_record('quiz', array('id' => $quizid));
 
-        $obj = new \stdClass();
+        $obj = new stdClass();
         $obj->quiz = $quizid;
         $obj->userid = $userid;
         $obj->timeclose = $timeclose;
@@ -419,14 +423,12 @@ class request extends \local_extension\base_request {
      *
      * This uses an extra parameter too the $event object, timeclose.
      *
-     * @param array $mod
-     * @param \MoodleQuickForm $mform
+     * @param mod_data $mod
+     * @param MoodleQuickForm $mform
      * @param bool $optional
      */
     public function date_selector($mod, $mform, $optional = true) {
         $event = $mod->event;
-
-        /* @var $lcm \local_extension\cm IDE hinting */
         $lcm = $mod->localcm;
 
         $defaultdate = $event->timeclose;

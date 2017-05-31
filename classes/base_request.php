@@ -25,6 +25,8 @@
 
 namespace local_extension;
 
+use MoodleQuickForm;
+
 defined('MOODLE_INTERNAL') || die();
 
 /**
@@ -62,24 +64,24 @@ abstract class base_request {
     /**
      * Define parts of the request for for an event object
      *
-     * @param array $mod An array of event detail
-     * @param \MoodleQuickForm $mform A moodle form object
+     * @param mod_data $mod Local mod_data object with event details
+     * @param MoodleQuickForm $mform A moodle form object
      */
     abstract public function request_definition($mod, $mform);
 
     /**
      * Define parts of the request for for an event object
      *
-     * @param array $mod An array of event details
-     * @param \MoodleQuickForm $mform A moodle form object
+     * @param mod_data $mod Local mod_data object with event details
+     * @param MoodleQuickForm $mform A moodle form object
      */
     abstract public function status_definition($mod, $mform);
 
     /**
      * Return data to be stored for the request
      *
-     * @param \MoodleQuickForm $mform A moodle form object
-     * @param array $mod An array of event details
+     * @param MoodleQuickForm $mform A moodle form object
+     * @param mod_data $mod Local mod_data object with event details
      * @param array $data An array of form data
      * @return string The data to be stored
      */
@@ -116,15 +118,15 @@ abstract class base_request {
     /**
      * Obtains an instance of the mod.
      *
-     * @param array $mod
+     * @param mod_data $mod Local mod_data object with event details
      */
     abstract public function get_instance($mod);
 
     /**
      * Adds a date selector to the mform that it has been passed.
      *
-     * @param array $mod
-     * @param \MoodleQuickForm $mform
+     * @param mod_data $mod Local mod_data object with event details
+     * @param MoodleQuickForm $mform
      * @param bool $optional
      */
     abstract public function date_selector($mod, $mform, $optional = true);

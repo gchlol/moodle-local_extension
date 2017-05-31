@@ -25,6 +25,11 @@
 
 namespace local_extension;
 
+use core_user;
+use moodle_url;
+use stdClass;
+use stored_file;
+
 defined('MOODLE_INTERNAL') || die();
 
 /**
@@ -40,7 +45,7 @@ class request implements \cache_data_source {
     /** @var integer The local_extension_request id */
     public $requestid = null;
 
-    /** @var \stdClass The local_extension_request database object */
+    /** @var stdClass The local_extension_request database object */
     public $request = array();
 
     /** @var cm[] cm */
@@ -169,14 +174,14 @@ class request implements \cache_data_source {
     /**
      * Adds a comment to the request
      *
-     * @param \stdClass $from The user that has commented.
+     * @param stdClass $from The user that has commented.
      * @param string $msg The comment itself.
      * @return object|string
      */
     public function add_comment($from, $msg) {
         global $DB;
 
-        $comment = new \stdClass();
+        $comment = new stdClass();
         $comment->request = $this->requestid;
         $comment->userid = $from->id;
         $comment->timestamp = time();
@@ -208,7 +213,7 @@ class request implements \cache_data_source {
 
         $this->request->messageid++;
 
-        $record = new \stdClass();
+        $record = new stdClass();
         $record->id = $this->requestid;
         $record->messageid = $this->request->messageid;
 
@@ -302,7 +307,7 @@ class request implements \cache_data_source {
 
             $status = state::instance()->get_state_name($record->state);
 
-            $log = new \stdClass();
+            $log = new stdClass();
             $log->status = $status;
             $log->course = $course->fullname;
             $log->event = $event->name;
@@ -348,7 +353,7 @@ class request implements \cache_data_source {
                 continue;
             }
 
-            $fileurl = \moodle_url::make_pluginfile_url(
+            $fileurl = moodle_url::make_pluginfile_url(
                 $file->get_contextid(),
                 $file->get_component(),
                 $file->get_filearea(),
@@ -424,7 +429,7 @@ class request implements \cache_data_source {
         // 2. Join the template subjects and content together in one message.
         foreach ($templatedata as $ruleid => $templatecms) {
             // If there are multiple cms in a request we need to concatenate them into the one message.
-            $templates = new \stdClass();
+            $templates = new stdClass();
 
             foreach ($templatecms as $template) {
                 $types = array(
@@ -471,7 +476,7 @@ class request implements \cache_data_source {
     /**
      * Processes the rule and request recursively.
      *
-     * @param array $mod
+     * @param mod_data $mod
      * @param \local_extension\rule $rule
      * @param array $data
      * @return array
@@ -488,7 +493,7 @@ class request implements \cache_data_source {
 
         // If true, then we will create a notification data entry that will be returned.
         if ($notify === true) {
-            $item = new \stdClass();
+            $item = new stdClass();
 
             $item->rule = $rule;
             $item->role = $rule->role;
@@ -530,17 +535,17 @@ class request implements \cache_data_source {
     /**
      * Adds a stored_file hash to the history for this request.
      *
-     * @param \stored_file $file
+     * @param stored_file $file
      * @return null|object
      */
-    public function add_attachment_history(\stored_file $file) {
+    public function add_attachment_history(stored_file $file) {
         global $DB;
 
         if ($file->is_directory()) {
             return null;
         }
 
-        $data = new \stdClass();
+        $data = new stdClass();
         $data->requestid = $this->requestid;
         $data->timestamp = time();
         $data->filehash = $file->get_pathnamehash();
@@ -548,7 +553,7 @@ class request implements \cache_data_source {
 
         $DB->insert_record('local_extension_hist_file', $data);
 
-        $fileurl = \moodle_url::make_pluginfile_url(
+        $fileurl = moodle_url::make_pluginfile_url(
             $file->get_contextid(),
             $file->get_component(),
             $file->get_filearea(),
@@ -591,7 +596,7 @@ class request implements \cache_data_source {
                 continue;
             }
 
-            $userto = \core_user::get_user($userid);
+            $userto = core_user::get_user($userid);
 
             $comments = '';
 
@@ -607,7 +612,7 @@ class request implements \cache_data_source {
 
                     $this->sort_history($items);
 
-                    $comment = new \stdClass();
+                    $comment = new stdClass();
                     $message = '';
                     // Second inner loop for collating the message content into one status item.
                     foreach ($items as $item) {
@@ -621,18 +626,18 @@ class request implements \cache_data_source {
                 }
             }
 
-            $requestuser = \core_user::get_user($this->request->userid);
+            $requestuser = core_user::get_user($this->request->userid);
             $fullname = \fullname($requestuser, true);
 
-            $data = new \stdClass();
+            $data = new stdClass();
             $data->requestid = $this->requestid;
             $data->fullname = $fullname;
 
             $subject = get_string('email_notification_subject', 'local_extension', $data);
 
-            $statusurl = new \moodle_url("/local/extension/status.php", array('id' => $this->requestid));
+            $statusurl = new moodle_url("/local/extension/status.php", array('id' => $this->requestid));
 
-            $obj = new \stdClass();
+            $obj = new stdClass();
             $obj->content = $comments;
             $obj->id = $this->requestid;
             $obj->fullname = $fullname;
@@ -641,7 +646,7 @@ class request implements \cache_data_source {
             $content = get_string('notification_footer', 'local_extension', $obj);
 
             // Setup the noreply user name.
-            $noreplyuser = \core_user::get_noreply_user();
+            $noreplyuser = core_user::get_noreply_user();
             $supportusername = get_config('local_extension', 'supportusername');
             if (!empty($supportusername)) {
                 // If the plugin has the support username configured, use that name.
@@ -649,7 +654,7 @@ class request implements \cache_data_source {
             } else {
                 // The update is sent from who modified the history.
                 // There will always be at least one history item.
-                $userfrom = \core_user::get_user($history[0]->userid);
+                $userfrom = core_user::get_user($history[0]->userid);
                 $noreplyuser->firstname = \fullname($userfrom, true);
             }
 
@@ -671,7 +676,7 @@ class request implements \cache_data_source {
     public function update_lastmod($userid) {
         global $DB;
 
-        $record = new \stdClass();
+        $record = new stdClass();
         $record->id = $this->requestid;
         $record->lastmod = time();
         $record->lastmodid = $userid;

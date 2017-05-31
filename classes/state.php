@@ -27,6 +27,8 @@ namespace local_extension;
 
 use coding_exception;
 use html_writer;
+use moodle_url;
+use stdClass;
 
 defined('MOODLE_INTERNAL') || die();
 
@@ -175,15 +177,15 @@ class state {
         switch ($stateid) {
             case self::STATE_NEW:
             case self::STATE_REOPENED:
-                return \get_string('state_result_pending',   'local_extension');
+                return get_string('state_result_pending',   'local_extension');
             case self::STATE_DENIED:
-                return \get_string('state_result_denied',    'local_extension');
+                return get_string('state_result_denied',    'local_extension');
             case self::STATE_APPROVED:
-                return \get_string('state_result_approved',  'local_extension');
+                return get_string('state_result_approved',  'local_extension');
             case self::STATE_CANCEL:
-                return \get_string('state_result_cancelled', 'local_extension');
+                return get_string('state_result_cancelled', 'local_extension');
             default:
-                throw new \coding_exception('Unknown cm state.');
+                throw new coding_exception('Unknown cm state.');
         }
     }
 
@@ -335,7 +337,7 @@ class state {
     /**
      * If the $data object contains a state change reference, redirect the page to an intermediate acknowledgement.
      *
-     * @param \stdClass $data
+     * @param stdClass $data
      * @param request $request
      */
     public function has_submitted_state($data, $request) {
@@ -356,7 +358,7 @@ class state {
                         's' => $state,
                     );
 
-                    redirect(new \moodle_url('/local/extension/state.php', $params));
+                    redirect(new moodle_url('/local/extension/state.php', $params));
                 }
             }
         }
@@ -367,16 +369,15 @@ class state {
      *
      * @param \local_extension\request $request
      * @param int $user
-     * @param \stdClass $data
+     * @param stdClass $data
      * @return object|bool
      */
     public function update_cm_state($request, $user, $data) {
 
         $mod = $request->mods[$data->cmid];
-        /* @var \local_extension\base_request $handler IDE hinting */
+
         $handler = $mod->handler;
 
-        /* @var \local_extension\cm $localcm IDE hinting */
         $localcm = $mod->localcm;
         $event   = $mod->event;
         $course  = $mod->course;
@@ -406,7 +407,7 @@ class state {
         // After writing the history it will return the ID of the new row.
         $history = $localcm->write_history($mod, $state, $user->id);
 
-        $log = new \stdClass();
+        $log = new stdClass();
         $log->status = $status;
         $log->course = $course->fullname;
         $log->event = $event->name;
@@ -425,7 +426,7 @@ class state {
      *
      * @param \local_extension\request $request
      * @param int $user The user that has called this operation.
-     * @param \stdClass $data
+     * @param stdClass $data
      * @return object|bool
      */
     public function extend_cm_length($request, $user, $data) {
@@ -446,7 +447,7 @@ class state {
         // After writing the history it will return the ID of the new row.
         $history = $localcm->write_history($mod, $state, $user->id);
 
-        $log = new \stdClass();
+        $log = new stdClass();
         $log->status = $status;
         $log->course = $course->fullname;
         $log->event = $event->name;
