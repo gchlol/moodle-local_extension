@@ -158,7 +158,11 @@ class utility {
             $data->course = $courses[$courseid];
             $data->handler = $handler;
 
-            $events[$cm->id] = $data;
+            // Do not replace a $cmid with an event override (eg. user quiz override).
+            if (!array_key_exists($cm->id, $events)) {
+                $events[$cm->id] = $data;
+            }
+
         }
 
         return $events;

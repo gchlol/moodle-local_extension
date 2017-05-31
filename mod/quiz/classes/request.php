@@ -87,6 +87,14 @@ class request extends \local_extension\base_request {
         $quiz = $DB->get_record('quiz', ['id' => $cm->instance], '*');
         $event->timeclose = $quiz->timeclose;
 
+        /*
+         * It is possible that when obtaining the list of events, if an extension has been granted it will return
+         * the override instead. The events timestart will be of the overrides, not the quiz timeclose.
+         *
+         * We replace this so the starting time of the close of the event is now the closing time of the quiz.
+         */
+        $event->timestart = $quiz->timeclose;
+
         if ($event->eventtype == "close") {
             return true;
         }
