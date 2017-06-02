@@ -25,6 +25,8 @@
 
 namespace local_extension;
 
+use stdClass;
+
 defined('MOODLE_INTERNAL') || die();
 
 require_once($CFG->libdir . '/tablelib.php');
@@ -43,7 +45,7 @@ class utility {
     /**
      * Returns a list of candidate dates for activities
      *
-     * @param int|\stdClass $userid Userid or user object
+     * @param int|stdClass $userid Userid or user object
      * @param int $start  Start of search period
      * @param int $end End of search period
      * @param array $options Optional arguments.
@@ -174,8 +176,8 @@ class utility {
      * @param \local_extension\request $request
      * @param string $subject
      * @param string $content
-     * @param \stdClass $userfrom
-     * @param \stdClass $userto
+     * @param stdClass $userfrom
+     * @param stdClass $userto
      */
     public static function send_trigger_email(\local_extension\request $request, $subject, $content, $userfrom, $userto) {
         global $CFG;
@@ -221,7 +223,7 @@ class utility {
             $message->userto = \core_user::get_user($userto->id);
         } else {
             // Moodle 2.7, 2.8.
-            $message = new \stdClass();
+            $message = new stdClass();
             $message->userto = $userto->id;
         }
 
@@ -585,7 +587,7 @@ class utility {
      */
     public static function calculate_length($seconds) {
         // Partial extract of $str from format_time().
-        $str = new \stdClass();
+        $str = new stdClass();
         $str->day   = get_string('day');
         $str->days  = get_string('days');
         $str->hour  = get_string('hour');

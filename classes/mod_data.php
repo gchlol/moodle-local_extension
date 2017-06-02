@@ -25,6 +25,10 @@
 
 namespace local_extension;
 
+use calendar_event;
+use course_modinfo;
+use stdClass;
+
 defined('MOODLE_INTERNAL') || die();
 
 /**
@@ -37,16 +41,16 @@ defined('MOODLE_INTERNAL') || die();
  */
 class mod_data {
 
-    /** @var \calendar_event */
+    /** @var calendar_event */
     public $event;
 
-    /** @var \course_modinfo */
+    /** @var course_modinfo */
     public $cm;
 
-    /** @var cm The local_extension_cm class */
+    /** @var cm_data The local_extension_cm class */
     public $localcm;
 
-    /** @var \stdClass The course database object */
+    /** @var stdClass The course database object */
     public $course;
 
     /** @var \local_extension\base_request */
