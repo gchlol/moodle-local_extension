@@ -290,6 +290,12 @@ class rule {
     public function process(&$request, $mod) {
         // Checks if the trigger for this cm has been activated.
         if ($this->check_history($mod) === false) {
+
+            // There are times when the request length has been modified, but triggers have already been fired.
+            // We will need to possibly reset the subscription data for this rule.
+            if ($this->check_request_length($mod) === true) {
+                $this->setup_subscription($request, $mod);
+            }
             return false;
         }
 
@@ -328,13 +334,13 @@ class rule {
             'localcmid' => $mod->localcm->cm->id,
         ];
 
-        $select = "userid = :userid AND localcmid = :localcmid";
+        $select = "userid = :userid AND localcmid = :localcmid ORDER BY id ASC";
+
         $fields = $DB->get_fieldset_select('local_extension_subscription', 'access', $select, $params);
 
-        rsort($fields);
-
+        // Return the last possible status for this user.
         if (!empty($fields)) {
-            return $fields[0];
+            return array_pop($fields);
         }
 
         return self::RULE_ACTION_DEFAULT;
@@ -426,16 +432,18 @@ class rule {
 
         // Iterate over all users in the cm's course that have the roleid $role.
         foreach ($users as $user) {
-            $params = array(
+            $params = [
                 'userid' => $user->id,
-                'localcmid' => $localcm->cmid,
-            );
+                'localcmid' => $localcm->cm->id,
+            ];
 
-            $sub = $DB->get_record('local_extension_subscription', $params);
+            $records = $DB->get_records('local_extension_subscription', $params, 'id asc', '*');
 
-            if (empty($sub)) {
+            if (empty($records)) {
                 $sub = new stdClass();
                 $sub->access = self::RULE_ACTION_DEFAULT;
+            } else {
+                $sub = array_pop($records);
             }
 
             // If the action is the same we are to assume that they have been setup already.

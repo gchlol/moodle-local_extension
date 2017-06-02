@@ -696,26 +696,22 @@ class request implements \cache_data_source {
     public function get_user_access($userid, $localcmid) {
         global $DB;
 
-        $params = array(
+        $params = [
             'userid' => $userid,
             'requestid' => $this->requestid,
             'localcmid' => $localcmid,
-        );
+        ];
 
-        $select = 'requestid = :requestid AND userid = :userid AND localcmid = :localcmid';
+        $select = 'requestid = :requestid AND userid = :userid AND localcmid = :localcmid ORDER BY id ASC';
 
-        // Using fieldset as sometimes there is more than one result if triggers have been setup differently.
         $fieldset = $DB->get_fieldset_select('local_extension_subscription', 'access', $select, $params);
 
-        $access = rule::RULE_ACTION_DEFAULT;
-
-        foreach ($fieldset as $item) {
-            if ($item > $access) {
-                $access = $item;
-            }
+        // Return the last possible value in the DB for this particualar user.
+        if (!empty($fieldset)) {
+            return array_pop($fieldset);
         }
 
-        return $access;
+        return rule::RULE_ACTION_DEFAULT;
     }
 
     /**
