@@ -15,7 +15,7 @@
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
 /**
- * Requests page in local_extension. Prorviding a filter and search for requests.
+ * Requests page in local_extension. Providing a filter and search for requests.
  *
  * @package    local_extension
  * @author     Nicholas Hoobin <nicholashoobin@catalyst-au.net>
@@ -63,9 +63,12 @@ if (has_capability('local/extension:viewallrequests', $context)) {
     $viewallrequests = true;
 }
 
-// The user cannot view all requests and select the caregories.
 if (!$viewallrequests) {
+    // The user cannot view all requests or select the categories.
     $categoryid = 0;
+
+    // Prevent standard user from downloading.
+    $download = false;
 }
 
 $systemcontext = context_system::instance();
