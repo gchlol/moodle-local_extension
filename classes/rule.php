@@ -367,26 +367,22 @@ class rule {
         $data->fullname = fullname($requestuser, true);
         $subject = get_string('email_notification_subject', 'local_extension', $data);
 
+        // Setup the noreply user name.
+        $supportusername = get_config('local_extension', 'supportusername');
+        if (!empty($supportusername)) {
+            $noreplyuser->firstname = $supportusername;
+        } else {
+            $noreplyuser->firstname = get_string('supportusernamedefault', 'local_extension');
+        }
+
         // Notifying the roles.
         $rolecontent = $templates->role_content;
-
-        // The $noreplyuser has the full name of the requesting user.
-        $noreplyuser->firstname = fullname($requestuser);
-
         if (!empty($rolecontent)) {
             $this->notify_roles($request, $subject, $rolecontent, $mod->course, $noreplyuser);
         }
 
         // Notifying the user.
         $usercontent = $templates->user_content;
-        $config = get_config('local_extension');
-        if (!empty($config->supportusername)) {
-            $noreplyuser->firstname = $config->supportusername;
-        } else {
-            $noreplyuser = \core_user::get_noreply_user();
-        }
-
-        // Now notifying the user with the noreplyuser that has a name set, or just the default no reply user.
         if (!empty($usercontent)) {
             $this->notify_user($request, $subject, $usercontent, $noreplyuser, $userto);
         }
