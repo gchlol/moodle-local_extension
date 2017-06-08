@@ -23,7 +23,6 @@
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
-use local_extension\state;
 use local_extension\utility;
 
 require_once(__DIR__ . '/../../config.php');
@@ -131,31 +130,21 @@ if ($mform->is_cancelled()) {
     $cm->cm->length = $newdate - $event->timestart;
     $cm->update_data();
 
-    $currentstate = $cm->get_stateid();
+    \local_extension\state::instance()->extend_cm_length($request, $USER, $form);
 
-    $notifycontent = [];
-
-    // The the current state is new, then we keep it as new.
-    if (!state::instance()->is_open_state($currentstate)) {
-        // Set the state to 'reopened' for all other states, eg. cancelled, granted, denied.
-
-        // The update_cm_state accepts form data with the state specified as 's'.
-        $form = new stdClass();
-        $form->cmid = $cm->get_cmid();
-        $form->s = state::STATE_REOPENED;
-        $notifycontent[] = state::instance()->update_cm_state($request, $USER, $form);
-    }
-
+    $notifycontent = array();
     $notifycontent[] = $request->add_comment($USER, $datestring);
 
-    // The state has changed / dates are different. Triggers may associate new users or set other rules.
-    $request->process_triggers();
+    // The request should have been accepted. There is no requirement to process the ruleset.
+    if ($cm->get_stateid() != \local_extension\state::STATE_APPROVED) {
+        // If the date has changed, we need to run the triggers to see if we alert new subscribers.
+        $request->process_triggers();
+    }
 
     // Process the triggers before sending the notifications. New subscribers exist.
     $request->notify_subscribers($notifycontent, $USER->id);
 
     $request->get_data_cache()->delete($request->requestid);
-
     $statusurl = new moodle_url('/local/extension/status.php', array('id' => $requestid));
 
     redirect($statusurl);
