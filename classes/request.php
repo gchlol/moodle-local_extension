@@ -626,8 +626,6 @@ class request implements \cache_data_source {
                 }
             }
 
-
-
             // The update is sent from who modified the history.
             // There will always be at least one history item.
             $userfrom = core_user::get_user($history[0]->userid);
