@@ -74,8 +74,10 @@ class status extends \moodleform {
             $approve = (rule::RULE_ACTION_APPROVE | rule::RULE_ACTION_FORCEAPPROVE);
             $access = rule::get_access($mod, $USER->id);
 
+            // Displays details about the course, module, due dates.
             $handler->status_definition($mod, $mform);
 
+            // Displays a list of state changes, their status and extension length.
             $state->render_state_history($mform, $localcm);
 
             if ($forcestatus) {

@@ -69,7 +69,6 @@ class state extends \moodleform {
         $mod = $mods[$cmid];
         $handler = $mod->handler;
 
-        /* @var \local_extension\cm $lcm IDE hinting. */
         $lcm = $mod->localcm;
 
         $html = \html_writer::tag('h2', 'State change confirmation');
