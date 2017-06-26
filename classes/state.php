@@ -282,14 +282,16 @@ class state {
      * @param int $id
      */
     public function render_approve_buttons(&$mform, $state, $id) {
-        $buttonarray = array();
+        $buttonarray = [];
 
         $approvestr = get_string('state_button_approve', 'local_extension');
         $denystr = get_string('state_button_deny', 'local_extension');
+        $additionalstr = get_string('state_button_additional_request', 'local_extension');
 
         $deny = $this->statearray[self::STATE_DENIED];
         $approve = $this->statearray[self::STATE_APPROVED];
 
+        $buttonarray[] = $mform->createElement('submit', 'additionalextention' . $id, $additionalstr);
 
         switch ($state) {
             case self::STATE_NEW:
@@ -339,6 +341,10 @@ class state {
                 break;
         }
 
+        $buttonarray = [];
+        $additionalstr = get_string('state_button_additional_request', 'local_extension');
+        $buttonarray[] = $mform->createElement('submit', 'additionalextention' . $id, $additionalstr);
+
         if (!empty($buttonarray)) {
             $mform->addGroup($buttonarray, 'statusmodgroup' . $id, '', ' ', false);
         }
@@ -358,11 +364,14 @@ class state {
         $cancelstr = get_string('state_button_cancel', 'local_extension');
         $denystr = get_string('state_button_deny', 'local_extension');
         $reopenstr = get_string('state_button_reopen', 'local_extension');
+        $additionalstr = get_string('state_button_additional_request', 'local_extension');
 
         $deny = $this->statearray[self::STATE_DENIED];
         $approve = $this->statearray[self::STATE_APPROVED];
         $cancel = $this->statearray[self::STATE_CANCEL];
         $reopen = $this->statearray[self::STATE_REOPENED];
+
+        $buttonarray[] = $mform->createElement('submit', 'additionalextention' . $id, $additionalstr);
 
         switch ($state) {
             case self::STATE_NEW:
