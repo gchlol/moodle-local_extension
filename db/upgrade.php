@@ -68,5 +68,66 @@ function xmldb_local_extension_upgrade($oldversion) {
         upgrade_plugin_savepoint(true, 2017051600, 'local', 'extension');
     }
 
+    if ($oldversion < 2017062200) {
+
+        // Define field extlength to be added to local_extension_hist_state.
+        $table = new xmldb_table('local_extension_hist_state');
+        $field = new xmldb_field('extlength', XMLDB_TYPE_INTEGER, '10', null, XMLDB_NOTNULL, null, '0', 'userid');
+
+        // Conditionally launch add field timestamp.
+        if (!$dbman->field_exists($table, $field)) {
+            $dbman->add_field($table, $field);
+        }
+
+        // Obtains the first comment for the request. Will be used when setting the initial history state and length.
+        $sql = "SELECT lcm.*,
+                       com.*
+                  FROM {local_extension_cm} lcm
+            INNER JOIN {local_extension_comment} com
+                    ON lcm.request = com.request
+            INNER JOIN
+                      (
+                      SELECT cc.request, MIN(cc.timestamp) as timestamp
+                        FROM {local_extension_comment} cc
+                    GROUP BY cc.request
+                      ) cc ON lcm.request = cc.request
+                          AND com.timestamp = cc.timestamp
+              ORDER BY lcm.request ASC";
+
+        $records = $DB->get_records_sql($sql);
+
+        foreach ($records as $record) {
+
+            $sh = new stdClass();
+            $sh->localcmid = $record->cmid;
+            $sh->requestid = $record->request;
+            $sh->timestamp = $record->timestamp;
+            $sh->state = \local_extension\state::STATE_NEW;
+            $sh->userid = $record->userid;
+            $sh->extlength = $record->length;
+
+            $DB->insert_record('local_extension_hist_state', $sh, false, true);
+        }
+
+        // Obtains length value for cms that match a possible history state. Updates the history with the length of the cm.
+        $sql = "SELECT hst.*,
+                       lcm.length AS extlength
+                  FROM {local_extension_cm} lcm
+             LEFT JOIN {local_extension_hist_state} hst
+                    ON lcm.request = hst.requestid
+                   AND lcm.state = hst.state
+              ORDER BY lcm.request ASC";
+
+        $records = $DB->get_records_sql($sql);
+
+        foreach ($records as $record) {
+            if (!empty($record->id)) {
+                $DB->update_record('local_extension_hist_state', $record, true);
+            }
+        }
+
+        upgrade_plugin_savepoint(true, 2017062200, 'local', 'extension');
+    }
+
     return true;
 }

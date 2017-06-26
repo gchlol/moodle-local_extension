@@ -78,6 +78,8 @@ class update extends \moodleform {
 
             $handler->status_definition($mod, $mform);
 
+            $state->render_state_history($mform, $localcm);
+
             if ($forcestatus) {
                 $state->render_force_buttons($mform, $stateid, $id);
 

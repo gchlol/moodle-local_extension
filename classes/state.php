@@ -213,6 +213,65 @@ class state {
 
     }
 
+    private function get_state_history($requestid, $localcmid) {
+        global $DB;
+
+        $sql = "SELECT id,
+                       localcmid,
+                       requestid,
+                       timestamp,
+                       state,
+                       userid,
+                       extlength
+                  FROM {local_extension_hist_state}
+                 WHERE requestid = :requestid
+                   AND localcmid = :localcmid
+              ORDER BY timestamp ASC";
+
+        $params = [
+            'requestid' => $requestid,
+            'localcmid' => $localcmid,
+        ];
+
+        return $DB->get_records_sql($sql, $params);
+    }
+
+    /**
+     * @param MoodleQuickForm $mform
+     * @param request $request
+     */
+    public function render_state_history(&$mform, $localcm) {
+        $history = $this->get_state_history($localcm->requestid, $localcm->cmid);
+
+        $html = html_writer::start_div();
+
+        // The initial start date will be the first comment in the local_extension_comment table for the requestid.
+        foreach ($history as $state) {
+            $s = state::instance()->get_state_name($state->state);
+
+            $obj = new stdClass();
+            $obj->status = $s;
+            $obj->date = userdate($state->timestamp);
+            $obj->length = utility::calculate_length($state->extlength);
+
+            if (empty($obj->length)) {
+                $string = 'status_status_summary_no_length';
+            } else {
+                $string = 'status_status_summary';
+            }
+
+            $s  = html_writer::start_tag('p', array('class' => 'time'));
+            $s .= get_string($string, 'local_extension', $obj);
+            $s .= html_writer::end_tag('p');
+
+            $html .= $s;
+        }
+
+        $html .= html_writer::end_div();
+
+        $mform->addElement('html', $html);
+    }
+
     /**
      * Renders the approve buttons for a standard user that can approve or deny an extension.
      *

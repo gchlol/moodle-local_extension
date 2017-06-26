@@ -165,6 +165,7 @@ class cm {
         $history->timestamp = time();
         $history->state = $state;
         $history->userid = $userid;
+        $history->extlength = $localcm->cm->length;
 
         $DB->insert_record('local_extension_hist_state', $history);
 

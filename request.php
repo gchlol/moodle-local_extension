@@ -176,8 +176,17 @@ if ($mform->is_cancelled()) {
             'data' => $data,
             'length' => $data - $event->timestart,
         );
-
         $cm['id'] = $DB->insert_record('local_extension_cm', $cm);
+
+        // Construct the initial history state length and status 'new'.
+        $history = new stdClass();
+        $history->localcmid = $cm['cmid'];
+        $history->requestid = $cm['requestid'];
+        $history->timestamp = time();
+        $history->state = \local_extension\state::STATE_NEW;
+        $history->userid = $USER->id;
+        $history->extlength = $cm['length'];
+        $DB->insert_record('local_extension_hist_state', $history);
 
         // Setup the default subscription for the user making the request.
         $sub = new stdClass();
