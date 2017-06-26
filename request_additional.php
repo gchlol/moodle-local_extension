@@ -72,9 +72,20 @@ if ($mform->is_cancelled()) {
     redirect($statusurl);
 
 } else if ($data = $mform->get_data()) {
+    $cm     = $request->mods[$cmid]->localcm;
+    $event  = $request->mods[$cmid]->event;
+    $course = $request->mods[$cmid]->course;
+
     $notifycontent = [];
 
-    // Update the state of the cm.
+    // Update the requested cm length.
+    $due = 'due' . $cmid;
+    $newdate = $data->$due;
+    $cm->cm->data = $newdate;
+    $cm->cm->length = $newdate - $event->timestart;
+    $cm->update_data();
+
+    // Update the state of the cm to state::REOPENED.
     $data->s = \local_extension\state::STATE_REOPENED;
     $notifycontent[] = \local_extension\state::instance()->update_cm_state($request, $USER, $data);
 
@@ -153,6 +164,9 @@ if ($mform->is_cancelled()) {
 
     // Invalidate the cache for this request. The content has changed.
     $request->get_data_cache()->delete($request->requestid);
+
+    $url = new moodle_url('/local/extension/status.php', ['id' => $requestid]);
+    redirect($url);
 }
 
 echo $OUTPUT->header();
