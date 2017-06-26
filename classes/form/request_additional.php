@@ -108,6 +108,20 @@ class request_additional extends \moodleform {
      */
     public function validation($data, $files) {
         $errors = parent::validation($data, $files);
+
+        $mform = $this->_form;
+        $request = $this->_customdata['request'];
+        $cmid = $this->_customdata['cmid'];
+        $mod = $request->mods[$cmid];
+
+        $formid = 'due' . $cmid;
+        $due[$formid] = $data[$formid];
+
+        $handler = $mod->handler;
+
+        // Default request_validation checks for dates within one day of the request.
+        $errors += $handler->request_validation($mform, $mod, $data);
+
         return $errors;
     }
 
