@@ -291,8 +291,6 @@ class state {
         $deny = $this->statearray[self::STATE_DENIED];
         $approve = $this->statearray[self::STATE_APPROVED];
 
-        $buttonarray[] = $mform->createElement('submit', 'additionalextention' . $id, $additionalstr);
-
         switch ($state) {
             case self::STATE_NEW:
                 $buttonarray[] = $mform->createElement('submit', $approve . $id, $approvestr);
@@ -305,6 +303,8 @@ class state {
             default:
                 break;
         }
+
+        $buttonarray[] = $mform->createElement('submit', 'additionalextention' . $id, $additionalstr);
 
         if (!empty($buttonarray)) {
             $mform->addGroup($buttonarray, 'statusmodgroup' . $id, '', ' ', false);
@@ -371,8 +371,6 @@ class state {
         $cancel = $this->statearray[self::STATE_CANCEL];
         $reopen = $this->statearray[self::STATE_REOPENED];
 
-        $buttonarray[] = $mform->createElement('submit', 'additionalextention' . $id, $additionalstr);
-
         switch ($state) {
             case self::STATE_NEW:
                 $buttonarray[] = $mform->createElement('submit', $approve . $id, $approvestr);
@@ -399,6 +397,8 @@ class state {
             default:
                 break;
         }
+
+        $buttonarray[] = $mform->createElement('submit', 'additionalextention' . $id, $additionalstr);
 
         if (!empty($buttonarray)) {
             $mform->addGroup($buttonarray, 'statusmodgroup' . $id, '', ' ', false);
