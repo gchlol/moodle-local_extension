@@ -290,6 +290,7 @@ class state {
         $deny = $this->statearray[self::STATE_DENIED];
         $approve = $this->statearray[self::STATE_APPROVED];
 
+
         switch ($state) {
             case self::STATE_NEW:
                 $buttonarray[] = $mform->createElement('submit', $approve . $id, $approvestr);
@@ -421,6 +422,31 @@ class state {
 
                     redirect(new moodle_url('/local/extension/state.php', $params));
                 }
+            }
+        }
+    }
+
+    /**
+     * If the $data object contains an additional extension reference, redirect the page to allow the student to
+     * extend the request length.
+     *
+     * @param stdClass $data
+     * @param request $request
+     */
+    public function has_submititted_additional_request($data, $request) {
+        // Iterate over the request mods to obtain the cmid.
+        foreach ($request->mods as $id => $mod) {
+            $item = 'additionalextention' . $id;
+
+            if (!empty($data->$item)) {
+
+                $params = [
+                    'id'       => $request->requestid,
+                    'courseid' => $mod->cm->course,
+                    'cmid'     => $mod->cm->id,
+                ];
+
+                redirect(new moodle_url('/local/extension/request_additional.php', $params));
             }
         }
     }

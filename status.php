@@ -89,6 +89,8 @@ if ($mform->is_cancelled()) {
 } else if ($form = $mform->get_data()) {
     // If the state has changed, redirect to an intermediate page.
     state::instance()->has_submitted_state($form, $request);
+    // If the individual clicks on a button to request an additional extension, redirect to an itermediate page.
+    state::instance()->has_submititted_additional_request($form, $request);
 
     $comment = $form->commentarea;
 
