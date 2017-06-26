@@ -65,6 +65,13 @@
     border: 1px none;
 }
 
+.local_extension div .statusbadge {
+    float: left;
+    margin-right: 5px;
+    text-align: right;
+    width: 80px;
+}
+
 .local_extension div .manageruleitem {
     background-color: #d3d3d3;
     border: 1px solid;

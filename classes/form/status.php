@@ -78,7 +78,7 @@ class status extends \moodleform {
             $handler->status_definition($mod, $mform);
 
             // Displays a list of state changes, their status and extension length.
-            $state->render_state_history($mform, $localcm);
+            $state->render_state_history($mform, $localcm, $mod);
 
             if ($forcestatus) {
                 // The user has the required capabilities, allow them to change everything.

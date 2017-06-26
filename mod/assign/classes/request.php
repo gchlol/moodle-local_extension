@@ -144,15 +144,17 @@ class request extends \local_extension\base_request {
         $mform->addElement('html', html_writer::tag('p', $html));
         $html .= html_writer::end_div(); // End .content.
 
-        if ($instance->allowsubmissionsfromdate) {
+        if ($instance && $instance->allowsubmissionsfromdate) {
             $mform->addElement('static', 'allowsubmissionsfromdate', get_string('allowsubmissionsfromdate', 'assign'),
                 userdate($instance->allowsubmissionsfromdate));
         }
-        if ($instance->duedate) {
+
+        if ($instance && $instance->duedate) {
             $mform->addElement('static', 'duedate', get_string('duedate', 'assign'), userdate($instance->duedate));
             $finaldate = $instance->duedate;
         }
-        if ($instance->cutoffdate) {
+
+        if ($instance && $instance->cutoffdate) {
             $mform->addElement('static', 'cutoffdate', get_string('cutoffdate', 'assign'), userdate($instance->cutoffdate));
             $finaldate = $instance->cutoffdate;
         }

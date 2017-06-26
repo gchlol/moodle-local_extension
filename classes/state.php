@@ -241,8 +241,9 @@ class state {
     /**
      * @param MoodleQuickForm $mform
      * @param request $request
+     * @param mod_data $mod
      */
-    public function render_state_history(&$mform, $localcm) {
+    public function render_state_history(&$mform, $localcm, $mod) {
         $history = $this->get_state_history($localcm->requestid, $localcm->cmid);
 
         $html = html_writer::start_div();
@@ -251,22 +252,28 @@ class state {
         foreach ($history as $state) {
             $s = state::instance()->get_state_name($state->state);
 
+            $event = $mod->event;
+            $date = $event->timestart + $state->extlength;
+
             $obj = new stdClass();
             $obj->status = $s;
-            $obj->date = userdate($state->timestamp);
+            $obj->date = userdate($date);
             $obj->length = utility::calculate_length($state->extlength);
 
             if (empty($obj->length)) {
-                $string = 'status_status_summary_no_length';
+                $string = 'status_status_summary_without_length';
             } else {
-                $string = 'status_status_summary';
+                $string = 'status_status_summary_with_length';
             }
 
-            $s  = html_writer::start_tag('p', array('class' => 'time'));
-            $s .= get_string($string, 'local_extension', $obj);
-            $s .= html_writer::end_tag('p');
 
-            $html .= $s;
+            $left = html_writer::div($s, 'statusbadge');
+            $right = html_writer::div(get_string($string, 'local_extension', $obj));
+
+            $html .= html_writer::tag('p', $left . $right);
+
+
+
         }
 
         $html .= html_writer::end_div();
