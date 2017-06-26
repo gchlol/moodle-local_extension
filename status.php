@@ -80,7 +80,7 @@ $obj = array(
 $pageurl = new moodle_url('/local/extension/status.php', array('id' => $request->requestid));
 $PAGE->navbar->add(get_string('breadcrumb_nav_status', 'local_extension', $obj), $pageurl);
 
-$mform = new \local_extension\form\update(null, $params);
+$mform = new \local_extension\form\status(null, $params);
 
 if ($mform->is_cancelled()) {
     $indexurl = new moodle_url('/local/extension/index.php');

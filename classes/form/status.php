@@ -42,7 +42,7 @@ require_once($CFG->libdir . '/formslib.php');
  * @copyright  Catalyst IT
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
-class update extends \moodleform {
+class status extends \moodleform {
     /**
      * {@inheritDoc}
      * @see moodleform::definition()
@@ -59,10 +59,8 @@ class update extends \moodleform {
         $state = state::instance();
 
         foreach ($mods as $id => $mod) {
-            /* @var \local_extension\cm $localcm IDE hinting */
             $localcm = $mod->localcm;
             $course = $mod->course;
-            /* @var \local_extension\base_request $handler IDE hinting */
             $handler = $mod->handler;
             $id = $localcm->cmid;
             $stateid = $localcm->cm->state;
