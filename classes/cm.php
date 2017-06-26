@@ -25,6 +25,8 @@
 
 namespace local_extension;
 
+use stdClass;
+
 defined('MOODLE_INTERNAL') || die();
 
 /**
@@ -110,7 +112,7 @@ class cm {
     /**
      * Parses submitted form data and sets the properties of this class to match.
      *
-     * @param \stdClass $form
+     * @param stdClass $form
      */
     public function load_from_form($form) {
 
@@ -149,17 +151,17 @@ class cm {
     /**
      * Writes an state change entry to local_extension_hist_state. Returns the history object.
      *
-     * @param \stdClass $mod
+     * @param mod_data $mod
      * @param int $state
      * @param int $userid
-     * @return \stdClass $history
+     * @return stdClass $history
      */
     public function write_history($mod, $state, $userid) {
         global $DB;
 
         $localcm = $mod->localcm;
 
-        $history = new \stdClass();
+        $history = new stdClass();
         $history->localcmid = $localcm->cmid;
         $history->requestid = $localcm->requestid;
         $history->timestamp = time();

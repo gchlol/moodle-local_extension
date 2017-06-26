@@ -27,7 +27,9 @@ namespace local_extension;
 
 use coding_exception;
 use html_writer;
+use local_extension\request;
 use moodle_url;
+use MoodleQuickForm;
 use stdClass;
 
 defined('MOODLE_INTERNAL') || die();
@@ -275,7 +277,7 @@ class state {
     /**
      * Renders the approve buttons for a standard user that can approve or deny an extension.
      *
-     * @param \MoodleQuickForm $mform
+     * @param MoodleQuickForm $mform
      * @param int $state
      * @param int $id
      */
@@ -309,7 +311,7 @@ class state {
     /**
      * Renders the approve buttons for a the owner of the request/cms.
      *
-     * @param \MoodleQuickForm $mform
+     * @param MoodleQuickForm $mform
      * @param int $state
      * @param int $id
      */
@@ -344,7 +346,7 @@ class state {
     /**
      * Renders the approve buttons for an admin user that can approve, deny or cancel an extension.
      *
-     * @param \MoodleQuickForm $mform
+     * @param MoodleQuickForm $mform
      * @param int $state
      * @param int $id
      */
@@ -426,7 +428,7 @@ class state {
     /**
      * Updates the cm state with posted data.
      *
-     * @param \local_extension\request $request
+     * @param request $request
      * @param int $user
      * @param stdClass $data
      * @return object|bool
@@ -483,7 +485,7 @@ class state {
     /**
      * When a cm has been approved and the length has been updated then we must call the handler and update the extension.
      *
-     * @param \local_extension\request $request
+     * @param request $request
      * @param int $user The user that has called this operation.
      * @param stdClass $data
      * @return object|bool

@@ -81,12 +81,15 @@ class update extends \moodleform {
             $state->render_state_history($mform, $localcm);
 
             if ($forcestatus) {
+                // The user has the required capabilities, allow them to change everything.
                 $state->render_force_buttons($mform, $stateid, $id);
 
             } else if ($USER->id == $userid) {
+                // A student is viewing this component, display the additional request buttons and basic cancellation.
                 $state->render_owner_buttons($mform, $stateid, $id);
 
             } else if ($access & $approve) {
+                // The user has the approiate level of access to confirm, deny or extend the request.
                 $state->render_approve_buttons($mform, $stateid, $id);
 
             }
