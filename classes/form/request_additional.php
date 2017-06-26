@@ -78,8 +78,8 @@ class request_additional extends \moodleform {
         // Utilise the same visual modify definition that admins/coordinators view.
         $handler->modify_definition($mod, $mform, null);
 
-        $mform->addElement('textarea', 'comment', get_string('comment', 'local_extension'), 'rows="5" cols="70"');
-        $mform->addRule('comment', 'Required', 'required', null, 'client');
+        $mform->addElement('textarea', 'commentarea', get_string('comment', 'local_extension'), 'rows="5" cols="70"');
+        $mform->addRule('commentarea', 'Required', 'required', null, 'client');
 
         $policy = get_config('local_extension', 'attachmentpolicy');
         // Moodle rich text editor may leave a <br> in an empty editor.

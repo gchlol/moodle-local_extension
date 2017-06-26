@@ -72,7 +72,87 @@ if ($mform->is_cancelled()) {
     redirect($statusurl);
 
 } else if ($data = $mform->get_data()) {
+    $notifycontent = [];
 
+    // Update the state of the cm.
+    $data->s = \local_extension\state::STATE_REOPENED;
+    $notifycontent[] = \local_extension\state::instance()->update_cm_state($request, $USER, $data);
+
+    // Adding the comment to the notify content.
+    $comment = $data->commentarea;
+    if (!empty($comment)) {
+        $notifycontent[] = $request->add_comment($USER, $comment);
+    }
+
+    // Obtain any new attachments that have been added.
+    $draftcontext = context_user::instance($USER->id);
+    $usercontext = context_user::instance($request->request->userid);
+
+    $itemid = $requestid;
+    $draftitemid = file_get_submitted_draft_itemid('attachments');
+
+    $fs = get_file_storage();
+    $draftfiles = $fs->get_area_files($draftcontext->id, 'user', 'draft', $draftitemid, 'id');
+    $oldfiles = $fs->get_area_files($usercontext->id, 'local_extension', 'attachments', $itemid, 'id');
+
+    // File count must be greater that 1, as an item is the directory '.'.
+    if (count($draftfiles) > 1) {
+        // We need to add the existing files to the draft area so they are saved and merged with the new area.
+        foreach ($oldfiles as $oldfile) {
+            $filerecord = new stdClass();
+            $filerecord->contextid = $draftcontext->id;
+            $filerecord->component = 'user';
+            $filerecord->filearea = 'draft';
+            $filerecord->itemid = $draftitemid;
+
+            // Check if see if the pathname hash exists before adding the file.
+            $hash = $fs->get_pathname_hash(
+                $usercontext->id,
+                'user',
+                'draft',
+                $draftitemid,
+                $oldfile->get_filepath(),
+                $oldfile->get_filename()
+            );
+
+            // We do not delete / update / modify the old file. Ideally we will not reach this state due to the previous validation.
+            if (!array_key_exists($hash, $draftfiles)) {
+                $fs->create_file_from_storedfile($filerecord, $oldfile);
+            }
+        }
+
+        file_save_draft_area_files($draftitemid, $usercontext->id, 'local_extension', 'attachments', $itemid);
+
+        $draftnames = [];
+        $oldnames = [];
+
+        foreach ($draftfiles as $file) {
+            $draftnames[$file->get_filename()] = $file;
+        }
+
+        foreach ($oldfiles as $file) {
+            $oldnames[$file->get_filename()] = $file;
+        }
+
+        // This diff array will contain all the new files to be attached.
+        $diff = array_diff_key($draftnames, $oldnames);
+        foreach ($diff as $file) {
+            $notifycontent[] = $request->add_attachment_history($file);
+        }
+    }
+
+    // Cleaning up the array.
+    $notifycontent = array_filter($notifycontent, function($obj) {
+        return !is_null($obj);
+    });
+
+    $request->notify_subscribers($notifycontent, $USER->id);
+
+    // Update the lastmod.
+    $request->update_lastmod($USER->id);
+
+    // Invalidate the cache for this request. The content has changed.
+    $request->get_data_cache()->delete($request->requestid);
 }
 
 echo $OUTPUT->header();
