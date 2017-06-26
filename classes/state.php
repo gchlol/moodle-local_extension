@@ -411,7 +411,7 @@ class state {
      * @param stdClass $data
      * @param request $request
      */
-    public function has_submitted_state($data, $request) {
+    public function has_submitted_state_change($data, $request) {
         // Iterate over the request mods to obtain the cmid.
         foreach ($request->mods as $id => $mod) {
             // Iterate over the possible states.
