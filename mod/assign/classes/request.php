@@ -30,6 +30,7 @@ use local_extension\mod_data;
 use local_extension\rule;
 use local_extension\state;
 use local_extension\utility;
+use moodle_url;
 use MoodleQuickForm;
 use stdClass;
 
@@ -184,10 +185,10 @@ class request extends \local_extension\base_request {
 
         $html = html_writer::start_div('content');
 
-        $courseurl = new \moodle_url('/course/view.php', array('id' => $course->id));
+        $courseurl = new moodle_url('/course/view.php', array('id' => $course->id));
         $courselink = html_writer::link($courseurl, $course->fullname);
 
-        $eventurl = new \moodle_url('/mod/' . $event->modulename . '/view.php', array('id' => $cmid));
+        $eventurl = new moodle_url('/mod/' . $event->modulename . '/view.php', array('id' => $cmid));
         $eventlink = html_writer::link($eventurl, $event->name);
 
         $coursestring = html_writer::tag('b', $courselink. ' > ' . $eventlink, array('class' => 'mod'));
