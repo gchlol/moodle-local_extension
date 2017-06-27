@@ -135,16 +135,15 @@ if ($mform->is_cancelled()) {
 
     $notifycontent = [];
 
+    $form = new stdClass();
+    $form->cmid = $cm->get_cmid();
     // The the current state is new, then we keep it as new.
     if (!state::instance()->is_open_state($currentstate)) {
         // Set the state to 'reopened' for all other states, eg. cancelled, granted, denied.
-
         // The update_cm_state accepts form data with the state specified as 's'.
-        $form = new stdClass();
-        $form->cmid = $cm->get_cmid();
         $form->s = state::STATE_REOPENED;
-        $notifycontent[] = state::instance()->update_cm_state($request, $USER, $form);
     }
+    $notifycontent[] = state::instance()->update_cm_state($request, $USER, $form);
 
     $notifycontent[] = $request->add_comment($USER, $datestring);
 

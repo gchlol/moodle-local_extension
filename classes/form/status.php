@@ -62,7 +62,6 @@ class status extends \moodleform {
             $localcm = $mod->localcm;
             $course = $mod->course;
             $handler = $mod->handler;
-            $id = $localcm->cmid;
             $stateid = $localcm->cm->state;
             $userid = $localcm->userid;
 
@@ -78,7 +77,7 @@ class status extends \moodleform {
             $handler->status_definition($mod, $mform);
 
             // Displays a list of state changes, their status and extension length.
-            $state->render_state_history($mform, $localcm, $mod);
+            $state->render_state_definition($mod, $mform);
 
             if ($forcestatus) {
                 // The user has the required capabilities, allow them to change everything.

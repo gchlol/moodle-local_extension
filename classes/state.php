@@ -25,7 +25,9 @@
 
 namespace local_extension;
 
+use assign;
 use coding_exception;
+use context_module;
 use html_writer;
 use local_extension\request;
 use moodle_url;
@@ -238,20 +240,112 @@ class state {
         return $DB->get_records_sql($sql, $params);
     }
 
-    public function render_current_state() {
+    /**
+     * @param mod_data $mod
+     * @param MoodleQuickForm $mform
+     */
+    public function render_state_definition($mod, $mform) {
+        $localcm = $mod->localcm;
 
-    }
+        // List of state changes ordered by ascending timestamp.
+        $history = $this->get_state_history($localcm->requestid, $localcm->cmid);
 
-    public function render_pending_state() {
-
+        $this->render_current_state($mod, $mform);
+        $this->render_pending_state($mod, $mform, $history);
+        $this->render_state_history($mod, $mform, $history);
     }
 
     /**
-     * @param MoodleQuickForm $mform
-     * @param request $request
      * @param mod_data $mod
+     * @param MoodleQuickForm $mform
+     * @param array $history
      */
-    public function render_state_history(&$mform, $localcm, $mod) {
+    public function render_current_state($mod, $mform) {
+        global $CFG;
+        require_once($CFG->dirroot . '/mod/assign/locallib.php');
+
+        $context = context_module::instance($mod->cm->id);
+        $assign = new assign($context, $mod->cm, $mod->course);
+        $flags = $assign->get_user_flags($mod->localcm->userid, false);
+
+        // No flags? No set extension exists.
+        if ($flags === false) {
+            return false;
+        }
+
+        // No extensionduedate, no
+        if ($flags->extensionduedate <= 0) {
+            return false;
+        }
+
+        $html = html_writer::div('Current Extension');
+
+        // The date of the current extension.
+        $extdate = $flags->extensionduedate;
+
+        // The original assignment submission date.
+        $duedate = $mod->event->timestart;
+
+        $obj = new stdClass();
+        $obj->date = userdate($extdate);
+        $obj->length = utility::calculate_length($extdate - $duedate);
+        $statusstring = get_string('status_status_summary_with_length', 'local_extension', $obj);
+
+        $statusbadge = self::get_state_name(self::STATE_APPROVED);
+        $left = html_writer::div($statusbadge, 'statusbadge');
+        $right = html_writer::div($statusstring);
+
+        $html .= html_writer::tag('p', $left . $right);
+
+        $mform->addElement('html', $html);
+
+        return true;
+    }
+
+    /**
+     * @param mod_data $mod
+     * @param MoodleQuickForm $mform
+     * @param array $history
+     */
+    public function render_pending_state($mod, $mform, $history) {
+
+        $currentstate = $mod->localcm->get_stateid();
+        if (state::instance()->is_open_state($currentstate)) {
+            $html = html_writer::div('Pending Extension');
+
+            $html .= html_writer::start_div();
+
+            // The date of the current extension.
+            $extdate = $mod->localcm->cm->data;
+
+            // The original assignment submission date.
+            $duedate = $mod->event->timestart;
+
+            $obj = new stdClass();
+            $obj->date = userdate($extdate);
+            $obj->length = utility::calculate_length($extdate - $duedate);
+            $statusstring = get_string('status_status_summary_with_length', 'local_extension', $obj);
+
+            $statusbadge = state::get_state_name($currentstate);
+            $left = html_writer::div($statusbadge, 'statusbadge');
+            $right = html_writer::div($statusstring);
+
+            $html .= html_writer::tag('p', $left . $right);
+
+            $html .= html_writer::end_div();
+            $mform->addElement('html', $html);
+            return true;
+        }
+
+        return false;
+    }
+
+    /**
+     * @param mod_data $mod
+     * @param MoodleQuickForm $mform
+     * @param array $history
+     */
+    public function render_state_history($mod, $mform, $history) {
         global $USER;
 
         $course = $mod->course;
@@ -264,7 +358,8 @@ class state {
         // Admins and users with the capability will have the ability to view extra details with the state history.
         $adminrights = $forcestatus | ($access & $approve);
 
-        $history = $this->get_state_history($localcm->requestid, $localcm->cmid);
+        $html = html_writer::div('Extension History');
+        $mform->addElement('html', $html);
 
         $html = html_writer::start_div();
 
@@ -280,6 +375,7 @@ class state {
             $obj->date = userdate($date);
             $obj->length = utility::calculate_length($state->extlength);
 
+            // During the database upgrade to 2017062200 some state changes may not have any historic length.
             if (empty($obj->length)) {
                 $moodlestring = 'status_status_summary_without_length';
             } else {
@@ -316,7 +412,8 @@ class state {
      * @param cm $cm
      */
     public function render_approve_buttons(&$mform, $state, $cm) {
-        $buttonarray = [];
+        $statebuttons = [];
+        $extrabuttons = [];
 
         $id = $cm->cmid;
 
@@ -330,23 +427,24 @@ class state {
 
         switch ($state) {
             case self::STATE_NEW:
-                $buttonarray[] = $mform->createElement('submit', $approve . $id, $approvestr);
-                $buttonarray[] = $mform->createElement('submit', $deny . $id, $denystr);
+                $statebuttons[] = $mform->createElement('submit', $approve . $id, $approvestr);
+                $statebuttons[] = $mform->createElement('submit', $deny . $id, $denystr);
                 break;
             case self::STATE_REOPENED:
-                $buttonarray[] = $mform->createElement('submit', $approve . $id, $approvestr);
-                $buttonarray[] = $mform->createElement('submit', $deny . $id, $denystr);
+                $statebuttons[] = $mform->createElement('submit', $approve . $id, $approvestr);
+                $statebuttons[] = $mform->createElement('submit', $deny . $id, $denystr);
                 break;
             default:
                 break;
         }
 
-        $buttonarray[] = $mform->createElement('submit', 'modifyextension' . $id, $modifystr);
-        $buttonarray[] = $mform->createElement('submit', 'additionalextention' . $id, $additionalstr);
-
-        if (!empty($buttonarray)) {
-            $mform->addGroup($buttonarray, 'statusmodgroup' . $id, '', ' ', false);
+        if (!empty($statebuttons)) {
+            $mform->addGroup($statebuttons, 'statusmodgroup' . $id, '', ' ', false);
         }
+
+        $extrabuttons[] = $mform->createElement('submit', 'modifyextension' . $id, $modifystr);
+        $extrabuttons[] = $mform->createElement('submit', 'additionalextention' . $id, $additionalstr);
+        $mform->addGroup($extrabuttons, 'extramodgroup' . $id, '', ' ', false);
     }
 
     /**
@@ -357,36 +455,38 @@ class state {
      * @param cm $cm
      */
     public function render_owner_buttons(&$mform, $state, $cm) {
-        $buttonarray = [];
+        $statebuttons = [];
+        $extrabuttons = [];
 
         $id = $cm->cmid;
 
         $cancelstr = get_string('state_button_cancel', 'local_extension');
         $reopenstr = get_string('state_button_reopen', 'local_extension');
+        $additionalstr = get_string('state_button_additional_request', 'local_extension');
 
         $cancel = $this->statearray[self::STATE_CANCEL];
         $reopen = $this->statearray[self::STATE_REOPENED];
 
-        $additionalstr = get_string('state_button_additional_request', 'local_extension');
-        $buttonarray[] = $mform->createElement('submit', 'additionalextention' . $id, $additionalstr);
-
         switch ($state) {
             case self::STATE_NEW:
-                $buttonarray[] = $mform->createElement('submit', $cancel . $id, $cancelstr);
+                $statebuttons[] = $mform->createElement('submit', $cancel . $id, $cancelstr);
                 break;
             case self::STATE_REOPENED:
-                $buttonarray[] = $mform->createElement('submit', $cancel . $id, $cancelstr);
+                $statebuttons[] = $mform->createElement('submit', $cancel . $id, $cancelstr);
                 break;
             case self::STATE_CANCEL:
-                $buttonarray[] = $mform->createElement('submit', $reopen . $id, $reopenstr);
+                $statebuttons[] = $mform->createElement('submit', $reopen . $id, $reopenstr);
                 break;
             default:
                 break;
         }
 
-        if (!empty($buttonarray)) {
-            $mform->addGroup($buttonarray, 'statusmodgroup' . $id, '', ' ', false);
+        if (!empty($statebuttons)) {
+            $mform->addGroup($statebuttons, 'statusmodgroup' . $id, '', ' ', false);
         }
+
+        $extrabuttons[] = $mform->createElement('submit', 'additionalextention' . $id, $additionalstr);
+        $mform->addGroup($extrabuttons, 'extramodgroup' . $id, '', ' ', false);
     }
 
     /**
@@ -397,7 +497,8 @@ class state {
      * @param cm $cm
      */
     public function render_force_buttons(&$mform, $state, $cm) {
-        $buttonarray = [];
+        $statebuttons = [];
+        $extrabuttons = [];
 
         $id = $cm->cmid;
 
@@ -415,37 +516,38 @@ class state {
 
         switch ($state) {
             case self::STATE_NEW:
-                $buttonarray[] = $mform->createElement('submit', $approve . $id, $approvestr);
-                $buttonarray[] = $mform->createElement('submit', $deny . $id, $denystr);
-                $buttonarray[] = $mform->createElement('submit', $cancel . $id, $cancelstr);
+                $statebuttons[] = $mform->createElement('submit', $approve . $id, $approvestr);
+                $statebuttons[] = $mform->createElement('submit', $deny . $id, $denystr);
+                $statebuttons[] = $mform->createElement('submit', $cancel . $id, $cancelstr);
                 break;
             case self::STATE_REOPENED:
-                $buttonarray[] = $mform->createElement('submit', $approve . $id, $approvestr);
-                $buttonarray[] = $mform->createElement('submit', $deny . $id, $denystr);
-                $buttonarray[] = $mform->createElement('submit', $cancel . $id, $cancelstr);
+                $statebuttons[] = $mform->createElement('submit', $approve . $id, $approvestr);
+                $statebuttons[] = $mform->createElement('submit', $deny . $id, $denystr);
+                $statebuttons[] = $mform->createElement('submit', $cancel . $id, $cancelstr);
                 break;
             case self::STATE_DENIED:
-                $buttonarray[] = $mform->createElement('submit', $approve . $id, $approvestr);
-                $buttonarray[] = $mform->createElement('submit', $reopen . $id, $reopenstr);
-                $buttonarray[] = $mform->createElement('submit', $cancel . $id, $cancelstr);
+                $statebuttons[] = $mform->createElement('submit', $approve . $id, $approvestr);
+                $statebuttons[] = $mform->createElement('submit', $reopen . $id, $reopenstr);
+                $statebuttons[] = $mform->createElement('submit', $cancel . $id, $cancelstr);
                 break;
             case self::STATE_CANCEL:
-                $buttonarray[] = $mform->createElement('submit', $reopen . $id, $reopenstr);
+                $statebuttons[] = $mform->createElement('submit', $reopen . $id, $reopenstr);
                 break;
             case self::STATE_APPROVED:
-                $buttonarray[] = $mform->createElement('submit', $deny . $id, $denystr);
-                $buttonarray[] = $mform->createElement('submit', $cancel . $id, $cancelstr);
+                $statebuttons[] = $mform->createElement('submit', $deny . $id, $denystr);
+                $statebuttons[] = $mform->createElement('submit', $cancel . $id, $cancelstr);
                 break;
             default:
                 break;
         }
 
-        $buttonarray[] = $mform->createElement('submit', 'modifyextension' . $id, $modifystr);
-        $buttonarray[] = $mform->createElement('submit', 'additionalextention' . $id, $additionalstr);
-
-        if (!empty($buttonarray)) {
-            $mform->addGroup($buttonarray, 'statusmodgroup' . $id, '', ' ', false);
+        if (!empty($statebuttons)) {
+            $mform->addGroup($statebuttons, 'statusmodgroup' . $id, '', ' ', false);
         }
+
+        $extrabuttons[] = $mform->createElement('submit', 'modifyextension' . $id, $modifystr);
+        $extrabuttons[] = $mform->createElement('submit', 'additionalextention' . $id, $additionalstr);
+        $mform->addGroup($extrabuttons, 'extramodgroup' . $id, '', ' ', false);
     }
 
     /**
