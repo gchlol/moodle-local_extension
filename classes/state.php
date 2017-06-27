@@ -313,14 +313,17 @@ class state {
      *
      * @param MoodleQuickForm $mform
      * @param int $state
-     * @param int $id
+     * @param cm $cm
      */
-    public function render_approve_buttons(&$mform, $state, $id) {
+    public function render_approve_buttons(&$mform, $state, $cm) {
         $buttonarray = [];
+
+        $id = $cm->cmid;
 
         $approvestr = get_string('state_button_approve', 'local_extension');
         $denystr = get_string('state_button_deny', 'local_extension');
         $additionalstr = get_string('state_button_additional_request', 'local_extension');
+        $modifystr = get_string('state_button_modfiy_length', 'local_extension');
 
         $deny = $this->statearray[self::STATE_DENIED];
         $approve = $this->statearray[self::STATE_APPROVED];
@@ -338,6 +341,7 @@ class state {
                 break;
         }
 
+        $buttonarray[] = $mform->createElement('submit', 'modifyextension' . $id, $modifystr);
         $buttonarray[] = $mform->createElement('submit', 'additionalextention' . $id, $additionalstr);
 
         if (!empty($buttonarray)) {
@@ -350,16 +354,21 @@ class state {
      *
      * @param MoodleQuickForm $mform
      * @param int $state
-     * @param int $id
+     * @param cm $cm
      */
-    public function render_owner_buttons(&$mform, $state, $id) {
-        $buttonarray = array();
+    public function render_owner_buttons(&$mform, $state, $cm) {
+        $buttonarray = [];
+
+        $id = $cm->cmid;
 
         $cancelstr = get_string('state_button_cancel', 'local_extension');
         $reopenstr = get_string('state_button_reopen', 'local_extension');
 
         $cancel = $this->statearray[self::STATE_CANCEL];
         $reopen = $this->statearray[self::STATE_REOPENED];
+
+        $additionalstr = get_string('state_button_additional_request', 'local_extension');
+        $buttonarray[] = $mform->createElement('submit', 'additionalextention' . $id, $additionalstr);
 
         switch ($state) {
             case self::STATE_NEW:
@@ -375,10 +384,6 @@ class state {
                 break;
         }
 
-        $buttonarray = [];
-        $additionalstr = get_string('state_button_additional_request', 'local_extension');
-        $buttonarray[] = $mform->createElement('submit', 'additionalextention' . $id, $additionalstr);
-
         if (!empty($buttonarray)) {
             $mform->addGroup($buttonarray, 'statusmodgroup' . $id, '', ' ', false);
         }
@@ -389,16 +394,19 @@ class state {
      *
      * @param MoodleQuickForm $mform
      * @param int $state
-     * @param int $id
+     * @param cm $cm
      */
-    public function render_force_buttons(&$mform, $state, $id) {
-        $buttonarray = array();
+    public function render_force_buttons(&$mform, $state, $cm) {
+        $buttonarray = [];
+
+        $id = $cm->cmid;
 
         $approvestr = get_string('state_button_approve', 'local_extension');
         $cancelstr = get_string('state_button_cancel', 'local_extension');
         $denystr = get_string('state_button_deny', 'local_extension');
         $reopenstr = get_string('state_button_reopen', 'local_extension');
         $additionalstr = get_string('state_button_additional_request', 'local_extension');
+        $modifystr = get_string('state_button_modfiy_length', 'local_extension');
 
         $deny = $this->statearray[self::STATE_DENIED];
         $approve = $this->statearray[self::STATE_APPROVED];
@@ -432,6 +440,7 @@ class state {
                 break;
         }
 
+        $buttonarray[] = $mform->createElement('submit', 'modifyextension' . $id, $modifystr);
         $buttonarray[] = $mform->createElement('submit', 'additionalextention' . $id, $additionalstr);
 
         if (!empty($buttonarray)) {
@@ -479,17 +488,21 @@ class state {
     public function has_submititted_additional_request($data, $request) {
         // Iterate over the request mods to obtain the cmid.
         foreach ($request->mods as $id => $mod) {
-            $item = 'additionalextention' . $id;
+            $extend = 'additionalextention' . $id;
+            $modify = 'modifyextension' . $id;
 
-            if (!empty($data->$item)) {
+            $params = [
+                'id'       => $request->requestid,
+                'courseid' => $mod->cm->course,
+                'cmid'     => $mod->cm->id,
+            ];
 
-                $params = [
-                    'id'       => $request->requestid,
-                    'courseid' => $mod->cm->course,
-                    'cmid'     => $mod->cm->id,
-                ];
-
+            if (!empty($data->$extend)) {
                 redirect(new moodle_url('/local/extension/request_additional.php', $params));
+            }
+
+            if (!empty($data->$modify)) {
+                redirect(new moodle_url('/local/extension/modify.php', $params));
             }
         }
     }

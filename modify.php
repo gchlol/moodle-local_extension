@@ -33,7 +33,7 @@ global $PAGE, $USER;
 require_login(true);
 
 $requestid = required_param('id', PARAM_INT);
-$courseid = required_param('course', PARAM_INT);
+$courseid = required_param('courseid', PARAM_INT);
 $cmid = required_param('cmid', PARAM_INT);
 
 $request = utility::cache_get_request($requestid);

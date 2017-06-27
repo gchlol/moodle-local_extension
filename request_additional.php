@@ -60,9 +60,15 @@ $PAGE->navbar->add(get_string('breadcrumb_nav_index', 'local_extension'), new mo
 $PAGE->navbar->add(get_string('breadcrumb_nav_status', 'local_extension', $obj), $pageurl);
 $PAGE->navbar->add(get_string('breadcrumb_nav_additional', 'local_extension'));
 
+$cm      = $request->mods[$cmid]->localcm;
+$event   = $request->mods[$cmid]->event;
+$course  = $request->mods[$cmid]->course;
+$handler = $request->mods[$cmid]->handler;
+
 $params = [
-    'request' => $request,
-    'cmid'    => $cmid,
+    'request'  => $request,
+    'cmid'     => $cmid,
+    'instance' => $handler->get_instance($request->mods[$cmid]),
 ];
 
 $mform = new \local_extension\form\request_additional(null, $params);
@@ -72,10 +78,6 @@ if ($mform->is_cancelled()) {
     redirect($statusurl);
 
 } else if ($data = $mform->get_data()) {
-    $cm     = $request->mods[$cmid]->localcm;
-    $event  = $request->mods[$cmid]->event;
-    $course = $request->mods[$cmid]->course;
-
     $notifycontent = [];
 
     // Update the requested cm length.

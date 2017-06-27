@@ -238,6 +238,7 @@ $string['state_button_additional_request'] = 'Request Additional Extension';
 $string['state_button_approve'] = 'Approve request';
 $string['state_button_cancel'] = 'Cancel request';
 $string['state_button_deny'] = 'Deny request';
+$string['state_button_modfiy_length'] = 'Modify extension length';
 $string['state_button_reopen'] = 'Reopen request';
 $string['state'] = 'State';
 $string['state_cancel'] = 'Cancelled';

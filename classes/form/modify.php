@@ -66,8 +66,8 @@ class modify extends \moodleform {
         $mform->addElement('hidden', 'cmid');
         $mform->setType('cmid', PARAM_INT);
 
-        $mform->addElement('hidden', 'course');
-        $mform->setType('course', PARAM_INT);
+        $mform->addElement('hidden', 'courseid');
+        $mform->setType('courseid', PARAM_INT);
 
         $mform->addElement('hidden', 'userid');
         $mform->setType('userid', PARAM_INT);
