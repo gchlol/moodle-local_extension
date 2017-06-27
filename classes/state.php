@@ -238,42 +238,69 @@ class state {
         return $DB->get_records_sql($sql, $params);
     }
 
+    public function render_current_state() {
+
+    }
+
+    public function render_pending_state() {
+
+    }
+
     /**
      * @param MoodleQuickForm $mform
      * @param request $request
      * @param mod_data $mod
      */
     public function render_state_history(&$mform, $localcm, $mod) {
+        global $USER;
+
+        $course = $mod->course;
+        $context = \context_course::instance($course->id, MUST_EXIST);
+        $forcestatus = has_capability('local/extension:modifyrequeststatus', $context);
+
+        $approve = (rule::RULE_ACTION_APPROVE | rule::RULE_ACTION_FORCEAPPROVE);
+        $access = rule::get_access($mod, $USER->id);
+
+        // Admins and users with the capability will have the ability to view extra details with the state history.
+        $adminrights = $forcestatus | ($access & $approve);
+
         $history = $this->get_state_history($localcm->requestid, $localcm->cmid);
 
         $html = html_writer::start_div();
 
         // The initial start date will be the first comment in the local_extension_comment table for the requestid.
         foreach ($history as $state) {
-            $s = state::instance()->get_state_name($state->state);
+            $statusbadge = self::get_state_name($state->state);
 
             $event = $mod->event;
             $date = $event->timestart + $state->extlength;
 
             $obj = new stdClass();
-            $obj->status = $s;
+            $obj->status = $statusbadge;
             $obj->date = userdate($date);
             $obj->length = utility::calculate_length($state->extlength);
 
             if (empty($obj->length)) {
-                $string = 'status_status_summary_without_length';
+                $moodlestring = 'status_status_summary_without_length';
             } else {
-                $string = 'status_status_summary_with_length';
+                $moodlestring = 'status_status_summary_with_length';
             }
 
+            $left = html_writer::div($statusbadge, 'statusbadge');
 
-            $left = html_writer::div($s, 'statusbadge');
-            $right = html_writer::div(get_string($string, 'local_extension', $obj));
+            $rightstring = get_string($moodlestring, 'local_extension', $obj);
+
+            if ($adminrights) {
+                $extra = new stdClass();
+                $user = \core_user::get_user($state->userid);
+                $extra->date = userdate($state->timestamp);
+                $extra->user = fullname($user);
+                $rightstring .= ' ' . get_string('status_status_summary_extra_details', 'local_extension', $extra);
+            }
+
+            $right = html_writer::div($rightstring);
 
             $html .= html_writer::tag('p', $left . $right);
-
-
-
         }
 
         $html .= html_writer::end_div();
