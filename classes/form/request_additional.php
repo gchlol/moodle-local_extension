@@ -76,7 +76,7 @@ class request_additional extends \moodleform {
         $mform->addElement('html', $html);
 
         // Utilise the same visual modify definition that admins/coordinators view.
-        $handler->modify_definition($mod, $mform, null);
+        $handler->modify_definition($mod, $mform, $this->_customdata);
 
         $mform->addElement('textarea', 'commentarea', get_string('comment', 'local_extension'), 'rows="5" cols="70"');
         $mform->addRule('commentarea', 'Required', 'required', null, 'client');
