@@ -385,40 +385,5 @@ class request extends \local_extension\base_request {
         return false;
     }
 
-    /**
-     * Adds a date selector to the mform that it has been passed.
-     *
-     * This uses an extra parameter too the $event object, timeclose.
-     *
-     * @param mod_data $mod
-     * @param MoodleQuickForm $mform
-     * @param bool $optional
-     */
-    public function date_selector($mod, $mform, $optional = true) {
-        $event = $mod->event;
-        $lcm = $mod->localcm;
-
-        $defaultdate = $event->timeclose;
-        $lcmdate = $lcm->get_data();
-
-        if (!empty($lcmdate)) {
-            $defaultdate = $lcmdate;
-        }
-
-        $startyear = date('Y');
-        $stopyear = date('Y') + 1;
-
-        $dateconfig = array(
-            'optional' => $optional,
-            'step' => 1,
-            'startyear' => $startyear,
-            'stopyear' => $stopyear,
-        );
-
-        $formid = 'due' . $lcm->cmid;
-        $mform->addElement('date_time_selector', $formid, get_string('requestdue', 'extension_assign'), $dateconfig);
-        $mform->setDefault($formid, $defaultdate);
-    }
-
 }
 

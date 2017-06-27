@@ -348,37 +348,4 @@ class request extends \local_extension\base_request {
         // Requires 'mod/assign:grantextension'.
         // $this->submit_extension($assignmentinstance, $userid, 0);
     }
-
-    /**
-     * Adds a date selector to the mform that it has been passed.
-     *
-     * @param mod_data $mod Local mod_data object with event details
-     * @param MoodleQuickForm $mform
-     * @param bool $optional
-     */
-    public function date_selector($mod, $mform, $optional = true) {
-        $event = $mod->event;
-        $lcm = $mod->localcm;
-
-        $defaultdate = $event->timestart;
-        $lcmdate = $lcm->get_data();
-
-        if (!empty($lcmdate)) {
-            $defaultdate = $lcmdate;
-        }
-
-        $startyear = date('Y');
-        $stopyear = date('Y') + 1;
-
-        $dateconfig = array(
-            'optional' => $optional,
-            'step' => 1,
-            'startyear' => $startyear,
-            'stopyear' => $stopyear,
-        );
-
-        $formid = 'due' . $lcm->cmid;
-        $mform->addElement('date_time_selector', $formid, get_string('requestdue', 'extension_assign'), $dateconfig);
-        $mform->setDefault($formid, $defaultdate);
-    }
 }

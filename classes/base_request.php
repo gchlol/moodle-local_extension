@@ -129,5 +129,29 @@ abstract class base_request {
      * @param MoodleQuickForm $mform
      * @param bool $optional
      */
-    abstract public function date_selector($mod, $mform, $optional = true);
+    public function date_selector($mod, $mform, $optional = true) {
+        $event = $mod->event;
+        $lcm = $mod->localcm;
+
+        $defaultdate = $event->timestart;
+        $lcmdate = $lcm->get_data();
+
+        if (!empty($lcmdate)) {
+            $defaultdate = $lcmdate;
+        }
+
+        $startyear = date('Y');
+        $stopyear = date('Y') + 1;
+
+        $dateconfig = array(
+            'optional' => $optional,
+            'step' => 1,
+            'startyear' => $startyear,
+            'stopyear' => $stopyear,
+        );
+
+        $formid = 'due' . $lcm->cmid;
+        $mform->addElement('date_time_selector', $formid, get_string('requestdue', 'extension_assign'), $dateconfig);
+        $mform->setDefault($formid, $defaultdate);
+    }
 }
