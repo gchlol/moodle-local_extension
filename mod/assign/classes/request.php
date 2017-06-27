@@ -177,13 +177,9 @@ class request extends \local_extension\base_request {
      * @return string
      */
     public function status_definition($mod, $mform = null) {
-        global $USER;
-
         $event = $mod->event;
         $course = $mod->course;
         $localcm = $mod->localcm;
-
-        $requestid = $localcm->requestid;
         $cmid = $localcm->cmid;
 
         $html = html_writer::start_div('content');
@@ -198,35 +194,6 @@ class request extends \local_extension\base_request {
         $str = get_string('dueon', 'extension_assign', userdate($event->timestart));
         $html .= html_writer::tag('p', $coursestring . ' ' . $str);
 
-        $status = state::instance()->get_state_name($localcm->cm->state);
-
-        $obj = new stdClass();
-        $obj->status = $status;
-        $obj->date = userdate($localcm->cm->data);
-        $obj->length = utility::calculate_length($localcm->cm->length);
-
-        $status  = html_writer::start_tag('p', array('class' => 'time'));
-        $status .= get_string('status_status_line', 'local_extension', $obj);
-
-        // If the users access is either approve or force, then they can modify the request length.
-        $context = \context_course::instance($course->id, MUST_EXIST);
-        $forcestatus = has_capability('local/extension:modifyrequeststatus', $context);
-        $approve = (rule::RULE_ACTION_APPROVE | rule::RULE_ACTION_FORCEAPPROVE);
-        $access = rule::get_access($mod, $USER->id);
-        if ($forcestatus || $access & $approve) {
-            $params = array(
-                'id' => $requestid,
-                'course' => $course->id,
-                'cmid' => $cmid,
-            );
-
-            $modifyurl = new \moodle_url('/local/extension/modify.php', $params);
-            $modlink = html_writer::link($modifyurl, get_string('modifyextensionlength', 'local_extension'));
-            $status .= ' ' . $modlink;
-        }
-
-        $status .= html_writer::end_tag('p');
-        $html .= $status;
         $html .= html_writer::end_div(); // End .content.
 
         if (!empty($mform)) {
