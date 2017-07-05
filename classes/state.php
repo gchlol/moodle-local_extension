@@ -262,26 +262,17 @@ class state {
      */
     public function render_current_state($mod, $mform) {
         global $CFG;
-        require_once($CFG->dirroot . '/mod/assign/locallib.php');
 
-        $context = context_module::instance($mod->cm->id);
-        $assign = new assign($context, $mod->cm, $mod->course);
-        $flags = $assign->get_user_flags($mod->localcm->userid, false);
+        $modulename = $mod->event->modulename;
+        $handler = $mod->handler;
 
-        // No flags? No set extension exists.
-        if ($flags === false) {
-            return false;
-        }
+        $extdate = $handler->get_current_extension($mod);
 
-        // No extensionduedate, no
-        if ($flags->extensionduedate <= 0) {
+        if ($extdate === false) {
             return false;
         }
 
         $html = html_writer::div('Current Extension');
-
-        // The date of the current extension.
-        $extdate = $flags->extensionduedate;
 
         // The original assignment submission date.
         $duedate = $mod->event->timestart;
@@ -630,6 +621,11 @@ class state {
         // The form data passed through contains the state.
         $state = $data->s;
 
+        $ret = $localcm->set_state($state);
+        if (empty($ret)) {
+            return false;
+        }
+
         // The extension has been approved. Lets hook into the handler and extend the items length.
         if ($state == self::STATE_APPROVED) {
             $handler->submit_extension($event->instance,
@@ -640,11 +636,9 @@ class state {
                    $state == self::STATE_DENIED) {
             $handler->cancel_extension($event->instance,
                                        $request->request->userid);
-        }
 
-        $ret = $localcm->set_state($state);
-        if (empty($ret)) {
-            return false;
+            // When cancelling or denying a request, it may be that an existing request is present.
+
         }
 
         $status = $this->get_state_name($localcm->cm->state);

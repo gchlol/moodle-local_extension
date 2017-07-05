@@ -137,6 +137,8 @@ if ($mform->is_cancelled()) {
 
     $form = new stdClass();
     $form->cmid = $cm->get_cmid();
+    $form->s = $currentstate;
+
     // The the current state is new, then we keep it as new.
     if (!state::instance()->is_open_state($currentstate)) {
         // Set the state to 'reopened' for all other states, eg. cancelled, granted, denied.
