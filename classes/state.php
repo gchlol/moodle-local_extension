@@ -621,11 +621,6 @@ class state {
         // The form data passed through contains the state.
         $state = $data->s;
 
-        $ret = $localcm->set_state($state);
-        if (empty($ret)) {
-            return false;
-        }
-
         // The extension has been approved. Lets hook into the handler and extend the items length.
         if ($state == self::STATE_APPROVED) {
             $handler->submit_extension($event->instance,
@@ -636,9 +631,11 @@ class state {
                    $state == self::STATE_DENIED) {
             $handler->cancel_extension($event->instance,
                                        $request->request->userid);
+        }
 
-            // When cancelling or denying a request, it may be that an existing request is present.
-
+        $ret = $localcm->set_state($state);
+        if (empty($ret)) {
+            return false;
         }
 
         $status = $this->get_state_name($localcm->cm->state);
@@ -653,11 +650,61 @@ class state {
 
         $history->message = get_string('request_state_history_log', 'local_extension', $log);
 
+        // When cancelling or denying a request, it may be that an existing request is present.
+        if ($state == self::STATE_CANCEL ||
+            $state == self::STATE_DENIED) {
+
+            $existingextension = $handler->get_current_extension($mod);
+
+            // When we find an existing approved request in the history, we must update the cm item to reflect that.
+            // This cm item is used with the general extension tables.
+            if ($existingextension) {
+                $latest = $this->get_last_extension($mod);
+                $localcm->set_state(state::STATE_APPROVED);
+                $localcm->cm->length = $latest->extlength;
+                $localcm->cm->data = $event->timestart + $latest->extlength;
+                $localcm->update_data();
+            }
+        }
+
         // Update the lastmod.
         $request->update_lastmod($user->id);
 
         // You can only edit one state at a time, returning here is ok!
         return $history;
+    }
+
+    /**
+     * Searches the history of state changes and finds the most recent approved state.
+     *
+     * @param $mod
+     * @return array|bool
+     */
+    private function get_last_extension($mod) {
+        global $DB;
+
+        $lcm = $mod->localcm;
+
+        $sql = "SELECT *
+                  FROM {local_extension_hist_state} hs
+                 WHERE hs.requestid = :requestid
+                   AND hs.state = :state
+                   AND hs.localcmid = :localcmid
+              ORDER BY hs.id ASC";
+        $params = [
+            'requestid' => $lcm->cm->request,
+            'state' => state::STATE_APPROVED,
+            'userid' => $lcm->cm->userid,
+            'localcmid' => $lcm->cm->cmid,
+        ];
+
+        $approved = $DB->get_records_sql($sql, $params);
+
+        if ($approved) {
+            return array_pop($approved);
+        }
+
+        return false;
     }
 
     /**
