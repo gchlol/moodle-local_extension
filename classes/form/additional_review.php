@@ -26,6 +26,7 @@
 namespace local_extension\form;
 
 use html_writer;
+use moodleform;
 
 if (!defined('MOODLE_INTERNAL')) {
     die('Direct access to this script is forbidden.'); // It must be included from a Moodle page.
@@ -41,7 +42,7 @@ require_once($CFG->libdir . '/formslib.php');
  * @copyright  Catalyst IT
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
-class request_additional extends \moodleform {
+class additional_review extends moodleform {
 
     /**
      * {@inheritDoc}
@@ -52,49 +53,41 @@ class request_additional extends \moodleform {
 
         $request = $this->_customdata['request'];
         $cmid = $this->_customdata['cmid'];
+        $reviewdate = $this->_customdata['reviewdate'];
+
+        // Suppress the date selector
+        $this->_customdata['suppressdate'] = true;
 
         $mod = $request->mods[$cmid];
-
-        $localcm = $mod->localcm;
-        $course = $mod->course;
         $handler = $mod->handler;
-        $stateid = $localcm->cm->state;
-        $userid = $localcm->userid;
+        $lcm = $mod->localcm;
 
-        // These hidden elements are used when clicking the 'cancel' button.
-        // We request that cmid, reqid and courseid are required parameters to view the additional extension page.
-        $mform->addElement('hidden', 'cmid', $cmid);
+        // These hidden elements are set with the $form->set_data() function.
+        $mform->addElement('hidden', 'cmid');
         $mform->setType('cmid', PARAM_INT);
 
-        $mform->addElement('hidden', 'id', $request->requestid);
+        $mform->addElement('hidden', 'id');
         $mform->setType('id', PARAM_INT);
 
-        $mform->addElement('hidden', 'courseid', $course->id);
+        $mform->addElement('hidden', 'courseid');
         $mform->setType('courseid', PARAM_INT);
 
-        $html = html_writer::tag('h2', get_string('form_modify_request_header', 'local_extension'));
-        $mform->addElement('html', $html);
+        $mform->addElement('hidden', 'attachments');
+        $mform->setType('attachments', PARAM_INT);
 
-        // Utilise the same visual modify definition that admins/coordinators view.
+        $mform->addElement('hidden', 'commentarea');
+        $mform->setType('commentarea', PARAM_TEXT);
+
+        $mform->addElement('hidden', 'due'. $cmid);
+        $mform->setType('due'. $cmid, PARAM_INT);
+
+        // Print a basic defintion.
         $handler->modify_definition($mod, $mform, $this->_customdata);
 
-        $mform->addElement('textarea', 'commentarea', get_string('comment', 'local_extension'), 'rows="5" cols="70"');
-        $mform->addRule('commentarea', 'Required', 'required', null, 'client');
-
-        $policy = get_config('local_extension', 'attachmentpolicy');
-        // Moodle rich text editor may leave a <br> in an empty editor.
-        if (!empty($policy)) {
-            $html = html_writer::div($policy, '');
-            $mform->addElement('static', 'policy', '', $html);
-        }
-
-        $mform->addElement('filemanager', 'attachments', get_string('attachments', 'local_extension'), null, array(
-            'subdirs' => 0,
-        ));
-
-        if (get_config('local_extension', 'requireattachment')) {
-            $mform->addRule('attachments', 'Required', 'required', null, 'client');;
-        }
+        // Display the new extension request length.
+        $newlength = ($reviewdate - $lcm->cm->data) + $lcm->cm->length;
+        $extensionlength = \local_extension\utility::calculate_length($newlength);
+        $mform->addElement('static', 'cutoffdate', 'New extension length', $extensionlength);
 
         $this->add_action_buttons(true, get_string('submit_additional_request', 'local_extension'));
     }
@@ -109,21 +102,6 @@ class request_additional extends \moodleform {
     public function validation($data, $files) {
         $errors = parent::validation($data, $files);
 
-        $mform = $this->_form;
-        $request = $this->_customdata['request'];
-        $cmid = $this->_customdata['cmid'];
-        $mod = $request->mods[$cmid];
-
-        $formid = 'due' . $cmid;
-        $due[$formid] = $data[$formid];
-
-        $handler = $mod->handler;
-
-        // Default request_validation checks for dates within one day of the request.
-        $errors += $handler->request_validation($mform, $mod, $data);
-
         return $errors;
     }
-
 }
-

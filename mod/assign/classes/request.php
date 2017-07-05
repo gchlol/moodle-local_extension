@@ -137,6 +137,11 @@ class request extends \local_extension\base_request {
 
         $instance = $customdata['instance'];
 
+        $suppressdate = null;
+        if (isset($customdata['suppressdate'])) {
+            $suppressdate = $customdata['suppressdate'];
+        }
+
         $html = html_writer::start_div('content');
         $coursestring = html_writer::tag('b', $course->fullname . ' > ' . $event->name, array('class' => 'mod'));
         $html .= html_writer::tag('p', $coursestring);
@@ -165,7 +170,9 @@ class request extends \local_extension\base_request {
             $mform->addElement('static', 'cutoffdate', 'Current extension length', $extensionlength);
         }
 
-        $this->date_selector($mod, $mform, false);
+        if (!$suppressdate) {
+            $this->date_selector($mod, $mform, false);
+        }
 
         return $html;
     }

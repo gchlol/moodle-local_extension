@@ -600,7 +600,7 @@ class state {
             ];
 
             if (!empty($data->$extend)) {
-                redirect(new moodle_url('/local/extension/request_additional.php', $params));
+                redirect(new moodle_url('/local/extension/additional_request.php', $params));
             }
 
             if (!empty($data->$modify)) {

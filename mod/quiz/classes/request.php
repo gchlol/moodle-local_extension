@@ -230,6 +230,11 @@ class request extends \local_extension\base_request {
 
         $instance = $customdata['instance'];
 
+        $suppressdate = null;
+        if (isset($customdata['suppressdate'])) {
+            $suppressdate = $customdata['suppressdate'];
+        }
+
         $quiz = $DB->get_record('quiz', ['id' => $cm->instance], 'timeclose');
 
         $html = html_writer::start_div('content');
@@ -249,7 +254,9 @@ class request extends \local_extension\base_request {
             $mform->addElement('static', 'cutoffdate', 'Current extension length', $extensionlength);
         }
 
-        $this->date_selector($mod, $mform, false);
+        if (!$suppressdate) {
+            $this->date_selector($mod, $mform, false);
+        }
 
         return $html;
     }

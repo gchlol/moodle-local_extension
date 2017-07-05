@@ -255,6 +255,7 @@ $string['status_status_summary_extra_details'] = 'Updated by {$a->user} on {$a->
 $string['status_status_summary_with_length'] = 'extension request for {$a->length} until {$a->date}.';
 $string['status_status_summary_without_length'] = 'extension request until {$a->date}.';
 $string['submit_additional_request'] = 'Submit additional request';
+$string['submit_additional_review'] = 'Review additional request';
 $string['submit_comment'] = 'Submit comment';
 $string['submit_request'] = 'Submit request';
 $string['submit_state_return_status'] = 'Confirm state change and return the comment stream';

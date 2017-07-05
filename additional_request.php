@@ -30,11 +30,12 @@ $requestid     = required_param('id', PARAM_INT);
 $cmid          = required_param('cmid', PARAM_INT);
 $courseid      = required_param('courseid', PARAM_INT);
 
-$PAGE->set_url(new moodle_url('/local/extension/request_additional.php'), [
+$PAGE->set_url(new moodle_url('/local/extension/additional_request.php'), [
     'id'       => $requestid,
     'cmid'     => $cmid,
     'courseid' => $courseid,
 ]);
+$selfurl = $PAGE->url;
 
 $cm = get_fast_modinfo($courseid)->get_cm($cmid);
 require_login($courseid, null, $cm);
@@ -69,30 +70,57 @@ $params = [
     'request'  => $request,
     'cmid'     => $cmid,
     'instance' => $handler->get_instance($request->mods[$cmid]),
+    'reviewdate' => 0,
 ];
 
-$mform = new \local_extension\form\request_additional(null, $params);
-
-if ($mform->is_cancelled()) {
+$requestform = new \local_extension\form\additional_request(null, $params);
+if ($requestform->is_cancelled()) {
     $statusurl = new moodle_url('/local/extension/status.php', array('id' => $requestid));
     redirect($statusurl);
 
-} else if ($data = $mform->get_data()) {
+} else if ($requestdata = $requestform->get_data()) {
+
+    // Did we submit to review the contents?
+    if ($requestdata->review) {
+        // Provide the new due date to the review form.
+        $due = 'due' . $cmid;
+        $params['reviewdate'] = $requestdata->$due;
+
+        // Unset the submit button text. We have changed this.
+        unset($requestdata->submitbutton);
+
+        $reviewform = new \local_extension\form\additional_review(null, $params);
+        $reviewform->set_data($requestdata);
+
+        // Show the review page before processing the data.
+        echo $OUTPUT->header();
+        $reviewform->display();
+        echo $OUTPUT->footer();
+        exit();
+    }
+}
+
+$reviewform = new \local_extension\form\additional_review(null, $params);
+if ($reviewform->is_cancelled()) {
+    redirect($PAGE->url);
+
+} else if ($reviewdata = $reviewform->get_data()) {
+    // The review has been confirmed, try to submit the extension request!
     $notifycontent = [];
 
     // Update the requested cm length.
     $due = 'due' . $cmid;
-    $newdate = $data->$due;
+    $newdate = $reviewdata->$due;
     $cm->cm->data = $newdate;
     $cm->cm->length = $newdate - $event->timestart;
     $cm->update_data();
 
     // Update the state of the cm to state::REOPENED.
-    $data->s = \local_extension\state::STATE_REOPENED;
-    $notifycontent[] = \local_extension\state::instance()->update_cm_state($request, $USER, $data);
+    $reviewdata->s = \local_extension\state::STATE_REOPENED;
+    $notifycontent[] = \local_extension\state::instance()->update_cm_state($request, $USER, $reviewdata);
 
     // Adding the comment to the notify content.
-    $comment = $data->commentarea;
+    $comment = $reviewdata->commentarea;
     if (!empty($comment)) {
         $notifycontent[] = $request->add_comment($USER, $comment);
     }
@@ -171,10 +199,7 @@ if ($mform->is_cancelled()) {
     redirect($url);
 }
 
+// Output the initial form to request an additional extension.
 echo $OUTPUT->header();
-
-$mform->display();
-
+$requestform->display();
 echo $OUTPUT->footer();
-
-
