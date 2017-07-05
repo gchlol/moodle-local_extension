@@ -301,7 +301,7 @@ class state {
     public function render_pending_state($mod, $mform, $history) {
 
         $currentstate = $mod->localcm->get_stateid();
-        if (state::instance()->is_open_state($currentstate)) {
+        if (self::instance()->is_open_state($currentstate)) {
             $html = html_writer::div('Pending Extension');
 
             $html .= html_writer::start_div();
@@ -317,7 +317,7 @@ class state {
             $obj->length = utility::calculate_length($extdate - $duedate);
             $statusstring = get_string('status_status_summary_with_length', 'local_extension', $obj);
 
-            $statusbadge = state::get_state_name($currentstate);
+            $statusbadge = self::get_state_name($currentstate);
             $left = html_writer::div($statusbadge, 'statusbadge');
             $right = html_writer::div($statusstring);
 
@@ -660,7 +660,7 @@ class state {
             // This cm item is used with the general extension tables.
             if ($existingextension) {
                 $latest = $this->get_last_extension($mod);
-                $localcm->set_state(state::STATE_APPROVED);
+                $localcm->set_state(self::STATE_APPROVED);
                 $localcm->cm->length = $latest->extlength;
                 $localcm->cm->data = $event->timestart + $latest->extlength;
                 $localcm->update_data();
@@ -693,7 +693,7 @@ class state {
               ORDER BY hs.id ASC";
         $params = [
             'requestid' => $lcm->cm->request,
-            'state' => state::STATE_APPROVED,
+            'state' => self::STATE_APPROVED,
             'userid' => $lcm->cm->userid,
             'localcmid' => $lcm->cm->cmid,
         ];
