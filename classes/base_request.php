@@ -123,6 +123,14 @@ abstract class base_request {
     abstract public function get_instance($mod);
 
     /**
+     * Obtains the timestamp date of a potential request.
+     *
+     * @param mod_data $mod Local mod_data object with event details
+     * @return int|bool
+     */
+    abstract public function get_current_extension($mod);
+
+    /**
      * Adds a date selector to the mform that it has been passed.
      *
      * @param mod_data $mod Local mod_data object with event details

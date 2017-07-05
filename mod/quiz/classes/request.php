@@ -392,5 +392,37 @@ class request extends \local_extension\base_request {
         return false;
     }
 
+    /**
+     * Obtains the timestamp date of a potential request.
+     *
+     * @param mod_data $mod Local mod_data object with event details
+     * @return int|bool
+     */
+    public function get_current_extension($mod) {
+        global $DB;
+
+        // There is no interface to obtain the quiz overrides.
+        // This is extracted from quiz/overrides.php and slightly modified.
+        list($sort, $params) = users_order_by_sql('u');
+
+        $sql = 'SELECT o.*, ' . get_all_user_name_fields(true, 'u') . '
+                  FROM {quiz_overrides} o
+                  JOIN {user} u ON o.userid = u.id
+                 WHERE o.quiz = :quizid
+                   AND o.userid = :userid
+              ORDER BY ' . $sort;
+
+        $params['quizid'] = $mod->event->instance;
+        $params['userid'] = $mod->localcm->userid;
+
+        $override = $DB->get_record_sql($sql, $params);
+
+        if ($override) {
+            return $override->timeclose;
+        } else {
+            return false;
+        }
+    }
+
 }
 

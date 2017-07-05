@@ -356,4 +356,30 @@ class request extends \local_extension\base_request {
         // Requires 'mod/assign:grantextension'.
         // $this->submit_extension($assignmentinstance, $userid, 0);
     }
+
+    /**
+     * Obtains the timestamp date of a potential request.
+     *
+     * @param mod_data $mod Local mod_data object with event details
+     * @return int|bool
+     */
+    public function get_current_extension($mod) {
+        $context = \context_module::instance($mod->cm->id);
+        $assign = new \assign($context, $mod->cm, $mod->course);
+        $flags = $assign->get_user_flags($mod->localcm->userid, false);
+
+        // No flags? No set extension exists.
+        if ($flags === false) {
+            return false;
+        }
+
+        // No extensionduedate, no
+        if ($flags->extensionduedate <= 0) {
+            return false;
+        }
+
+        // The date of the current extension.
+        return $flags->extensionduedate;
+    }
+
 }
