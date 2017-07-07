@@ -252,6 +252,7 @@ $string['state_result_denied'] = 'Denied';
 $string['state_result_pending'] = 'Pending';
 $string['status_file_attachment'] = 'File attached {$a}';
 $string['status_status_line'] = '{$a->status} extension request for {$a->length} until {$a->date}.';
+$string['status_status_internal_with_length'] = 'extension overrides the request, the extension is for {$a->length} until {$a->date}.';
 $string['status_status_summary_extra_details'] = 'Updated by {$a->user} on {$a->date}.';
 $string['status_status_summary_with_length'] = 'extension request for {$a->length} until {$a->date}.';
 $string['status_status_summary_without_length'] = 'extension request until {$a->date}.';

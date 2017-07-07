@@ -279,7 +279,17 @@ class state {
         }
 
         $handler = $mod->handler;
+
+        // Obtain the current extension, this could be an override.
+        $extdate = $handler->get_current_extension($mod);
+
+        // No extension was found.
+        if ($extdate === false) {
+            return false;
+        }
+
         $lateststate = null;
+        $latestextensionlength = null;
 
         // This is list of states sorted by timestamp.
         foreach ($history as $item) {
@@ -290,19 +300,10 @@ class state {
 
         // There has been no state::STATE_APPROVED in the state change history.
         // We will not render any 'Current' state as it could be a manual extension granted.
-        if ($lateststate === null) {
-            return false;
+        if ($lateststate !== null) {
+            // Obtain the due date of the most recent extension.
+            $latestextensionlength = $lateststate->extlength + $mod->event->timestart;
         }
-
-        $extdate = $handler->get_current_extension($mod);
-
-        // No extension was found.
-        if ($extdate === false) {
-            return false;
-        }
-
-        // Obtain the due date of the most recent extension.
-        $latestextensionlength = $lateststate->extlength + $mod->event->timestart;
 
         // If the most recent approved extension does not match the override, print the most recent.
         if ($extdate != $latestextensionlength) {
@@ -314,7 +315,7 @@ class state {
             $obj = new stdClass();
             $obj->date = userdate($extdate);
             $obj->length = utility::calculate_length($extdate - $duedate);
-            $statusstring = get_string('status_status_summary_with_length', 'local_extension', $obj);
+            $statusstring = get_string('status_status_internal_with_length', 'local_extension', $obj);
 
             $statusbadge = self::get_state_name(self::STATE_INTERNAL);
             $left = html_writer::div($statusbadge, 'statusbadge');
@@ -326,8 +327,6 @@ class state {
 
             return true;
         }
-
-
     }
 
     /**
