@@ -26,6 +26,7 @@
 namespace local_extension;
 
 use MoodleQuickForm;
+use stdClass;
 
 defined('MOODLE_INTERNAL') || die();
 

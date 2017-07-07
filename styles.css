@@ -26,6 +26,10 @@
     font-weight: bold;
 }
 
+.local_extension span.statusinternal {
+    background-color: #bc57d9;
+}
+
 .local_extension span.statusnew {
     background-color: #39CCCC;
 }

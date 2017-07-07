@@ -63,6 +63,9 @@ class state {
     /** @var int Cancelled request. */
     const STATE_CANCEL = 5;
 
+    /** @var int Internal request. */
+    const STATE_INTERNAL = 6;
+
     /** @var array An array of state ids */
     public $statearray = array();
 
@@ -89,6 +92,7 @@ class state {
             self::STATE_DENIED => 'deny',
             self::STATE_REOPENED => 'reopen',
             self::STATE_CANCEL => 'cancel',
+            self::STATE_INTERNAL => 'internal',
         );
     }
 
@@ -164,6 +168,14 @@ class state {
                 }
 
                 return html_writer::span($str, 'statuscancel label');
+
+            case self::STATE_INTERNAL:
+                $str = get_string('state_internal',   'local_extension');
+                if ($raw) {
+                    return $str;
+                }
+
+                return html_writer::span($str, 'statusinternal label');
 
             default:
                 throw new coding_exception('Unknown cm state.');
@@ -250,10 +262,75 @@ class state {
         // List of state changes ordered by ascending timestamp.
         $history = $this->get_state_history($localcm->requestid, $localcm->cmid);
 
+        $this->render_override_state($mod, $mform, $history);
         $this->render_current_state($mod, $mform, $history);
         $this->render_pending_state($mod, $mform, $history);
         $this->render_state_history($mod, $mform, $history);
     }
+
+    /**
+     * @param mod_data $mod
+     * @param MoodleQuickForm $mform
+     * @param array $history
+     */
+    public function render_override_state($mod, $mform, $history) {
+        if (!is_siteadmin()) {
+            return false;
+        }
+
+        $handler = $mod->handler;
+        $lateststate = null;
+
+        // This is list of states sorted by timestamp.
+        foreach ($history as $item) {
+            if ($item->state == self::STATE_APPROVED) {
+                $lateststate = $item;
+            }
+        }
+
+        // There has been no state::STATE_APPROVED in the state change history.
+        // We will not render any 'Current' state as it could be a manual extension granted.
+        if ($lateststate === null) {
+            return false;
+        }
+
+        $extdate = $handler->get_current_extension($mod);
+
+        // No extension was found.
+        if ($extdate === false) {
+            return false;
+        }
+
+        // Obtain the due date of the most recent extension.
+        $latestextensionlength = $lateststate->extlength + $mod->event->timestart;
+
+        // If the most recent approved extension does not match the override, print the most recent.
+        if ($extdate != $latestextensionlength) {
+            $html = html_writer::div('Internal Extension');
+
+            // The original assignment submission date.
+            $duedate = $mod->event->timestart;
+
+            $obj = new stdClass();
+            $obj->date = userdate($extdate);
+            $obj->length = utility::calculate_length($extdate - $duedate);
+            $statusstring = get_string('status_status_summary_with_length', 'local_extension', $obj);
+
+            $statusbadge = self::get_state_name(self::STATE_INTERNAL);
+            $left = html_writer::div($statusbadge, 'statusbadge');
+            $right = html_writer::div($statusstring);
+
+            $html .= html_writer::tag('p', $left . $right);
+
+            $mform->addElement('html', $html);
+
+            return true;
+        }
+
+
+    }
+
+    /**
 
     /**
      * @param mod_data $mod

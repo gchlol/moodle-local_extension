@@ -243,6 +243,7 @@ $string['state_button_reopen'] = 'Reopen request';
 $string['state'] = 'State';
 $string['state_cancel'] = 'Cancelled';
 $string['state_denied'] = 'Denied';
+$string['state_internal'] = 'Internal';
 $string['state_new'] = 'New';
 $string['state_reopened'] = 'Reopened';
 $string['state_result_approved'] = 'Approved';
