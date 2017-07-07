@@ -250,7 +250,7 @@ class state {
         // List of state changes ordered by ascending timestamp.
         $history = $this->get_state_history($localcm->requestid, $localcm->cmid);
 
-        $this->render_current_state($mod, $mform);
+        $this->render_current_state($mod, $mform, $history);
         $this->render_pending_state($mod, $mform, $history);
         $this->render_state_history($mod, $mform, $history);
     }
@@ -260,16 +260,36 @@ class state {
      * @param MoodleQuickForm $mform
      * @param array $history
      */
-    public function render_current_state($mod, $mform) {
-        global $CFG;
-
-        $modulename = $mod->event->modulename;
+    public function render_current_state($mod, $mform, $history) {
         $handler = $mod->handler;
+        $lateststate = null;
+
+        // This is list of states sorted by timestamp.
+        foreach ($history as $item) {
+            if ($item->state == self::STATE_APPROVED) {
+                $lateststate = $item;
+            }
+        }
+
+        // There has been no state::STATE_APPROVED in the state change history.
+        // We will not render any 'Current' state as it could be a manual extension granted.
+        if ($lateststate === null) {
+            return false;
+        }
 
         $extdate = $handler->get_current_extension($mod);
 
+        // No extension was found.
         if ($extdate === false) {
             return false;
+        }
+
+        // Obtain the due date of the most recent extension.
+        $latestextensionlength = $lateststate->extlength + $mod->event->timestart;
+
+        // If the most recent approved extension does not match the override, print the most recent.
+        if ($extdate != $latestextensionlength) {
+            $extdate = $latestextensionlength;
         }
 
         $html = html_writer::div('Current Extension');
@@ -654,15 +674,14 @@ class state {
         if ($state == self::STATE_CANCEL ||
             $state == self::STATE_DENIED) {
 
-            $existingextension = $handler->get_current_extension($mod);
+            // Obtain the latest approved state.
+            $lastapproved = $this->get_last_approved_extension($mod);
 
-            // When we find an existing approved request in the history, we must update the cm item to reflect that.
-            // This cm item is used with the general extension tables.
-            if ($existingextension) {
-                $latest = $this->get_last_extension($mod);
+            // If an existing approved history item exists.
+            if ($lastapproved) {
                 $localcm->set_state(self::STATE_APPROVED);
-                $localcm->cm->length = $latest->extlength;
-                $localcm->cm->data = $event->timestart + $latest->extlength;
+                $localcm->cm->length = $lastapproved->extlength;
+                $localcm->cm->data = $event->timestart + $lastapproved->extlength;
                 $localcm->update_data();
             }
         }
@@ -680,7 +699,7 @@ class state {
      * @param $mod
      * @return array|bool
      */
-    private function get_last_extension($mod) {
+    private function get_last_approved_extension($mod) {
         global $DB;
 
         $lcm = $mod->localcm;
