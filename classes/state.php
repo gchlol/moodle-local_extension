@@ -307,7 +307,7 @@ class state {
 
         // If the most recent approved extension does not match the override, print the most recent.
         if ($extdate != $latestextensionlength) {
-            $html = html_writer::div('Internal Extension');
+            $html = html_writer::div('Internal Extension (Administrator view only)');
 
             // The original assignment submission date.
             $duedate = $mod->event->timestart;
