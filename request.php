@@ -46,7 +46,7 @@ $PAGE->set_url(new moodle_url('/local/extension/request.php'), array(
 
 if (!empty($cmid)) {
     $cm = get_fast_modinfo($courseid)->get_cm($cmid);
-    require_login($courseid, null, $cm);
+    require_login($courseid, false, $cm);
     $context = context_module::instance($cmid);
 
     // When selecting an individual module, someone has sought to click the link. This will hopefully display the request form.
@@ -57,11 +57,11 @@ if (!empty($cmid)) {
     $searchback = $maxweeks * 7;
 
 } else if (!empty($courseid)) {
-    require_login($courseid);
+    require_login($courseid, false);
     $context = context_course::instance($courseid);
 
 } else {
-    require_login();
+    require_login(null, false);
     $context = context_system::instance();
 
 }

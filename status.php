@@ -29,7 +29,7 @@ use local_extension\utility;
 require_once(__DIR__ . '/../../config.php');
 global $PAGE, $USER;
 
-require_login(true);
+require_login(null, false);
 
 $requestid = required_param('id', PARAM_INT);
 $request = utility::cache_get_request($requestid);

@@ -30,7 +30,7 @@ use local_extension\rule;
 require_once(__DIR__ . '/../../config.php');
 global $PAGE, $USER;
 
-require_login(true);
+require_login(null, false);
 
 $requestid = required_param('id', PARAM_INT);
 $courseid = required_param('course', PARAM_INT);

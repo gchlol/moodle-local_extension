@@ -38,7 +38,7 @@ $PAGE->set_url(new moodle_url('/local/extension/additional_request.php'), [
 $selfurl = $PAGE->url;
 
 $cm = get_fast_modinfo($courseid)->get_cm($cmid);
-require_login($courseid, null, $cm);
+require_login($courseid, false, $cm);
 
 $request = \local_extension\request::from_id($requestid);
 

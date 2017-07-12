@@ -30,7 +30,7 @@ require_once(__DIR__ . '/../../config.php');
 require_once($CFG->dirroot . '/mod/assign/locallib.php');
 global $PAGE, $USER;
 
-require_login(true);
+require_login(null, false);
 
 $requestid = required_param('id', PARAM_INT);
 $courseid = required_param('courseid', PARAM_INT);

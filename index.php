@@ -35,7 +35,7 @@ $search     = optional_param('search', '', PARAM_RAW); // Make sure it is proces
 $faculty    = optional_param('faculty', '', PARAM_RAW); // Make sure it is processed with p() or s() when sending to output!
 $download   = optional_param('download', '', PARAM_ALPHA);
 
-require_login();
+require_login(null, false);
 
 $PAGE->set_url('/local/extension/index.php', []);
 
