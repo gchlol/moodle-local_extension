@@ -106,7 +106,13 @@ class utility {
                 continue;
             }
 
-            if (!\core_availability\info_module::is_user_visible($cm, 0, false)) {
+            $userid = 0;
+            if (defined('CLI_SCRIPT')) {
+                $user = get_admin();
+                $userid = $user->id;
+            }
+
+            if (!\core_availability\info_module::is_user_visible($cm, $userid, false)) {
                 continue;
             }
 
