@@ -870,6 +870,11 @@ class local_extension_renderer extends plugin_renderer_base {
 
         foreach ($state->statearray as $sid => $name) {
 
+            // Do not add the internal state to the list.
+            if ($sid === \local_extension\state::STATE_INTERNAL) {
+                continue;
+            }
+
             $statelist[$sid] = $state->get_state_name($sid);
         }
 
