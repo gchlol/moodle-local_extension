@@ -96,6 +96,7 @@ function xmldb_local_extension_upgrade($oldversion) {
 
         $records = $DB->get_records_sql($sql);
 
+        // Create 'New' states for each request.
         foreach ($records as $record) {
 
             $sh = new stdClass();
@@ -104,7 +105,7 @@ function xmldb_local_extension_upgrade($oldversion) {
             $sh->timestamp = $record->timestamp;
             $sh->state = \local_extension\state::STATE_NEW;
             $sh->userid = $record->userid;
-            $sh->extlength = $record->length;
+//            $sh->extlength = $record->length;
 
             $DB->insert_record('local_extension_hist_state', $sh, false, true);
         }
@@ -116,12 +117,25 @@ function xmldb_local_extension_upgrade($oldversion) {
              LEFT JOIN {local_extension_hist_state} hst
                     ON lcm.request = hst.requestid
                    AND lcm.state = hst.state
-              ORDER BY lcm.request ASC";
+              ORDER BY hst.timestamp ASC";
 
         $records = $DB->get_records_sql($sql);
 
+        $history = [];
+
+        // Create a map of the requestids and each history item.
         foreach ($records as $record) {
             if (!empty($record->id)) {
+                $history[$record->requestid][] = $record;
+            }
+        }
+
+        foreach ($history as $rid => $items) {
+
+            // Only update the last history item, as we will know the extension length for this based on the cm object.
+            $record = array_pop($items);
+
+            if ($record) {
                 $DB->update_record('local_extension_hist_state', $record, true);
             }
         }
