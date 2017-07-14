@@ -307,7 +307,9 @@ class state {
 
         // If the most recent approved extension does not match the override, print the most recent.
         if ($extdate != $latestextensionlength) {
-            $html = html_writer::div('Internal Extension (Administrator view only)');
+            $html = html_writer::start_div('statusblock');
+
+            $html .= html_writer::div('Internal Extension (Administrator view only)', 'statusheader');
 
             // The original assignment submission date.
             $duedate = $mod->event->timestart;
@@ -315,13 +317,18 @@ class state {
             $obj = new stdClass();
             $obj->date = userdate($extdate);
             $obj->length = utility::calculate_length($extdate - $duedate);
+
             $statusstring = get_string('status_status_internal_with_length', 'local_extension', $obj);
 
             $statusbadge = self::get_state_name(self::STATE_INTERNAL);
-            $left = html_writer::div($statusbadge, 'statusbadge');
-            $right = html_writer::div($statusstring);
 
-            $html .= html_writer::tag('p', $left . $right);
+            $html .= html_writer::start_div('statusitem');
+            $left = html_writer::div($statusbadge, 'statusbadge');
+            $right = html_writer::span($statusstring);
+            $html .= $left . $right;
+            $html .= html_writer::end_div();
+
+            $html .= html_writer::end_div(); // End .statusitem
 
             $mform->addElement('html', $html);
 
@@ -342,6 +349,8 @@ class state {
 
         // This is list of states sorted by timestamp.
         foreach ($history as $item) {
+
+            // Only Approved states will be displayed with this function.
             if ($item->state == self::STATE_APPROVED) {
                 $lateststate = $item;
             }
@@ -368,21 +377,34 @@ class state {
             $extdate = $latestextensionlength;
         }
 
-        $html = html_writer::div('Current Extension');
+        $html = html_writer::start_div('statusblock');
+
+        $html .= html_writer::div('Current Extension', 'statusheader');
 
         // The original assignment submission date.
         $duedate = $mod->event->timestart;
 
         $obj = new stdClass();
-        $obj->date = userdate($extdate);
+        $obj->date = userdate($item->timestamp);
         $obj->length = utility::calculate_length($extdate - $duedate);
-        $statusstring = get_string('status_status_summary_with_length', 'local_extension', $obj);
+
+        if (empty($obj->length)) {
+            $moodlestring = 'status_status_summary_without_length';
+        } else {
+            $moodlestring = 'status_status_summary_with_length';
+        }
+
+        $statusstring = get_string($moodlestring, 'local_extension', $obj);
 
         $statusbadge = self::get_state_name(self::STATE_APPROVED);
-        $left = html_writer::div($statusbadge, 'statusbadge');
-        $right = html_writer::div($statusstring);
 
-        $html .= html_writer::tag('p', $left . $right);
+        $html .= html_writer::start_div('statusitem');
+        $left = html_writer::div($statusbadge, 'statusbadge');
+        $right = html_writer::span($statusstring);
+        $html .= $left . $right;
+        $html .= html_writer::end_div();
+
+        $html .= html_writer::end_div(); // End .statusitem
 
         $mform->addElement('html', $html);
 
@@ -398,9 +420,9 @@ class state {
 
         $currentstate = $mod->localcm->get_stateid();
         if (self::instance()->is_open_state($currentstate)) {
-            $html = html_writer::div('Pending Extension');
+            $html = html_writer::start_div('statusblock');
 
-            $html .= html_writer::start_div();
+            $html .= html_writer::div('Pending Extension', 'statusheader');
 
             // The date of the current extension.
             $extdate = $mod->localcm->cm->data;
@@ -410,17 +432,21 @@ class state {
 
             $obj = new stdClass();
             $obj->date = userdate($extdate);
-            $obj->length = utility::calculate_length($extdate - $duedate);
+            $obj->length = utility::calculate_length($mod->localcm->cm->length);
             $statusstring = get_string('status_status_summary_with_length', 'local_extension', $obj);
 
             $statusbadge = self::get_state_name($currentstate);
+
+            $html .= html_writer::start_div('statusitem');
             $left = html_writer::div($statusbadge, 'statusbadge');
-            $right = html_writer::div($statusstring);
-
-            $html .= html_writer::tag('p', $left . $right);
-
+            $right = html_writer::span($statusstring);
+            $html .= $left . $right;
             $html .= html_writer::end_div();
+
+            $html .= html_writer::end_div(); // End .statusitem
+
             $mform->addElement('html', $html);
+
             return true;
         }
 
@@ -445,13 +471,18 @@ class state {
         // Admins and users with the capability will have the ability to view extra details with the state history.
         $adminrights = $forcestatus | ($access & $approve);
 
-        $html = html_writer::div('Extension History');
+        $html = html_writer::start_div('statusblock');
+
+        $html .= html_writer::div('Extension History', 'statusheader');
+
         $mform->addElement('html', $html);
 
-        $html = html_writer::start_div();
+        // Start thhe next html block that will be added.
+        $html = '';
 
         // The initial start date will be the first comment in the local_extension_comment table for the requestid.
         foreach ($history as $state) {
+
             $statusbadge = self::get_state_name($state->state);
 
             $event = $mod->event;
@@ -465,25 +496,30 @@ class state {
             // During the database upgrade to 2017062200 some state changes may not have any historic length.
             if (empty($obj->length)) {
                 $moodlestring = 'status_status_summary_without_length';
+                $obj->date = userdate($state->timestamp);
             } else {
                 $moodlestring = 'status_status_summary_with_length';
+                $obj->date = userdate($date);
             }
 
-            $left = html_writer::div($statusbadge, 'statusbadge');
+            $html .= html_writer::start_div('statusitem');
 
             $rightstring = get_string($moodlestring, 'local_extension', $obj);
+            $left = html_writer::div($statusbadge, 'statusbadge');
 
-            if ($adminrights) {
-                $extra = new stdClass();
-                $user = \core_user::get_user($state->userid);
-                $extra->date = userdate($state->timestamp);
-                $extra->user = fullname($user);
-                $rightstring .= ' ' . get_string('status_status_summary_extra_details', 'local_extension', $extra);
-            }
+//            if ($adminrights) {
+//                $extra = new stdClass();
+//                $user = \core_user::get_user($state->userid);
+//                $extra->date = userdate($state->timestamp);
+//                $extra->user = fullname($user);
+//                $rightstring .= ' ' . get_string('status_status_summary_extra_details', 'local_extension', $extra);
+//            }
 
-            $right = html_writer::div($rightstring);
+            $right = html_writer::span($rightstring);
 
-            $html .= html_writer::tag('p', $left . $right);
+            $html .= $left . $right;
+
+            $html .= html_writer::end_div(); // End .statusitem
         }
 
         $html .= html_writer::end_div();

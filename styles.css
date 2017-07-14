@@ -109,6 +109,10 @@
     white-space: nowrap;
 }
 
+.local_extension .policy {
+    margin-bottom: 30px;
+}
+
 .local_extension_status .mform fieldset div.fitemtitle {
     width: 0;
 }
@@ -119,9 +123,17 @@
 }
 
 .local_extension_status .mform fieldset div.felement.ffilemanager {
-    width: 60%;
+    width: 700px;
 }
 
 .local_extension_status .mform fieldset div.felement.ftextarea textarea {
-    width: 60%;
+    width: 100%;
+}
+
+.local_extension_status .statusheader {
+    font-weight: bold;
+}
+
+.local_extension_status .statusblock {
+    margin-bottom: 20px;
 }

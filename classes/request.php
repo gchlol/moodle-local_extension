@@ -102,6 +102,7 @@ class request implements \cache_data_source {
         );
 
         $activities = utility::get_activities($request->userid, $request->searchstart, $request->searchend, $options);
+
         $this->mods = $activities;
 
         foreach ($activities as $id => $mod) {

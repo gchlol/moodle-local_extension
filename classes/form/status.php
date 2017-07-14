@@ -25,6 +25,7 @@
 
 namespace local_extension\form;
 
+use html_writer;
 use local_extension\rule;
 use local_extension\state;
 
@@ -98,12 +99,12 @@ class status extends \moodleform {
         $html = '';
 
         if ($html .= $renderer->render_extension_attachments($request)) {
-            $html .= \html_writer::start_tag('br');
+            $html .= html_writer::start_tag('br');
         }
 
-        $html .= \html_writer::empty_tag('p');
+        $html .= html_writer::empty_tag('p');
         $html .= $renderer->render_extension_comments($request);
-        $html .= \html_writer::start_tag('br');
+        $html .= html_writer::start_tag('br');
         $mform->addElement('html', $html);
 
         $mform->addElement('hidden', 'id');
@@ -112,7 +113,7 @@ class status extends \moodleform {
         $policy = get_config('local_extension', 'attachmentpolicy');
         // Moodle rich text editor may leave a <br> in an empty editor.
         if (!empty($policy)) {
-            $html = \html_writer::div($policy, '');
+            $html = html_writer::div($policy, '');
             $mform->addElement('html', $html);
         }
 

@@ -58,6 +58,10 @@ class local_extension_renderer extends plugin_renderer_base {
             $indexed[$comment->timestamp][$comment->userid][] = $comment;
         }
 
+        if (!empty($indexed)) {
+            $out .= html_writer::tag('div', get_string('comments', 'local_extension'), ['class' => 'statusheader']);
+        }
+
         // Initial loop for items that have the same timestamp.
         foreach ($indexed as $timestamp => $userid) {
             // First inner loop for items that have the same userid.
@@ -195,7 +199,7 @@ class local_extension_renderer extends plugin_renderer_base {
         list($fs, $files) = $req->fetch_attachments();
 
         $out  = html_writer::start_tag('div', ['class' => 'attachments']);
-        $out .= html_writer::tag('p', get_string('attachments', 'local_extension'));
+        $out .= html_writer::tag('div', get_string('attachments', 'local_extension'), ['class' => 'statusheader']);
         $out .= html_writer::start_tag('ul');
 
         foreach ($files as $file) {
