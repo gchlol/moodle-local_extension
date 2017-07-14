@@ -507,13 +507,13 @@ class state {
             $rightstring = get_string($moodlestring, 'local_extension', $obj);
             $left = html_writer::div($statusbadge, 'statusbadge');
 
-//            if ($adminrights) {
-//                $extra = new stdClass();
-//                $user = \core_user::get_user($state->userid);
-//                $extra->date = userdate($state->timestamp);
-//                $extra->user = fullname($user);
-//                $rightstring .= ' ' . get_string('status_status_summary_extra_details', 'local_extension', $extra);
-//            }
+            if ($adminrights) {
+                $extra = new stdClass();
+                $user = \core_user::get_user($state->userid);
+                $extra->date = userdate($state->timestamp);
+                $extra->user = fullname($user);
+                $rightstring .= ' ' . get_string('status_status_summary_extra_details', 'local_extension', $extra);
+            }
 
             $right = html_writer::span($rightstring);
 
