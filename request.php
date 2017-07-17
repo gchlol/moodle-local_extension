@@ -181,7 +181,7 @@ if ($mform->is_cancelled()) {
         // Construct the initial history state length and status 'new'.
         $history = new stdClass();
         $history->localcmid = $cm['cmid'];
-        $history->requestid = $cm['requestid'];
+        $history->requestid = $cm['request'];
         $history->timestamp = time();
         $history->state = \local_extension\state::STATE_NEW;
         $history->userid = $USER->id;
