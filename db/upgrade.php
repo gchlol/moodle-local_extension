@@ -105,7 +105,6 @@ function xmldb_local_extension_upgrade($oldversion) {
             $sh->timestamp = $record->timestamp;
             $sh->state = \local_extension\state::STATE_NEW;
             $sh->userid = $record->userid;
-//            $sh->extlength = $record->length;
 
             $DB->insert_record('local_extension_hist_state', $sh, false, true);
         }
