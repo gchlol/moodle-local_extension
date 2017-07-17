@@ -50,6 +50,10 @@
     background-color: #0074D9;
 }
 
+.local_extension .mform .fitem_actionbuttons {
+    margin-bottom: 0;
+}
+
 .local_extension .mform fieldset div {
     margin-left: 0;
 }
