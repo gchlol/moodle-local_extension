@@ -192,7 +192,7 @@ if ($mform->is_cancelled()) {
         $sub = new stdClass();
         $sub->userid = $USER->id;
         $sub->localcmid = $cm['id'];
-        $sub->requestid = $request['id'];
+        $sub->requestid = $cm['request'];
         $sub->lastmod = time();
         $sub->trig = null;
         $sub->access = rule::RULE_ACTION_DEFAULT;
