@@ -154,17 +154,22 @@ class cm {
      * @param mod_data $mod
      * @param int $state
      * @param int $userid
+     * @param int $time
      * @return stdClass $history
      */
-    public function write_history($mod, $state, $userid) {
+    public function write_history($mod, $state, $userid, $time = null) {
         global $DB;
+
+        if ($time === null) {
+            $time = time();
+        }
 
         $localcm = $mod->localcm;
 
         $history = new stdClass();
         $history->localcmid = $localcm->cmid;
         $history->requestid = $localcm->requestid;
-        $history->timestamp = time();
+        $history->timestamp = $time;
         $history->state = $state;
         $history->userid = $userid;
         $history->extlength = $localcm->cm->length;

@@ -114,13 +114,17 @@ if ($mform->is_cancelled()) {
     redirect($statusurl);
 
 } else if ($form = $mform->get_data()) {
+
+    // Use the same time for the attachments and comments.
+    $time = time();
+
     // Parse the form data to see if any accept/deny/reopen/etc buttons have been clicked, and update the state accordingly.
     // If the state has been approved then it will call the handers->submit_extension method to extend the module.
-    $notifycontent[] = state::instance()->update_cm_state($request, $USER, $form);
+    $notifycontent[] = state::instance()->update_cm_state($request, $USER, $form, $time);
 
     $comment = $form->commentarea;
     if (!empty($comment)) {
-        $notifycontent[] = $request->add_comment($USER, $comment);
+        $notifycontent[] = $request->add_comment($USER, $comment, $time);
     }
 
     // Cleaning up the array.
@@ -131,7 +135,7 @@ if ($mform->is_cancelled()) {
     $request->notify_subscribers($notifycontent, $USER->id);
 
     // Update the lastmod.
-    $request->update_lastmod($USER->id);
+    $request->update_lastmod($USER->id, $time);
 
     // Invalidate the cache for this request. The content has changed.
     $request->get_data_cache()->delete($request->requestid);

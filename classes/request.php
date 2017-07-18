@@ -177,20 +177,25 @@ class request implements \cache_data_source {
      *
      * @param stdClass $from The user that has commented.
      * @param string $msg The comment itself.
+     * @param int $time A timestamp.
      * @return object|string
      */
-    public function add_comment($from, $msg) {
+    public function add_comment($from, $msg, $time = null) {
         global $DB;
+
+        if ($time === null) {
+            $time = time();
+        }
 
         $comment = new stdClass();
         $comment->request = $this->requestid;
         $comment->userid = $from->id;
-        $comment->timestamp = time();
+        $comment->timestamp = $time;
         $comment->message = $msg;
         $DB->insert_record('local_extension_comment', $comment);
 
         // Update the lastmod.
-        $this->update_lastmod($from->id);
+        $this->update_lastmod($from->id, $time);
 
         return $comment;
     }
@@ -537,18 +542,23 @@ class request implements \cache_data_source {
      * Adds a stored_file hash to the history for this request.
      *
      * @param stored_file $file
+     * @param int $time A timestamp.
      * @return null|object
      */
-    public function add_attachment_history(stored_file $file) {
+    public function add_attachment_history(stored_file $file, $time = null) {
         global $DB;
 
         if ($file->is_directory()) {
             return null;
         }
 
+        if ($time === null) {
+            $time = time();
+        }
+
         $data = new stdClass();
         $data->requestid = $this->requestid;
-        $data->timestamp = time();
+        $data->timestamp = $time;
         $data->filehash = $file->get_pathnamehash();
         $data->userid = $file->get_userid();
 
@@ -568,7 +578,7 @@ class request implements \cache_data_source {
         $data->message = get_string('status_file_attachment', 'local_extension', $filelink);
 
         // Update the lastmod.
-        $this->update_lastmod($file->get_userid());
+        $this->update_lastmod($file->get_userid(), $time);
 
         return $data;
     }
@@ -672,14 +682,19 @@ class request implements \cache_data_source {
      * Updates the last modified time for this request.
      *
      * @param int $userid
+     * @param int $time
      * @return bool
      */
-    public function update_lastmod($userid) {
+    public function update_lastmod($userid, $time = null) {
         global $DB;
+
+        if ($time === null) {
+            $time = time();
+        }
 
         $record = new stdClass();
         $record->id = $this->requestid;
-        $record->lastmod = time();
+        $record->lastmod = $time;
         $record->lastmodid = $userid;
 
         $status = $DB->update_record('local_extension_request', $record);

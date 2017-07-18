@@ -87,6 +87,10 @@ if ($mform->is_cancelled()) {
     redirect($indexurl);
 
 } else if ($form = $mform->get_data()) {
+
+    // Use the same time for the attachments and comments.
+    $time = time();
+
     // If the state has changed, redirect to an intermediate page.
     state::instance()->has_submitted_state_change($form, $request);
 
@@ -149,12 +153,12 @@ if ($mform->is_cancelled()) {
         // This diff array will contain all the new files to be attached.
         $diff = array_diff_key($draftnames, $oldnames);
         foreach ($diff as $file) {
-            $notifycontent[] = $request->add_attachment_history($file);
+            $notifycontent[] = $request->add_attachment_history($file, $time);
         }
     }
 
     if (!empty($comment)) {
-        $notifycontent[] = $request->add_comment($USER, $comment);
+        $notifycontent[] = $request->add_comment($USER, $comment, $time);
     }
 
     // Cleaning up the array.
@@ -165,7 +169,7 @@ if ($mform->is_cancelled()) {
     $request->notify_subscribers($notifycontent, $USER->id);
 
     // Update the lastmod.
-    $request->update_lastmod($USER->id);
+    $request->update_lastmod($USER->id, $time);
 
     // Invalidate the cache for this request. The content has changed.
     $request->get_data_cache()->delete($request->requestid);

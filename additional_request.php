@@ -105,6 +105,10 @@ if ($reviewform->is_cancelled()) {
     redirect($PAGE->url);
 
 } else if ($reviewdata = $reviewform->get_data()) {
+
+    // Use the same time for the attachments and comments.
+    $time = time();
+
     // The review has been confirmed, try to submit the extension request!
     $notifycontent = [];
 
@@ -117,12 +121,12 @@ if ($reviewform->is_cancelled()) {
 
     // Update the state of the cm to state::REOPENED.
     $reviewdata->s = \local_extension\state::STATE_REOPENED;
-    $notifycontent[] = \local_extension\state::instance()->update_cm_state($request, $USER, $reviewdata);
+    $notifycontent[] = \local_extension\state::instance()->update_cm_state($request, $USER, $reviewdata, $time);
 
     // Adding the comment to the notify content.
     $comment = $reviewdata->commentarea;
     if (!empty($comment)) {
-        $notifycontent[] = $request->add_comment($USER, $comment);
+        $notifycontent[] = $request->add_comment($USER, $comment, $time);
     }
 
     // Obtain any new attachments that have been added.
@@ -178,7 +182,7 @@ if ($reviewform->is_cancelled()) {
         // This diff array will contain all the new files to be attached.
         $diff = array_diff_key($draftnames, $oldnames);
         foreach ($diff as $file) {
-            $notifycontent[] = $request->add_attachment_history($file);
+            $notifycontent[] = $request->add_attachment_history($file, $time);
         }
     }
 
@@ -192,9 +196,8 @@ if ($reviewform->is_cancelled()) {
 
     // Process the triggers before sending the notifications. New subscribers exist.
     $request->notify_subscribers($notifycontent, $USER->id);
-
     // Update the lastmod.
-    $request->update_lastmod($USER->id);
+    $request->update_lastmod($USER->id, $time);
 
     // Invalidate the cache for this request. The content has changed.
     $request->get_data_cache()->delete($request->requestid);

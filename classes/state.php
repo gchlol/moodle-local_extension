@@ -738,9 +738,14 @@ class state {
      * @param request $request
      * @param int $user
      * @param stdClass $data
+     * @param int $time
      * @return object|bool
      */
-    public function update_cm_state($request, $user, $data) {
+    public function update_cm_state($request, $user, $data, $time = null) {
+
+        if ($time === null) {
+            $time = time();
+        }
 
         $mod = $request->mods[$data->cmid];
 
@@ -773,7 +778,7 @@ class state {
         $status = $this->get_state_name($localcm->cm->state);
 
         // After writing the history it will return the ID of the new row.
-        $history = $localcm->write_history($mod, $state, $user->id);
+        $history = $localcm->write_history($mod, $state, $user->id, $time);
 
         $log = new stdClass();
         $log->status = $status;
@@ -799,7 +804,7 @@ class state {
         }
 
         // Update the lastmod.
-        $request->update_lastmod($user->id);
+        $request->update_lastmod($user->id, $time);
 
         // You can only edit one state at a time, returning here is ok!
         return $history;

@@ -102,6 +102,9 @@ if ($mform->is_cancelled()) {
     redirect($statusurl);
 
 } else if ($form = $mform->get_data()) {
+    // Use the same time for the attachments and comments.
+    $time = time();
+
     // TODO Edge cases with lowering the length beyond set triggers. Deal with changes / triggers.
     $cm = $request->cms[$cmid];
     $event = $request->mods[$cmid]->event;
@@ -145,12 +148,10 @@ if ($mform->is_cancelled()) {
         // The update_cm_state accepts form data with the state specified as 's'.
         $form->s = state::STATE_REOPENED;
     }
-    $notifycontent[] = state::instance()->update_cm_state($request, $USER, $form);
 
-    $notifycontent[] = $request->add_comment($USER, $datestring);
+    $notifycontent[] = state::instance()->update_cm_state($request, $USER, $form, $time);
 
-    // The state has changed / dates are different. Triggers may associate new users or set other rules.
-    $request->process_triggers();
+    $notifycontent[] = $request->add_comment($USER, $datestring, $time);
 
     // Process the triggers before sending the notifications. New subscribers exist.
     $request->notify_subscribers($notifycontent, $USER->id);
