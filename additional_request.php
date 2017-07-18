@@ -191,11 +191,12 @@ if ($reviewform->is_cancelled()) {
         return !is_null($obj);
     });
 
+    // Notify the core set of subscribers with updated details.
+    $request->notify_subscribers($notifycontent, $USER->id);
+
     // The state has changed / dates are different. Triggers may associate new users or set other rules.
     $request->process_triggers();
 
-    // Process the triggers before sending the notifications. New subscribers exist.
-    $request->notify_subscribers($notifycontent, $USER->id);
     // Update the lastmod.
     $request->update_lastmod($USER->id, $time);
 
