@@ -194,6 +194,9 @@ if ($reviewform->is_cancelled()) {
     // Notify the core set of subscribers with updated details.
     $request->notify_subscribers($notifycontent, $USER->id);
 
+    // We've modified the length of the request, too many people may be notified, lets reset the list of subscriptions.
+    $request->reset_subscribers($cmid);
+
     // The state has changed / dates are different. Triggers may associate new users or set other rules.
     $request->process_triggers();
 

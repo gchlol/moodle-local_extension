@@ -755,6 +755,31 @@ class request implements \cache_data_source {
     }
 
     /**
+     * Resets the list of subscribed users.
+     */
+    public function reset_subscribers($cmid) {
+        global $DB;
+
+        $params = [
+            'requestid' => $this->request->id,
+        ];
+
+        // Cleaning up all the subscriptions for this request.
+        $DB->delete_records('local_extension_subscription', $params);
+
+        // Setup the default subscription for the user making the request.
+        $sub = new stdClass();
+        $sub->userid = $this->request->userid;
+        $sub->localcmid = $cmid;
+        $sub->requestid = $this->request->id;
+        $sub->lastmod = time();
+        $sub->trig = null;
+        $sub->access = rule::RULE_ACTION_DEFAULT;
+
+        $DB->insert_record('local_extension_subscription', $sub);
+    }
+
+    /**
      * Returns the request cache.
      *
      * @return \cache_application|\cache_session|\cache_store
