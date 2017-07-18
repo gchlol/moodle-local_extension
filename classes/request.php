@@ -192,7 +192,10 @@ class request implements \cache_data_source {
         $comment->userid = $from->id;
         $comment->timestamp = $time;
         $comment->message = $msg;
-        $DB->insert_record('local_extension_comment', $comment);
+        $cid = $DB->insert_record('local_extension_comment', $comment);
+        $comment->id = $cid;
+
+        $this->comments[$cid] = $comment;
 
         // Update the lastmod.
         $this->update_lastmod($from->id, $time);
