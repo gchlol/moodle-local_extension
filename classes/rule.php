@@ -289,26 +289,43 @@ class rule {
      */
     public function process(&$request, $mod) {
         // Checks if the trigger for this cm has been activated.
-        if ($this->check_history($mod) === false) {
+        if ($this->check_history($mod)) {
+            // There are times when the request length has been modified, and triggers have already been fired.
 
-            // There are times when the request length has been modified, but triggers have already been fired.
-            // We will need to possibly reset the subscription data for this rule.
-            if ($this->check_request_length($mod) === true) {
+            // The result is true, the trigger has been fired.
+
+            /* We only need to check when the request length has changed, this can be changed via:
+
+               modify.php
+               additional_request.php
+
+               When the length has been modified we may need to reset the subscribers when processing ruleset.
+            */
+
+            // We are matching the rules request length checks. eg. Request lt/gt than 14 days.
+            if ($this->check_request_length($mod) === false) {
                 $this->setup_subscription($request, $mod);
             }
+
+            // Due to deleting the list of subscribed users we may need to add them back again if the rule has already
+            // triggered.
+            if ($this->check_elapsed_length($request, $mod) === false) {
+                $this->setup_subscription($request, $mod);
+            }
+
             return false;
         }
 
-        // If the parent has not been triggered then we abort.
-        if ($this->check_parent($mod, $this->parent) === false) {
+        // If the parent has been triggered then we abort.
+        if ($this->check_parent($mod, $this->parent)) {
             return false;
         }
 
-        if ($this->check_request_length($mod) === false) {
+        if ($this->check_request_length($mod)) {
             return false;
         }
 
-        if ($this->check_elapsed_length($request, $mod) === false) {
+        if ($this->check_elapsed_length($request, $mod)) {
             return false;
         }
 
@@ -375,6 +392,8 @@ class rule {
             $noreplyuser->firstname = get_string('supportusernamedefault', 'local_extension');
         }
 
+        $subject = $this->id . ' - ' . $this->name;
+
         // Notifying the roles.
         $rolecontent = $templates->role_content;
         if (!empty($rolecontent)) {
@@ -437,12 +456,15 @@ class rule {
                 'localcmid' => $localcm->cm->id,
             ];
 
-            $records = $DB->get_records('local_extension_subscription', $params, 'id asc', '*');
+            // Earlier code had duplicate subscription records hence the call to obtain many.
+            $records = $DB->get_records('local_extension_subscription', $params, 'id ASC');
 
             if (empty($records)) {
+                // Create a new record if it does not exist.
                 $sub = new stdClass();
                 $sub->access = self::RULE_ACTION_DEFAULT;
             } else {
+                // We now call get_records which returns an array, so pop the last value.
                 $sub = array_pop($records);
             }
 
@@ -517,7 +539,7 @@ class rule {
     }
 
     /**
-     * If the localcm has a history entry then this will return false.
+     * If the localcm has a history entry then this will return true.
      * This means that the triggers/rules have been fired off and users were notified.
      *
      * We do not want to fire the trigger multiple times.
@@ -540,12 +562,12 @@ class rule {
 
         $record = $DB->get_record('local_extension_hist_trig', $params);
 
-        // A record has been found. Return false to stop processing the trigger.
+        // A record has been found. Return true to stop processing the trigger.
         if (!empty($record)) {
-            return false;
+            return true;
         }
 
-        return true;
+        return false;
     }
 
     /**
@@ -708,7 +730,7 @@ class rule {
 
         // There is no parent. Lets rock.
         if (empty($parent)) {
-            return true;
+            return false;
         }
 
         $localcm = $mod->localcm;
@@ -754,24 +776,29 @@ class rule {
         $daterequested = $localcm->get_data();
         $datedue = $mod->event->timestart;
 
+        // The length of the request.
         $delta = $daterequested - $datedue;
 
+        // The length (in seconds) of the current rule.
         $days = $this->lengthfromduedate * 24 * 60 * 60;
 
         if ($this->lengthtype == self::RULE_CONDITION_ANY) {
-            return true;
+            // If the condition is any, then we always process this.
+            return false;
+
         } else if ($this->lengthtype == self::RULE_CONDITION_LT) {
             if ($delta < $days) {
-                return true;
+                return false;
             }
 
         } else if ($this->lengthtype == self::RULE_CONDITION_GE) {
             if ($delta >= $days) {
-                return true;
+                return false;
             }
         }
 
-        return false;
+        // The delta check against the rule type passes.
+        return true;
     }
 
     /**
@@ -787,19 +814,22 @@ class rule {
         $days = $this->elapsedfromrequest * 24 * 60 * 60;
 
         if ($this->elapsedtype == self::RULE_CONDITION_ANY) {
-            return true;
+            // If the condition is any, then we always process this.
+            return false;
+
         } else if ($this->elapsedtype == self::RULE_CONDITION_LT) {
             if ($delta < $days) {
-                return true;
+                return false;
             }
 
         } else if ($this->elapsedtype == self::RULE_CONDITION_GE) {
             if ($delta >= $days) {
-                return true;
+                return false;
             }
         }
 
-        return false;
+        // The delta check against the rule type passes.
+        return true;
     }
 
     /**
