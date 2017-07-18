@@ -153,8 +153,11 @@ if ($mform->is_cancelled()) {
 
     $notifycontent[] = $request->add_comment($USER, $datestring, $time);
 
-    // Process the triggers before sending the notifications. New subscribers exist.
+    // Notify the core set of subscribers with updated details.
     $request->notify_subscribers($notifycontent, $USER->id);
+
+    // The state has changed / dates are different. Triggers may associate new users or set other rules.
+    $request->process_triggers();
 
     $request->get_data_cache()->delete($request->requestid);
 
