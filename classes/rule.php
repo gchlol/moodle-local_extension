@@ -392,8 +392,6 @@ class rule {
             $noreplyuser->firstname = get_string('supportusernamedefault', 'local_extension');
         }
 
-        $subject = $this->id . ' - ' . $this->name;
-
         // Notifying the roles.
         $rolecontent = $templates->role_content;
         if (!empty($rolecontent)) {
