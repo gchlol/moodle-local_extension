@@ -60,7 +60,7 @@ if (!has_capability('local/extension:viewallrequests', $context)) {
     }
 }
 
-$url = new moodle_url('/local/extension/modify.php', array('id' => $requestid, 'course' => $courseid, 'cmid' => $cmid));
+$url = new moodle_url('/local/extension/modify.php', array('id' => $requestid, 'courseid' => $courseid, 'cmid' => $cmid));
 $PAGE->set_url($url);
 
 // TODO context could be user, course or module.
