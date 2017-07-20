@@ -155,19 +155,21 @@ class request extends \local_extension\base_request {
                 userdate($instance->allowsubmissionsfromdate));
         }
 
-        if ($instance && $instance->duedate) {
-            $mform->addElement('static', 'duedate', get_string('duedate', 'assign'), userdate($instance->duedate));
-            $finaldate = $instance->duedate;
-        }
-
         if ($instance && $instance->cutoffdate) {
             $mform->addElement('static', 'cutoffdate', get_string('cutoffdate', 'assign'), userdate($instance->cutoffdate));
             $finaldate = $instance->cutoffdate;
         }
 
+        if ($instance && $instance->duedate) {
+            $mform->addElement('static', 'duedate', get_string('duedateoriginal', 'local_extension'), userdate($instance->duedate));
+            $finaldate = $instance->duedate;
+        }
+
+        $mform->addElement('static', 'extensionduedate', get_string('duedateextension', 'local_extension'), userdate($lcm->get_data()));
+
         $extensionlength = utility::calculate_length($lcm->cm->length);
         if ($extensionlength) {
-            $mform->addElement('static', 'cutoffdate', 'Current extension length', $extensionlength);
+            $mform->addElement('static', 'currentlength', 'Current extension length', $extensionlength);
         }
 
         if (!$suppressdate) {

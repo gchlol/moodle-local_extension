@@ -249,6 +249,8 @@ class request extends \local_extension\base_request {
             $mform->addElement('static', 'duedate', get_string('duedate', 'assign'), userdate($quiz->timeclose));
         }
 
+        $mform->addElement('static', 'extensionduedate', get_string('duedateextension', 'local_extension'), userdate($lcm->get_data()));
+
         $extensionlength = utility::calculate_length($lcm->cm->length);
         if ($extensionlength) {
             $mform->addElement('static', 'cutoffdate', 'Current extension length', $extensionlength);
