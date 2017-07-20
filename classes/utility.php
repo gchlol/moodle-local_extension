@@ -106,8 +106,7 @@ class utility {
                 continue;
             }
 
-            $userid = 0;
-            if (defined('CLI_SCRIPT')) {
+            if (CLI_SCRIPT) {
                 $user = get_admin();
                 $userid = $user->id;
             }
