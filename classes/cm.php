@@ -98,7 +98,10 @@ class cm {
 
         $localcm = new cm($cmid, $userid, null);
 
-        $conditions = array('cmid' => $localcm->cmid, 'userid' => $localcm->userid);
+        $conditions = [
+            'cmid' => $localcm->cmid,
+            'userid' => $localcm->userid
+        ];
         $cm = $DB->get_record('local_extension_cm', $conditions, 'cmid,course,data,id,request,state,length,userid');
 
         if (!empty($cm)) {

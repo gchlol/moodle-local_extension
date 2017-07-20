@@ -78,20 +78,18 @@ $mod = $request->mods[$cmid];
 $course = $mod->course;
 $cm = $mod->cm;
 
-$params = array(
+$params = [
     'request' => $request,
     'cmid' => $cmid,
     'instance' => $mod->handler->get_instance($mod),
-);
+];
 
 $requestuser = core_user::get_user($request->request->userid);
+$pageurl = new moodle_url('/local/extension/status.php', ['id' => $request->requestid]);
+$obj = ['id' => $requestid, 'name' => fullname($requestuser)];
 
 $PAGE->navbar->ignore_active();
 $PAGE->navbar->add(get_string('breadcrumb_nav_index', 'local_extension'), new moodle_url('/local/extension/index.php'));
-
-$obj = array('id' => $requestid, 'name' => fullname($requestuser));
-
-$pageurl = new moodle_url('/local/extension/status.php', array('id' => $request->requestid));
 $PAGE->navbar->add(get_string('breadcrumb_nav_status', 'local_extension', $obj), $pageurl);
 $PAGE->navbar->add(get_string('breadcrumb_nav_modify', 'local_extension'));
 

@@ -53,7 +53,7 @@ $PAGE->requires->css('/local/extension/styles.css');
 $PAGE->add_body_class('local_extension');
 
 $requestuser = core_user::get_user($request->request->userid);
-$pageurl = new moodle_url('/local/extension/status.php', array('id' => $request->requestid));
+$pageurl = new moodle_url('/local/extension/status.php', ['id' => $request->requestid]);
 $obj = ['id' => $requestid, 'name' => fullname($requestuser)];
 
 $PAGE->navbar->ignore_active();
