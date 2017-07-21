@@ -770,7 +770,7 @@ class request implements \cache_data_source {
         // Setup the default subscription for the user making the request.
         $sub = new stdClass();
         $sub->userid = $this->request->userid;
-        $sub->localcmid = $cmid;
+        $sub->localcmid = $this->cms[$cmid]->cm->id;
         $sub->requestid = $this->request->id;
         $sub->lastmod = time();
         $sub->trig = null;
