@@ -385,7 +385,7 @@ class state {
         $duedate = $mod->event->timestart;
 
         $obj = new stdClass();
-        $obj->date = userdate($item->timestamp);
+        $obj->date = userdate($extdate);
         $obj->length = utility::calculate_length($extdate - $duedate);
 
         if (empty($obj->length)) {
