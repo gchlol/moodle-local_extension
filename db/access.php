@@ -38,4 +38,10 @@ $capabilities = array(
         'contextlevel' => CONTEXT_SYSTEM,
     ),
 
+    'local/extension:viewhistorydetail' => array(
+        'riskbitmask'  => RISK_PERSONAL,
+        'captype'      => 'read',
+        'contextlevel' => CONTEXT_SYSTEM,
+    ),
+
 );

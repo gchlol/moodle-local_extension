@@ -464,7 +464,7 @@ class state {
         $course = $mod->course;
         $context = \context_course::instance($course->id, MUST_EXIST);
 
-        $adminrights = has_capability('local/extension:viewallrequests', $context);
+        $adminrights = has_capability('local/extension:viewhistorydetail', $context);
 
         $html = html_writer::start_div('statusblock');
 

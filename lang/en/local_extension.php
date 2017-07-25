@@ -82,6 +82,7 @@ $string['extensionpolicystatus'] = 'Extension policy for status';
 $string['extensionpolicystatushelp'] = 'When viewing the status of a request, this policy will be displayed at the top of the page.';
 $string['extension:modifyrequeststatus'] = 'Abilitiy to force a status change in a request';
 $string['extension:viewallrequests'] = 'View all extension requests';
+$string['extension:viewhistorydetail'] = 'View detailed history in the extension status page';
 $string['externalrules'] = 'Manage Adapter Triggers';
 $string['form_modify_original_status'] = 'Original extension request details and status.';
 $string['form_modify_request_header'] = 'Please specify the new extension length.';
