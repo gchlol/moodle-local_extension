@@ -463,13 +463,8 @@ class state {
 
         $course = $mod->course;
         $context = \context_course::instance($course->id, MUST_EXIST);
-        $forcestatus = has_capability('local/extension:modifyrequeststatus', $context);
 
-        $approve = (rule::RULE_ACTION_APPROVE | rule::RULE_ACTION_FORCEAPPROVE);
-        $access = rule::get_access($mod, $USER->id);
-
-        // Admins and users with the capability will have the ability to view extra details with the state history.
-        $adminrights = $forcestatus | ($access & $approve);
+        $adminrights = has_capability('local/extension:viewallrequests', $context);
 
         $html = html_writer::start_div('statusblock');
 
