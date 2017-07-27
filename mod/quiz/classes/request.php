@@ -189,6 +189,7 @@ class request extends \local_extension\base_request {
 
         $event = $mod->event;
         $course = $mod->course;
+        $lcm = $mod->localcm;
 
         $user = $customdata['user'];
 
@@ -202,12 +203,18 @@ class request extends \local_extension\base_request {
 
         $mform->addElement('static', 'cutoffdate', 'Requested by', fullname($user));
 
+        $mform->addElement('static', 'timeclose', get_string('duedate', 'assign'), userdate($event->timeclose));
+        $mform->addElement('static', 'extensionduedate', get_string('duedateextension', 'local_extension'), userdate($lcm->get_data()));
+
+        $extensionlength = utility::calculate_length($lcm->cm->length);
+        if ($extensionlength) {
+            $mform->addElement('static', 'currentlength', 'Current extension length', $extensionlength);
+        }
+
         $showuseridentityfields = explode(',', $CFG->showuseridentity);
         if (in_array('idnumber', $showuseridentityfields)) {
             $mform->addElement('static', 'cutoffdate', 'ID number', $user->idnumber);
         }
-
-        $mform->addElement('static', 'timeclose', get_string('duedate', 'assign'), userdate($event->timeclose));
 
         return $html;
     }

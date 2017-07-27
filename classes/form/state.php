@@ -76,9 +76,6 @@ class state extends \moodleform {
 
         $handler->status_change_definition($mod, $mform, $this->_customdata);
 
-        $extensionlength = \local_extension\utility::calculate_length($lcm->cm->length);
-        $mform->addElement('static', 'extensionlength', 'Extension length', $extensionlength);
-
         $currentstate = \local_extension\state::instance()->get_state_name($lcm->cm->state);
         $mform->addElement('static', 'currentstate', 'Current state', $currentstate);
 
