@@ -288,6 +288,7 @@ class rule {
      * @return bool
      */
     public function process(&$request, $mod) {
+
         // Checks if the trigger for this cm has been activated.
         if ($this->check_history($mod)) {
             // There are times when the request length has been modified, and triggers have already been fired.
@@ -306,13 +307,6 @@ class rule {
             if ($this->check_request_length($mod) === false) {
                 $this->setup_subscription($request, $mod);
             }
-
-            // Due to deleting the list of subscribed users we may need to add them back again if the rule has already
-            // triggered.
-            if ($this->check_elapsed_length($request, $mod) === false) {
-                $this->setup_subscription($request, $mod);
-            }
-
             return false;
         }
 
