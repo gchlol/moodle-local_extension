@@ -44,4 +44,13 @@ $capabilities = array(
         'contextlevel' => CONTEXT_SYSTEM,
     ),
 
+    'local/extension:accessallcourserequests' => array(
+        'riskbitmask'  => RISK_SPAM | RISK_XSS | RISK_PERSONAL,
+        'captype'      => 'write',
+        'contextlevel' => CONTEXT_COURSE,
+        'archetypes'   => array(
+            'manager'        => CAP_ALLOW,
+            'editingteacher' => CAP_ALLOW,
+        ),
+    ),
 );

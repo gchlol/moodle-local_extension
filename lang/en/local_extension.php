@@ -80,6 +80,7 @@ $string['extensionpolicyrequest'] = 'Extension policy for request';
 $string['extensionpolicyrequesthelp'] = 'When making a new request, this policy will be displayed at the top of the page.';
 $string['extensionpolicystatus'] = 'Extension policy for status';
 $string['extensionpolicystatushelp'] = 'When viewing the status of a request, this policy will be displayed at the top of the page.';
+$string['extension:accessallcourserequests'] = 'Allow user to view all extension requests in the course';
 $string['extension:modifyrequeststatus'] = 'Abilitiy to force a status change in a request';
 $string['extension:viewallrequests'] = 'View all extension requests';
 $string['extension:viewhistorydetail'] = 'View detailed history in the extension status page';
