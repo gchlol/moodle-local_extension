@@ -61,7 +61,6 @@ class student extends request_list {
      * @param integer $stateid
      * @param string $search
      * @param string $faculty
-     * @return bool
      */
     public function generate_query($categoryid, $courseid, $stateid, $search, $faculty) {
         global $USER;
