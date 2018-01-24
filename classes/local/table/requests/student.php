@@ -140,11 +140,6 @@ class student extends request_list {
 
         $this->where = implode(" AND ", $this->where);
 
-        $sql = "SELECT {$this->select}\nFROM {$this->from}\nWHERE {$this->where}";
-        $sql = str_replace('{', 'mdl_', $sql);
-        $sql = str_replace('}', '', $sql);
-
-
         $this->set_sql($this->select, $this->from, $this->where, $this->params);
     }
 }

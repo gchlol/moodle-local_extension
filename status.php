@@ -23,6 +23,7 @@
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
+use local_extension\access\capability_checker;
 use local_extension\attachment_processor;
 use local_extension\state;
 use local_extension\utility;
@@ -39,11 +40,8 @@ $request = utility::cache_get_request($requestid);
 // The list of subscribed users populated each time the request object is generated.
 // The request object is invalidated and regenerated after each comment, attachment added, or rule triggered.
 
-if (!array_key_exists($USER->id, $request->users)) {
-    // Admin users will have this capability, or anyone that was subscribed.
-    if (!has_capability('local/extension:viewallrequests', context_system::instance())) {
-        print_error('permissiondenied', 'local_extension');
-    }
+if (!capability_checker::can_view_request($request)) {
+    print_error('permissiondenied', 'local_extension');
 }
 
 $url = new moodle_url('/local/extension/status.php', array('id' => $requestid));

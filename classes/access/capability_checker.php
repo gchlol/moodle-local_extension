@@ -25,6 +25,7 @@ namespace local_extension\access;
 
 use context_course;
 use context_coursecat;
+use context_system;
 
 defined('MOODLE_INTERNAL') || die();
 
@@ -39,12 +40,16 @@ class capability_checker {
 
     const CAPABILITY_ACCESS_ALL_COURSE_REQUESTS = 'local/extension:accessallcourserequests';
 
-    public static function can_view_all_requests($categoryid, $defaultcontext) {
+    public static function can_view_all_requests($categoryid = null, $defaultcontext = null) {
         if ($categoryid) {
             $categorycontext = context_coursecat::instance($categoryid);
             if (has_capability(self::CAPABILITY_VIEW_ALL_REQUESTS, $categorycontext)) {
                 return true;
             }
+        }
+
+        if (is_null($defaultcontext)) {
+            $defaultcontext = context_system::instance();
         }
 
         if (has_capability(self::CAPABILITY_VIEW_ALL_REQUESTS, $defaultcontext)) {
@@ -54,15 +59,42 @@ class capability_checker {
         return false;
     }
 
+    private static function can_access_all_course_requests($courseid) {
+        $context = context_course::instance($courseid);
+        $hascapability = has_capability(self::CAPABILITY_ACCESS_ALL_COURSE_REQUESTS, $context);
+        return $hascapability;
+    }
+
     public static function get_courses_ids_with_all_access_to_all_requests() {
         $mycourses = enrol_get_my_courses(['id'], 'id ASC');
         $withaccess = [];
         foreach ($mycourses as $mycourse) {
-            $context = context_course::instance($mycourse->id);
-            if (has_capability(self::CAPABILITY_ACCESS_ALL_COURSE_REQUESTS, $context)) {
+            if (self::can_access_all_course_requests($mycourse->id)) {
                 $withaccess[] = (int)$mycourse->id;
             }
         }
         return $withaccess;
+    }
+
+    public static function can_view_request($request) {
+        global $USER;
+
+        if (self::can_view_all_requests()) {
+            return true;
+        }
+
+        foreach ($request->cms as $cm) {
+            $courseid = $cm->cm->course;
+            if (self::can_access_all_course_requests($courseid)) {
+                return true;
+            }
+        }
+
+        // Is user subscribed?
+        if (array_key_exists($USER->id, $request->users)) {
+            return true;
+        }
+
+        return false;
     }
 }
