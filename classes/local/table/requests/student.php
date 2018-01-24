@@ -29,6 +29,7 @@ if (!defined('MOODLE_INTERNAL')) {
     die('Direct access to this script is forbidden.'); // It must be included from a Moodle page.
 }
 
+use local_extension\access\capability_checker;
 use moodle_url;
 use user_picture;
 
@@ -92,22 +93,29 @@ class student extends request_list {
 
         // Sometimes invalid trigger setup will assign multiple subscription states.
         // This queries the distinct possibilities.
-        $this->joins[] = "JOIN
+        // Filtering the subscriptions to only those that belong to the $USER.
+        // If a rule has been triggered this will grant access to individuals to modify/view the requests.
+        $this->joins[] = "LEFT JOIN
                               (
-                              SELECT DISTINCT localcmid,
-                              userid
-                              FROM {local_extension_subscription}
+                                  SELECT DISTINCT localcmid
+                                  FROM {local_extension_subscription}
+                                  WHERE userid = :subuserid
                               ) s
                           ON s.localcmid = lcm.id";
+        $this->params['subuserid'] = $USER->id;
 
         $this->joins[] = "JOIN {local_extension_request} r ON r.id = lcm.request";
         $this->joins[] = "JOIN {course} c ON c.id = lcm.course";
         $this->joins[] = "JOIN {user} u ON u.id = r.userid";
 
-        // Filtering the subscriptions to only those that belong to the $USER.
-        // If a rule has been triggered this will grant access to individuals to modify/view the requests.
-        $this->where[] = "s.userid = :subuserid";
-        $this->params = array_merge($this->params, ['subuserid' => $USER->id], $this->params);
+        // Show only records with subscription or that belong to a course with view capability.
+        $viewcoursesids = capability_checker::get_courses_ids_with_all_access_to_all_requests();
+        $where = 's.localcmid IS NOT NULL';
+        if (count($viewcoursesids) > 0) {
+            $viewcoursesids = implode(',', $viewcoursesids);
+            $where = "({$where} OR lcm.course IN ({$viewcoursesids}))";
+        }
+        $this->where[] = $where;
 
         if ($courseid != 1) {
             $this->where[] = "lcm.course = :courseid";
@@ -131,6 +139,11 @@ class student extends request_list {
         $this->from = implode("\n", $this->joins);
 
         $this->where = implode(" AND ", $this->where);
+
+        $sql = "SELECT {$this->select}\nFROM {$this->from}\nWHERE {$this->where}";
+        $sql = str_replace('{', 'mdl_', $sql);
+        $sql = str_replace('}', '', $sql);
+
 
         $this->set_sql($this->select, $this->from, $this->where, $this->params);
     }

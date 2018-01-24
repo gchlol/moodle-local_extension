@@ -23,6 +23,7 @@
 
 namespace local_extension\access;
 
+use context_course;
 use context_coursecat;
 
 defined('MOODLE_INTERNAL') || die();
@@ -34,18 +35,34 @@ defined('MOODLE_INTERNAL') || die();
  * @license     http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 class capability_checker {
+    const CAPABILITY_VIEW_ALL_REQUESTS = 'local/extension:viewallrequests';
+
+    const CAPABILITY_ACCESS_ALL_COURSE_REQUESTS = 'local/extension:accessallcourserequests';
+
     public static function can_view_all_requests($categoryid, $defaultcontext) {
         if ($categoryid) {
             $categorycontext = context_coursecat::instance($categoryid);
-            if (has_capability('local/extension:viewallrequests', $categorycontext)) {
+            if (has_capability(self::CAPABILITY_VIEW_ALL_REQUESTS, $categorycontext)) {
                 return true;
             }
         }
 
-        if (has_capability('local/extension:viewallrequests', $defaultcontext)) {
+        if (has_capability(self::CAPABILITY_VIEW_ALL_REQUESTS, $defaultcontext)) {
             return true;
         }
 
         return false;
+    }
+
+    public static function get_courses_ids_with_all_access_to_all_requests() {
+        $mycourses = enrol_get_my_courses(['id'], 'id ASC');
+        $withaccess = [];
+        foreach ($mycourses as $mycourse) {
+            $context = context_course::instance($mycourse->id);
+            if (has_capability(self::CAPABILITY_ACCESS_ALL_COURSE_REQUESTS, $context)) {
+                $withaccess[] = (int)$mycourse->id;
+            }
+        }
+        return $withaccess;
     }
 }
