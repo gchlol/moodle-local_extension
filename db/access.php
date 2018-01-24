@@ -23,6 +23,8 @@
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
+use local_extension\access\capability_checker;
+
 defined('MOODLE_INTERNAL') || die();
 
 $capabilities = array(
@@ -44,4 +46,13 @@ $capabilities = array(
         'contextlevel' => CONTEXT_SYSTEM,
     ),
 
+    capability_checker::CAPABILITY_ACCESS_ALL_COURSE_REQUESTS => array(
+        'riskbitmask'  => RISK_SPAM | RISK_XSS | RISK_PERSONAL,
+        'captype'      => 'write',
+        'contextlevel' => CONTEXT_COURSE,
+        'archetypes'   => array(
+            'manager'        => CAP_ALLOW,
+            'editingteacher' => CAP_ALLOW,
+        ),
+    ),
 );

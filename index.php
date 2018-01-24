@@ -23,6 +23,8 @@
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
+use local_extension\access\capability_checker;
+
 require_once(__DIR__ . '/../../config.php');
 require_once($CFG->libdir . '/coursecatlib.php');
 
@@ -48,20 +50,7 @@ if ($courseid) {
     $context = context_user::instance($USER->id, MUST_EXIST);
 }
 
-if ($categoryid) {
-    $categorycontext = context_coursecat::instance($categoryid);
-} else {
-    $categorycontext = $context;
-}
-
-$viewallrequests = false;
-if (has_capability('local/extension:viewallrequests', $categorycontext)) {
-    $viewallrequests = true;
-}
-
-if (has_capability('local/extension:viewallrequests', $context)) {
-    $viewallrequests = true;
-}
+$viewallrequests = capability_checker::can_view_all_requests($categoryid, $context);
 
 if (!$viewallrequests) {
     // The user cannot view all requests or select the categories.
