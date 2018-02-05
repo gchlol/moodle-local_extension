@@ -21,8 +21,9 @@
  * @license     http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
-use local_extension\request;
+use local_extension\mod_data;
 use local_extension\rule;
+use local_extension\test\extension_testcase;
 
 defined('MOODLE_INTERNAL') || die();
 
@@ -32,27 +33,45 @@ defined('MOODLE_INTERNAL') || die();
  * @copyright   2018 Catalyst IT Australia {@link http://www.catalyst-au.net}
  * @license     http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
-class local_extension_email_test extends advanced_testcase {
+class local_extension_email_test extends extension_testcase {
     public function test_the_subject_has_the_course_shortname() {
         $this->resetAfterTest();
 
         $course = $this->getDataGenerator()->create_course(['shortname' => 'XYZ_TEST']);
         $user = $this->getDataGenerator()->create_user();
+        $notifyuser = $this->getDataGenerator()->create_user();
 
         $rule = new rule();
 
-        $request = new request();
-        $request->request = (object)['userid' => $user->id, 'messageid' => 0];
+        $request = $this->create_request($user->id);
+        $request->subscribedids[] = $notifyuser->id;
 
-        $mod = (object)['course' => $course];
+        $mod = new mod_data();
+        $mod->course = $course;
+
+        $request->mods = [$mod];
 
         $templates = (object)['role_content' => '', 'user_content' => 'send it'];
 
+        $history = [
+            (object)[
+                'request'   => $request->requestid,
+                'userid'    => $user->id,
+                'timestamp' => time(),
+                'message'   => 'Testing',
+                'id'        => 0,
+            ],
+        ];
+
+
         $sink = phpunit_util::start_message_redirection();
-        $rule->send_notifications($request, $mod, $templates);
+        $rule->send_notifications($request, $mod, $templates); // Send rule notifications.
+        $request->notify_subscribers($history, $user->id);// Send subscriber notifications.
         phpunit_util::stop_message_redirection();
 
-        self::assertCount(1, $sink->get_messages());
-        self::assertContains('XYZ_TEST', $sink->get_messages()[0]->subject);
+        self::assertCount(2, $sink->get_messages());
+        foreach ($sink->get_messages() as $key => $message) {
+            self::assertContains('XYZ_TEST', $message->subject, "Message #[{$key}]");
+        }
     }
 }
