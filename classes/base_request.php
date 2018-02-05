@@ -25,8 +25,9 @@
 
 namespace local_extension;
 
+use html_writer;
+use moodle_url;
 use MoodleQuickForm;
-use stdClass;
 
 defined('MOODLE_INTERNAL') || die();
 
@@ -44,6 +45,14 @@ abstract class base_request {
      * @return string Module name
      */
     abstract public function get_name();
+
+    /**
+     * Gets when the given activity module is due.
+     *
+     * @param mod_data $mod Local mod_data object with event details
+     * @return int Timestamp indicating the due date for this activity.
+     */
+    abstract public function get_due_date($mod);
 
     /**
      * Data type name.
@@ -69,14 +78,6 @@ abstract class base_request {
      * @param MoodleQuickForm $mform A moodle form object
      */
     abstract public function request_definition($mod, $mform);
-
-    /**
-     * Define parts of the request for for an event object
-     *
-     * @param mod_data $mod Local mod_data object with event details
-     * @param MoodleQuickForm $mform A moodle form object
-     */
-    abstract public function status_definition($mod, $mform);
 
     /**
      * Return data to be stored for the request
@@ -162,5 +163,39 @@ abstract class base_request {
         $formid = 'due' . $lcm->cmid;
         $mform->addElement('date_time_selector', $formid, get_string('requestdue', 'extension_assign'), $dateconfig);
         $mform->setDefault($formid, $defaultdate);
+    }
+
+    /**
+     * Define parts of the request for for an event object
+     *
+     * @param mod_data        $mod   Local mod_data object with event details
+     * @param MoodleQuickForm $mform A moodle form object
+     * @return string
+     */
+    public function status_definition($mod, $mform) {
+        $event = $mod->event;
+        $course = $mod->course;
+        $localcm = $mod->localcm;
+        $cmid = $localcm->cmid;
+
+        $courselink = new moodle_url('/course/view.php', ['id' => $course->id]);
+        $courselink = html_writer::link($courselink, $course->fullname);
+
+        $eventlink = new moodle_url('/mod/' . $event->modulename . '/view.php', ['id' => $cmid]);
+        $eventlink = html_writer::link($eventlink, $event->name);
+
+        $coursestring = html_writer::tag('b', $courselink . ' > ' . $eventlink);
+        $coursestring = html_writer::div($coursestring, 'mod');
+
+        $dueon = get_string('dueon', 'extension_assign', userdate($this->get_due_date($mod)));
+        $dueon = html_writer::div($dueon);
+
+        $html = html_writer::div($coursestring . ' ' . $dueon, 'content');
+
+        if (!empty($mform)) {
+            $mform->addElement('html', $html);
+        }
+
+        return $html;
     }
 }
