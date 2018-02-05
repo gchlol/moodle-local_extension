@@ -644,6 +644,7 @@ class request implements \cache_data_source {
             $fullname = \fullname($requestuser, true);
 
             $data = new stdClass();
+            $data->courseshortname = array_values($this->mods)[0]->course->shortname;
             $data->requestid = $this->requestid;
             $data->fullname = $fullname;
 

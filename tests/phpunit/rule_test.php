@@ -23,10 +23,9 @@
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
-defined('MOODLE_INTERNAL') || die('Direct access to this script is forbidden');
+use local_extension\test\extension_testcase;
 
-global $CFG;
-require_once($CFG->dirroot . '/mod/assign/locallib.php');
+defined('MOODLE_INTERNAL') || die('Direct access to this script is forbidden');
 
 /**
  * Rule tests.
@@ -35,7 +34,7 @@ require_once($CFG->dirroot . '/mod/assign/locallib.php');
  * @copyright  Catalyst IT
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
-class local_extension_rule_testcase extends advanced_testcase {
+class local_extension_rule_testcase extends extension_testcase {
 
     /** @var int number of students to create */
     const DEFAULT_STUDENT_COUNT = 3;
@@ -262,16 +261,7 @@ class local_extension_rule_testcase extends advanced_testcase {
 
         $activities = \local_extension\utility::get_activities($user->id, $start, $end);
 
-        $request = array(
-            'userid' => $user->id,
-            'lastmodid' => $user->id,
-            'lastmod' => $now,
-            'searchstart' => $start,
-            'searchend' => $end,
-            'timestamp' => $now,
-        );
-
-        $request['id'] = $DB->insert_record('local_extension_request', $request);
+        $request = (array)$this->create_request($user->id, $start, $end, $now)->request;
 
         foreach ($activities as $cmid => $mod) {
             $course = $mod->course;
