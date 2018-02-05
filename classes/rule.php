@@ -374,6 +374,7 @@ class rule {
 
         // The email subject, for the moment a language string.
         $data = new stdClass();
+        $data->courseshortname = $mod->course->shortname;
         $data->requestid = $request->requestid;
         $data->fullname = fullname($requestuser, true);
         $subject = get_string('email_notification_subject', 'local_extension', $data);
