@@ -172,7 +172,7 @@ abstract class base_request {
      * @param MoodleQuickForm $mform A moodle form object
      * @return string
      */
-    public function status_definition($mod, $mform) {
+    public function status_definition($mod, $mform = null) {
         $event = $mod->event;
         $course = $mod->course;
         $localcm = $mod->localcm;
@@ -190,7 +190,7 @@ abstract class base_request {
         $dueon = get_string('dueon', 'extension_assign', userdate($this->get_due_date($mod)));
         $dueon = html_writer::div($dueon);
 
-        $html = html_writer::div($coursestring . ' ' . $dueon, 'content');
+        $html = html_writer::div($coursestring . ' ' . $dueon, 'content local_extension_title');
 
         if (!empty($mform)) {
             $mform->addElement('html', $html);

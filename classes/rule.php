@@ -358,6 +358,20 @@ class rule {
     }
 
     /**
+     * Check if the users access is either approve or force.
+     *
+     * @param mod_data $mod
+     * @param int $userid
+     * @return bool
+     */
+    public static function can_approve($mod, $userid) {
+        $bitmask = (rule::RULE_ACTION_APPROVE | rule::RULE_ACTION_FORCEAPPROVE);
+        $access = rule::get_access($mod, $userid);
+
+        return (bool)($access & $bitmask);
+    }
+
+    /**
      * Helper to send notifications for roles based on the rule and request. Used when processing rules.
      *
      * @param request $request
