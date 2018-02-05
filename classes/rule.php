@@ -365,8 +365,8 @@ class rule {
      * @return bool
      */
     public static function can_approve($mod, $userid) {
-        $bitmask = (rule::RULE_ACTION_APPROVE | rule::RULE_ACTION_FORCEAPPROVE);
-        $access = rule::get_access($mod, $userid);
+        $bitmask = (self::RULE_ACTION_APPROVE | self::RULE_ACTION_FORCEAPPROVE);
+        $access = self::get_access($mod, $userid);
 
         return (bool)($access & $bitmask);
     }

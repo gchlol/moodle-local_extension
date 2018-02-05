@@ -131,7 +131,7 @@ class request implements \cache_data_source {
 
         // Fetch the users.
         list($uids, $params) = $DB->get_in_or_equal($userids);
-        $userfields = \user_picture::fields();
+        $userfields = \user_picture::fields('', ['idnumber']);
         $sql = "SELECT $userfields
                   FROM {user}
                  WHERE id $uids";

@@ -27,7 +27,6 @@ namespace local_extension\form;
 
 use html_writer;
 use local_extension\access\capability_checker;
-use local_extension\base_request;
 use local_extension\rule;
 use local_extension\state;
 
