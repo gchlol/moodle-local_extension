@@ -63,7 +63,6 @@ class local_extension_email_test extends extension_testcase {
             ],
         ];
 
-
         $sink = phpunit_util::start_message_redirection();
         $rule->send_notifications($request, $mod, $templates); // Send rule notifications.
         $request->notify_subscribers($history, $user->id);// Send subscriber notifications.
