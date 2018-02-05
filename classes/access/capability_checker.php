@@ -65,6 +65,12 @@ class capability_checker {
         return $hascapability;
     }
 
+    public static function can_force_change_status($courseid) {
+        $context = context_course::instance($courseid);
+        $hascapability = has_capability('local/extension:modifyrequeststatus', $context);
+        return $hascapability;
+    }
+
     public static function get_courses_ids_with_all_access_to_all_requests() {
         $mycourses = enrol_get_my_courses(['id'], 'id ASC');
         $withaccess = [];

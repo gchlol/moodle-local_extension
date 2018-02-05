@@ -26,6 +26,10 @@
     font-weight: bold;
 }
 
+.local_extension .comment .useridnumber {
+    font-style: oblique;
+}
+
 .local_extension span.statusinternal {
     background-color: #bc57d9;
 }
@@ -67,11 +71,23 @@
     margin-top: 10px;
 }
 
-.local_extension .mform fieldset div .comment {
-    margin-bottom: 8px;
+.local_extension .mform fieldset .comments > div.comment {
+    background-color: #fff;
+    border: 1px solid #ccc;
+    border-radius: 5px;
     min-height: 30px;
+    padding: 2px;
     position: relative;
 }
+
+.local_extension .mform fieldset .comments > div.comment > div.avatar {
+    margin-left: 2px;
+}
+
+.local_extension .mform fieldset .comments > div.comment > div.avatar img {
+    border-radius: 5px;
+}
+
 .local_extension table tr.clearrow td {
     background-color: inherit;
     border: 1px none;
@@ -143,5 +159,9 @@
 }
 
 .local_extension_status .statusblock {
+    margin-bottom: 20px;
+}
+
+.local_extension_title {
     margin-bottom: 20px;
 }

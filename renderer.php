@@ -42,10 +42,9 @@ class local_extension_renderer extends plugin_renderer_base {
      * Extension comment renderer.
      *
      * @param \local_extension\request $req The extension request object.
-     * @param boolean $showdate If this is set, then print the full date instead of 'time ago'.
      * @return string $out The html output.
      */
-    public function render_extension_comments(\local_extension\request $req, $showdate = false) {
+    public function render_extension_comments(\local_extension\request $req) {
         $out = '';
 
         $out .= html_writer::start_tag('div', ['class' => 'comments']);
@@ -79,7 +78,7 @@ class local_extension_renderer extends plugin_renderer_base {
                 $comment->timestamp = $items[0]->timestamp;
                 $comment->userid = $items[0]->userid;
                 $comment->message = $message;
-                $out .= $this->render_single_comment($req, $comment, $showdate);
+                $out .= $this->render_single_comment($req, $comment);
             }
         }
 
@@ -93,10 +92,9 @@ class local_extension_renderer extends plugin_renderer_base {
      *
      * @param \local_extension\request $req
      * @param stdClass $comment
-     * @param boolean $showdate If this is set, then print the full date instead of 'time ago'.
      * @return string $out
      */
-    public function render_single_comment(\local_extension\request $req, $comment, $showdate = false) {
+    public function render_single_comment(\local_extension\request $req, $comment) {
         $class = 'content';
         $out = '';
 
@@ -114,8 +112,11 @@ class local_extension_renderer extends plugin_renderer_base {
 
         $out .= html_writer::start_tag('div', ['class' => $class]);
         $out .= html_writer::tag('span', fullname($user), ['class' => 'name']);
+        if (!empty($user->idnumber)) {
+            $out .= html_writer::tag('span', " ({$user->idnumber})", ['class' => 'useridnumber']);
+        }
         $out .= html_writer::tag('span', ' - ' . $this->render_role($req, $user->id), ['class' => 'role']);
-        $out .= html_writer::tag('span', ' - ' . $this->render_time($comment->timestamp, $showdate), ['class' => 'time']);
+        $out .= html_writer::tag('span', ' - ' . $this->render_time($comment->timestamp), ['class' => 'time']);
 
         $out .= html_writer::start_tag('div', ['class' => 'message']);
         $out .= html_writer::div(format_text(trim($comment->message), FORMAT_MOODLE), 'comment');
@@ -174,17 +175,12 @@ class local_extension_renderer extends plugin_renderer_base {
         $show = format_time($delta);
         $num = strtok($show, ' ');
         $unit = strtok(' ');
-        $show = "$num $unit";
+        $show = "$num $unit ".get_string('ago', 'local_extension');
 
         // The full date.
-        $fulldate = userdate($time);
+        $fulldate = userdate($time, get_string('strftime_datetime', 'local_extension'));
 
-        if ($showdate) {
-            return html_writer::tag('abbr', $fulldate);
-        } else {
-            return html_writer::tag('abbr', $show, ['title' => $fulldate]);
-        }
-
+        return "{$fulldate} ($show)";
     }
 
     /**

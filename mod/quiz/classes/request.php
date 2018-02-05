@@ -28,7 +28,6 @@ namespace extension_quiz;
 use html_writer;
 use local_extension\mod_data;
 use local_extension\rule;
-use local_extension\state;
 use local_extension\utility;
 use moodleform;
 use MoodleQuickForm;
@@ -142,38 +141,8 @@ class request extends \local_extension\base_request {
         return $html;
     }
 
-    /**
-     * Define parts of the request for for an event object
-     *
-     * @param mod_data $mod Local mod_data object with event details
-     * @param moodleform $mform A moodle form object
-     * @return string
-     */
-    public function status_definition($mod, $mform = null) {
-        $event = $mod->event;
-        $course = $mod->course;
-        $localcm = $mod->localcm;
-        $cmid = $localcm->cmid;
-
-        $html = html_writer::start_div('content');
-
-        $courseurl = new \moodle_url('/course/view.php', array('id' => $course->id));
-        $courselink = html_writer::link($courseurl, $course->fullname);
-
-        $eventurl = new \moodle_url('/mod/' . $event->modulename . '/view.php', array('id' => $cmid));
-        $eventlink = html_writer::link($eventurl, $event->name);
-
-        $coursestring = html_writer::tag('b', $courselink. ' > ' . $eventlink, array('class' => 'mod'));
-        $str = get_string('dueon', 'extension_assign', userdate($event->timeclose));
-        $html .= html_writer::tag('p', $coursestring . ' ' . $str);
-
-        $html .= html_writer::end_div(); // End .content.
-
-        if (!empty($mform)) {
-            $mform->addElement('html', $html);
-        }
-
-        return $html;
+    public function get_due_date($mod) {
+        return $mod->event->timeclose;
     }
 
     /**

@@ -25,6 +25,7 @@
  */
 
 $string['admin_settings_general'] = 'Extension settings';
+$string['ago'] = 'ago';
 $string['and'] = 'and';
 $string['attachmentpolicy'] = 'File attachment policy';
 $string['attachmentpolicyhelp'] = 'This policy will be displayed above the attachment field.';
@@ -260,6 +261,7 @@ $string['status_status_internal_with_length'] = 'extension overrides the request
 $string['status_status_summary_extra_details'] = 'Updated by {$a->user} on {$a->date}.';
 $string['status_status_summary_with_length'] = 'extension request for {$a->length} until {$a->date}.';
 $string['status_status_summary_without_length'] = 'extension request on {$a->date}.';
+$string['strftime_datetime'] = '%d/%m/%Y %H:%M';
 $string['submit_additional_request'] = 'Submit additional request';
 $string['submit_additional_review'] = 'Review additional request';
 $string['submit_comment'] = 'Submit comment';

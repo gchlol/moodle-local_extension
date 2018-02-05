@@ -26,6 +26,7 @@
 namespace local_extension\form;
 
 use html_writer;
+use local_extension\access\capability_checker;
 use local_extension\rule;
 use local_extension\state;
 
@@ -33,6 +34,7 @@ if (!defined('MOODLE_INTERNAL')) {
     die('Direct access to this script is forbidden.'); // It must be included from a Moodle page.
 }
 
+global $CFG;
 require_once($CFG->libdir . '/formslib.php');
 
 /**
@@ -49,51 +51,14 @@ class status extends \moodleform {
      * @see moodleform::definition()
      */
     public function definition() {
-        global $USER;
-
         $mform    = $this->_form;
         $request  = $this->_customdata['request'];
         /* @var \local_extension_renderer $renderer IDE hinting */
         $renderer = $this->_customdata['renderer'];
         $mods     = $request->mods;
 
-        $state = state::instance();
-
-        foreach ($mods as $id => $mod) {
-            $localcm = $mod->localcm;
-            $course = $mod->course;
-            $handler = $mod->handler;
-            $stateid = $localcm->cm->state;
-            $userid = $localcm->userid;
-
-            // The capability 'local/extension:modifyrequeststatus' allows a user to force change the status.
-            $context = \context_course::instance($course->id, MUST_EXIST);
-            $forcestatus = has_capability('local/extension:modifyrequeststatus', $context);
-
-            // If the users access is either approve or force, then they can see the approval buttons.
-            $approve = (rule::RULE_ACTION_APPROVE | rule::RULE_ACTION_FORCEAPPROVE);
-            $access = rule::get_access($mod, $USER->id);
-
-            // Displays details about the course, module, due dates.
-            $handler->status_definition($mod, $mform);
-
-            // Displays a list of state changes, their status and extension length.
-            $state->render_state_definition($mod, $mform);
-
-            if ($forcestatus) {
-                // The user has the required capabilities, allow them to change everything.
-                $state->render_force_buttons($mform, $stateid, $localcm);
-
-            } else if ($USER->id == $userid) {
-                // A student is viewing this component, display the additional request buttons and basic cancellation.
-                $state->render_owner_buttons($mform, $stateid, $localcm);
-
-            } else if ($access & $approve) {
-                // The user has the approiate level of access to confirm, deny or extend the request.
-                $state->render_approve_buttons($mform, $stateid, $localcm);
-
-            }
-
+        foreach ($mods as $mod) {
+            $this->definition_for_module($mod);
         }
 
         $html = '';
@@ -126,5 +91,27 @@ class status extends \moodleform {
         $buttonarray[] = &$mform->createElement('cancel', 'cancel', get_string('back'));
         $mform->addGroup($buttonarray, 'buttonar', '', array(' '), false);
         $mform->closeHeaderBefore('buttonar');
+    }
+
+    private function definition_for_module($mod) {
+        global $USER;
+
+        $state = state::instance();
+
+        $mod->handler->status_definition($mod, $this->_form);
+
+        // Displays a list of state changes, their status and extension length.
+        $state->render_state_definition($mod, $this->_form);
+
+        if (capability_checker::can_force_change_status($mod->course->id)) {
+            // The user has the required capabilities, allow them to change everything.
+            $state->render_force_buttons($this->_form, $mod->localcm->cm->state, $mod->localcm);
+        } else if ($USER->id == $mod->localcm->userid) {
+            // A student is viewing this component, display the additional request buttons and basic cancellation.
+            $state->render_owner_buttons($this->_form, $mod->localcm->cm->state, $mod->localcm);
+        } else if (rule::can_approve($mod, $USER->id)) {
+            // The user has the approiate level of access to confirm, deny or extend the request.
+            $state->render_approve_buttons($this->_form, $mod->localcm->cm->state, $mod->localcm);
+        }
     }
 }
