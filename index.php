@@ -103,6 +103,15 @@ if (!$table->is_downloading()) {
     // New filter functionality, searching and listing of requests.
     echo $renderer->render_index_search_controls($context, $categoryid, $courseid, $stateid, $baseurl, $search, $faculty);
 
+    if (capability_checker::can_export_csv()) {
+        $url = clone $baseurl;
+        $url->param('download', 'csv');
+        echo html_writer::div(
+            $OUTPUT->single_button($url, get_string('export_csv', 'local_extension')),
+            'local_extension_export_csv'
+        );
+    }
+
     echo html_writer::tag('h2', get_string('page_h2_summary', 'local_extension'));
 }
 
