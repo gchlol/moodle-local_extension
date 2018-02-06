@@ -165,3 +165,7 @@
 .local_extension_title {
     margin-bottom: 20px;
 }
+
+.local_extension_export_csv {
+    float: right;
+}
