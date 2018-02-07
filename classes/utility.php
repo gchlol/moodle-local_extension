@@ -112,7 +112,18 @@ class utility {
             }
 
             if (!\core_availability\info_module::is_user_visible($cm, $userid, false)) {
-                continue;
+                // Keep mod_data if user has a request for it.
+                $usercmsids = $DB->get_records(
+                    'local_extension_cm',
+                    ['userid' => $userid],
+                    'id ASC',
+                    'id,cmid');
+                foreach ($usercmsids as &$usercmsid) {
+                    $usercmsid = $usercmsid->cmid;
+                }
+                if (!in_array($cm->id, $usercmsids)) {
+                    continue;
+                }
             }
 
             // Now give the handler a chance to filter, for instance an activity
