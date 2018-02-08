@@ -734,8 +734,6 @@ class state {
 
         $mod = $request->mods[$data->cmid];
 
-        $handler = $mod->handler;
-
         $localcm = $mod->localcm;
         $event   = $mod->event;
         $course  = $mod->course;
@@ -744,15 +742,15 @@ class state {
         $state = $data->s;
 
         // The extension has been approved. Lets hook into the handler and extend the items length.
-        if ($state == self::STATE_APPROVED) {
-            $handler->submit_extension($event->instance,
-                                       $request->request->userid,
-                                       $localcm->cm->data);
-
-        } else if ($state == self::STATE_CANCEL ||
-                   $state == self::STATE_DENIED) {
-            $handler->cancel_extension($event->instance,
-                                       $request->request->userid);
+        if (!is_null($mod->handler)) {
+            if ($state == self::STATE_APPROVED) {
+                $mod->handler->submit_extension($event->instance,
+                                                $request->request->userid,
+                                                $localcm->cm->data);
+            } else if ($state == self::STATE_CANCEL || $state == self::STATE_DENIED) {
+                $mod->handler->cancel_extension($event->instance,
+                                                $request->request->userid);
+            }
         }
 
         $ret = $localcm->set_state($state);
@@ -768,7 +766,7 @@ class state {
         $log = new stdClass();
         $log->status = $status;
         $log->course = $course->fullname;
-        $log->event = $event->name;
+        $log->event = is_null($event) ? $mod->cm->name : $event->name;
 
         $history->message = get_string('request_state_history_log', 'local_extension', $log);
 

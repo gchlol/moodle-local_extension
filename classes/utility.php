@@ -25,6 +25,10 @@
 
 namespace local_extension;
 
+use context;
+use context_course;
+use context_module;
+use context_system;
 use local_extension\plugininfo\extension;
 use stdClass;
 
@@ -693,5 +697,32 @@ class utility {
         }
 
         return $diff->format($fmt);
+    }
+
+    /**
+     * Try to return the module context for the given CMID.
+     * If the course module was deleted, return the course context where it was.
+     * If cannot find course, use system context.
+     *
+     * @param $cmid
+     * @return context
+     */
+    public static function get_context($cmid) {
+        global $DB;
+
+        if ($DB->count_records('course_modules', ['id' => $cmid]) > 0) {
+            return context_module::instance($cmid);
+        }
+
+        // Course module deleted, use course context.
+        $course = $DB->get_field('local_extension_cm',
+                                 'course',
+                                 ['cmid' => $cmid],
+                                 IGNORE_MULTIPLE);
+        if ($course) {
+            return context_course::instance($course);
+        }
+
+        return context_system::instance();
     }
 }
