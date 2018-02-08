@@ -25,10 +25,12 @@
 
 namespace local_extension;
 
+use local_extension\plugininfo\extension;
 use stdClass;
 
 defined('MOODLE_INTERNAL') || die();
 
+global $CFG;
 require_once($CFG->libdir . '/tablelib.php');
 require_once($CFG->dirroot . '/calendar/lib.php');
 require_once($CFG->dirroot . '/user/lib.php');
@@ -183,7 +185,51 @@ class utility {
 
         }
 
+        if ($requestid > 0) {
+            $events = self::get_activities_for_requestid($events, $requestid, $userid);
+        }
+
         return $events;
+    }
+
+    private static function get_activities_for_requestid($events, $requestid, $userid) {
+        global $DB;
+
+        $cms = $DB->get_records('local_extension_cm',
+                                ['request' => $requestid, 'userid' => $userid],
+                                'id ASC',
+                                'id, cmid');
+
+        foreach ($cms as $cm) {
+            if (!array_key_exists($cm->cmid, $events)) {
+                $events[$cm->cmid] = self::create_request_mod_data($cm->cmid, $userid);
+            }
+        }
+
+        return $events;
+    }
+
+    public static function create_request_mod_data($cmid, $userid) {
+        global $DB;
+
+        list($course, $cm) = get_course_and_cm_from_cmid($cmid);
+
+        $events = $DB->get_records('event',
+                                   [
+                                       'courseid'   => $course->id,
+                                       'modulename' => $cm->modname,
+                                       'instance'   => $cm->instance,
+                                   ],
+                                   'id ASC');
+
+        $data = new mod_data();
+        $data->event = reset($events);
+        $data->cm = $cm;
+        $data->localcm = cm::from_userid($cm->id, $userid);
+        $data->course = $course;
+        $data->handler = extension::get_enabled_request()[$cm->modname];
+
+        return $data;
     }
 
     /**
