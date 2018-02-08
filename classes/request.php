@@ -319,7 +319,7 @@ class request implements \cache_data_source {
             $log = new stdClass();
             $log->status = $status;
             $log->course = $course->fullname;
-            $log->event = $event->name;
+            $log->event = is_null($event) ? $mod->cm->name : $event->name;
 
             $log = get_string('request_state_history_log', 'local_extension', $log);
 

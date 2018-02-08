@@ -197,37 +197,49 @@ class utility {
 
         $cms = $DB->get_records('local_extension_cm',
                                 ['request' => $requestid, 'userid' => $userid],
-                                'id ASC',
-                                'id, cmid');
+                                'id ASC');
 
         foreach ($cms as $cm) {
             if (!array_key_exists($cm->cmid, $events)) {
-                $events[$cm->cmid] = self::create_request_mod_data($cm->cmid, $userid);
+                $events[$cm->cmid] = self::create_request_mod_data($cm, $userid);
             }
         }
 
         return $events;
     }
 
-    public static function create_request_mod_data($cmid, $userid) {
+    public static function create_request_mod_data($localcm, $userid) {
         global $DB;
 
-        list($course, $cm) = get_course_and_cm_from_cmid($cmid);
-
-        $events = $DB->get_records('event',
-                                   [
-                                       'courseid'   => $course->id,
-                                       'modulename' => $cm->modname,
-                                       'instance'   => $cm->instance,
-                                   ],
-                                   'id ASC');
+        if ($DB->count_records('course_modules', ['id' => $localcm->cmid]) == 0) {
+            $course = get_course($localcm->course);
+            // If it was deleted, add some basic information.
+            $cm = (object)[
+                'id'     => $localcm->cmid,
+                'course' => $course->id,
+                'name'   => '[DELETED] ' . $localcm->name,
+            ];
+            $event = null;
+            $handler = null;
+        } else {
+            list($course, $cm) = get_course_and_cm_from_cmid($localcm->cmid);
+            $events = $DB->get_records('event',
+                                       [
+                                           'courseid'   => $course->id,
+                                           'modulename' => $cm->modname,
+                                           'instance'   => $cm->instance,
+                                       ],
+                                       'id ASC');
+            $event = reset($events);
+            $handler = extension::get_enabled_request()[$cm->modname];
+        }
 
         $data = new mod_data();
-        $data->event = reset($events);
+        $data->event = $event;
         $data->cm = $cm;
         $data->localcm = cm::from_userid($cm->id, $userid);
         $data->course = $course;
-        $data->handler = extension::get_enabled_request()[$cm->modname];
+        $data->handler = $handler;
 
         return $data;
     }
@@ -685,5 +697,4 @@ class utility {
 
         return $diff->format($fmt);
     }
-
 }
