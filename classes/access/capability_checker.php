@@ -24,7 +24,6 @@
 namespace local_extension\access;
 
 use context_course;
-use context_coursecat;
 use context_system;
 
 defined('MOODLE_INTERNAL') || die();
@@ -42,23 +41,14 @@ class capability_checker {
 
     const CAPABILITY_EXPORT_REQUESTS_CSV = 'local/extension:exportrequestscsv';
 
-    public static function can_view_all_requests($categoryid = null, $defaultcontext = null) {
-        if ($categoryid) {
-            $categorycontext = context_coursecat::instance($categoryid);
-            if (has_capability(self::CAPABILITY_VIEW_ALL_REQUESTS, $categorycontext)) {
-                return true;
-            }
-        }
-
+    public static function can_view_all_requests($defaultcontext = null) {
         if (is_null($defaultcontext)) {
             $defaultcontext = context_system::instance();
         }
 
-        if (has_capability(self::CAPABILITY_VIEW_ALL_REQUESTS, $defaultcontext)) {
-            return true;
-        }
+        $hascapability = has_capability(self::CAPABILITY_VIEW_ALL_REQUESTS, $defaultcontext);
 
-        return false;
+        return $hascapability;
     }
 
     private static function can_access_all_course_requests($courseid) {
