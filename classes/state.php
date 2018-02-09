@@ -743,12 +743,13 @@ class state {
 
         // The extension has been approved. Lets hook into the handler and extend the items length.
         if (!is_null($mod->handler)) {
+            $instance = is_null($event) ? null : $event->instance;
             if ($state == self::STATE_APPROVED) {
-                $mod->handler->submit_extension($event->instance,
+                $mod->handler->submit_extension($instance,
                                                 $request->request->userid,
                                                 $localcm->cm->data);
             } else if ($state == self::STATE_CANCEL || $state == self::STATE_DENIED) {
-                $mod->handler->cancel_extension($event->instance,
+                $mod->handler->cancel_extension($instance,
                                                 $request->request->userid);
             }
         }
