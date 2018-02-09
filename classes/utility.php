@@ -232,7 +232,7 @@ class utility {
                                            'instance'   => $cm->instance,
                                        ],
                                        'id ASC');
-            $event = reset($events);
+            $event = (count($events) > 0) ? reset($events) : null;
             $handler = extension::get_enabled_request()[$cm->modname];
         }
 

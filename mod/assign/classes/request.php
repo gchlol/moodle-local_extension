@@ -177,6 +177,9 @@ class request extends \local_extension\base_request {
     }
 
     public function get_due_date($mod) {
+        if (is_null($mod->event)) {
+            return null;
+        }
         return $mod->event->timestart;
     }
 
