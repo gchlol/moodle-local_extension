@@ -173,6 +173,18 @@ abstract class base_request {
      * @return string
      */
     public function status_definition($mod, $mform = null) {
+        return $this->default_status_definition($mod, $mform, $this->get_due_date($mod));
+    }
+
+    /**
+     * Define parts of the request for for an event object
+     *
+     * @param mod_data        $mod   Local mod_data object with event details
+     * @param MoodleQuickForm $mform A moodle form object
+     * @param int             $dueon When the module was due
+     * @return string HTML
+     */
+    public static function default_status_definition($mod, $mform, $dueon) {
         $event = $mod->event;
         $course = $mod->course;
         $localcm = $mod->localcm;
@@ -181,20 +193,24 @@ abstract class base_request {
         $courselink = new moodle_url('/course/view.php', ['id' => $course->id]);
         $courselink = html_writer::link($courselink, $course->fullname);
 
-        $eventlink = new moodle_url('/mod/' . $event->modulename . '/view.php', ['id' => $cmid]);
-        $eventlink = html_writer::link($eventlink, $event->name);
+        if (is_null($event)) {
+            $eventlink = html_writer::span($mod->cm->name);
+        } else {
+            $eventlink = new moodle_url('/mod/' . $event->modulename . '/view.php', ['id' => $cmid]);
+            $eventlink = html_writer::link($eventlink, $event->name);
+        }
 
         $coursestring = html_writer::tag('b', $courselink . ' > ' . $eventlink);
         $coursestring = html_writer::div($coursestring, 'mod');
 
-        $dueon = get_string('dueon', 'extension_assign', userdate($this->get_due_date($mod)));
-        $dueon = html_writer::div($dueon);
+        if (!is_null($dueon)) {
+            $dueon = get_string('dueon', 'extension_assign', userdate($dueon));
+            $dueon = html_writer::div($dueon);
+        }
 
         $html = html_writer::div($coursestring . ' ' . $dueon, 'content local_extension_title');
 
-        if (!empty($mform)) {
-            $mform->addElement('html', $html);
-        }
+        $mform->addElement('html', $html);
 
         return $html;
     }

@@ -25,6 +25,10 @@
 
 namespace local_extension;
 
+use context;
+use context_course;
+use context_module;
+use context_system;
 use local_extension\plugininfo\extension;
 use stdClass;
 
@@ -47,10 +51,10 @@ class utility {
     /**
      * Returns a list of candidate dates for activities
      *
-     * @param int|stdClass $userid Userid or user object
-     * @param int $start  Start of search period
-     * @param int $end End of search period
-     * @param array $options Optional arguments.
+     * @param int|stdClass $userid  Userid or user object
+     * @param int          $start   Start of search period
+     * @param int          $end     End of search period
+     * @param array        $options Optional arguments.
      * @return mod_data[] An array of candidates.
      *
      */
@@ -61,7 +65,7 @@ class utility {
         $cmid = !empty($options['moduleid']) ? $options['moduleid'] : 0;
         $requestid = !empty($options['requestid']) ? $options['requestid'] : 0;
 
-        $dates = array();
+        $dates = [];
 
         $mods = \local_extension\plugininfo\extension::get_enabled_request();
 
@@ -76,10 +80,10 @@ class utility {
         // Get the events matching our criteria.
         list($courses, $group, $user2) = calendar_set_filters($courses);
 
-        $allevents = calendar_get_events($start, $end, array($userid), $groups, $courses);
+        $allevents = calendar_get_events($start, $end, [$userid], $groups, $courses);
 
-        $events = array();
-        $courses = array();
+        $events = [];
+        $courses = [];
 
         foreach ($allevents as $id => $event) {
 
@@ -151,7 +155,7 @@ class utility {
 
             $courseid = $cm->course;
             if (!isset($courses[$courseid])) {
-                $courses[$courseid] = $DB->get_record('course', array('id' => $courseid));
+                $courses[$courseid] = $DB->get_record('course', ['id' => $courseid]);
             }
 
             // If a requestid has been provided, obtain the local cm data for this mod.
@@ -165,7 +169,6 @@ class utility {
                 if (empty($localcm->cm)) {
                     continue;
                 }
-
             } else {
                 // Try and obtain a request associated to this user for a course module.
                 $localcm = cm::from_userid($cm->id, $userid);
@@ -182,7 +185,6 @@ class utility {
             if (!array_key_exists($cm->id, $events)) {
                 $events[$cm->id] = $data;
             }
-
         }
 
         if ($requestid > 0) {
@@ -197,37 +199,49 @@ class utility {
 
         $cms = $DB->get_records('local_extension_cm',
                                 ['request' => $requestid, 'userid' => $userid],
-                                'id ASC',
-                                'id, cmid');
+                                'id ASC');
 
         foreach ($cms as $cm) {
             if (!array_key_exists($cm->cmid, $events)) {
-                $events[$cm->cmid] = self::create_request_mod_data($cm->cmid, $userid);
+                $events[$cm->cmid] = self::create_request_mod_data($cm, $userid);
             }
         }
 
         return $events;
     }
 
-    public static function create_request_mod_data($cmid, $userid) {
+    public static function create_request_mod_data($localcm, $userid) {
         global $DB;
 
-        list($course, $cm) = get_course_and_cm_from_cmid($cmid);
-
-        $events = $DB->get_records('event',
-                                   [
-                                       'courseid'   => $course->id,
-                                       'modulename' => $cm->modname,
-                                       'instance'   => $cm->instance,
-                                   ],
-                                   'id ASC');
+        if ($DB->count_records('course_modules', ['id' => $localcm->cmid]) == 0) {
+            $course = get_course($localcm->course);
+            // If it was deleted, add some basic information.
+            $cm = (object)[
+                'id'     => $localcm->cmid,
+                'course' => $course->id,
+                'name'   => '[DELETED] ' . $localcm->name,
+            ];
+            $event = null;
+            $handler = null;
+        } else {
+            list($course, $cm) = get_course_and_cm_from_cmid($localcm->cmid);
+            $events = $DB->get_records('event',
+                                       [
+                                           'courseid'   => $course->id,
+                                           'modulename' => $cm->modname,
+                                           'instance'   => $cm->instance,
+                                       ],
+                                       'id ASC');
+            $event = (count($events) > 0) ? reset($events) : null;
+            $handler = extension::get_enabled_request()[$cm->modname];
+        }
 
         $data = new mod_data();
-        $data->event = reset($events);
+        $data->event = $event;
         $data->cm = $cm;
         $data->localcm = cm::from_userid($cm->id, $userid);
         $data->course = $course;
-        $data->handler = extension::get_enabled_request()[$cm->modname];
+        $data->handler = $handler;
 
         return $data;
     }
@@ -236,10 +250,10 @@ class utility {
      * Sends a notification email, or queues them if the request object has more than one local cm/mod item.
      *
      * @param \local_extension\request $request
-     * @param string $subject
-     * @param string $content
-     * @param stdClass $userfrom
-     * @param stdClass $userto
+     * @param string                   $subject
+     * @param string                   $content
+     * @param stdClass                 $userfrom
+     * @param stdClass                 $userto
      */
     public static function send_trigger_email(\local_extension\request $request, $subject, $content, $userfrom, $userto) {
         global $CFG;
@@ -254,14 +268,14 @@ class utility {
         // The base messageid.
         $rootid = self::get_email_message_id($request->requestid, $userto->id);
 
-        $userfrom->customheaders = array(
+        $userfrom->customheaders = [
             'Message-ID: ' . $rootid,
 
             // Headers to help prevent auto-responders.
             'Precedence: Bulk',
             'X-Auto-Response-Suppress: All',
             'Auto-Submitted: auto-generated',
-        );
+        ];
 
         if ($request->request->messageid != 0) {
             $inputid = $request->requestid . $request->request->messageid;
@@ -289,15 +303,15 @@ class utility {
             $message->userto = $userto->id;
         }
 
-        $message->component         = 'local_extension';
-        $message->name              = 'status';
-        $message->userfrom          = $userfrom;
-        $message->subject           = $subject;
-        $message->fullmessage       = html_to_text($content);;
+        $message->component = 'local_extension';
+        $message->name = 'status';
+        $message->userfrom = $userfrom;
+        $message->subject = $subject;
+        $message->fullmessage = html_to_text($content);;
         $message->fullmessageformat = FORMAT_PLAIN;
-        $message->fullmessagehtml   = $content;
-        $message->smallmessage      = '';
-        $message->notification      = 1;
+        $message->fullmessagehtml = $content;
+        $message->smallmessage = '';
+        $message->notification = 1;
 
         // Moodle 3.2 has introduced the courseid parameter to the message object.
         if ($CFG->version >= 2016120500) {
@@ -312,7 +326,7 @@ class utility {
      * message-id is used by email clients to identify emails and to nest conversations
      *
      * @param int $requestid The ID of the request.
-     * @param int $usertoid The ID of the user being notified
+     * @param int $usertoid  The ID of the user being notified
      * @return string A unique message-id
      */
     public static function get_email_message_id($requestid, $usertoid) {
@@ -355,12 +369,12 @@ class utility {
 
     /**
      * TODO
+     *
      * @param integer $courseid
      * @param integer $userid
      */
     public static function course_request_status($courseid, $userid) {
         global $DB;
-
     }
 
     /**
@@ -378,7 +392,7 @@ class utility {
                  WHERE userid = :userid
                    AND course = :courseid";
 
-        $params = array('userid' => $userid, 'courseid' => $courseid);
+        $params = ['userid' => $userid, 'courseid' => $courseid];
 
         $record = $DB->get_record_sql($sql, $params);
 
@@ -411,10 +425,10 @@ class utility {
 
         if (!empty($userid)) {
             $where = " WHERE r.userid = ? ";
-            $params = array('userid' => $userid);
+            $params = ['userid' => $userid];
         } else {
             $where = '';
-            $params = array();
+            $params = [];
         }
 
         $sql = "SELECT r.id
@@ -448,7 +462,7 @@ class utility {
 
         $requests = self::cache_get_requests($USER->id);
 
-        $matchedrequests = array();
+        $matchedrequests = [];
 
         // Return matching requests for a course.
         foreach ($requests as $request) {
@@ -478,7 +492,7 @@ class utility {
         foreach ($requests as $request) {
             foreach ($request->cms as $cm) {
                 if ($courseid == $cm->get_courseid() && $moduleid == $cm->cmid) {
-                    return array($request, $cm);
+                    return [$request, $cm];
                 }
             }
         }
@@ -500,10 +514,10 @@ class utility {
         });
 
         // Ordered parent rules based on priority.
-        $parentrules = array();
+        $parentrules = [];
 
         // They key is a rule that has children. Value is an array of child object rules.
-        $parentmap = array();
+        $parentmap = [];
 
         foreach ($rules as $rule) {
 
@@ -516,7 +530,7 @@ class utility {
         }
 
         // Ordered list of rules for the table.
-        $ordered = array();
+        $ordered = [];
 
         foreach ($parentrules as $rule) {
             $ordered[] = $rule;
@@ -527,7 +541,6 @@ class utility {
                 // Append the array of children to the return result.
                 $children = $parentmap[$rule->id];
                 $ordered = array_merge($ordered, $children);
-
             }
         }
 
@@ -539,11 +552,11 @@ class utility {
      * Nested child rules can be accessed via $rule->children
      *
      * @param \local_extension\rule[] $rules
-     * @param int|number $parent
+     * @param int|number              $parent
      * @return rule[] Tree structure.
      */
     public static function rule_tree(array $rules, $parent = 0) {
-        $branch = array();
+        $branch = [];
 
         // Sort the rule nodes based on priority.
         usort($rules, function($a, $b) {
@@ -580,7 +593,7 @@ class utility {
      * Useful for recursive deletion.
      *
      * @param array $rules
-     * @param int $id
+     * @param int   $id
      * @return boolean
      */
     public static function rule_tree_branch(array $rules, $id) {
@@ -608,14 +621,14 @@ class utility {
      * Returns an array of ids that are possible candidates for being a parent item.
      *
      * @param \local_extension\rule[] $rules
-     * @param int $id The id that will not be added, nor children added.
-     * @param array $idlist A growing list of ids that can be possible parent items.
+     * @param int                     $id     The id that will not be added, nor children added.
+     * @param array                   $idlist A growing list of ids that can be possible parent items.
      * @return array An associated array of id=>name for parents.
      */
     public static function rule_tree_check_children(array $rules, $id, $idlist = null) {
 
         if (empty($idlist)) {
-            $idlist = array();
+            $idlist = [];
         }
 
         // Sort the rules based on priority.
@@ -650,12 +663,12 @@ class utility {
     public static function calculate_length($seconds) {
         // Partial extract of $str from format_time().
         $str = new stdClass();
-        $str->day   = get_string('day');
-        $str->days  = get_string('days');
-        $str->hour  = get_string('hour');
+        $str->day = get_string('day');
+        $str->days = get_string('days');
+        $str->hour = get_string('hour');
         $str->hours = get_string('hours');
-        $str->min   = get_string('min');
-        $str->mins  = get_string('mins');
+        $str->min = get_string('min');
+        $str->mins = get_string('mins');
 
         $seconds = abs($seconds);
 
@@ -686,4 +699,30 @@ class utility {
         return $diff->format($fmt);
     }
 
+    /**
+     * Try to return the module context for the given CMID.
+     * If the course module was deleted, return the course context where it was.
+     * If cannot find course, use system context.
+     *
+     * @param $cmid
+     * @return context
+     */
+    public static function get_context($cmid) {
+        global $DB;
+
+        if ($DB->count_records('course_modules', ['id' => $cmid]) > 0) {
+            return context_module::instance($cmid);
+        }
+
+        // Course module deleted, use course context.
+        $course = $DB->get_field('local_extension_cm',
+                                 'course',
+                                 ['cmid' => $cmid],
+                                 IGNORE_MULTIPLE);
+        if ($course) {
+            return context_course::instance($course);
+        }
+
+        return context_system::instance();
+    }
 }

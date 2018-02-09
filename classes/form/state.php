@@ -25,6 +25,8 @@
 
 namespace local_extension\form;
 
+use local_extension\utility;
+
 if (!defined('MOODLE_INTERNAL')) {
     die('Direct access to this script is forbidden.'); // It must be included from a Moodle page.
 }
@@ -67,14 +69,15 @@ class state extends \moodleform {
         $mform->setType('s', PARAM_INT);
 
         $mod = $mods[$cmid];
-        $handler = $mod->handler;
 
         $lcm = $mod->localcm;
 
         $html = \html_writer::tag('h2', 'State change confirmation');
         $mform->addElement('html', $html);
 
-        $handler->status_change_definition($mod, $mform, $this->_customdata);
+        if (!is_null($mod->handler)) {
+            $mod->handler->status_change_definition($mod, $mform, $this->_customdata);
+        }
 
         $currentstate = \local_extension\state::instance()->get_state_name($lcm->cm->state);
         $mform->addElement('static', 'currentstate', 'Current state', $currentstate);
@@ -125,7 +128,7 @@ class state extends \moodleform {
         }
 
         // Checking for capabilities or admin access.
-        $context = \context_module::instance($cmid);
+        $context = utility::get_context($cmid);
         if (has_capability('local/extension:viewallrequests', $context)) {
             $approved = true;
         }

@@ -23,9 +23,9 @@
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
-use local_extension\utility;
-use local_extension\state;
 use local_extension\rule;
+use local_extension\state;
+use local_extension\utility;
 
 require_once(__DIR__ . '/../../config.php');
 global $PAGE, $USER;
@@ -44,10 +44,11 @@ $request = utility::cache_get_request($requestid);
 // The request object is invalidated and regenerated after each comment, attachment added, or rule triggered.
 
 // Allow the user to modify their own request.
+
 if ($USER->id != $request->request->userid) {
 
     // Checking if the current user is not part of the request or does not have the capability to view all requests.
-    $context = context_module::instance($cmid);
+    $context = utility::get_context($requestid, $cmid);
     if (!has_capability('local/extension:viewallrequests', $context)) {
 
         if (array_key_exists($USER->id, $request->users)) {
@@ -93,10 +94,12 @@ $requestuser = core_user::get_user($request->request->userid);
 $params = array(
     'request' => $request,
     'cmid' => $cmid,
-    'instance' => $mod->handler->get_instance($mod),
     'state' => $stateid,
     'user' => $requestuser,
 );
+if (!is_null($mod->handler)) {
+    $params['instance'] = $mod->handler->get_instance($mod);
+}
 
 $PAGE->navbar->ignore_active();
 $PAGE->navbar->add(get_string('breadcrumb_nav_index', 'local_extension'), new moodle_url('/local/extension/index.php'));

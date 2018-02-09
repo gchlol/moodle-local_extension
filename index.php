@@ -50,7 +50,8 @@ if ($courseid) {
     $context = context_user::instance($USER->id, MUST_EXIST);
 }
 
-$viewallrequests = capability_checker::can_view_all_requests($categoryid, $context);
+$checkcontext = $categoryid ? context_coursecat::instance($categoryid) : null;
+$viewallrequests = capability_checker::can_view_all_requests($checkcontext);
 
 if (!$viewallrequests) {
     // The user cannot view all requests or select the categories.

@@ -27,6 +27,7 @@ namespace local_extension\form;
 
 use html_writer;
 use local_extension\access\capability_checker;
+use local_extension\base_request;
 use local_extension\rule;
 use local_extension\state;
 
@@ -98,7 +99,11 @@ class status extends \moodleform {
 
         $state = state::instance();
 
-        $mod->handler->status_definition($mod, $this->_form);
+        if (is_null($mod->handler)) {
+            base_request::default_status_definition($mod, $this->_form, null);
+        } else {
+            $mod->handler->status_definition($mod, $this->_form);
+        }
 
         // Displays a list of state changes, their status and extension length.
         $state->render_state_definition($mod, $this->_form);

@@ -25,11 +25,8 @@
 
 namespace local_extension;
 
-use assign;
 use coding_exception;
-use context_module;
 use html_writer;
-use local_extension\request;
 use moodle_url;
 use MoodleQuickForm;
 use stdClass;
@@ -279,6 +276,9 @@ class state {
         }
 
         $handler = $mod->handler;
+        if (is_null($handler)) {
+            return false;
+        }
 
         // Obtain the current extension, this could be an override.
         $extdate = $handler->get_current_extension($mod);
@@ -416,7 +416,7 @@ class state {
      * @param MoodleQuickForm $mform
      * @param array $history
      */
-    public function render_pending_state($mod, $mform, $history) {
+    public function render_pending_state($mod, $mform) {
 
         $currentstate = $mod->localcm->get_stateid();
         if (self::instance()->is_open_state($currentstate)) {
@@ -426,9 +426,6 @@ class state {
 
             // The date of the current extension.
             $extdate = $mod->localcm->cm->data;
-
-            // The original assignment submission date.
-            $duedate = $mod->event->timestart;
 
             $obj = new stdClass();
             $obj->date = userdate($extdate);
@@ -459,8 +456,6 @@ class state {
      * @param array $history
      */
     public function render_state_history($mod, $mform, $history) {
-        global $USER;
-
         $course = $mod->course;
         $context = \context_course::instance($course->id, MUST_EXIST);
 
@@ -480,21 +475,16 @@ class state {
 
             $statusbadge = self::get_state_name($state->state);
 
-            $event = $mod->event;
-            $date = $event->timestart + $state->extlength;
-
             $obj = new stdClass();
             $obj->status = $statusbadge;
-            $obj->date = userdate($date);
             $obj->length = utility::calculate_length($state->extlength);
 
-            // During the database upgrade to 2017062200 some state changes may not have any historic length.
-            if (empty($obj->length)) {
+            if (is_null($mod->event) || empty($obj->length)) {
                 $moodlestring = 'status_status_summary_without_length';
                 $obj->date = userdate($state->timestamp);
             } else {
                 $moodlestring = 'status_status_summary_with_length';
-                $obj->date = userdate($date);
+                $obj->date = userdate($mod->event->timestart + $state->extlength);
             }
 
             $html .= html_writer::start_div('statusitem');
@@ -744,8 +734,6 @@ class state {
 
         $mod = $request->mods[$data->cmid];
 
-        $handler = $mod->handler;
-
         $localcm = $mod->localcm;
         $event   = $mod->event;
         $course  = $mod->course;
@@ -754,15 +742,15 @@ class state {
         $state = $data->s;
 
         // The extension has been approved. Lets hook into the handler and extend the items length.
-        if ($state == self::STATE_APPROVED) {
-            $handler->submit_extension($event->instance,
-                                       $request->request->userid,
-                                       $localcm->cm->data);
-
-        } else if ($state == self::STATE_CANCEL ||
-                   $state == self::STATE_DENIED) {
-            $handler->cancel_extension($event->instance,
-                                       $request->request->userid);
+        if (!is_null($mod->handler)) {
+            if ($state == self::STATE_APPROVED) {
+                $mod->handler->submit_extension($event->instance,
+                                                $request->request->userid,
+                                                $localcm->cm->data);
+            } else if ($state == self::STATE_CANCEL || $state == self::STATE_DENIED) {
+                $mod->handler->cancel_extension($event->instance,
+                                                $request->request->userid);
+            }
         }
 
         $ret = $localcm->set_state($state);
@@ -778,7 +766,7 @@ class state {
         $log = new stdClass();
         $log->status = $status;
         $log->course = $course->fullname;
-        $log->event = $event->name;
+        $log->event = is_null($event) ? $mod->cm->name : $event->name;
 
         $history->message = get_string('request_state_history_log', 'local_extension', $log);
 
