@@ -169,3 +169,7 @@
 .local_extension_export_csv {
     float: right;
 }
+
+.local_extension_coordinators {
+    margin-top: 15px;
+}

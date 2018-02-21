@@ -25,9 +25,11 @@
 
 namespace local_extension;
 
+use context_course;
 use html_writer;
 use moodle_url;
 use MoodleQuickForm;
+use user_picture;
 
 defined('MOODLE_INTERNAL') || die();
 
@@ -135,9 +137,9 @@ abstract class base_request {
     /**
      * Adds a date selector to the mform that it has been passed.
      *
-     * @param mod_data $mod Local mod_data object with event details
+     * @param mod_data        $mod Local mod_data object with event details
      * @param MoodleQuickForm $mform
-     * @param bool $optional
+     * @param bool            $optional
      */
     public function date_selector($mod, $mform, $optional = true) {
         $event = $mod->event;
@@ -154,10 +156,10 @@ abstract class base_request {
         $stopyear = date('Y') + 1;
 
         $dateconfig = array(
-            'optional' => $optional,
-            'step' => 1,
+            'optional'  => $optional,
+            'step'      => 1,
             'startyear' => $startyear,
-            'stopyear' => $stopyear,
+            'stopyear'  => $stopyear,
         );
 
         $formid = 'due' . $lcm->cmid;
@@ -208,9 +210,37 @@ abstract class base_request {
             $dueon = html_writer::div($dueon);
         }
 
-        $html = html_writer::div($coursestring . ' ' . $dueon, 'content local_extension_title');
+        $coursecoordinators = self::get_course_coordinators($course);
+
+        $html = html_writer::div($coursestring . ' ' . $dueon . $coursecoordinators,
+                                 'content local_extension_title');
 
         $mform->addElement('html', $html);
+
+        return $html;
+    }
+
+    private static function get_course_coordinators($course) {
+        global $DB;
+
+        $role = $DB->get_record('role', ['shortname' => 'coordinator']);
+        if ($role === false) {
+            return '';
+        }
+
+        $context = context_course::instance($course->id);
+
+        $users = get_role_users($role->id, $context);
+        if (count($users) == 0) {
+            return '';
+        }
+
+        $html = html_writer::tag('strong', "{$role->name}: ");
+        foreach ($users as $user) {
+            $html .= html_writer::link("/user/profile.php?id={$user->id}", fullname($user));
+        }
+
+        $html = html_writer::div($html, 'local_extension_coordinators');
 
         return $html;
     }
