@@ -34,7 +34,7 @@ defined('MOODLE_INTERNAL') || die('Direct access to this script is forbidden');
  * @copyright  Catalyst IT
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
-class local_extension_rule_testcase extends extension_testcase {
+class local_extension_general_rules_testcase extends extension_testcase {
 
     /** @var int number of students to create */
     const DEFAULT_STUDENT_COUNT = 3;
