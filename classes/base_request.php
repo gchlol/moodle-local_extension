@@ -238,7 +238,9 @@ abstract class base_request {
         $html = html_writer::tag('strong', "{$role->name}: ");
         foreach ($users as $user) {
             $html .= html_writer::link("/user/profile.php?id={$user->id}", fullname($user));
+            $html .= '; ';
         }
+        $html = trim($html, ' ;');
 
         $html = html_writer::div($html, 'local_extension_coordinators');
 
