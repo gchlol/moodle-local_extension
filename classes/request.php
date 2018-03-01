@@ -384,8 +384,15 @@ class request implements \cache_data_source {
 
     /**
      * Each cm may have a different set of rules that will need to be processed.
+     *
+     * @param int|null $currenttime Current time to consider or null to use system time.
+     * @return bool If any was triggered
      */
-    public function process_triggers() {
+    public function process_triggers($currenttime = null) {
+        if (is_null($currenttime)) {
+            $currenttime = time();
+        }
+
         $notifydata = array();
 
         // There can only be one request per course module.
@@ -399,19 +406,22 @@ class request implements \cache_data_source {
             $ordered = utility::rule_tree($rules);
 
             foreach ($ordered as $rule) {
-                $return = $this->process_recursive($mod, $rule);
+                $return = $this->process_recursive($mod, $rule, $currenttime);
                 $notifydata = array_merge($notifydata, $return);
             }
 
         }
 
         // We have processed the triggers, lets send some emails!
-        if (!empty($notifydata)) {
+        $triggered = !empty($notifydata);
+        if ($triggered) {
             $this->process_notification_data($notifydata, $mod);
         }
 
         // Invalidate the cache for this request, there may be new users subscribed.
         $this->invalidate_request();
+
+        return $triggered;
     }
 
     /**
@@ -490,7 +500,7 @@ class request implements \cache_data_source {
      * @param array $data
      * @return array
      */
-    private function process_recursive($mod, $rule, &$data = null) {
+    private function process_recursive($mod, $rule, $currenttime, &$data = null) {
 
         // Initialise the data object.
         if (empty($data)) {
@@ -498,7 +508,7 @@ class request implements \cache_data_source {
         }
 
         // Processing a rule.
-        $notify = $rule->process($this, $mod);
+        $notify = $rule->process($this, $mod, $currenttime);
 
         // If true, then we will create a notification data entry that will be returned.
         if ($notify === true) {
@@ -516,7 +526,7 @@ class request implements \cache_data_source {
         if (!empty($rule->children)) {
 
             foreach ($rule->children as $child) {
-                $data = $this->process_recursive($mod, $child, $data);
+                $data = $this->process_recursive($mod, $child, $currenttime, $data);
             }
 
         }
@@ -838,4 +848,14 @@ class request implements \cache_data_source {
         $this->get_data_cache()->delete($this->requestid);
     }
 
+    public function update_timestamp($timestamp) {
+        global $DB;
+
+        $record = (object)[
+            'id'        => $this->requestid,
+            'timestamp' => $timestamp,
+        ];
+
+        $DB->update_record('local_extension_request', $record);
+    }
 }

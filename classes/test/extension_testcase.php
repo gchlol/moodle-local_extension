@@ -24,6 +24,9 @@
 namespace local_extension\test;
 
 use advanced_testcase;
+use DateTime;
+use DateTimeZone;
+use local_extension\base_request;
 use local_extension\request;
 
 defined('MOODLE_INTERNAL') || die();
@@ -38,8 +41,20 @@ require_once($CFG->dirroot . '/mod/assign/locallib.php');
  * @license     http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 abstract class extension_testcase extends advanced_testcase {
-    protected function create_request($userid, $searchstart = null, $searchend = null, $lastmod = null) {
+    protected function tearDown() {
+        parent::tearDown();
+        base_request::$rules = null;
+    }
+
+    /**
+     * @return request
+     */
+    protected function create_request($userid = null, $searchstart = null, $searchend = null, $lastmod = null) {
         global $DB;
+
+        if (is_null($userid)) {
+            $userid = $this->getDataGenerator()->create_user()->id;
+        }
 
         $request = (object)[
             'userid'      => $userid,
@@ -55,5 +70,14 @@ abstract class extension_testcase extends advanced_testcase {
         $request = new request($requestid);
         $request->load();
         return $request;
+    }
+
+    protected function create_timestamp($date) {
+        $utc = new DateTimeZone('UTC');
+        list($day, $date) = explode(', ', $date);
+        $datetime = new DateTime($date, $utc);
+        $datetimeday = $datetime->format('l');
+        self::assertSame($day, $datetimeday);
+        return $datetime->getTimestamp();
     }
 }

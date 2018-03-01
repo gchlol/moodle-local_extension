@@ -112,7 +112,7 @@ class rule extends \moodleform {
         $elapsedtimegroup = array(
             $mform->createElement('select', 'elapsedtype', '', $lengthtypes),
             $mform->createElement('text', 'elapsedfromrequest', ''),
-            $mform->createElement('static', 'daysold', '', get_string('form_rule_label_days_old', 'local_extension')),
+            $mform->createElement('static', 'daysold', '', get_string('form_rule_label_weekdays_old', 'local_extension')),
         );
 
         $mform->setType('elapsedfromrequest', PARAM_INT);

@@ -283,11 +283,12 @@ class rule {
      * Processes the rules associated with this object.
      * Returning a value of true will identify that notifications need to be sent out.
      *
-     * @param request $request
+     * @param request  $request
      * @param mod_data $mod
+     * @param int      $currenttime
      * @return bool
      */
-    public function process(&$request, $mod) {
+    public function process(&$request, $mod, $currenttime) {
 
         // Checks if the trigger for this cm has been activated.
         if ($this->check_history($mod)) {
@@ -319,7 +320,7 @@ class rule {
             return false;
         }
 
-        if ($this->check_elapsed_length($request, $mod)) {
+        if ($this->check_elapsed_length($request, $currenttime)) {
             return false;
         }
 
@@ -780,8 +781,8 @@ class rule {
         $localcm = $mod->localcm;
 
         // This value will be a timestamp.
-        $daterequested = $localcm->get_data();
-        $datedue = $mod->event->timestart;
+        $daterequested = (int)$localcm->get_data();
+        $datedue = (int)$mod->event->timestart;
 
         // The length of the request.
         $delta = $daterequested - $datedue;
@@ -812,13 +813,13 @@ class rule {
      * Checks the rule for elapsed length.
      *
      * @param request $request
-     * @param mod_data $mod
+     * @param int     $currenttime Current time to consider
      * @return boolean
      */
-    private function check_elapsed_length($request, $mod) {
-        $delta = time() - $request->request->timestamp;
+    private function check_elapsed_length($request, $currenttime) {
+        $delta = utility::calculate_weekdays_elapsed($request->request->timestamp, $currenttime);
 
-        $days = $this->elapsedfromrequest * 24 * 60 * 60;
+        $days = (int)$this->elapsedfromrequest;
 
         if ($this->elapsedtype == self::RULE_CONDITION_ANY) {
             // If the condition is any, then we always process this.

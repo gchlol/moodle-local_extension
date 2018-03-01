@@ -44,10 +44,6 @@ require_once($CFG->dirroot . '/mod/assign/locallib.php');
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 class request extends \local_extension\base_request {
-
-    /** @var rule[] $rules */
-    public static $rules = null;
-
     /**
      * {@inheritDoc}
      * @see \local_extension\base_request::get_name()
@@ -62,17 +58,6 @@ class request extends \local_extension\base_request {
      */
     public function get_data_type() {
         return 'assign';
-    }
-
-    /**
-     * {@inheritDoc}
-     * @see \local_extension\base_request::get_triggers()
-     */
-    public function get_triggers() {
-        if (empty(self::$rules)) {
-            self::$rules = rule::load_all($this->get_data_type());
-        }
-        return self::$rules;
     }
 
     /**

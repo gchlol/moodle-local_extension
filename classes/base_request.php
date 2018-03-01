@@ -42,6 +42,9 @@ defined('MOODLE_INTERNAL') || die();
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 abstract class base_request {
+    /** @var rule[] $rules */
+    public static $rules = null;
+
     /**
      * A readable name.
      * @return string Module name
@@ -96,7 +99,12 @@ abstract class base_request {
      *
      * @return \local_extension\rule[]
      */
-    abstract public function get_triggers();
+    public function get_triggers() {
+        if (empty(self::$rules)) {
+            self::$rules = rule::load_all($this->get_data_type());
+        }
+        return self::$rules;
+    }
 
     /**
      * Sets the extension length to the requested date.

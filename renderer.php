@@ -325,7 +325,7 @@ class local_extension_renderer extends plugin_renderer_base {
             get_string('form_rule_label_elapsed_length', 'local_extension'),
             $elapsedtype,
             $rule->elapsedfromrequest,
-            get_string('form_rule_label_days_old', 'local_extension'),
+            get_string('form_rule_label_weekdays_old', 'local_extension'),
         ];
         $html .= html_writer::tag('p', implode(' ', $elapsedlength));
 
