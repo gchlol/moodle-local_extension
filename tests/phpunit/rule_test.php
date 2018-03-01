@@ -56,7 +56,6 @@ class local_extension_rule_test extends extension_testcase {
             'length'  => 0,
         ]);
 
-
         $role = $DB->get_field('role', 'id', ['shortname' => 'manager']);
         $rule = new rule();
         $rule->load_from_form((object)[
