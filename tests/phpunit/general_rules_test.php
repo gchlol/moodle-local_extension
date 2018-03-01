@@ -72,7 +72,7 @@ class local_extension_general_rules_testcase extends extension_testcase {
         global $DB, $CFG;
 
         parent::setUp();
-        $this->resetAfterTest(true);
+        $this->resetAfterTest();
 
         unset_config('noemailever');
 

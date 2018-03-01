@@ -26,6 +26,7 @@ namespace local_extension\test;
 use advanced_testcase;
 use DateTime;
 use DateTimeZone;
+use local_extension\base_request;
 use local_extension\request;
 
 defined('MOODLE_INTERNAL') || die();
@@ -40,6 +41,11 @@ require_once($CFG->dirroot . '/mod/assign/locallib.php');
  * @license     http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 abstract class extension_testcase extends advanced_testcase {
+    protected function tearDown() {
+        parent::tearDown();
+        base_request::$rules = null;
+    }
+
     /**
      * @return request
      */

@@ -35,7 +35,6 @@ defined('MOODLE_INTERNAL') || die();
 class local_extension_utility_test extends extension_testcase {
     public function provider_for_test_it_calculates_the_number_of_weekdays() {
         return [
-            ['Friday, 2018-03-02', 'Saturday, 2018-03-03', 0],
             ['Monday, 2018-03-05', 'Monday, 2018-03-05', 0],
             ['Monday, 2018-03-05', 'Tuesday, 2018-03-06', 1],
             ['Monday, 2018-03-05', 'Friday, 2018-03-09', 4],
@@ -51,6 +50,9 @@ class local_extension_utility_test extends extension_testcase {
             ['Saturday, 2018-03-03', 'Friday, 2018-03-09', 4],
             ['Saturday, 2018-03-03', 'Saturday, 2018-03-10', 4],
             ['Saturday, 2018-03-03', 'Monday, 2018-03-12', 5],
+            ['Friday, 2018-03-02', 'Saturday, 2018-03-03', 0],
+            ['Thursday, 2018-02-01', 'Thursday, 2018-02-08', 5],
+            ['Thursday, 2018-02-01', 'Wednesday, 2018-02-07', 4],
         ];
     }
 

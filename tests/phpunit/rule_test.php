@@ -35,7 +35,7 @@ defined('MOODLE_INTERNAL') || die();
 class local_extension_rule_test extends extension_testcase {
     public function test_it_uses_working_days_instead_of_calendar_days() {
         global $DB;
-        $this->resetAfterTest(true);
+        $this->resetAfterTest();
         self::setAdminUser();
 
         $user = $this->getDataGenerator()->create_user();
