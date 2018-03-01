@@ -24,6 +24,8 @@
 namespace local_extension\test;
 
 use advanced_testcase;
+use DateTime;
+use DateTimeZone;
 use local_extension\request;
 
 defined('MOODLE_INTERNAL') || die();
@@ -55,5 +57,14 @@ abstract class extension_testcase extends advanced_testcase {
         $request = new request($requestid);
         $request->load();
         return $request;
+    }
+
+    protected function create_timestamp($date) {
+        $utc = new DateTimeZone('UTC');
+        list($day, $date) = explode(', ', $date);
+        $datetime = new DateTime($date, $utc);
+        $datetimeday = $datetime->format('l');
+        self::assertSame($day, $datetimeday);
+        return $datetime->getTimestamp();
     }
 }

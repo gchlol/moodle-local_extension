@@ -29,6 +29,8 @@ use context;
 use context_course;
 use context_module;
 use context_system;
+use DateInterval;
+use DateTime;
 use local_extension\plugininfo\extension;
 use stdClass;
 
@@ -724,5 +726,32 @@ class utility {
         }
 
         return context_system::instance();
+    }
+
+    /**
+     * @param int $from  Timestamp to the starting date
+     * @param int $until Timestamp for the ending date
+     * @return int Number of weekdays elapsed
+     */
+    public static function calculate_weekdays_elapsed($from, $until) {
+        $oneday = new DateInterval('P1D');
+
+        $datetime = new DateTime();
+        $datetime->setTimestamp($from);
+        $startedonweekend = ($datetime->format('N') >= 6);
+        $datetime->add($oneday);
+
+        $weekdays = 0;
+        while ($datetime->getTimestamp() <= $until) {
+            $isweekend = ($datetime->format('N') >= 6);
+            if (!$isweekend && $startedonweekend) {
+                $startedonweekend = false;
+            } else if (!$isweekend && !$startedonweekend) {
+                $weekdays++;
+            }
+            $datetime->add($oneday);
+        }
+
+        return $weekdays;
     }
 }
