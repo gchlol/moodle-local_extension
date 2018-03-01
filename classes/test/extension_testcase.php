@@ -40,8 +40,15 @@ require_once($CFG->dirroot . '/mod/assign/locallib.php');
  * @license     http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 abstract class extension_testcase extends advanced_testcase {
-    protected function create_request($userid, $searchstart = null, $searchend = null, $lastmod = null) {
+    /**
+     * @return request
+     */
+    protected function create_request($userid = null, $searchstart = null, $searchend = null, $lastmod = null) {
         global $DB;
+
+        if (is_null($userid)) {
+            $userid = $this->getDataGenerator()->create_user()->id;
+        }
 
         $request = (object)[
             'userid'      => $userid,
