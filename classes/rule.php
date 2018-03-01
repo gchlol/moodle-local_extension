@@ -781,8 +781,8 @@ class rule {
         $localcm = $mod->localcm;
 
         // This value will be a timestamp.
-        $daterequested = $localcm->get_data();
-        $datedue = $mod->event->timestart;
+        $daterequested = (int)$localcm->get_data();
+        $datedue = (int)$mod->event->timestart;
 
         // The length of the request.
         $delta = $daterequested - $datedue;
