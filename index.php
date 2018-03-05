@@ -109,9 +109,17 @@ if (!$table->is_downloading()) {
         $url->param('download', 'csv');
         echo html_writer::div(
             $OUTPUT->single_button($url, get_string('export_csv', 'local_extension')),
-            'local_extension_export_csv'
+            'local_extension_option_buttons'
         );
     }
+
+    echo html_writer::div(
+        $OUTPUT->single_button(
+            '/local/extension/preferences.php',
+            get_string('preferences', 'local_extension')
+        ),
+        'local_extension_option_buttons'
+    );
 
     echo html_writer::tag('h2', get_string('page_h2_summary', 'local_extension'));
 }
