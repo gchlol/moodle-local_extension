@@ -31,6 +31,7 @@ use context_module;
 use context_system;
 use DateInterval;
 use DateTime;
+use local_extension\message\mailer;
 use local_extension\plugininfo\extension;
 use stdClass;
 
@@ -319,7 +320,8 @@ class utility {
         if ($CFG->version >= 2016120500) {
             $message->courseid = SITEID;
         }
-        message_send($message);
+
+        (new mailer())->send($message);
     }
 
     /**
