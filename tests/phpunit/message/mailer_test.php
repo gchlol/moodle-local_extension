@@ -39,7 +39,9 @@ class local_extension_mailer_test extends extension_testcase {
 
     protected function setUp() {
         parent::setUp();
-        self::resetAfterTest();
+        $this->resetAfterTest();
+        self::setAdminUser();
+        unset_config('noemailever');
         $this->recipient = $this->getDataGenerator()->create_user(['email' => 'destination@extension.test']);
     }
 
@@ -62,17 +64,17 @@ class local_extension_mailer_test extends extension_testcase {
         $message->fullmessage = 'Message Contents';
         $message->fullmessageformat = FORMAT_PLAIN;
 
+        // The call below tell us to not call that method directly, but the alternative does not work!
+        $sink = phpunit_util::start_message_redirection();
         (new mailer())->send($message);
+        $sink->close();
+
+        return $sink->get_messages();
     }
 
     public function test_it_sends_message_immediately() {
-        self::setAdminUser();
+        $messages = $this->send_email();
 
-        $sink = phpunit_util::start_message_redirection();
-        $this->send_email();
-        phpunit_util::stop_message_redirection();
-
-        $messages = $sink->get_messages();
         self::assertCount(1, $messages);
         $message = reset($messages);
         self::assertSame('Message Subject', $message->subject);
@@ -80,16 +82,10 @@ class local_extension_mailer_test extends extension_testcase {
     }
 
     public function test_it_does_not_send_message_immediately() {
-        $this->resetAfterTest();
-        self::setAdminUser();
-
         (new preferences())->set(preferences::MAIL_DIGEST, true);
 
-        $sink = phpunit_util::start_message_redirection();
-        $this->send_email();
-        phpunit_util::stop_message_redirection();
+        $messages = $this->send_email();
 
-        $messages = $sink->get_messages();
         self::assertCount(0, $messages);
     }
 }
