@@ -1,8 +1,6 @@
 
 language: php
 
-sudo: false
-
 cache:
   directories:
     - $HOME/.composer/cache
@@ -11,8 +9,15 @@ cache:
 php:
   - 7.0
 
+sudo: required
+
 addons:
+  firefox: "35.0.1"
   postgresql: "9.3"
+  apt:
+    packages:
+      - oracle-java8-installer
+      - oracle-java8-set-default
 
 env:
   matrix:
