@@ -45,8 +45,30 @@ class local_extension_mailer_test extends extension_testcase {
         $this->recipient = $this->getDataGenerator()->create_user(['email' => 'destination@extension.test']);
     }
 
-    protected function send_email() {
-        global $CFG;
+    public function test_status_db_field_size() {
+        $class = new ReflectionClass(mailer::class);
+        $prefix = 'STATUS_';
+        $maxlength = 10; // Should match database length.
+        foreach ($class->getConstants() as $name => $value) {
+            if (substr($name, 0, strlen($prefix)) != $prefix) {
+                continue;
+            }
+            self::assertLessThanOrEqual($maxlength, strlen($value), "Constant '{$name}' too big for field.'");
+        }
+    }
+
+    public function test_status_db_default_status() {
+        // This is the default status for the table, although it should never be used outside tests.
+        self::assertSame('invalid', mailer::STATUS_INVALID);
+    }
+
+    public function test_it_uses_a_single_time() {
+        $mailer = new mailer();
+        self::assertLessThanOrEqual(time(), $mailer->get_time());
+    }
+
+    protected function send_email($time = null, $subject = 'Message Subject', $body = 'Message Contents') {
+        global $CFG, $USER;
         $user = $this->recipient;
 
         if ($CFG->version >= 2015051100) {
@@ -59,14 +81,19 @@ class local_extension_mailer_test extends extension_testcase {
 
         $message->component = 'local_extension';
         $message->name = 'status';
-        $message->userfrom = $user;
-        $message->subject = 'Message Subject';
-        $message->fullmessage = 'Message Contents';
+        $message->userfrom = $USER;
+        $message->subject = $subject;
+        $message->fullmessage = $body;
         $message->fullmessageformat = FORMAT_PLAIN;
+
+        $mailer = new mailer();
+        if (!is_null($time)) {
+            $mailer->set_time($time);
+        }
 
         // The call below tell us to not call that method directly, but the alternative does not work!
         $sink = phpunit_util::start_message_redirection();
-        (new mailer())->send($message);
+        $mailer->send($message);
         $sink->close();
 
         return $sink->get_messages();
@@ -87,5 +114,26 @@ class local_extension_mailer_test extends extension_testcase {
         $messages = $this->send_email();
 
         self::assertCount(0, $messages);
+    }
+
+    public function test_it_stores_messages_in_database_for_digest_mode() {
+        global $DB;
+
+        (new preferences())->set(preferences::MAIL_DIGEST, true);
+
+        $time = 1234567890;
+
+        $messages = $this->send_email($time, 'Hello', 'World');
+        self::assertCount(0, $messages);
+
+        $actual = $DB->get_records('local_extension_digest_queue');
+        self::assertCount(1, $actual);
+        $actual = reset($actual);
+        self::assertSame(mailer::STATUS_QUEUED, $actual->status);
+        self::assertEquals($time, $actual->added);
+        self::assertNull($actual->sentid);
+        self::assertEquals(2, $actual->sender);
+        self::assertEquals($this->recipient->id, $actual->recipient);
+        self::assertSame('Hello', $actual->subject);
     }
 }

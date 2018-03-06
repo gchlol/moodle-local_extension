@@ -28,10 +28,44 @@ use local_extension\preferences;
 defined('MOODLE_INTERNAL') || die();
 
 class mailer {
+    const STATUS_INVALID = 'invalid';
+
+    const STATUS_QUEUED = 'queued';
+
+    /** @var int Timestamp to use when sending messages. */
+    protected $time;
+
+    public function __construct() {
+        $this->time = time();
+    }
+
+    public function get_time() {
+        return $this->time;
+    }
+
+    public function set_time($time) {
+        $this->time = $time;
+    }
+
     public function send($message) {
         $preferences = new preferences();
-        if (!$preferences->get(preferences::MAIL_DIGEST)) {
+        if ($preferences->get(preferences::MAIL_DIGEST)) {
+            $this->save_for_digest($message);
+        } else {
             message_send($message);
         }
+    }
+
+    private function save_for_digest($message) {
+        global $DB;
+        $row = (object)[
+            'status'    => self::STATUS_QUEUED,
+            'added'     => $this->time,
+            'sender'    => $message->userfrom->id,
+            'recipient' => $message->userto->id,
+            'subject'   => $message->subject,
+            'message'   => $message->fullmessage,
+        ];
+        $DB->insert_record('local_extension_digest_queue', $row);
     }
 }

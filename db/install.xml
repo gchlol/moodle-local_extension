@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8" ?>
-<XMLDB PATH="local/extension/db" VERSION="20160718" COMMENT="XMLDB file for Moodle local/extension"
+<XMLDB PATH="local/extension/db" VERSION="20180307" COMMENT="XMLDB file for Moodle local/extension"
     xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
     xsi:noNamespaceSchemaLocation="../../../lib/xmldb/xmldb.xsd"
 >
@@ -155,6 +155,24 @@
       <KEYS>
         <KEY NAME="primary" TYPE="primary" FIELDS="id"/>
       </KEYS>
+    </TABLE>
+    <TABLE NAME="local_extension_digest_queue" COMMENT="Accumulated messages to be sent as an email digest. Records from this table may be deleted from time to time.">
+      <FIELDS>
+        <FIELD NAME="id" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="true"/>
+        <FIELD NAME="status" TYPE="char" LENGTH="10" NOTNULL="true" DEFAULT="invalid" SEQUENCE="false" COMMENT="See mailer::STATUS_* class."/>
+        <FIELD NAME="added" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="false" COMMENT="Timestamp when the email was supposed to be sent (queued)."/>
+        <FIELD NAME="sentid" TYPE="int" LENGTH="10" NOTNULL="false" SEQUENCE="false" COMMENT="Foreign key for local_extension_digest_sent table."/>
+        <FIELD NAME="sender" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="false" COMMENT="Message from (user id)"/>
+        <FIELD NAME="recipient" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="false" COMMENT="Message to (user id)"/>
+        <FIELD NAME="subject" TYPE="text" NOTNULL="true" SEQUENCE="false" COMMENT="Message subject"/>
+        <FIELD NAME="message" TYPE="text" NOTNULL="true" SEQUENCE="false" COMMENT="Message body"/>
+      </FIELDS>
+      <KEYS>
+        <KEY NAME="primary" TYPE="primary" FIELDS="id"/>
+      </KEYS>
+      <INDEXES>
+        <INDEX NAME="in_extension_status_added" UNIQUE="false" FIELDS="status, added"/>
+      </INDEXES>
     </TABLE>
   </TABLES>
 </XMLDB>
