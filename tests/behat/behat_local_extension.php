@@ -19,6 +19,7 @@
  * @author      Daniel Thee Roperto <daniel.roperto@catalyst-au.net>
  * @copyright   2018 Catalyst IT Australia {@link http://www.catalyst-au.net}
  * @license     http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
+ * @codingStandardsIgnoreFile
  */
 
 // NOTE: no MOODLE_INTERNAL test here, this file may be required by behat before including /config.php.
