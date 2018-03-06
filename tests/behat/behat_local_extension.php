@@ -23,6 +23,8 @@
 
 // NOTE: no MOODLE_INTERNAL test here, this file may be required by behat before including /config.php.
 
+use Behat\Mink\Exception\ExpectationException;
+
 require_once(__DIR__ . '/../../../../lib/behat/behat_base.php');
 
 /**
@@ -66,5 +68,32 @@ class behat_local_extension extends behat_base {
         }
 
         $this->execute('behat_auth::i_log_in_as', [$user]);
+    }
+
+    /**
+     * @Given /^I (?:am at|go to) the extension preferences page(?: again)? +\# local_extension$/
+     */
+    public function iAmAtTheExtensionPreferencesPageLocal_extension() {
+        $this->visitPath('/local/extension/preferences.php');
+    }
+
+    /**
+     * @Given /^I (select|deselect|unselect) the checkbox "([^"]*)" +\# local_extension$/
+     */
+    public function iSelectTheCheckboxLocal_extension($selected, $field) {
+        $selected = ($selected == 'select') ? 1 : 0;
+        $this->execute('behat_forms::i_set_the_field_to', [$field, $selected]);
+    }
+
+    /**
+     * @Given /^the checkbox "([^"]*)" should be ((?:un)?selected) +\# local_extension$/
+     */
+    public function theCheckboxShouldBeSelectedLocal_extension($checkbox, $selectedornot) {
+        $selected = ($selectedornot == 'selected');
+        $element = $this->find_field($checkbox);
+
+        if ($element->isChecked() != $selected) {
+            throw new ExpectationException('"' . $checkbox . '" should be ' . $selectedornot, $this->getSession());
+        }
     }
 }

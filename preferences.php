@@ -23,6 +23,9 @@
  * @license     http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
+use local_extension\form\preferences_form;
+use local_extension\preferences_manager;
+
 require_once(__DIR__ . '/../../config.php');
 
 require_login(null, false);
@@ -41,6 +44,15 @@ $PAGE->navbar->add(get_string('breadcrumb_nav_preferences', 'local_extension'),
 
 echo $OUTPUT->header();
 
+$form = new preferences_form();
+$data = $form->get_data();
+
+if (!is_null($data)) {
+    preferences_manager::set(preferences_manager::MAIL_DIGEST, !empty($data->{preferences_manager::MAIL_DIGEST}));
+    echo $OUTPUT->notification(get_string('preferences_saved', 'local_extension'), 'notifysuccess');
+}
+
 echo $OUTPUT->heading(get_string('preferences_title', 'local_extension'));
+$form->display();
 
 echo $OUTPUT->footer();
