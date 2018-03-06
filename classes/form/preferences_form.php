@@ -23,7 +23,7 @@
 
 namespace local_extension\form;
 
-use local_extension\preferences_manager;
+use local_extension\preferences;
 use moodleform;
 
 defined('MOODLE_INTERNAL') || die();
@@ -33,10 +33,10 @@ require_once("{$CFG->libdir}/formslib.php");
 
 class preferences_form extends moodleform {
     public function definition() {
-        $this->_form->addElement('checkbox', preferences_manager::MAIL_DIGEST,
+        $this->_form->addElement('checkbox', preferences::MAIL_DIGEST,
                                  get_string('preference_mail_digest', 'local_extension'),
                                  get_string('preference_mail_digest_help', 'local_extension'));
-        $this->_form->setDefault('mail_digest', preferences_manager::get(preferences_manager::MAIL_DIGEST));
+        $this->_form->setDefault('mail_digest', (new preferences())->get(preferences::MAIL_DIGEST));
 
         $this->add_action_buttons();
     }

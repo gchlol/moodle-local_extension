@@ -21,7 +21,7 @@
  * @license     http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
-use local_extension\preferences_manager;
+use local_extension\preferences;
 use local_extension\test\extension_testcase;
 
 defined('MOODLE_INTERNAL') || die();
@@ -32,25 +32,58 @@ defined('MOODLE_INTERNAL') || die();
  * @copyright   2017 Catalyst IT Australia {@link http://www.catalyst-au.net}
  * @license     http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
-class local_extension_preferences_manager_test extends extension_testcase {
-    public function test_it_sets() {
-        preferences_manager::set('name', 'abc123');
+class local_extension_preferences_test extends extension_testcase {
+    protected function setUp() {
+        parent::setUp();
+        $this->resetAfterTest();
+        self::setAdminUser();
+    }
+
+    public function test_it_creates_with_userid() {
+        global $USER;
+
+        $tests = [
+            [null, $USER->id],
+            [999, 999],
+        ];
+
+        foreach ($tests as $key => list($parameter, $expected)) {
+            $manager = new preferences($parameter);
+            self::assertSame($expected, $manager->get_user_id(), "Test #{$key}");
+        }
+    }
+
+    public function test_it_sets_for_current_user() {
+        (new preferences())->set('name', 'abc123');
         self::assertSame('abc123', get_user_preferences('local_extension_name'));
     }
 
-    public function test_it_gets() {
+    public function test_it_gets_for_current_user() {
         set_user_preferences(['local_extension_name' => 'john']);
-        $got = preferences_manager::get('name');
+        $got = (new preferences())->get('name');
+        self::assertSame('john', $got);
+    }
+
+    public function test_it_sets_for_another_user() {
+        $user = $this->getDataGenerator()->create_user();
+        (new preferences($user->id))->set('name', 'abc123');
+        self::assertSame('abc123', get_user_preferences('local_extension_name', null, $user));
+    }
+
+    public function test_it_gets_for_another_user() {
+        $user = $this->getDataGenerator()->create_user();
+        set_user_preferences(['local_extension_name' => 'john'], $user);
+        $got = (new preferences($user->id))->get('name');
         self::assertSame('john', $got);
     }
 
     public function test_it_has_defaults() {
         $expectations = [
-            'invalid'                        => null,
-            preferences_manager::MAIL_DIGEST => false,
+            'invalid'                => null,
+            preferences::MAIL_DIGEST => false,
         ];
         foreach ($expectations as $preference => $expectation) {
-            $actual = preferences_manager::get($preference);
+            $actual = (new preferences())->get($preference);
             self::assertSame($expectation, $actual, "Preference: {$preference}");
         }
     }

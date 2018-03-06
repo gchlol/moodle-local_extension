@@ -31,19 +31,36 @@ defined('MOODLE_INTERNAL') || die();
  * @copyright   2018 Catalyst IT Australia {@link http://www.catalyst-au.net}
  * @license     http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
-abstract class preferences_manager {
+class preferences {
     const MAIL_DIGEST = 'mail_digest';
 
     protected static $defaults = [
         self::MAIL_DIGEST => false,
     ];
 
-    public static function set($name, $value) {
-        set_user_preferences(["local_extension_{$name}" => $value]);
+    /** @var int */
+    private $userid;
+
+    public function get_user_id() {
+        return $this->userid;
     }
 
-    public static function get($name) {
+    public function __construct($userid = null) {
+        global $USER;
+
+        if (is_null($userid)) {
+            $userid = $USER->id;
+        }
+
+        $this->userid = $userid;
+    }
+
+    public function get($name) {
         $default = array_key_exists($name, self::$defaults) ? self::$defaults[$name] : null;
-        return get_user_preferences("local_extension_{$name}", $default);
+        return get_user_preferences("local_extension_{$name}", $default, $this->userid);
+    }
+
+    public function set($name, $value) {
+        set_user_preferences(["local_extension_{$name}" => $value], $this->userid);
     }
 }

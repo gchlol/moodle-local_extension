@@ -23,10 +23,15 @@
 
 namespace local_extension\message;
 
+use local_extension\preferences;
+
 defined('MOODLE_INTERNAL') || die();
 
 class mailer {
     public function send($message) {
-        message_send($message);
+        $preferences = new preferences();
+        if (!$preferences->get(preferences::MAIL_DIGEST)) {
+            message_send($message);
+        }
     }
 }

@@ -24,7 +24,7 @@
  */
 
 use local_extension\form\preferences_form;
-use local_extension\preferences_manager;
+use local_extension\preferences;
 
 require_once(__DIR__ . '/../../config.php');
 
@@ -48,7 +48,7 @@ $form = new preferences_form();
 $data = $form->get_data();
 
 if (!is_null($data)) {
-    preferences_manager::set(preferences_manager::MAIL_DIGEST, !empty($data->{preferences_manager::MAIL_DIGEST}));
+    (new preferences())->set(preferences::MAIL_DIGEST, !empty($data->{preferences::MAIL_DIGEST}));
     echo $OUTPUT->notification(get_string('preferences_saved', 'local_extension'), 'notifysuccess');
 }
 

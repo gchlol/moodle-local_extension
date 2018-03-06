@@ -22,6 +22,8 @@
  */
 
 use core\message\message;
+use local_extension\message\mailer;
+use local_extension\preferences;
 use local_extension\test\extension_testcase;
 
 defined('MOODLE_INTERNAL') || die();
@@ -33,9 +35,17 @@ defined('MOODLE_INTERNAL') || die();
  * @license     http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 class local_extension_mailer_test extends extension_testcase {
-    protected function send_message() {
+    private $recipient;
+
+    protected function setUp() {
+        parent::setUp();
+        self::resetAfterTest();
+        $this->recipient = $this->getDataGenerator()->create_user(['email' => 'destination@extension.test']);
+    }
+
+    protected function send_email() {
         global $CFG;
-        $user = core_user::get_user(2);
+        $user = $this->recipient;
 
         if ($CFG->version >= 2015051100) {
             $message = new message();
@@ -52,14 +62,14 @@ class local_extension_mailer_test extends extension_testcase {
         $message->fullmessage = 'Message Contents';
         $message->fullmessageformat = FORMAT_PLAIN;
 
-        message_send($message);
+        (new mailer())->send($message);
     }
 
     public function test_it_sends_message_immediately() {
-        $this->resetAfterTest();
+        self::setAdminUser();
 
         $sink = phpunit_util::start_message_redirection();
-        $this->send_message();
+        $this->send_email();
         phpunit_util::stop_message_redirection();
 
         $messages = $sink->get_messages();
@@ -67,5 +77,19 @@ class local_extension_mailer_test extends extension_testcase {
         $message = reset($messages);
         self::assertSame('Message Subject', $message->subject);
         self::assertSame('Message Contents', $message->fullmessage);
+    }
+
+    public function test_it_does_not_send_message_immediately() {
+        $this->resetAfterTest();
+        self::setAdminUser();
+
+        (new preferences())->set(preferences::MAIL_DIGEST, true);
+
+        $sink = phpunit_util::start_message_redirection();
+        $this->send_email();
+        phpunit_util::stop_message_redirection();
+
+        $messages = $sink->get_messages();
+        self::assertCount(0, $messages);
     }
 }
