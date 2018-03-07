@@ -37,6 +37,8 @@ class mailer {
 
     const STATUS_QUEUED = 'queued';
 
+    const TABLE_DIGEST_QUEUE = 'local_extension_digest_queue';
+
     /** @var int Timestamp to use when sending messages. */
     protected $time;
 
@@ -76,7 +78,7 @@ class mailer {
             'subject'   => $message->subject,
             'message'   => $message->fullmessage,
         ];
-        $DB->insert_record('local_extension_digest_queue', $row);
+        $DB->insert_record(self::TABLE_DIGEST_QUEUE, $row);
     }
 
     public function email_digest_send() {

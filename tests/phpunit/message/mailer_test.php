@@ -130,7 +130,7 @@ class local_extension_mailer_test extends extension_testcase {
         $messages = $this->send_email($time, 'Hello', 'World');
         self::assertCount(0, $messages);
 
-        $actual = $DB->get_records('local_extension_digest_queue');
+        $actual = $DB->get_records(mailer::TABLE_DIGEST_QUEUE);
         self::assertCount(1, $actual);
         $actual = reset($actual);
         self::assertSame(mailer::STATUS_QUEUED, $actual->status);
