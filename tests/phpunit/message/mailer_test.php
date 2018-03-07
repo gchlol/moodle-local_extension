@@ -148,4 +148,23 @@ class local_extension_mailer_test extends extension_testcase {
     public function test_it_deletes_old_messages_from_queue() {
         $this->markTestSkipped('Test/Feature not yet implemented.');
     }
+
+    public function provider_for_test_is_enabled_setting() {
+        return [
+            [null, true],
+            [false, true],
+            ['0', true],
+            [true, false],
+            ['1', false],
+        ];
+    }
+
+    /**
+     * @dataProvider provider_for_test_is_enabled_setting
+     */
+    public function test_is_enabled_setting($setting, $expected) {
+        $mailer = new mailer();
+        set_config('emaildisable', $setting, 'local_extension');
+        self::assertSame($expected, $mailer->is_enabled());
+    }
 }

@@ -47,6 +47,11 @@ class mailer {
         $this->time = $time;
     }
 
+    public function is_enabled() {
+        $setting = get_config('local_extension', 'emaildisable');
+        return empty($setting);
+    }
+
     public function send($message) {
         $preferences = new preferences();
         if ($preferences->get(preferences::MAIL_DIGEST)) {

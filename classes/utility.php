@@ -261,8 +261,8 @@ class utility {
     public static function send_trigger_email(\local_extension\request $request, $subject, $content, $userfrom, $userto) {
         global $CFG;
 
-        $emaildisable = get_config('local_extension', 'emaildisable');
-        if ($emaildisable == true) {
+        $mailer = new mailer();
+        if (!$mailer->is_enabled()) {
             return;
         }
 
@@ -321,7 +321,7 @@ class utility {
             $message->courseid = SITEID;
         }
 
-        (new mailer())->send($message);
+        $mailer->send($message);
     }
 
     /**
