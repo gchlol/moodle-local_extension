@@ -24,14 +24,29 @@
 namespace local_extension\task;
 
 use core\task\scheduled_task;
+use local_extension\message\mailer;
 
 defined('MOODLE_INTERNAL') || die();
 
 class email_digest_task extends scheduled_task {
+    /** @var mailer */
+    private $mailer;
+
+    public function __construct($mailer = null) {
+        if (is_null($mailer)) {
+            $mailer = new mailer();
+        }
+        $this->mailer = $mailer;
+    }
+
     public function get_name() {
         return get_string('task_email_digest', 'local_extension');
     }
 
     public function execute() {
+        mtrace('Sending e-mails digest...');
+        $this->mailer->email_digest_send();
+        mtrace('Deleting old messages from queue...');
+        $this->mailer->email_digest_cleanup();
     }
 }

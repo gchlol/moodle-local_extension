@@ -51,15 +51,17 @@ class local_extension_email_digest_task_test extends extension_testcase {
         self::fail('Not found: ' . email_digest_task::class);
     }
 
-    public function test_it_sends_queued_messages() {
-        $this->markTestSkipped('Test/Feature not yet implemented.');
-    }
+    public function test_it_sends_and_cleans_up() {
+        $mock = $this->getMock(\local_extension\message\mailer::class);
+        $mock->expects($this->once())->method('email_digest_send');
+        $mock->expects($this->once())->method('email_digest_cleanup');
 
-    public function test_it_saves_in_database_the_sending_summary() {
-        $this->markTestSkipped('Test/Feature not yet implemented.');
-    }
+        ob_start();
+        $task = new email_digest_task($mock);
+        $task->execute();
+        $output = ob_get_clean();
 
-    public function test_it_deletes_old_messages_from_queue() {
-        $this->markTestSkipped('Test/Feature not yet implemented.');
+        self::assertTrue(strpos($output, 'Sending') !== false, 'sending');
+        self::assertTrue(strpos($output, 'Deleting') !== false, 'deleting');
     }
 }

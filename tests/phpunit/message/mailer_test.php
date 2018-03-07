@@ -136,4 +136,16 @@ class local_extension_mailer_test extends extension_testcase {
         self::assertEquals($this->recipient->id, $actual->recipient);
         self::assertSame('Hello', $actual->subject);
     }
+
+    public function test_it_digest_sends_emails_in_queue() {
+        $this->markTestSkipped('Test/Feature not yet implemented.');
+    }
+
+    public function test_it_saves_in_database_the_sending_summary() {
+        $this->markTestSkipped('Test/Feature not yet implemented.');
+    }
+
+    public function test_it_deletes_old_messages_from_queue() {
+        $this->markTestSkipped('Test/Feature not yet implemented.');
+    }
 }

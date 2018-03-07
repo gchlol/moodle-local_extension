@@ -68,4 +68,10 @@ class mailer {
         ];
         $DB->insert_record('local_extension_digest_queue', $row);
     }
+
+    public function email_digest_send() {
+    }
+
+    public function email_digest_cleanup() {
+    }
 }
