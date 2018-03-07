@@ -92,7 +92,7 @@ class mailer {
         $message->userto = core_user::get_user($usertoid);
         $message->component = 'local_extension';
         $message->name = 'status';
-        $message->userfrom =  $this->create_user_from($headers);
+        $message->userfrom = $this->create_user_from($headers);
         $message->subject = $subject;
         $message->fullmessage = html_to_text($content);;
         $message->fullmessageformat = FORMAT_PLAIN;
