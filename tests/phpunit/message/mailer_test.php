@@ -34,6 +34,10 @@ defined('MOODLE_INTERNAL') || die();
  * @license     http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 class local_extension_mailer_test extends extension_testcase {
+    /** @var mailer */
+    private $mailer;
+
+    /** @var stdClass */
     private $recipient;
 
     protected function setUp() {
@@ -41,6 +45,7 @@ class local_extension_mailer_test extends extension_testcase {
         $this->resetAfterTest();
         self::setAdminUser();
         unset_config('noemailever');
+        $this->mailer = new mailer();
         $this->recipient = $this->getDataGenerator()->create_user(['email' => 'destination@extension.test']);
     }
 
@@ -62,21 +67,18 @@ class local_extension_mailer_test extends extension_testcase {
     }
 
     public function test_it_uses_a_single_time() {
-        $mailer = new mailer();
-        self::assertLessThanOrEqual(time(), $mailer->get_time());
+        self::assertLessThanOrEqual(time(), $this->mailer->get_time());
     }
 
     protected function send_email($time = null, $subject = 'Message Subject', $body = 'Message Contents') {
-        $mailer = new mailer();
-
-        $message = $mailer->create_message($this->recipient->id, [], $subject, $body);
+        $message = $this->mailer->create_message($this->recipient->id, [], $subject, $body);
 
         if (!is_null($time)) {
-            $mailer->set_time($time);
+            $this->mailer->set_time($time);
         }
 
         $sink = $this->start_mail_sink();
-        $mailer->send($message);
+        $this->mailer->send($message);
         $sink->close();
 
         return $sink->get_messages();
@@ -209,7 +211,7 @@ class local_extension_mailer_test extends extension_testcase {
      */
     protected function send_digest_with_sink() {
         $sink = $this->start_mail_sink();
-        (new mailer())->email_digest_send();
+        $this->mailer->email_digest_send();
         $sink->close();
         $messages = $sink->get_messages();
         return $messages;
