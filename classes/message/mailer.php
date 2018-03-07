@@ -23,9 +23,13 @@
 
 namespace local_extension\message;
 
+use core\message\message;
+use core_user;
 use local_extension\preferences;
 
 defined('MOODLE_INTERNAL') || die();
+
+require_once($CFG->dirroot . '/user/lib.php');
 
 class mailer {
     const STATUS_INVALID = 'invalid';
@@ -78,5 +82,46 @@ class mailer {
     }
 
     public function email_digest_cleanup() {
+    }
+
+    public function create_message($usertoid, $headers, $subject, $content) {
+        global $CFG;
+
+        $message = new message();
+        $message->userto = core_user::get_user($usertoid);
+        $message->component = 'local_extension';
+        $message->name = 'status';
+        $message->userfrom =  $this->create_user_from($headers);
+        $message->subject = $subject;
+        $message->fullmessage = html_to_text($content);;
+        $message->fullmessageformat = FORMAT_PLAIN;
+        $message->fullmessagehtml = $content;
+        $message->smallmessage = '';
+        $message->notification = 1;
+
+        if ($CFG->branch >= 32) {
+            $message->courseid = SITEID;
+        }
+
+        return $message;
+    }
+
+    public function create_user_from(array $headers = []) {
+        // Headers to help prevent auto-responders.
+        $headers[] = 'Precedence: Bulk';
+        $headers[] = 'X-Auto-Response-Suppress: All';
+        $headers[] = 'Auto-Submitted: auto-generated';
+
+        $noreplyuser = core_user::get_noreply_user();
+
+        $supportusername = get_config('local_extension', 'supportusername');
+        if (empty($supportusername)) {
+            $supportusername = get_string('supportusernamedefault', 'local_extension');
+        }
+
+        $noreplyuser->firstname = $supportusername;
+        $noreplyuser->customheaders = $headers;
+
+        return $noreplyuser;
     }
 }

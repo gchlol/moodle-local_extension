@@ -40,7 +40,6 @@ defined('MOODLE_INTERNAL') || die();
 global $CFG;
 require_once($CFG->libdir . '/tablelib.php');
 require_once($CFG->dirroot . '/calendar/lib.php');
-require_once($CFG->dirroot . '/user/lib.php');
 
 /**
  * Utility class.
@@ -255,24 +254,18 @@ class utility {
      * @param \local_extension\request $request
      * @param string                   $subject
      * @param string                   $content
-     * @param stdClass                 $userfrom
      * @param stdClass                 $userto
      */
-    public static function send_trigger_email(\local_extension\request $request, $subject, $content, $userfrom, $userto) {
-        global $CFG;
-
+    public static function send_trigger_email(\local_extension\request $request, $subject, $content, $userto) {
         $mailer = new mailer();
         if (!$mailer->is_enabled()) {
             return;
         }
 
-        // Email threading.
+        $messageid = self::get_email_message_id($request->requestid, $userto->id);
 
-        // The base messageid.
-        $rootid = self::get_email_message_id($request->requestid, $userto->id);
-
-        $userfrom->customheaders = [
-            'Message-ID: ' . $rootid,
+        $customheaders = [
+            'Message-ID: ' . $messageid,
 
             // Headers to help prevent auto-responders.
             'Precedence: Bulk',
@@ -285,42 +278,12 @@ class utility {
             $messageid = self::get_email_message_id($inputid, $userto->id);
 
             // This post is a reply, so add reply header (RFC 2822).
-            $userfrom->customheaders[] = "In-Reply-To: $rootid";
-            $userfrom->customheaders[] = "References: $rootid";
-            $userfrom->customheaders[] = 'Message-ID: ' . $messageid;
+            $customheaders[] = "In-Reply-To: $messageid";
+            $customheaders[] = "References: $messageid";
+            $customheaders[] = 'Message-ID: ' . $messageid;
         }
 
-        // MS Outlook / Office uses poorly documented and non standard headers, including
-        // Thread-Topic which overrides the Subject and shouldn't contain Re: or Fwd: etc.
-
-        $userfrom->customheaders[] = "Thread-Topic: $subject";
-        $userfrom->customheaders[] = "Thread-Index: " . substr($rootid, 1, 28);
-
-        // Moodle 2.9 has introcuded a new message api.
-        if ($CFG->version >= 2015051100) {
-            $message = new \core\message\message();
-            $message->userto = \core_user::get_user($userto->id);
-        } else {
-            // Moodle 2.7, 2.8.
-            $message = new stdClass();
-            $message->userto = $userto->id;
-        }
-
-        $message->component = 'local_extension';
-        $message->name = 'status';
-        $message->userfrom = $userfrom;
-        $message->subject = $subject;
-        $message->fullmessage = html_to_text($content);;
-        $message->fullmessageformat = FORMAT_PLAIN;
-        $message->fullmessagehtml = $content;
-        $message->smallmessage = '';
-        $message->notification = 1;
-
-        // Moodle 3.2 has introduced the courseid parameter to the message object.
-        if ($CFG->version >= 2016120500) {
-            $message->courseid = SITEID;
-        }
-
+        $message = $mailer->create_message($userto->id, $customheaders, $subject, $content);
         $mailer->send($message);
     }
 
