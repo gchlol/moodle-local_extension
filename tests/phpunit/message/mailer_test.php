@@ -49,7 +49,7 @@ class local_extension_mailer_test extends extension_testcase {
         self::setAdminUser();
         unset_config('noemailever');
         $this->mailer = new mailer();
-        $this->recipient = $this->getDataGenerator()->create_user(['email' => 'destination@extension.test']);
+        $this->create_recipient();
         $this->lastdigestrunid = null;
     }
 
@@ -95,6 +95,11 @@ class local_extension_mailer_test extends extension_testcase {
     protected function start_mail_sink() {
         // The call below tell us to not call that method directly, but the alternative does not work!
         return phpunit_util::start_message_redirection();
+    }
+
+    protected function create_recipient() {
+        $this->recipient = $this->getDataGenerator()->create_user();
+        return $this->recipient;
     }
 
     public function test_status_db_field_size() {
@@ -174,7 +179,8 @@ class local_extension_mailer_test extends extension_testcase {
         self::assertCount(1, $messages);
 
         $message = reset($messages);
-        self::assertSame('This is a test.', $message->fullmessage);
+        self::assertTrue(strpos($message->fullmessage, 'test_it_digest_sends_emails_in_queue') !== false);
+        self::assertTrue(strpos($message->fullmessage, 'This is a test.') !== false);
 
         $status = $DB->get_field(mailer::TABLE_DIGEST_QUEUE, 'status', ['id' => $data->id], MUST_EXIST);
         self::assertSame(mailer::STATUS_SENT, $status);
@@ -204,7 +210,37 @@ class local_extension_mailer_test extends extension_testcase {
     }
 
     public function test_it_sends_all_messages_for_each_user_together() {
-        $this->markTestSkipped('Test/Feature not yet implemented.');
+        $this->create_recipient();
+        $this->create_queue_entry();
+        $this->create_queue_entry();
+        $this->create_queue_entry();
+
+        $this->create_recipient();
+        $this->create_queue_entry();
+        $this->create_queue_entry();
+
+        $messages = $this->send_digest_with_sink();
+        self::assertCount(2, $messages);
+    }
+
+    public function test_it_filters_users_from_queue() {
+        $a = $this->create_recipient();
+        $this->create_queue_entry();
+        $this->create_queue_entry();
+        $this->create_queue_entry();
+
+        $b = $this->create_recipient();
+        $this->create_queue_entry();
+        $this->create_queue_entry();
+
+        $c = $this->create_recipient();
+        $this->create_queue_entry();
+
+        $expected = [$a->id, $b->id, $c->id];
+        $actual = $this->mailer->fetch_digest_user_queues();
+        sort($expected);
+        sort($actual);
+        self::assertEquals($expected, $actual);
     }
 
     /**
@@ -239,5 +275,9 @@ class local_extension_mailer_test extends extension_testcase {
 
         $actual = $DB->get_record(mailer::TABLE_DIGEST_RUNS, ['id' => $id], '*', MUST_EXIST);
         self::assertEquals(12345, $actual->whenran);
+    }
+
+    public function test_it_creates_the_digest_message() {
+        $this->markTestSkipped('Test/Feature not yet implemented.');
     }
 }

@@ -89,19 +89,22 @@ class mailer {
     public function email_digest_send() {
         global $DB;
         $runid = $this->create_digest_run_id();
-        $queuemessages = $DB->get_records(self::TABLE_DIGEST_QUEUE, ['status' => self::STATUS_QUEUED]);
-        foreach ($queuemessages as $queuemessage) {
-            $headers = explode("\n", $queuemessage->headers);
-            $message = $this->create_message(
-                $queuemessage->userto,
-                $headers,
-                $queuemessage->subject,
-                $queuemessage->contents
-            );
 
-            $queuemessage->status = self::STATUS_SENT;
-            $queuemessage->runid = $runid;
-            $DB->update_record(self::TABLE_DIGEST_QUEUE, $queuemessage);
+        $users = $this->fetch_digest_user_queues();
+
+        foreach ($users as $userto) {
+            $emails = $DB->get_records(self::TABLE_DIGEST_QUEUE,
+                                       ['status' => self::STATUS_QUEUED, 'userto' => $userto]);
+            foreach ($emails as $email) {
+                $email->status = self::STATUS_SENT;
+                $email->runid = $runid;
+                $DB->update_record(self::TABLE_DIGEST_QUEUE, $email);
+            }
+
+            $message = $this->create_digest_message(
+                $userto,
+                $emails
+            );
 
             message_send($message);
         }
@@ -161,5 +164,26 @@ class mailer {
         ]);
 
         return $id;
+    }
+
+    public function fetch_digest_user_queues() {
+        global $DB;
+
+        $queue = $DB->get_records(
+            self::TABLE_DIGEST_QUEUE,
+            ['status' => self::STATUS_QUEUED],
+            '',
+            'DISTINCT (userto)');
+
+        $queue = array_keys($queue);
+        return $queue;
+    }
+
+    private function create_digest_message($userto, $messages) {
+        $contents = '';
+        foreach ($messages as $message) {
+            $contents .= "{$message->subject}\n\n{$message->contents}\n\n\n";
+        }
+        return $this->create_message($userto, [], 'Subject', $contents);
     }
 }
