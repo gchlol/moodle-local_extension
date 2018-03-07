@@ -23,6 +23,8 @@
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
+use local_extension\task\email_digest_task;
+
 defined('MOODLE_INTERNAL') || die();
 
 $tasks = array(
@@ -31,6 +33,15 @@ $tasks = array(
         'blocking' => 0,
         'minute' => '0',
         'hour' => '*',
+        'day' => '*',
+        'dayofweek' => '*',
+        'month' => '*'
+    ),
+    array(
+        'classname' => email_digest_task::class,
+        'blocking' => 0,
+        'minute' => '0',
+        'hour' => '6',
         'day' => '*',
         'dayofweek' => '*',
         'month' => '*'

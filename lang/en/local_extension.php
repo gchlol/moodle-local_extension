@@ -313,6 +313,7 @@ $string['table_header_statushead'] = 'Status';
 $string['table_header_statusrow'] = '<a href="{$a}">Click to view request status</a>';
 $string['table_header_username'] = 'Requesting User';
 $string['task_process'] = 'Process Tiggers / Rules';
+$string['task_email_digest'] = 'E-mail Digest Processing';
 $string['template_notify_content'] = '{{course}} => Course full name<br />
 {{module}} => Course module name<br />
 {{student}} => Requesting users full name<br />
