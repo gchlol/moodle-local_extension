@@ -34,6 +34,9 @@ defined('MOODLE_INTERNAL') || die();
  * @license     http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 class local_extension_mailer_test extends extension_testcase {
+    /** @var int */
+    private $lastdigestrunid;
+
     /** @var mailer */
     private $mailer;
 
@@ -47,9 +50,10 @@ class local_extension_mailer_test extends extension_testcase {
         unset_config('noemailever');
         $this->mailer = new mailer();
         $this->recipient = $this->getDataGenerator()->create_user(['email' => 'destination@extension.test']);
+        $this->lastdigestrunid = null;
     }
 
-    protected function create_queued_entry($status = mailer::STATUS_QUEUED, $contents = 'This is a test.') {
+    protected function create_queue_entry($status = mailer::STATUS_QUEUED, $contents = 'This is a test.') {
         global $DB;
 
         $subject = debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS, 2)[1]['function'];
@@ -68,7 +72,7 @@ class local_extension_mailer_test extends extension_testcase {
 
     protected function send_digest_with_sink() {
         $sink = $this->start_mail_sink();
-        $this->mailer->email_digest_send();
+        $this->lastdigestrunid = $this->mailer->email_digest_send();
         $sink->close();
         $messages = $sink->get_messages();
         return $messages;
@@ -157,7 +161,7 @@ class local_extension_mailer_test extends extension_testcase {
     public function test_it_digest_sends_emails_in_queue() {
         global $DB;
 
-        $data = $this->create_queued_entry();
+        $data = $this->create_queue_entry();
 
         $messages = $this->send_digest_with_sink();
 
@@ -171,8 +175,8 @@ class local_extension_mailer_test extends extension_testcase {
     }
 
     public function test_it_does_not_send_emails_with_status_not_queued() {
-        $this->create_queued_entry(mailer::STATUS_INVALID, 'Invalid message.');
-        $this->create_queued_entry(mailer::STATUS_SENT, 'Sent already!');
+        $this->create_queue_entry(mailer::STATUS_INVALID, 'Invalid message.');
+        $this->create_queue_entry(mailer::STATUS_SENT, 'Sent already!');
 
         $messages = $this->send_digest_with_sink();
 
@@ -214,8 +218,19 @@ class local_extension_mailer_test extends extension_testcase {
         $this->markTestSkipped('Test/Feature not yet implemented.');
     }
 
-    public function test_it_digest_send_returns_sent_id_and_updates_queue_sentid() {
-        $this->markTestSkipped('Test/Feature not yet implemented.');
+    public function test_it_stores_the_digest_run_id() {
+        global $DB;
+
+        $this->create_queue_entry();
+        $this->create_queue_entry();
+        $this->create_queue_entry();
+        $count = $DB->count_records(mailer::TABLE_DIGEST_QUEUE, ['runid' => null]);
+        self::assertSame(3, $count, 'They should start with no id.');
+
+        $this->send_digest_with_sink();
+
+        $count = $DB->count_records(mailer::TABLE_DIGEST_QUEUE, ['runid' => $this->lastdigestrunid]);
+        self::assertSame(3, $count, 'They all should have got the correct id.');
     }
 
     public function test_it_creates_a_digest_run_id() {

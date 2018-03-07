@@ -88,6 +88,7 @@ class mailer {
 
     public function email_digest_send() {
         global $DB;
+        $runid = $this->create_digest_run_id();
         $queuemessages = $DB->get_records(self::TABLE_DIGEST_QUEUE, ['status' => self::STATUS_QUEUED]);
         foreach ($queuemessages as $queuemessage) {
             $headers = explode("\n", $queuemessage->headers);
@@ -99,10 +100,13 @@ class mailer {
             );
 
             $queuemessage->status = self::STATUS_SENT;
+            $queuemessage->runid = $runid;
             $DB->update_record(self::TABLE_DIGEST_QUEUE, $queuemessage);
 
             message_send($message);
         }
+
+        return $runid;
     }
 
     public function email_digest_cleanup() {
