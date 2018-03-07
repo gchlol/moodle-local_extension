@@ -91,12 +91,16 @@ class local_extension_mailer_test extends extension_testcase {
             $mailer->set_time($time);
         }
 
-        // The call below tell us to not call that method directly, but the alternative does not work!
-        $sink = phpunit_util::start_message_redirection();
+        $sink = $this->start_mail_sink();
         $mailer->send($message);
         $sink->close();
 
         return $sink->get_messages();
+    }
+
+    protected function start_mail_sink() {
+        // The call below tell us to not call that method directly, but the alternative does not work!
+        return phpunit_util::start_message_redirection();
     }
 
     public function test_it_sends_message_immediately() {
