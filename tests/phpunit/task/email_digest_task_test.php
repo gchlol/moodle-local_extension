@@ -50,4 +50,16 @@ class local_extension_email_digest_task_test extends extension_testcase {
         }
         self::fail('Not found: ' . email_digest_task::class);
     }
+
+    public function test_it_sends_queued_messages() {
+        $this->markTestSkipped('Test/Feature not yet implemented.');
+    }
+
+    public function test_it_saves_in_database_the_sending_summary() {
+        $this->markTestSkipped('Test/Feature not yet implemented.');
+    }
+
+    public function test_it_deletes_old_messages_from_queue() {
+        $this->markTestSkipped('Test/Feature not yet implemented.');
+    }
 }
