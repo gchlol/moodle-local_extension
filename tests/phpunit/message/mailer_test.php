@@ -21,7 +21,6 @@
  * @license     http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
-use core\message\message;
 use local_extension\message\mailer;
 use local_extension\preferences;
 use local_extension\test\extension_testcase;
@@ -68,25 +67,10 @@ class local_extension_mailer_test extends extension_testcase {
     }
 
     protected function send_email($time = null, $subject = 'Message Subject', $body = 'Message Contents') {
-        global $CFG, $USER;
-        $user = $this->recipient;
-
-        if ($CFG->version >= 2015051100) {
-            $message = new message();
-            $message->userto = $user;
-        } else {
-            $message = new stdClass();
-            $message->userto = $user->id;
-        }
-
-        $message->component = 'local_extension';
-        $message->name = 'status';
-        $message->userfrom = $USER;
-        $message->subject = $subject;
-        $message->fullmessage = $body;
-        $message->fullmessageformat = FORMAT_PLAIN;
-
         $mailer = new mailer();
+
+        $message = $mailer->create_message($this->recipient->id, [], $subject, $body);
+
         if (!is_null($time)) {
             $mailer->set_time($time);
         }
@@ -132,13 +116,15 @@ class local_extension_mailer_test extends extension_testcase {
 
         $actual = $DB->get_records(mailer::TABLE_DIGEST_QUEUE);
         self::assertCount(1, $actual);
+
         $actual = reset($actual);
         self::assertSame(mailer::STATUS_QUEUED, $actual->status);
         self::assertEquals($time, $actual->added);
         self::assertNull($actual->sentid);
-        self::assertEquals(2, $actual->sender);
-        self::assertEquals($this->recipient->id, $actual->recipient);
+        self::assertEquals($this->recipient->id, $actual->userto);
+        self::assertNotNull(2, $actual->headers);
         self::assertSame('Hello', $actual->subject);
+        self::assertSame('World', $actual->contents);
     }
 
     public function test_it_digest_sends_emails_in_queue() {
@@ -170,5 +156,13 @@ class local_extension_mailer_test extends extension_testcase {
         $mailer = new mailer();
         set_config('emaildisable', $setting, 'local_extension');
         self::assertSame($expected, $mailer->is_enabled());
+    }
+
+    public function test_it_checks_preferences_for_recipien_not_current_user() {
+        $this->markTestSkipped('Test/Feature not yet implemented.');
+    }
+
+    public function test_it_digest_send_returns_sent_id_and_updates_queue_sentid() {
+        $this->markTestSkipped('Test/Feature not yet implemented.');
     }
 }

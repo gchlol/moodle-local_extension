@@ -37,6 +37,8 @@ class mailer {
 
     const STATUS_QUEUED = 'queued';
 
+    const STATUS_SENT = 'sent';
+
     const TABLE_DIGEST_QUEUE = 'local_extension_digest_queue';
 
     /** @var int Timestamp to use when sending messages. */
@@ -70,18 +72,34 @@ class mailer {
 
     private function save_for_digest($message) {
         global $DB;
+        $headers = $message->userfrom->customheaders;
         $row = (object)[
-            'status'    => self::STATUS_QUEUED,
-            'added'     => $this->time,
-            'sender'    => $message->userfrom->id,
-            'recipient' => $message->userto->id,
-            'subject'   => $message->subject,
-            'message'   => $message->fullmessage,
+            'status'   => self::STATUS_QUEUED,
+            'added'    => $this->time,
+            'userto'   => $message->userto->id,
+            'headers'  => implode("\n", $headers),
+            'subject'  => $message->subject,
+            'contents' => $message->fullmessage,
         ];
         $DB->insert_record(self::TABLE_DIGEST_QUEUE, $row);
     }
 
     public function email_digest_send() {
+        global $DB;
+        $queuemessages = $DB->get_records(self::TABLE_DIGEST_QUEUE, ['status' => self::STATUS_QUEUED]);
+        foreach ($queuemessages as $queuemessage) {
+            $message = $this->create_message(
+                $queuemessage->userto,
+                $queuemessage->headers,
+                $queuemessage->subject,
+                $queuemessage->contents
+            );
+
+            $queuemessage->status = self::STATUS_SENT;
+            $DB->update_record(self::TABLE_DIGEST_QUEUE, $queuemessage);
+
+            message_send($message);
+        }
     }
 
     public function email_digest_cleanup() {

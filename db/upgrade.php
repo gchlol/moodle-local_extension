@@ -142,7 +142,7 @@ function xmldb_local_extension_upgrade($oldversion) {
         upgrade_plugin_savepoint(true, 2017062200, 'local', 'extension');
     }
 
-    if ($oldversion < 2018030700) {
+    if ($oldversion < 2018030703) {
 
         // Define table local_extension_digest_queue to be created.
         $table = new xmldb_table('local_extension_digest_queue');
@@ -152,10 +152,10 @@ function xmldb_local_extension_upgrade($oldversion) {
         $table->add_field('status', XMLDB_TYPE_CHAR, '10', null, XMLDB_NOTNULL, null, 'invalid');
         $table->add_field('added', XMLDB_TYPE_INTEGER, '10', null, XMLDB_NOTNULL, null, null);
         $table->add_field('sentid', XMLDB_TYPE_INTEGER, '10', null, null, null, null);
-        $table->add_field('sender', XMLDB_TYPE_INTEGER, '10', null, XMLDB_NOTNULL, null, null);
-        $table->add_field('recipient', XMLDB_TYPE_INTEGER, '10', null, XMLDB_NOTNULL, null, null);
+        $table->add_field('userto', XMLDB_TYPE_INTEGER, '10', null, XMLDB_NOTNULL, null, null);
+        $table->add_field('headers', XMLDB_TYPE_TEXT, null, null, XMLDB_NOTNULL, null, null);
         $table->add_field('subject', XMLDB_TYPE_TEXT, null, null, XMLDB_NOTNULL, null, null);
-        $table->add_field('message', XMLDB_TYPE_TEXT, null, null, XMLDB_NOTNULL, null, null);
+        $table->add_field('contents', XMLDB_TYPE_TEXT, null, null, XMLDB_NOTNULL, null, null);
 
         // Adding keys to table local_extension_digest_queue.
         $table->add_key('primary', XMLDB_KEY_PRIMARY, array('id'));
@@ -169,7 +169,7 @@ function xmldb_local_extension_upgrade($oldversion) {
         }
 
         // Extension savepoint reached.
-        upgrade_plugin_savepoint(true, 2018030700, 'local', 'extension');
+        upgrade_plugin_savepoint(true, 2018030703, 'local', 'extension');
     }
 
     return true;

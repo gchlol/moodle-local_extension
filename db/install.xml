@@ -162,10 +162,10 @@
         <FIELD NAME="status" TYPE="char" LENGTH="10" NOTNULL="true" DEFAULT="invalid" SEQUENCE="false" COMMENT="See mailer::STATUS_* class."/>
         <FIELD NAME="added" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="false" COMMENT="Timestamp when the email was supposed to be sent (queued)."/>
         <FIELD NAME="sentid" TYPE="int" LENGTH="10" NOTNULL="false" SEQUENCE="false" COMMENT="Foreign key for local_extension_digest_sent table."/>
-        <FIELD NAME="sender" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="false" COMMENT="Message from (user id)"/>
-        <FIELD NAME="recipient" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="false" COMMENT="Message to (user id)"/>
+        <FIELD NAME="userto" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="false" COMMENT="Message to (user id)"/>
+        <FIELD NAME="headers" TYPE="text" NOTNULL="true" SEQUENCE="false" COMMENT="Custom headers added (one per line)."/>
         <FIELD NAME="subject" TYPE="text" NOTNULL="true" SEQUENCE="false" COMMENT="Message subject"/>
-        <FIELD NAME="message" TYPE="text" NOTNULL="true" SEQUENCE="false" COMMENT="Message body"/>
+        <FIELD NAME="contents" TYPE="text" NOTNULL="true" SEQUENCE="false" COMMENT="Message body"/>
       </FIELDS>
       <KEYS>
         <KEY NAME="primary" TYPE="primary" FIELDS="id"/>
