@@ -88,9 +88,10 @@ class mailer {
         global $DB;
         $queuemessages = $DB->get_records(self::TABLE_DIGEST_QUEUE, ['status' => self::STATUS_QUEUED]);
         foreach ($queuemessages as $queuemessage) {
+            $headers = explode("\n", $queuemessage->headers);
             $message = $this->create_message(
                 $queuemessage->userto,
-                $queuemessage->headers,
+                $headers,
                 $queuemessage->subject,
                 $queuemessage->contents
             );

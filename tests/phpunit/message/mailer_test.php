@@ -128,6 +128,33 @@ class local_extension_mailer_test extends extension_testcase {
     }
 
     public function test_it_digest_sends_emails_in_queue() {
+        global $DB;
+
+        $data = (object)[
+            'status'   => mailer::STATUS_QUEUED,
+            'added'    => time(),
+            'userto'   => $this->recipient->id,
+            'headers'  => "Custom Header: foo\nAnother: bar",
+            'subject'  => __METHOD__,
+            'contents' => 'This is a test.',
+        ];
+        $data->id = $DB->insert_record(mailer::TABLE_DIGEST_QUEUE, $data);
+
+        $sink = $this->start_mail_sink();
+        (new mailer())->email_digest_send();
+        $sink->close();
+        $messages = $sink->get_messages();
+
+        self::assertCount(1, $messages);
+
+        $message = reset($messages);
+        self::assertSame('This is a test.', $message->fullmessage);
+
+        $status = $DB->get_field(mailer::TABLE_DIGEST_QUEUE, 'status', ['id' => $data->id], MUST_EXIST);
+        self::assertSame(mailer::STATUS_SENT, $status);
+    }
+
+    public function test_it_does_not_send_emails_with_status_not_queued() {
         $this->markTestSkipped('Test/Feature not yet implemented.');
     }
 
