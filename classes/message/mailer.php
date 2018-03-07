@@ -29,6 +29,7 @@ use local_extension\preferences;
 
 defined('MOODLE_INTERNAL') || die();
 
+global $CFG;
 require_once($CFG->dirroot . '/user/lib.php');
 
 class mailer {
