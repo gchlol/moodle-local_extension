@@ -119,6 +119,10 @@ class local_extension_mailer_test extends extension_testcase {
     }
 
     public function test_it_sends_message_immediately() {
+        // Only the recipient digest mode should matter.
+        (new preferences())->set(preferences::MAIL_DIGEST, true);
+        (new preferences($this->recipient->id))->set(preferences::MAIL_DIGEST, false);
+
         $messages = $this->send_email();
 
         self::assertCount(1, $messages);
@@ -128,7 +132,9 @@ class local_extension_mailer_test extends extension_testcase {
     }
 
     public function test_it_does_not_send_message_immediately() {
-        (new preferences())->set(preferences::MAIL_DIGEST, true);
+        // Only the recipient digest mode should matter.
+        (new preferences())->set(preferences::MAIL_DIGEST, false);
+        (new preferences($this->recipient->id))->set(preferences::MAIL_DIGEST, true);
 
         $messages = $this->send_email();
 
@@ -138,7 +144,7 @@ class local_extension_mailer_test extends extension_testcase {
     public function test_it_stores_messages_in_database_for_digest_mode() {
         global $DB;
 
-        (new preferences())->set(preferences::MAIL_DIGEST, true);
+        (new preferences($this->recipient->id))->set(preferences::MAIL_DIGEST, true);
 
         $time = 1234567890;
 
@@ -212,10 +218,6 @@ class local_extension_mailer_test extends extension_testcase {
         $mailer = new mailer();
         set_config('emaildisable', $setting, 'local_extension');
         self::assertSame($expected, $mailer->is_enabled());
-    }
-
-    public function test_it_checks_preferences_for_recipien_not_current_user() {
-        $this->markTestSkipped('Test/Feature not yet implemented.');
     }
 
     public function test_it_stores_the_digest_run_id() {

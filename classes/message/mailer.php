@@ -64,7 +64,7 @@ class mailer {
     }
 
     public function send($message) {
-        $preferences = new preferences();
+        $preferences = new preferences($message->userto->id);
         if ($preferences->get(preferences::MAIL_DIGEST)) {
             $this->save_for_digest($message);
         } else {
