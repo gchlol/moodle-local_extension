@@ -49,25 +49,29 @@ class local_extension_mailer_test extends extension_testcase {
         $this->recipient = $this->getDataGenerator()->create_user(['email' => 'destination@extension.test']);
     }
 
-    public function test_status_db_field_size() {
-        $class = new ReflectionClass(mailer::class);
-        $prefix = 'STATUS_';
-        $maxlength = 10; // Should match database length.
-        foreach ($class->getConstants() as $name => $value) {
-            if (substr($name, 0, strlen($prefix)) != $prefix) {
-                continue;
-            }
-            self::assertLessThanOrEqual($maxlength, strlen($value), "Constant '{$name}' too big for field.'");
-        }
+    protected function create_queued_entry($status = mailer::STATUS_QUEUED, $contents = 'This is a test.') {
+        global $DB;
+
+        $subject = debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS, 2)[1]['function'];
+        $data = (object)[
+            'status'   => $status,
+            'added'    => time(),
+            'userto'   => $this->recipient->id,
+            'headers'  => "Custom Header: foo\nAnother: bar",
+            'subject'  => $subject,
+            'contents' => $contents,
+        ];
+        $data->id = $DB->insert_record(mailer::TABLE_DIGEST_QUEUE, $data);
+
+        return $data;
     }
 
-    public function test_status_db_default_status() {
-        // This is the default status for the table, although it should never be used outside tests.
-        self::assertSame('invalid', mailer::STATUS_INVALID);
-    }
-
-    public function test_it_uses_a_single_time() {
-        self::assertLessThanOrEqual(time(), $this->mailer->get_time());
+    protected function send_digest_with_sink() {
+        $sink = $this->start_mail_sink();
+        $this->mailer->email_digest_send();
+        $sink->close();
+        $messages = $sink->get_messages();
+        return $messages;
     }
 
     protected function send_email($time = null, $subject = 'Message Subject', $body = 'Message Contents') {
@@ -87,6 +91,27 @@ class local_extension_mailer_test extends extension_testcase {
     protected function start_mail_sink() {
         // The call below tell us to not call that method directly, but the alternative does not work!
         return phpunit_util::start_message_redirection();
+    }
+
+    public function test_status_db_field_size() {
+        $class = new ReflectionClass(mailer::class);
+        $prefix = 'STATUS_';
+        $maxlength = 10; // Should match database length.
+        foreach ($class->getConstants() as $name => $value) {
+            if (substr($name, 0, strlen($prefix)) != $prefix) {
+                continue;
+            }
+            self::assertLessThanOrEqual($maxlength, strlen($value), "Constant '{$name}' too big for field.'");
+        }
+    }
+
+    public function test_status_db_default_status() {
+        // This is the default status for the table, although it should never be used outside tests.
+        self::assertSame('invalid', mailer::STATUS_INVALID);
+    }
+
+    public function test_it_uses_a_single_time() {
+        self::assertLessThanOrEqual(time(), $this->mailer->get_time());
     }
 
     public function test_it_sends_message_immediately() {
@@ -172,6 +197,10 @@ class local_extension_mailer_test extends extension_testcase {
         ];
     }
 
+    public function test_it_sends_all_messages_for_each_user_together() {
+        $this->markTestSkipped('Test/Feature not yet implemented.');
+    }
+
     /**
      * @dataProvider provider_for_test_is_enabled_setting
      */
@@ -187,33 +216,5 @@ class local_extension_mailer_test extends extension_testcase {
 
     public function test_it_digest_send_returns_sent_id_and_updates_queue_sentid() {
         $this->markTestSkipped('Test/Feature not yet implemented.');
-    }
-
-    protected function create_queued_entry($status = mailer::STATUS_QUEUED, $contents = 'This is a test.') {
-        global $DB;
-
-        $subject = debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS, 2)[1]['function'];
-        $data = (object)[
-            'status'   => $status,
-            'added'    => time(),
-            'userto'   => $this->recipient->id,
-            'headers'  => "Custom Header: foo\nAnother: bar",
-            'subject'  => $subject,
-            'contents' => $contents,
-        ];
-        $data->id = $DB->insert_record(mailer::TABLE_DIGEST_QUEUE, $data);
-
-        return $data;
-    }
-
-    /**
-     * @return array
-     */
-    protected function send_digest_with_sink() {
-        $sink = $this->start_mail_sink();
-        $this->mailer->email_digest_send();
-        $sink->close();
-        $messages = $sink->get_messages();
-        return $messages;
     }
 }
