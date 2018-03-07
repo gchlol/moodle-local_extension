@@ -130,20 +130,9 @@ class local_extension_mailer_test extends extension_testcase {
     public function test_it_digest_sends_emails_in_queue() {
         global $DB;
 
-        $data = (object)[
-            'status'   => mailer::STATUS_QUEUED,
-            'added'    => time(),
-            'userto'   => $this->recipient->id,
-            'headers'  => "Custom Header: foo\nAnother: bar",
-            'subject'  => __METHOD__,
-            'contents' => 'This is a test.',
-        ];
-        $data->id = $DB->insert_record(mailer::TABLE_DIGEST_QUEUE, $data);
+        $data = $this->create_queued_entry();
 
-        $sink = $this->start_mail_sink();
-        (new mailer())->email_digest_send();
-        $sink->close();
-        $messages = $sink->get_messages();
+        $messages = $this->send_digest_with_sink();
 
         self::assertCount(1, $messages);
 
@@ -155,32 +144,10 @@ class local_extension_mailer_test extends extension_testcase {
     }
 
     public function test_it_does_not_send_emails_with_status_not_queued() {
-        global $DB;
+        $this->create_queued_entry(mailer::STATUS_INVALID, 'Invalid message.');
+        $this->create_queued_entry(mailer::STATUS_SENT, 'Sent already!');
 
-        $data = [
-            (object)[
-                'status'   => mailer::STATUS_INVALID,
-                'added'    => time(),
-                'userto'   => $this->recipient->id,
-                'headers'  => "Custom Header: foo\nAnother: bar",
-                'subject'  => __METHOD__,
-                'contents' => 'Invalid message.',
-            ],
-            (object)[
-                'status'   => mailer::STATUS_SENT,
-                'added'    => time(),
-                'userto'   => $this->recipient->id,
-                'headers'  => "Custom Header: foo\nAnother: bar",
-                'subject'  => __METHOD__,
-                'contents' => 'Sent already!',
-            ],
-        ];
-        $DB->insert_records(mailer::TABLE_DIGEST_QUEUE, $data);
-
-        $sink = $this->start_mail_sink();
-        (new mailer())->email_digest_send();
-        $sink->close();
-        $messages = $sink->get_messages();
+        $messages = $this->send_digest_with_sink();
 
         self::assertCount(0, $messages);
     }
@@ -218,5 +185,33 @@ class local_extension_mailer_test extends extension_testcase {
 
     public function test_it_digest_send_returns_sent_id_and_updates_queue_sentid() {
         $this->markTestSkipped('Test/Feature not yet implemented.');
+    }
+
+    protected function create_queued_entry($status = mailer::STATUS_QUEUED, $contents = 'This is a test.') {
+        global $DB;
+
+        $subject = debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS, 2)[1]['function'];
+        $data = (object)[
+            'status'   => $status,
+            'added'    => time(),
+            'userto'   => $this->recipient->id,
+            'headers'  => "Custom Header: foo\nAnother: bar",
+            'subject'  => $subject,
+            'contents' => $contents,
+        ];
+        $data->id = $DB->insert_record(mailer::TABLE_DIGEST_QUEUE, $data);
+
+        return $data;
+    }
+
+    /**
+     * @return array
+     */
+    protected function send_digest_with_sink() {
+        $sink = $this->start_mail_sink();
+        (new mailer())->email_digest_send();
+        $sink->close();
+        $messages = $sink->get_messages();
+        return $messages;
     }
 }
