@@ -41,6 +41,8 @@ class mailer {
 
     const TABLE_DIGEST_QUEUE = 'local_extension_digest_queue';
 
+    const TABLE_DIGEST_RUNS = 'local_extension_digest_runs';
+
     /** @var int Timestamp to use when sending messages. */
     protected $time;
 
@@ -145,5 +147,15 @@ class mailer {
         $noreplyuser->customheaders = $headers;
 
         return $noreplyuser;
+    }
+
+    public function create_digest_run_id() {
+        global $DB;
+
+        $id = $DB->insert_record(self::TABLE_DIGEST_RUNS, (object)[
+            'whenran' => $this->time,
+        ]);
+
+        return $id;
     }
 }

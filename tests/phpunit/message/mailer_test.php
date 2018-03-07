@@ -147,7 +147,7 @@ class local_extension_mailer_test extends extension_testcase {
         $actual = reset($actual);
         self::assertSame(mailer::STATUS_QUEUED, $actual->status);
         self::assertEquals($time, $actual->added);
-        self::assertNull($actual->sentid);
+        self::assertNull($actual->runid);
         self::assertEquals($this->recipient->id, $actual->userto);
         self::assertNotNull(2, $actual->headers);
         self::assertSame('Hello', $actual->subject);
@@ -216,5 +216,15 @@ class local_extension_mailer_test extends extension_testcase {
 
     public function test_it_digest_send_returns_sent_id_and_updates_queue_sentid() {
         $this->markTestSkipped('Test/Feature not yet implemented.');
+    }
+
+    public function test_it_creates_a_digest_run_id() {
+        global $DB;
+
+        $this->mailer->set_time(12345);
+        $id = $this->mailer->create_digest_run_id();
+
+        $actual = $DB->get_record(mailer::TABLE_DIGEST_RUNS, ['id' => $id], '*', MUST_EXIST);
+        self::assertEquals(12345, $actual->whenran);
     }
 }
