@@ -298,6 +298,10 @@ class local_extension_mailer_test extends extension_testcase {
     }
 
     public function test_it_does_not_send_an_empty_email_digest() {
-        $this->markTestSkipped('Test/Feature not yet implemented.');
+        $this->create_queue_entry(mailer::STATUS_INVALID);
+        $this->create_queue_entry(mailer::STATUS_SENT);
+        $messages = $this->send_digest_with_sink();
+
+        self::assertCount(0, $messages);
     }
 }
