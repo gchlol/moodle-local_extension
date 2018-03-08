@@ -83,7 +83,7 @@ class mailer {
             'userto'   => $message->userto->id,
             'headers'  => implode("\n", $headers),
             'subject'  => $message->subject,
-            'contents' => $message->fullmessage,
+            'contents' => $message->fullmessagehtml,
         ];
         $DB->insert_record(self::TABLE_DIGEST_QUEUE, $row);
     }
