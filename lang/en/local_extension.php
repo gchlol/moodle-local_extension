@@ -88,6 +88,7 @@ $string['extension:exportrequestscsv'] = 'Allow user to export the requests he i
 $string['extension:modifyrequeststatus'] = 'Abilitiy to force a status change in a request';
 $string['extension:viewallrequests'] = 'View all extension requests';
 $string['extension:viewhistorydetail'] = 'View detailed history in the extension status page';
+$string['digest_subject'] = 'Extension status - digest: {$a} message(s)';
 $string['externalrules'] = 'Manage Adapter Triggers';
 $string['form_modify_original_status'] = 'Original extension request details and status.';
 $string['form_modify_request_header'] = 'Please specify the new extension length.';

@@ -179,8 +179,8 @@ class local_extension_mailer_test extends extension_testcase {
         self::assertCount(1, $messages);
 
         $message = reset($messages);
-        self::assertTrue(strpos($message->fullmessage, 'test_it_digest_sends_emails_in_queue') !== false);
-        self::assertTrue(strpos($message->fullmessage, 'This is a test.') !== false);
+        self::assertStringContains('test_it_digest_sends_emails_in_queue', $message->fullmessagehtml);
+        self::assertStringContains('This is a test.', $message->fullmessagehtml);
 
         $status = $DB->get_field(mailer::TABLE_DIGEST_QUEUE, 'status', ['id' => $data->id], MUST_EXIST);
         self::assertSame(mailer::STATUS_SENT, $status);
@@ -278,6 +278,26 @@ class local_extension_mailer_test extends extension_testcase {
     }
 
     public function test_it_creates_the_digest_message() {
+        $messages = [
+            (object)[
+                'subject'  => 'First Message',
+                'contents' => "Message 1 line 1<br>line 2<br>line 3",
+            ],
+            (object)[
+                'subject'  => 'Second Message',
+                'contents' => "Message 2 line 1<br>line 2<br>line 3<br>The End",
+            ],
+        ];
+        $digest = $this->mailer->create_digest_message(2, $messages);
+        self::assertSame('Extension status - digest: 2 message(s)', $digest->subject);
+        foreach ($messages as $index => $message) {
+            $contents = $digest->fullmessagehtml;
+            self::assertStringContains($message->subject, $contents, "Message #{$index} subject missing");
+            self::assertStringContains($message->contents, $contents, "Message #{$index} contents missing");
+        }
+    }
+
+    public function test_it_does_not_send_an_empty_email_digest() {
         $this->markTestSkipped('Test/Feature not yet implemented.');
     }
 }

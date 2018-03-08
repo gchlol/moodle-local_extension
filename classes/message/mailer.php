@@ -115,7 +115,7 @@ class mailer {
     public function email_digest_cleanup() {
     }
 
-    public function create_message($usertoid, $headers, $subject, $content) {
+    public function create_message($usertoid, $headers, $subject, $htmlmessage) {
         global $CFG;
 
         $message = new message();
@@ -124,9 +124,9 @@ class mailer {
         $message->name = 'status';
         $message->userfrom = $this->create_user_from($headers);
         $message->subject = $subject;
-        $message->fullmessage = html_to_text($content);;
+        $message->fullmessage = html_to_text($htmlmessage);
         $message->fullmessageformat = FORMAT_PLAIN;
-        $message->fullmessagehtml = $content;
+        $message->fullmessagehtml = $htmlmessage;
         $message->smallmessage = '';
         $message->notification = 1;
 
@@ -179,11 +179,15 @@ class mailer {
         return $queue;
     }
 
-    private function create_digest_message($userto, $messages) {
+    public function create_digest_message($userto, $messages) {
         $contents = '';
         foreach ($messages as $message) {
-            $contents .= "{$message->subject}\n\n{$message->contents}\n\n\n";
+            $contents .= "<article><strong>{$message->subject}</strong><blockquote>{$message->contents}</blockquote></article>";
         }
-        return $this->create_message($userto, [], 'Subject', $contents);
+        $contents = trim($contents);
+        return $this->create_message($userto,
+                                     [],
+                                     get_string('digest_subject', 'local_extension', count($messages)),
+                                     $contents);
     }
 }
