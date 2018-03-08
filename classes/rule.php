@@ -381,7 +381,6 @@ class rule {
      */
     public function send_notifications($request, $mod, $templates) {
         // Sets the request users fullname to the email from name, only for roles that get triggered.
-        $noreplyuser = \core_user::get_noreply_user();
         $requestuser = \core_user::get_user($request->request->userid);
 
         // This is called when processing triggers. So the user to for 'user' notifications should be the requesting user.
@@ -394,24 +393,16 @@ class rule {
         $data->fullname = fullname($requestuser, true);
         $subject = get_string('email_notification_subject', 'local_extension', $data);
 
-        // Setup the noreply user name.
-        $supportusername = get_config('local_extension', 'supportusername');
-        if (!empty($supportusername)) {
-            $noreplyuser->firstname = $supportusername;
-        } else {
-            $noreplyuser->firstname = get_string('supportusernamedefault', 'local_extension');
-        }
-
         // Notifying the roles.
         $rolecontent = $templates->role_content;
         if (!empty($rolecontent)) {
-            $this->notify_roles($request, $subject, $rolecontent, $mod->course, $noreplyuser);
+            $this->notify_roles($request, $subject, $rolecontent, $mod->course);
         }
 
         // Notifying the user.
         $usercontent = $templates->user_content;
         if (!empty($usercontent)) {
-            $this->notify_user($request, $subject, $usercontent, $noreplyuser, $userto);
+            $this->notify_user($request, $subject, $usercontent, $userto);
         }
     }
 
@@ -847,14 +838,13 @@ class rule {
      * @param string $subject
      * @param string $content
      * @param stdClass $course
-     * @param stdClass $userfrom
      */
-    private function notify_roles(request $request, $subject, $content, $course, $userfrom) {
+    private function notify_roles(request $request, $subject, $content, $course) {
         $role = $this->role;
         $users = $this->rule_get_role_users($course, $role);
 
         foreach ($users as $userto) {
-            $this->notify_user($request, $subject, $content, $userfrom, $userto);
+            $this->notify_user($request, $subject, $content, $userto);
         }
 
     }
@@ -865,11 +855,10 @@ class rule {
      * @param request $request
      * @param string $subject
      * @param string $content
-     * @param stdClass $userfrom
      * @param stdClass $userto
      */
-    private function notify_user(request $request, $subject, $content, $userfrom, $userto) {
-        utility::send_trigger_email($request, $subject, $content, $userfrom, $userto);
+    private function notify_user(request $request, $subject, $content, $userto) {
+        utility::send_trigger_email($request, $subject, $content, $userto);
     }
 
     /**

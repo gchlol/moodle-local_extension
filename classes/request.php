@@ -670,20 +670,7 @@ class request implements \cache_data_source {
 
             $content = get_string('notification_footer', 'local_extension', $obj);
 
-            // Setup the noreply user name.
-            $noreplyuser = core_user::get_noreply_user();
-            $supportusername = get_config('local_extension', 'supportusername');
-            if (!empty($supportusername)) {
-                // If the plugin has the support username configured, use that name.
-                $noreplyuser->firstname = $supportusername;
-            } else {
-                // The update is sent from who modified the history.
-                // There will always be at least one history item.
-                $userfrom = core_user::get_user($history[0]->userid);
-                $noreplyuser->firstname = \fullname($userfrom, true);
-            }
-
-            utility::send_trigger_email($this, $subject, $content, $noreplyuser, $userto);
+            utility::send_trigger_email($this, $subject, $content, $userto);
         }
 
         // Increment the messageid to assist with inbox threading / message history.

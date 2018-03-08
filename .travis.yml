@@ -1,8 +1,6 @@
 
 language: php
 
-sudo: false
-
 cache:
   directories:
     - $HOME/.composer/cache
@@ -11,32 +9,37 @@ cache:
 php:
   - 7.0
 
+sudo: required
+
 addons:
+  firefox: "35.0.1"
   postgresql: "9.3"
+  apt:
+    packages:
+      - oracle-java8-installer
+      - oracle-java8-set-default
 
 env:
   matrix:
     - DB=pgsql MOODLE_BRANCH=MOODLE_31_STABLE
-    - DB=pgsql MOODLE_BRANCH=MOODLE_32_STABLE CI_PLUGIN=2
-    - DB=pgsql MOODLE_BRANCH=MOODLE_33_STABLE CI_PLUGIN=2
-    - DB=pgsql MOODLE_BRANCH=MOODLE_34_STABLE CI_PLUGIN=2
-    - DB=pgsql MOODLE_BRANCH=master CI_PLUGIN=2
+#    - DB=pgsql MOODLE_BRANCH=MOODLE_32_STABLE CI_PLUGIN=2
+#    - DB=pgsql MOODLE_BRANCH=MOODLE_33_STABLE CI_PLUGIN=2
+#    - DB=pgsql MOODLE_BRANCH=MOODLE_34_STABLE CI_PLUGIN=2
+#    - DB=pgsql MOODLE_BRANCH=master CI_PLUGIN=2
     - DB=mysqli MOODLE_BRANCH=MOODLE_31_STABLE
-    - DB=mysqli MOODLE_BRANCH=MOODLE_32_STABLE CI_PLUGIN=2
-    - DB=mysqli MOODLE_BRANCH=MOODLE_33_STABLE CI_PLUGIN=2
-    - DB=mysqli MOODLE_BRANCH=MOODLE_34_STABLE CI_PLUGIN=2
-    - DB=mysqli MOODLE_BRANCH=master CI_PLUGIN=2
+#    - DB=mysqli MOODLE_BRANCH=MOODLE_32_STABLE CI_PLUGIN=2
+#    - DB=mysqli MOODLE_BRANCH=MOODLE_33_STABLE CI_PLUGIN=2
+#    - DB=mysqli MOODLE_BRANCH=MOODLE_34_STABLE CI_PLUGIN=2
+#    - DB=mysqli MOODLE_BRANCH=master CI_PLUGIN=2
 
 matrix:
   include:
     - php: 5.6
       env: DB=pgsql MOODLE_BRANCH=MOODLE_31_STABLE
-    - php: 5.6
-      env: DB=mysqli MOODLE_BRANCH=MOODLE_31_STABLE
-    - php: 7.1
-      env: DB=mysqli MOODLE_BRANCH=master
-    - php: 7.2
-      env: DB=pgsql MOODLE_BRANCH=master
+#    - php: 7.1
+#      env: DB=mysqli MOODLE_BRANCH=master  CI_PLUGIN=2
+#    - php: 7.2
+#      env: DB=pgsql  MOODLE_BRANCH=master  CI_PLUGIN=2
 
 before_install:
   - sudo hostname short-hostname
@@ -57,7 +60,7 @@ install:
 script:
   - moodle-plugin-ci phplint
 # - moodle-plugin-ci phpcpd
-# - moodle-plugin-ci phpmd
+  - moodle-plugin-ci phpmd
   - moodle-plugin-ci codechecker
   - moodle-plugin-ci validate
   - if [ "$CI_PLUGIN" = 2 ]; then
