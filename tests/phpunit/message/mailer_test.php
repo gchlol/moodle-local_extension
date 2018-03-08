@@ -53,13 +53,17 @@ class local_extension_mailer_test extends extension_testcase {
         $this->lastdigestrunid = null;
     }
 
-    protected function create_queue_entry($status = mailer::STATUS_QUEUED, $contents = 'This is a test.') {
+    protected function create_queue_entry($status = mailer::STATUS_QUEUED, $contents = 'This is a test.', $added = null) {
         global $DB;
+
+        if (is_null($added)) {
+            $added = time();
+        }
 
         $subject = debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS, 2)[1]['function'];
         $data = (object)[
             'status'   => $status,
-            'added'    => time(),
+            'added'    => $added,
             'userto'   => $this->recipient->id,
             'headers'  => "Custom Header: foo\nAnother: bar",
             'subject'  => $subject,
@@ -195,8 +199,35 @@ class local_extension_mailer_test extends extension_testcase {
         self::assertCount(0, $messages);
     }
 
-    public function test_it_deletes_old_messages_from_queue() {
-        $this->markTestSkipped('Test/Feature not yet implemented.');
+    public function test_it_deletes_old_sent_messages_from_queue() {
+        global $DB;
+
+        $now = time();
+
+        $messages = [
+            ['keep me, sent today', mailer::STATUS_SENT, $now, false],
+            ['keep me, sent yesterday', mailer::STATUS_SENT, $now - DAYSECS, false],
+            ['keep me, sent 6 days ago', mailer::STATUS_SENT, $now - (6 * DAYSECS), false],
+            ['delete me, send two weeks ago', mailer::STATUS_SENT, $now - (2 * WEEKSECS), true],
+            ['delete me, sent a year ago', mailer::STATUS_SENT, $now - YEARSECS, true],
+            ['keep me, not sent (invalid)', mailer::STATUS_INVALID, $now - YEARSECS, false],
+            ['keep me, not sent (still queued)', mailer::STATUS_QUEUED, $now - YEARSECS, false],
+        ];
+        $shouldkeep = [];
+        foreach ($messages as list($contents, $status, $added, $shoulddelete)) {
+            $message = $this->create_queue_entry($status, $contents, $added);
+            if (!$shoulddelete) {
+                $shouldkeep[] = $message->id;
+            }
+        }
+
+        $this->mailer->email_digest_cleanup($now);
+        $queue = $DB->get_records(mailer::TABLE_DIGEST_QUEUE);
+        $queue = array_keys($queue);
+        sort($shouldkeep);
+        sort($queue);
+
+        self::assertSame($shouldkeep, $queue);
     }
 
     public function provider_for_test_is_enabled_setting() {

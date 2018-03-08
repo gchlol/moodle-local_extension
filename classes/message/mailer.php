@@ -33,6 +33,8 @@ global $CFG;
 require_once($CFG->dirroot . '/user/lib.php');
 
 class mailer {
+    const DAYS_TO_KEEP_SENT_MESSAGES_IN_QUEUE = 7;
+
     const STATUS_INVALID = 'invalid';
 
     const STATUS_QUEUED = 'queued';
@@ -112,7 +114,17 @@ class mailer {
         return $runid;
     }
 
-    public function email_digest_cleanup() {
+    public function email_digest_cleanup($currenttime = null) {
+        global $DB;
+
+        if (is_null($currenttime)) {
+            $currenttime = time();
+        }
+
+        $deletebeforetime = $currenttime - (DAYSECS * self::DAYS_TO_KEEP_SENT_MESSAGES_IN_QUEUE);
+        $DB->delete_records_select(self::TABLE_DIGEST_QUEUE,
+                                   'status = ? AND added < ?',
+                                   [self::STATUS_SENT, $deletebeforetime]);
     }
 
     public function create_message($usertoid, $headers, $subject, $htmlmessage) {
