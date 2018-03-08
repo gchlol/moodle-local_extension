@@ -41,7 +41,7 @@ require_once($CFG->dirroot . '/mod/assign/locallib.php');
  * @license     http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 abstract class extension_testcase extends advanced_testcase {
-    public static function assertStringContains($needle, $haystack, $message = null) {
+    public static function assert_string_contains($needle, $haystack, $message = null) {
         $found = (strpos($haystack, $needle) !== false);
         if (!$found) {
             $message = is_null($message) ? '' : "{$message}\n";

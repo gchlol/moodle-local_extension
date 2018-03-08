@@ -61,7 +61,7 @@ class local_extension_email_digest_task_test extends extension_testcase {
         $task->execute();
         $output = ob_get_clean();
 
-        self::assertStringContains('Sending', $output, 'sending');
-        self::assertStringContains('Deleting', $output, 'deleting');
+        self::assert_string_contains('Sending', $output, 'sending');
+        self::assert_string_contains('Deleting', $output, 'deleting');
     }
 }
