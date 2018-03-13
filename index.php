@@ -89,9 +89,9 @@ $baseurl = new moodle_url('/local/extension/index.php', array(
 
 // If the user can view all requests, display the administrator table.
 if ($viewallrequests) {
-    $table = new \local_extension\local\table\requests\administrator($baseurl);
+    $table = new \local_extension\local\table\requests\administrator($baseurl, null, (bool)$download);
 } else {
-    $table = new \local_extension\local\table\requests\student($baseurl);
+    $table = new \local_extension\local\table\requests\student($baseurl, null, (bool)$download);
 }
 
 $table->generate_query($categoryid, $courseid, $stateid, $search, $faculty);
