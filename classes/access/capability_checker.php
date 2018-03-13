@@ -65,7 +65,7 @@ class capability_checker {
 
     public static function can_export_csv() {
         $context = context_system::instance();
-        $hascapability = has_capability(self::CAPABILITY_ACCESS_ALL_COURSE_REQUESTS, $context);
+        $hascapability = has_capability(self::CAPABILITY_EXPORT_REQUESTS_CSV, $context);
         return $hascapability;
     }
 
