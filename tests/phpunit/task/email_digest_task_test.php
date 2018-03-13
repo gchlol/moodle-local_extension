@@ -52,7 +52,11 @@ class local_extension_email_digest_task_test extends extension_testcase {
     }
 
     public function test_it_sends_and_cleans_up() {
-        $mock = $this->getMock(\local_extension\message\mailer::class);
+        if (method_exists(self::class, 'createMock')) {
+            $mock = self::createMock(\local_extension\message\mailer::class);
+        } else {
+            $mock = $this->getMock(\local_extension\message\mailer::class);
+        }
         $mock->expects($this->once())->method('email_digest_send');
         $mock->expects($this->once())->method('email_digest_cleanup');
 
