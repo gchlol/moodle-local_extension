@@ -63,8 +63,10 @@ function local_extension_extends_navigation(global_navigation $nav) {
         }
 
         // General link in the navigation menu.
-        $url = new moodle_url('/local/extension/index.php');
-        $node = $nav->add(get_string('requestextension_status', 'local_extension'), $url->out(), null, null, 'local_extension');
+        $url = (new moodle_url('/local/extension/index.php'))->out();
+        $nodename = get_string('requestextension_status', 'local_extension');
+        $node = $nav->add($nodename, $url, null, null, 'local_extension');
+        $node->showinflatnavigation = true;
 
         if ($contextlevel == CONTEXT_COURSE) {
             // If the user is not enrolled, do not provide an extension request link in the course/mod context.
