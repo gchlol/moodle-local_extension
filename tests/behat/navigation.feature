@@ -29,8 +29,15 @@ Feature: Smart navigation items
 
   Scenario: A student of a course can view a direct link to request extensions
     Given the extension manager is configured                       # local_extension
-    And the user "maverick" is enrolled into "topgun" as "student" # local_extension
+    And the user "maverick" is enrolled into "topgun" as "student"  # local_extension
     And I am logged in as maverick                                  # local_extension
     When I am on course "topgun" page                               # local_extension
     And I follow "Request Extension"
     Then I should see "New Extension Request"
+
+  Scenario: A user not enrolled in a course cannot view a direct link to request extensions
+    Given the extension manager is configured                       # local_extension
+    And the user "maverick" is enrolled into "topgun" as "student"  # local_extension
+    But I am logged in as administrator                             # local_extension
+    When I am on course "topgun" page                               # local_extension
+    Then I should not see "Request Extension"

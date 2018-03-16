@@ -88,39 +88,37 @@ class extension_navigation {
     private function add_node_in_course() {
         global $PAGE, $USER, $COURSE;
 
-        // If the user is not enrolled, do not provide an extension request link in the course/mod context.
         if (!is_enrolled($PAGE->context, $USER->id)) {
             return;
         }
 
-        // Adding a nagivation string nested in the course that provides a count and status of the requests.
-        $courseid = $COURSE->id;
+        $coursenode = $this->globalnavigation->find($COURSE->id, navigation_node::TYPE_COURSE);
+        if (empty($coursenode)) {
+            debugging("Cannot find course node for course id: {$COURSE->id}");
+            return;
+        }
 
-        $url = new moodle_url('/local/extension/request.php', ['course' => $courseid]);
+        // MOODLE-1519 Workaround.
+        $requests = null; // \local_extension\utility::find_course_requests($courseid);
 
-        $coursenode = $this->globalnavigation->find($courseid, navigation_node::TYPE_COURSE);
-        if (!empty($coursenode)) {
-            // MOODLE-1519 Workaround.
-            $requests = null; // \local_extension\utility::find_course_requests($courseid);
+        if (empty($requests)) {
+            // Display the request extension link.
+            $url = new moodle_url('/local/extension/request.php', ['course' => $COURSE->id]);
+            $node = $coursenode->add(get_string('nav_request', 'local_extension'), $url);
+        } else {
 
-            if (empty($requests)) {
-                // Display the request extension link.
-                $node = $coursenode->add(get_string('nav_request', 'local_extension'), $url);
+            $requestcount = utility::count_requests($COURSE->id, $USER->id);
+
+            if ($requestcount > 1) {
+                $string = get_string('nav_course_request_plural', 'local_extension');
             } else {
-
-                $requestcount = utility::count_requests($courseid, $USER->id);
-
-                if ($requestcount > 1) {
-                    $string = get_string('nav_course_request_plural', 'local_extension');
-                } else {
-                    $string = get_string('nav_course_request', 'local_extension');
-                }
-
-                $requeststatus = utility::course_request_status($courseid, $USER->id);
-
-                $url = new moodle_url('/local/extension/index.php');
-                $node = $coursenode->add($requestcount . ' ' . $string . ' ' . $requeststatus, $url);
+                $string = get_string('nav_course_request', 'local_extension');
             }
+
+            $requeststatus = utility::course_request_status($COURSE->id, $USER->id);
+
+            $url = new moodle_url('/local/extension/index.php');
+            $node = $coursenode->add($requestcount . ' ' . $string . ' ' . $requeststatus, $url);
         }
     }
 
