@@ -21,3 +21,8 @@ Feature: Smart navigation items
     And I am logged in as guest                       # local_extension
     When I am on site homepage
     Then I should not see "Extension Status"
+
+  Scenario: Prevent access to the extensions page if it is not configured
+    Given I am logged in as student                   # local_extension
+    When I am on site homepage
+    Then I should not see "Extension Status"

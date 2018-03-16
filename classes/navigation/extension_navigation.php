@@ -67,23 +67,15 @@ class extension_navigation {
             return;
         }
 
+        if (!rule::has_rules()) {
+            return;
+        }
+
         global $PAGE, $USER;
 
         $context = $PAGE->context;
         $contextlevel = $context->contextlevel;
         $sitecontext = context_system::instance();
-
-        // If there are no triggers setup then we should not show these links at all.
-        $triggers = rule::load_all();
-        if (count($triggers) == 0) {
-            return;
-        }
-
-        // This is a map of datatypes and their triggers. Useful to know if a trigger has been set for a datatype later.
-        $datatypes = [];
-        foreach ($triggers as $trigger) {
-            $datatypes[$trigger->datatype][] = $trigger;
-        }
 
         // General link in the navigation menu.
         $this->add_node_in_main_navigation();
@@ -152,7 +144,7 @@ class extension_navigation {
                 $modname = $cmdata->modname;
 
                 // No triggers have been defined for this mod type. It will not show a request extension link.
-                if (!array_key_exists($modname, $datatypes)) {
+                if (!rule::has_rules($modname)) {
                     return;
                 }
 
