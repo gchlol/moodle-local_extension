@@ -6,7 +6,7 @@ Feature: Local extension user preferences
 
   Background:
     Given the extension manager is configured         # local_extension
-    And I am an teacher                               # local_extension
+    And I am a teacher                                # local_extension
 
   Scenario: Navigate to preferences page
     When I follow "Extension Status"

@@ -58,12 +58,12 @@ class behat_local_extension extends behat_base {
     }
 
     /**
-     * @Given /^I am an? (administrator|teacher) +\# local_extension$/
+     * @Given /^I am (?:logged in as )?(?:an? )?(\w+) +\# local_extension$/
      */
     public function iAmA($user) {
         if ($user == 'administrator') {
             $user = 'admin';
-        } else {
+        } else if ($user != 'guest') {
             $generator = new testing_data_generator();
             $generator->create_user(['username' => $user, 'password' => $user]);
         }

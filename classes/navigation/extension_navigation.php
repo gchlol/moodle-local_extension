@@ -24,6 +24,7 @@
 namespace local_extension\navigation;
 
 use context_system;
+use global_navigation;
 use local_extension\rule;
 use local_extension\utility;
 use moodle_url;
@@ -38,7 +39,18 @@ defined('MOODLE_INTERNAL') || die();
  * @license     http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 class extension_navigation {
-    public static function apply($nav) {
+    public static function apply(global_navigation $globalnavigation) {
+        $extensionnavigation = new extension_navigation($globalnavigation);
+        $extensionnavigation->add_nodes();
+    }
+
+    private $globalnavigation;
+
+    public function __construct(global_navigation $globalnavigation) {
+        $this->globalnavigation = $globalnavigation;
+    }
+
+    private function add_nodes() {
         global $PAGE, $USER;
 
         $context = $PAGE->context;
@@ -62,10 +74,7 @@ class extension_navigation {
             }
 
             // General link in the navigation menu.
-            $url = (new moodle_url('/local/extension/index.php'))->out();
-            $nodename = get_string('requestextension_status', 'local_extension');
-            $node = $nav->add($nodename, $url, null, null, 'local_extension');
-            $node->showinflatnavigation = true;
+            $this->add_node_in_main_navigation();
 
             if ($contextlevel == CONTEXT_COURSE) {
                 // If the user is not enrolled, do not provide an extension request link in the course/mod context.
@@ -81,7 +90,7 @@ class extension_navigation {
 
                 $url = new moodle_url('/local/extension/request.php', ['course' => $courseid]);
 
-                $coursenode = $nav->find($courseid, navigation_node::TYPE_COURSE);
+                $coursenode = $this->globalnavigation->find($courseid, navigation_node::TYPE_COURSE);
                 if (!empty($coursenode)) {
                     // MOODLE-1519 Workaround.
                     $requests = null; // \local_extension\utility::find_course_requests($courseid);
@@ -118,7 +127,7 @@ class extension_navigation {
                     return;
                 }
 
-                $modulenode = $nav->find($id, navigation_node::TYPE_ACTIVITY);
+                $modulenode = $this->globalnavigation->find($id, navigation_node::TYPE_ACTIVITY);
                 if (!empty($modulenode)) {
                     $courseid = $PAGE->course->id;
 
@@ -153,5 +162,12 @@ class extension_navigation {
                 }
             }
         }
+    }
+
+    private function add_node_in_main_navigation() {
+        $url = (new moodle_url('/local/extension/index.php'))->out();
+        $nodename = get_string('requestextension_status', 'local_extension');
+        $node = $this->globalnavigation->add($nodename, $url, null, null, 'local_extension');
+        $node->showinflatnavigation = true;
     }
 }
