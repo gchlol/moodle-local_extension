@@ -7,8 +7,8 @@ Feature: Smart navigation items
   Scenario: Users should access the extensions page
     Given the extension manager is configured         # local_extension
     And I am logged in as student                     # local_extension
-    And I am on site homepage
-    When I follow "Extension Status"
+    When I am on site homepage
+    And I follow "Extension Status"
     Then I should see "Extension status list"
 
   Scenario: Must be logged in to access the extensions page
