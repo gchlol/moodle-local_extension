@@ -86,7 +86,7 @@ class extension_navigation {
     }
 
     private function add_node_in_course() {
-        global $PAGE, $USER;
+        global $PAGE, $USER, $COURSE;
 
         // If the user is not enrolled, do not provide an extension request link in the course/mod context.
         if (!is_enrolled($PAGE->context, $USER->id)) {
@@ -94,10 +94,7 @@ class extension_navigation {
         }
 
         // Adding a nagivation string nested in the course that provides a count and status of the requests.
-        $courseid = optional_param('id', 0, PARAM_INT);
-        if (empty($courseid)) {
-            return;
-        }
+        $courseid = $COURSE->id;
 
         $url = new moodle_url('/local/extension/request.php', ['course' => $courseid]);
 

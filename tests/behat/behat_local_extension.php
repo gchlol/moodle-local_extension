@@ -61,11 +61,15 @@ class behat_local_extension extends behat_base {
      * @Given /^I am (?:logged in as )?(?:an? )?(\w+) +\# local_extension$/
      */
     public function iAmA($user) {
+        global $DB;
+
         if ($user == 'administrator') {
             $user = 'admin';
-        } else if ($user != 'guest') {
-            $generator = new testing_data_generator();
-            $generator->create_user(['username' => $user, 'password' => $user]);
+        } else {
+            if (!$DB->record_exists('user', ['username' => $user])) {
+                $generator = new testing_data_generator();
+                $generator->create_user(['username' => $user, 'password' => $user]);
+            }
         }
 
         $this->execute('behat_auth::i_log_in_as', [$user]);
@@ -96,5 +100,29 @@ class behat_local_extension extends behat_base {
         if ($element->isChecked() != $selected) {
             throw new ExpectationException('"' . $checkbox . '" should be ' . $selectedornot, $this->getSession());
         }
+    }
+
+    /**
+     * @Given /^the user "([^"]*)" is enrolled into "([^"]*)" as "([^"]*)" +\# local_extension$/
+     */
+    public function theUserIsEnrolledIntoAsLocal_extension($user, $course, $role) {
+        $generator = new testing_data_generator();
+        $user = $generator->create_user(['username' => $user, 'password' => $user]);
+        $course = $generator->create_course(['shortname' => $course]);
+
+        $userid = $user->id;
+        $courseid = $course->id;
+        $generator->enrol_user(
+            $userid,
+            $courseid,
+            $role
+        );
+    }
+
+    /**
+     * @When /^I am on course "([^"]*)" page +\# local_extension$/
+     */
+    public function iAmOnCoursePageLocal_extension($course) {
+        $this->visitPath("/course/view.php?name={$course}");
     }
 }

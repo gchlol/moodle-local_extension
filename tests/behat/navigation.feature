@@ -26,3 +26,11 @@ Feature: Smart navigation items
     Given I am logged in as student                   # local_extension
     When I am on site homepage
     Then I should not see "Extension Status"
+
+  Scenario: A student of a course can view a direct link to request extensions
+    Given the extension manager is configured                       # local_extension
+    And the user "maverick" is enrolled into "topgun" as "student" # local_extension
+    And I am logged in as maverick                                  # local_extension
+    When I am on course "topgun" page                               # local_extension
+    And I follow "Request Extension"
+    Then I should see "New Extension Request"
