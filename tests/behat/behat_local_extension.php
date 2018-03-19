@@ -104,6 +104,14 @@ class behat_local_extension extends behat_base {
     }
 
     /**
+     * @When /^I am on "([^"]*)" assignment page +\# local_extension$/
+     */
+    public function iAmOnAssignmentPageLocal_extension($assignment) {
+        $assignmentid = $this->generator->get_activity_cmid('assign', $assignment);
+        $this->visitPath("/mod/assign/view.php?id={$assignmentid}");
+    }
+
+    /**
      * @Given /^"([^"]*)" has an extension request for the "([^"]*)" assignment +\# local_extension$/
      */
     public function hasAnExtensionRequestForTheAssignmentLocal_extension($username, $assignment) {

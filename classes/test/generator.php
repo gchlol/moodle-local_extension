@@ -45,6 +45,9 @@ class generator extends testing_data_generator {
     /** @var stdClass[] */
     protected $users = [];
 
+    /** @var stdClass[][] */
+    private $activities = [];
+
     /** @var string */
     protected $lastcoursementioned = null;
 
@@ -96,6 +99,10 @@ class generator extends testing_data_generator {
         return $this->users[$username];
     }
 
+    public function get_activity_cmid($type, $name) {
+        return $this->activities[$type][$name]->cmid;
+    }
+
     public function create_activity($course, $activity, $name) {
         $this->create_course_by_shortname($course);
 
@@ -104,7 +111,7 @@ class generator extends testing_data_generator {
         }
 
         $now = time();
-        return $this->get_plugin_generator("mod_{$activity}")->create_instance(
+        $module = $this->get_plugin_generator("mod_{$activity}")->create_instance(
             [
                 'course'                   => $this->courses[$course]->id,
                 'name'                     => $name,
@@ -112,6 +119,11 @@ class generator extends testing_data_generator {
                 'duedate'                  => $now + DAYSECS,
             ]
         );
+        if (!array_key_exists($activity, $this->activities)) {
+            $this->activities[$activity] = [];
+        }
+        $this->activities[$activity][$name] = $module;
+        return $module;
     }
 
     public function enrol_user_role($user, $course, $role) {

@@ -25,6 +25,7 @@ namespace local_extension\navigation;
 
 use global_navigation;
 use local_extension\rule;
+use local_extension\state;
 use local_extension\utility;
 use moodle_url;
 use navigation_node;
@@ -102,7 +103,7 @@ class extension_navigation {
 
         if (empty($requests)) {
             $url = new moodle_url('/local/extension/request.php', ['course' => $COURSE->id]);
-            $coursenode->add(get_string('nav_request', 'local_extension'), $url);
+            $node = $coursenode->add(get_string('nav_request', 'local_extension'), $url);
         } else {
             $requestcount = utility::count_requests($COURSE->id, $USER->id);
             if ($requestcount > 1) {
@@ -112,58 +113,42 @@ class extension_navigation {
             }
 
             $url = new moodle_url('/local/extension/index.php');
-            $coursenode->add("{$requestcount} {$label}", $url);
+            $node = $coursenode->add("{$requestcount} {$label}", $url);
         }
+        $node->showinflatnavigation = true;
     }
 
     private function add_node_in_module() {
         global $PAGE, $USER;
 
-        // Adding a navigation string nested in the course module that provides a status update.
-        $id = optional_param('id', 0, PARAM_INT);
-
-        if (empty($id)) {
-            return;
-        }
-
-        // If the user is not enrolled, do not provide an extension request link in the course/mod context.
         if (!is_enrolled($PAGE->context, $USER->id)) {
             return;
         }
 
-        $modulenode = $this->globalnavigation->find($id, navigation_node::TYPE_ACTIVITY);
-        if (!empty($modulenode)) {
-            $courseid = $PAGE->course->id;
-
-            list($request, $cm) = utility::find_module_requests($courseid, $id);
-
-            $modinfo = get_fast_modinfo($courseid);
-            $cmdata = $modinfo->cms[$id];
-
-            // Eg. assign, quiz.
-            $modname = $cmdata->modname;
-
-            // No triggers have been defined for this mod type. It will not show a request extension link.
-            if (!rule::has_rules($modname)) {
-                return;
-            }
-
-            if (empty($cm)) {
-                // Display the request extension link.
-                $url = new moodle_url('/local/extension/request.php', ['course' => $courseid, 'cmid' => $id]);
-                $node = $modulenode->add(get_string('nav_request', 'local_extension'), $url);
-            } else {
-                // Display the request status for this module.
-                $url = new moodle_url('/local/extension/status.php', ['id' => $request->requestid]);
-
-                $localcm = $request->mods[$id]->localcm;
-
-                $result = \local_extension\state::instance()->get_state_result($localcm->get_stateid());
-
-                // The function block_nagivation->trim will truncate the navagation item to 25/50 characters.
-                $node = $modulenode->add(get_string('nav_status', 'local_extension', $result), $url);
-            }
+        $cmid = $PAGE->context->instanceid;
+        $modulenode = $this->globalnavigation->find($cmid, navigation_node::TYPE_ACTIVITY);
+        if (empty($modulenode)) {
+            debugging("Cannot find module node for course cmid: {$cmid}");
+            return;
         }
+
+        list($request, $cm) = utility::find_module_requests($PAGE->course->id, $cmid);
+        $moduletype = get_fast_modinfo($PAGE->course)->cms[$cmid]->modname;
+
+        if (!rule::has_rules($moduletype)) {
+            return;
+        }
+
+        if (empty($cm)) {
+            $url = new moodle_url('/local/extension/request.php', ['course' => $PAGE->course->id, 'cmid' => $cmid]);
+            $node = $modulenode->add(get_string('nav_request', 'local_extension'), $url);
+        } else {
+            $url = new moodle_url('/local/extension/status.php', ['id' => $request->requestid]);
+            $localcm = $request->mods[$cmid]->localcm;
+            $result = state::instance()->get_state_result($localcm->get_stateid());
+            $node = $modulenode->add(get_string('nav_status', 'local_extension', $result), $url);
+        }
+        $node->showinflatnavigation = true;
     }
 
     private function add_node_in_main_navigation() {

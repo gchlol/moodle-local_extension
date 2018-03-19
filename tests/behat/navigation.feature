@@ -55,3 +55,14 @@ Feature: Smart navigation items
     Then I should see "Extension status list"
     And I should see "Avionics"
     And I should see "Aerodynamics"
+
+  Scenario: If there are requests for a module, it should link it displaying its status
+    Given the extension manager is configured                                 # local_extension
+    And the user "maverick" is enrolled into "topgun" as "student"            # local_extension
+    And "maverick" has an extension request for the "Avionics" assignment     # local_extension
+    And I am logged in as maverick                                            # local_extension
+    When I am on "Avionics" assignment page                                   # local_extension
+    And I follow "Pending Extension"
+    Then I should see "Avionics"
+    And I should see "Pending Extension"
+    And I should see "Extension History"
