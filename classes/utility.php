@@ -88,6 +88,13 @@ class utility {
         $events = [];
         $courses = [];
 
+        $ruleignoredatatype = get_config('local_extension', 'ruleignoredatatype');
+        if ($ruleignoredatatype) {
+            $rulesdata = rule::load_all();
+        } else {
+            $rulesdata = [];
+        }
+
         foreach ($allevents as $id => $event) {
 
             $modtype = $event->modulename;
@@ -98,11 +105,13 @@ class utility {
             }
 
             // Next check to see if there are any rules for the module type. Without any rules, we cannot make a request.
-            $ruleignoredatatype = get_config('local_extension', 'ruleignoredatatype');
             if ($ruleignoredatatype) {
-                $rules = \local_extension\rule::load_all();
+                $rules = $rulesdata;
             } else {
-                $rules = \local_extension\rule::load_all($modtype);
+                if (!array_key_exists($modtype, $rulesdata)) {
+                    $rulesdata[$modtype] = rule::load_all($modtype);
+                }
+                $rules = $rulesdata[$modtype];
             }
 
             if (empty($rules)) {
@@ -461,7 +470,7 @@ class utility {
      *
      * Sorted based on the priority and grouped with parents.
      *
-     * @param \local_extension\rule[] $rules
+     * @param rule[] $rules
      * @return array
      */
     public static function sort_rules($rules) {
@@ -509,8 +518,8 @@ class utility {
      * Returns a tree structure of the rules.
      * Nested child rules can be accessed via $rule->children
      *
-     * @param \local_extension\rule[] $rules
-     * @param int|number              $parent
+     * @param rule[]     $rules
+     * @param int|number $parent
      * @return rule[] Tree structure.
      */
     public static function rule_tree(array $rules, $parent = 0) {
@@ -578,9 +587,9 @@ class utility {
     /**
      * Returns an array of ids that are possible candidates for being a parent item.
      *
-     * @param \local_extension\rule[] $rules
-     * @param int                     $id     The id that will not be added, nor children added.
-     * @param array                   $idlist A growing list of ids that can be possible parent items.
+     * @param rule[] $rules
+     * @param int    $id     The id that will not be added, nor children added.
+     * @param array  $idlist A growing list of ids that can be possible parent items.
      * @return array An associated array of id=>name for parents.
      */
     public static function rule_tree_check_children(array $rules, $id, $idlist = null) {
