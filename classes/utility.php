@@ -336,16 +336,6 @@ class utility {
     }
 
     /**
-     * TODO
-     *
-     * @param integer $courseid
-     * @param integer $userid
-     */
-    public static function course_request_status($courseid, $userid) {
-        global $DB;
-    }
-
-    /**
      * Returns the number of requests the user has for a specific course.
      *
      * @param int $courseid

@@ -98,27 +98,21 @@ class extension_navigation {
             return;
         }
 
-        // MOODLE-1519 Workaround.
-        $requests = null; // \local_extension\utility::find_course_requests($courseid);
+        $requests = utility::find_course_requests($COURSE->id);
 
         if (empty($requests)) {
-            // Display the request extension link.
             $url = new moodle_url('/local/extension/request.php', ['course' => $COURSE->id]);
-            $node = $coursenode->add(get_string('nav_request', 'local_extension'), $url);
+            $coursenode->add(get_string('nav_request', 'local_extension'), $url);
         } else {
-
             $requestcount = utility::count_requests($COURSE->id, $USER->id);
-
             if ($requestcount > 1) {
-                $string = get_string('nav_course_request_plural', 'local_extension');
+                $label = get_string('nav_course_request_plural', 'local_extension');
             } else {
-                $string = get_string('nav_course_request', 'local_extension');
+                $label = get_string('nav_course_request', 'local_extension');
             }
 
-            $requeststatus = utility::course_request_status($COURSE->id, $USER->id);
-
             $url = new moodle_url('/local/extension/index.php');
-            $node = $coursenode->add($requestcount . ' ' . $string . ' ' . $requeststatus, $url);
+            $coursenode->add("{$requestcount} {$label}", $url);
         }
     }
 

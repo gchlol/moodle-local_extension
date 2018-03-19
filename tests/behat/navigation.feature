@@ -30,10 +30,12 @@ Feature: Smart navigation items
   Scenario: A student of a course can view a direct link to request extensions
     Given the extension manager is configured                       # local_extension
     And the user "maverick" is enrolled into "topgun" as "student"  # local_extension
+    And the course "topgun" has an assignment "Avionics"            # local_extension
     And I am logged in as maverick                                  # local_extension
     When I am on course "topgun" page                               # local_extension
     And I follow "Request Extension"
     Then I should see "New Extension Request"
+    And I should see "Avionics"
 
   Scenario: A user not enrolled in a course cannot view a direct link to request extensions
     Given the extension manager is configured                       # local_extension
@@ -41,3 +43,15 @@ Feature: Smart navigation items
     But I am logged in as administrator                             # local_extension
     When I am on course "topgun" page                               # local_extension
     Then I should not see "Request Extension"
+
+  Scenario: If there are requests for a course, it should link to the statuses instead of a new request
+    Given the extension manager is configured                                 # local_extension
+    And the user "maverick" is enrolled into "topgun" as "student"            # local_extension
+    And "maverick" has an extension request for the "Avionics" assignment     # local_extension
+    And "maverick" has an extension request for the "Aerodynamics" assignment # local_extension
+    And I am logged in as maverick                                            # local_extension
+    When I am on course "topgun" page                                         # local_extension
+    And I follow "2 extension requests"
+    Then I should see "Extension status list"
+    And I should see "Avionics"
+    And I should see "Aerodynamics"
