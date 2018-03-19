@@ -93,17 +93,11 @@ class extension_navigation {
             return;
         }
 
-        $coursenode = $this->globalnavigation->find($COURSE->id, navigation_node::TYPE_COURSE);
-        if (empty($coursenode)) {
-            debugging("Cannot find course node for course id: {$COURSE->id}");
-            return;
-        }
-
         $requests = utility::find_course_requests($COURSE->id);
 
         if (empty($requests)) {
             $url = new moodle_url('/local/extension/request.php', ['course' => $COURSE->id]);
-            $node = $coursenode->add(get_string('nav_request', 'local_extension'), $url);
+            $label = get_string('nav_request', 'local_extension');
         } else {
             $requestcount = utility::count_requests($COURSE->id, $USER->id);
             if ($requestcount > 1) {
@@ -113,8 +107,15 @@ class extension_navigation {
             }
 
             $url = new moodle_url('/local/extension/index.php');
-            $node = $coursenode->add("{$requestcount} {$label}", $url);
+            $label = "{$requestcount} {$label}";
         }
+
+        $coursenode = $this->globalnavigation->find($COURSE->id, navigation_node::TYPE_COURSE);
+        if (empty($coursenode)) {
+            debugging("Cannot find course node for course id: {$COURSE->id}");
+            return;
+        }
+        $node = $coursenode->add($label, $url);
         $node->showinflatnavigation = true;
     }
 
@@ -141,13 +142,14 @@ class extension_navigation {
 
         if (empty($cm)) {
             $url = new moodle_url('/local/extension/request.php', ['course' => $PAGE->course->id, 'cmid' => $cmid]);
-            $node = $modulenode->add(get_string('nav_request', 'local_extension'), $url);
+            $label = get_string('nav_request', 'local_extension');
         } else {
             $url = new moodle_url('/local/extension/status.php', ['id' => $request->requestid]);
             $localcm = $request->mods[$cmid]->localcm;
             $result = state::instance()->get_state_result($localcm->get_stateid());
-            $node = $modulenode->add(get_string('nav_status', 'local_extension', $result), $url);
+            $label = get_string('nav_status', 'local_extension', $result);
         }
+        $node = $modulenode->add($label, $url);
         $node->showinflatnavigation = true;
     }
 
