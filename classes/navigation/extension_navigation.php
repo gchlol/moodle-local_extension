@@ -93,28 +93,34 @@ class extension_navigation {
             return;
         }
 
-        $coursenode = $this->globalnavigation->find($COURSE->id, navigation_node::TYPE_COURSE);
-        if (empty($coursenode)) {
+        $parentnode = $this->globalnavigation->find($COURSE->id, navigation_node::TYPE_COURSE);
+        if (empty($parentnode)) {
             debugging("Cannot find course node for course id: {$COURSE->id}");
             return;
         }
 
         $url = new moodle_url('/local/extension/request.php', ['course' => $COURSE->id]);
         $label = get_string('nav_request', 'local_extension');
-        $node = $coursenode->add($label, $url);
-        $node->showinflatnavigation = true;
+        $parentnode->add($label, $url, global_navigation::TYPE_COURSE);
     }
 
     private function add_node_in_module() {
-        global $PAGE, $USER;
+        global $CFG, $COURSE, $PAGE, $USER;
 
         if (!is_enrolled($PAGE->context, $USER->id)) {
             return;
         }
 
         $cmid = $PAGE->context->instanceid;
-        $modulenode = $this->globalnavigation->find($cmid, navigation_node::TYPE_ACTIVITY);
-        if (empty($modulenode)) {
+
+        // Moodle 32+ does not show activities in the menu, so show it inside the course.
+        if ($CFG->branch < 32) {
+            $parentnode = $this->globalnavigation->find($cmid, navigation_node::TYPE_ACTIVITY);
+        } else {
+            $parentnode = $this->globalnavigation->find($COURSE->id, navigation_node::TYPE_COURSE);
+        }
+
+        if (empty($parentnode)) {
             debugging("Cannot find module node for course cmid: {$cmid}");
             return;
         }
@@ -135,14 +141,13 @@ class extension_navigation {
             $result = state::instance()->get_state_result($localcm->get_stateid());
             $label = get_string('nav_status', 'local_extension', $result);
         }
-        $node = $modulenode->add($label, $url);
-        $node->showinflatnavigation = true;
+        $parentnode->add($label, $url, global_navigation::TYPE_COURSE);
     }
 
     private function add_node_in_main_navigation() {
         $url = (new moodle_url('/local/extension/index.php'))->out();
         $nodename = get_string('requestextension_status', 'local_extension');
-        $node = $this->globalnavigation->add($nodename, $url, null, null, 'local_extension');
+        $node = $this->globalnavigation->add($nodename, $url, global_navigation::TYPE_COURSE);
         $node->showinflatnavigation = true;
     }
 }
