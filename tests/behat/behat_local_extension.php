@@ -25,6 +25,7 @@
 // NOTE: no MOODLE_INTERNAL test here, this file may be required by behat before including /config.php.
 
 use Behat\Mink\Exception\ExpectationException;
+use local_extension\test\generator;
 
 require_once(__DIR__ . '/../../../../lib/behat/behat_base.php');
 
@@ -36,39 +37,29 @@ require_once(__DIR__ . '/../../../../lib/behat/behat_base.php');
  * @SuppressWarnings(public) Allow as many methods as needed.
  */
 class behat_local_extension extends behat_base {
+    /** @var generator */
+    private $generator;
+
+    /**
+     * @BeforeScenario
+     */
+    public function create_generator() {
+        $this->generator = new generator();
+    }
+
     /**
      * @Given /^the extension manager is configured +\# local_extension$/
      */
     public function theExtensionManagerIsConfiguredLocal_extension() {
-        global $DB;
-        $DB->insert_record('local_extension_triggers', (object)[
-            'context'            => 0,
-            'name'               => 'Dummy Trigger',
-            'role'               => 0,
-            'action'             => 0,
-            'priority'           => 0,
-            'parent'             => 0,
-            'lengthfromduedate'  => 0,
-            'lengthtype'         => 0,
-            'elapsedfromrequest' => 0,
-            'elapsedtype'        => 0,
-            'datatype'           => '',
-            'data'               => '',
-        ]);
+        $this->generator->create_trigger();
     }
 
     /**
-     * @Given /^I am an? (administrator|teacher) +\# local_extension$/
+     * @Given /^I am (?:logged in as )?(?:an? )?(\w+) +\# local_extension$/
      */
     public function iAmA($user) {
-        if ($user == 'administrator') {
-            $user = 'admin';
-        } else {
-            $generator = new testing_data_generator();
-            $generator->create_user(['username' => $user, 'password' => $user]);
-        }
-
-        $this->execute('behat_auth::i_log_in_as', [$user]);
+        $user = $this->generator->create_user_by_username($user);
+        $this->execute('behat_auth::i_log_in_as', [$user->username]);
     }
 
     /**
@@ -96,5 +87,43 @@ class behat_local_extension extends behat_base {
         if ($element->isChecked() != $selected) {
             throw new ExpectationException('"' . $checkbox . '" should be ' . $selectedornot, $this->getSession());
         }
+    }
+
+    /**
+     * @Given /^the user "([^"]*)" is enrolled into "([^"]*)" as "([^"]*)" +\# local_extension$/
+     */
+    public function theUserIsEnrolledIntoAsLocal_extension($user, $course, $role) {
+        $this->generator->enrol_user_role($user, $course, $role);
+    }
+
+    /**
+     * @When /^I am on course "([^"]*)" page +\# local_extension$/
+     */
+    public function iAmOnCoursePageLocal_extension($course) {
+        $this->visitPath("/course/view.php?name={$course}");
+    }
+
+    /**
+     * @When /^I am on "([^"]*)" assignment page +\# local_extension$/
+     */
+    public function iAmOnAssignmentPageLocal_extension($assignment) {
+        $assignmentid = $this->generator->get_activity_cmid('assign', $assignment);
+        $this->visitPath("/mod/assign/view.php?id={$assignmentid}");
+    }
+
+    /**
+     * @Given /^"([^"]*)" has an extension request for the "([^"]*)" assignment +\# local_extension$/
+     */
+    public function hasAnExtensionRequestForTheAssignmentLocal_extension($username, $assignment) {
+        $course = $this->generator->get_last_course_mentioned();
+        $assignment = $this->generator->create_activity($course->shortname, 'assign', $assignment);
+        $this->generator->create_extension($course, $assignment, $username);
+    }
+
+    /**
+     * @Given /^the course "([^"]*)" has an assignment "([^"]*)" +\# local_extension$/
+     */
+    public function theCourseHasAnAssignmentLocal_extension($course, $assignment) {
+        $this->generator->create_activity($course, 'assign', $assignment);
     }
 }

@@ -88,6 +88,13 @@ class utility {
         $events = [];
         $courses = [];
 
+        $ruleignoredatatype = get_config('local_extension', 'ruleignoredatatype');
+        if ($ruleignoredatatype) {
+            $rulesdata = rule::load_all();
+        } else {
+            $rulesdata = [];
+        }
+
         foreach ($allevents as $id => $event) {
 
             $modtype = $event->modulename;
@@ -98,11 +105,13 @@ class utility {
             }
 
             // Next check to see if there are any rules for the module type. Without any rules, we cannot make a request.
-            $ruleignoredatatype = get_config('local_extension', 'ruleignoredatatype');
             if ($ruleignoredatatype) {
-                $rules = \local_extension\rule::load_all();
+                $rules = $rulesdata;
             } else {
-                $rules = \local_extension\rule::load_all($modtype);
+                if (!array_key_exists($modtype, $rulesdata)) {
+                    $rulesdata[$modtype] = rule::load_all($modtype);
+                }
+                $rules = $rulesdata[$modtype];
             }
 
             if (empty($rules)) {
@@ -336,16 +345,6 @@ class utility {
     }
 
     /**
-     * TODO
-     *
-     * @param integer $courseid
-     * @param integer $userid
-     */
-    public static function course_request_status($courseid, $userid) {
-        global $DB;
-    }
-
-    /**
      * Returns the number of requests the user has for a specific course.
      *
      * @param int $courseid
@@ -420,32 +419,6 @@ class utility {
     }
 
     /**
-     * Returns the requests for a given courseid.
-     *
-     * @param integer $courseid
-     * @return \local_extension\request[]
-     */
-    public static function find_course_requests($courseid) {
-        global $USER;
-
-        $requests = self::cache_get_requests($USER->id);
-
-        $matchedrequests = [];
-
-        // Return matching requests for a course.
-        foreach ($requests as $request) {
-            foreach ($request->cms as $cm) {
-                if ($courseid == $cm->get_courseid()) {
-                    $matchedrequests[$cm->requestid] = $request;
-                    break;
-                }
-            }
-        }
-
-        return $matchedrequests;
-    }
-
-    /**
      * Returns the cm and request.
      *
      * @param int $courseid
@@ -471,7 +444,7 @@ class utility {
      *
      * Sorted based on the priority and grouped with parents.
      *
-     * @param \local_extension\rule[] $rules
+     * @param rule[] $rules
      * @return array
      */
     public static function sort_rules($rules) {
@@ -519,8 +492,8 @@ class utility {
      * Returns a tree structure of the rules.
      * Nested child rules can be accessed via $rule->children
      *
-     * @param \local_extension\rule[] $rules
-     * @param int|number              $parent
+     * @param rule[]     $rules
+     * @param int|number $parent
      * @return rule[] Tree structure.
      */
     public static function rule_tree(array $rules, $parent = 0) {
@@ -588,9 +561,9 @@ class utility {
     /**
      * Returns an array of ids that are possible candidates for being a parent item.
      *
-     * @param \local_extension\rule[] $rules
-     * @param int                     $id     The id that will not be added, nor children added.
-     * @param array                   $idlist A growing list of ids that can be possible parent items.
+     * @param rule[] $rules
+     * @param int    $id     The id that will not be added, nor children added.
+     * @param array  $idlist A growing list of ids that can be possible parent items.
      * @return array An associated array of id=>name for parents.
      */
     public static function rule_tree_check_children(array $rules, $id, $idlist = null) {

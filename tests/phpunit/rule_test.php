@@ -88,4 +88,35 @@ class local_extension_rule_test extends extension_testcase {
         $triggered = $extensionrequest->process_triggers($today);
         self::assertFalse($triggered);
     }
+
+    public function test_it_checks_if_has_rules() {
+        global $DB;
+        $this->resetAfterTest();
+
+        self::assertFalse(rule::has_rules());
+        self::assertFalse(rule::has_rules('assign'));
+        self::assertFalse(rule::has_rules('forum'));
+
+        $rule = new rule();
+        $rule->load_from_form((object)[
+            'context'            => 1,
+            'datatype'           => 'assign',
+            'name'               => 'Test',
+            'priority'           => 0,
+            'parent'             => 0,
+            'lengthtype'         => rule::RULE_CONDITION_ANY,
+            'lengthfromduedate'  => 0,
+            'elapsedtype'        => rule::RULE_CONDITION_GE,
+            'elapsedfromrequest' => 5,
+            'role'               => $DB->get_field('role', 'id', ['shortname' => 'manager']),
+            'action'             => rule::RULE_ACTION_APPROVE,
+            'template_notify'    => ['text' => ''],
+            'template_user'      => ['text' => ''],
+        ]);
+        $rule->id = $DB->insert_record('local_extension_triggers', $rule);
+
+        self::assertTrue(rule::has_rules());
+        self::assertTrue(rule::has_rules('assign'));
+        self::assertFalse(rule::has_rules('forum'));
+    }
 }

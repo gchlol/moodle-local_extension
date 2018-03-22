@@ -224,6 +224,25 @@ class rule {
         return $triggers;
     }
 
+    public static function has_rules($type = null) {
+        global $DB;
+
+        if (get_config('local_extension', 'ruleignoredatatype')) {
+            $type = null;
+        }
+
+        if (is_null($type)) {
+            $conditions = is_null($type) ? [] : ['datatype' => $type];
+            $count = $DB->count_records('local_extension_triggers', $conditions);
+        } else {
+            $params = ['datatype' => $type];
+            $select = $DB->sql_compare_text('datatype') . " = " . $DB->sql_compare_text(':datatype');
+            $count = $DB->count_records_select('local_extension_triggers', $select, $params);
+        }
+
+        return ($count > 0);
+    }
+
     /**
      * Obtain a rule object with the given id.
      *
@@ -936,6 +955,5 @@ class rule {
         ];
 
         event\trigger_update::create($eventdata)->trigger();
-
     }
 }
