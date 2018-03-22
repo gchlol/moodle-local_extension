@@ -419,32 +419,6 @@ class utility {
     }
 
     /**
-     * Returns the requests for a given courseid.
-     *
-     * @param integer $courseid
-     * @return \local_extension\request[]
-     */
-    public static function find_course_requests($courseid) {
-        global $USER;
-
-        $requests = self::cache_get_requests($USER->id);
-
-        $matchedrequests = [];
-
-        // Return matching requests for a course.
-        foreach ($requests as $request) {
-            foreach ($request->cms as $cm) {
-                if ($courseid == $cm->get_courseid()) {
-                    $matchedrequests[$cm->requestid] = $request;
-                    break;
-                }
-            }
-        }
-
-        return $matchedrequests;
-    }
-
-    /**
      * Returns the cm and request.
      *
      * @param int $courseid

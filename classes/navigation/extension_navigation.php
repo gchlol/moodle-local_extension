@@ -93,28 +93,14 @@ class extension_navigation {
             return;
         }
 
-        $requests = utility::find_course_requests($COURSE->id);
-
-        if (empty($requests)) {
-            $url = new moodle_url('/local/extension/request.php', ['course' => $COURSE->id]);
-            $label = get_string('nav_request', 'local_extension');
-        } else {
-            $requestcount = utility::count_requests($COURSE->id, $USER->id);
-            if ($requestcount > 1) {
-                $label = get_string('nav_course_request_plural', 'local_extension');
-            } else {
-                $label = get_string('nav_course_request', 'local_extension');
-            }
-
-            $url = new moodle_url('/local/extension/index.php');
-            $label = "{$requestcount} {$label}";
-        }
-
         $coursenode = $this->globalnavigation->find($COURSE->id, navigation_node::TYPE_COURSE);
         if (empty($coursenode)) {
             debugging("Cannot find course node for course id: {$COURSE->id}");
             return;
         }
+
+        $url = new moodle_url('/local/extension/request.php', ['course' => $COURSE->id]);
+        $label = get_string('nav_request', 'local_extension');
         $node = $coursenode->add($label, $url);
         $node->showinflatnavigation = true;
     }

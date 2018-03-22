@@ -44,18 +44,6 @@ Feature: Smart navigation items
     When I am on course "topgun" page                               # local_extension
     Then I should not see "Request Extension"
 
-  Scenario: If there are requests for a course, it should link to the statuses instead of a new request
-    Given the extension manager is configured                                 # local_extension
-    And the user "maverick" is enrolled into "topgun" as "student"            # local_extension
-    And "maverick" has an extension request for the "Avionics" assignment     # local_extension
-    And "maverick" has an extension request for the "Aerodynamics" assignment # local_extension
-    And I am logged in as maverick                                            # local_extension
-    When I am on course "topgun" page                                         # local_extension
-    And I follow "2 extension requests"
-    Then I should see "Extension status list"
-    And I should see "Avionics"
-    And I should see "Aerodynamics"
-
   Scenario: If there are requests for a module, it should link it displaying its status
     Given the extension manager is configured                                 # local_extension
     And the user "maverick" is enrolled into "topgun" as "student"            # local_extension
