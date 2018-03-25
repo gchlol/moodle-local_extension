@@ -20,3 +20,8 @@ Feature: Local extension user preferences
     Then I should see "Preferences saved"
     And I go to the extension preferences page again      # local_extension
     And the checkbox "Mail digest" should be selected     # local_extension
+
+  Scenario: I can cancel editing preferences
+    Given I am at the extension preferences page          # local_extension
+    When I press "Cancel"
+    Then I should see "Extension status list"
