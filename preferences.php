@@ -42,11 +42,14 @@ $PAGE->navbar->add(get_string('breadcrumb_nav_index', 'local_extension'),
 $PAGE->navbar->add(get_string('breadcrumb_nav_preferences', 'local_extension'),
                    new moodle_url('/local/extension/preferences.php'));
 
+$form = new preferences_form();
+if ($form->is_cancelled()) {
+    redirect('/local/extension/index.php');
+}
+
 echo $OUTPUT->header();
 
-$form = new preferences_form();
 $data = $form->get_data();
-
 if (!is_null($data)) {
     (new preferences())->set(preferences::MAIL_DIGEST, !empty($data->{preferences::MAIL_DIGEST}));
     echo $OUTPUT->notification(get_string('preferences_saved', 'local_extension'), 'notifysuccess');
