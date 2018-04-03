@@ -125,13 +125,12 @@ class extension_navigation {
             return;
         }
 
-        list($request, $cm) = utility::find_module_requests($PAGE->course->id, $cmid);
         $moduletype = get_fast_modinfo($PAGE->course)->cms[$cmid]->modname;
-
         if (!rule::has_rules($moduletype)) {
             return;
         }
 
+        list($request, $cm) = utility::find_module_requests($PAGE->course->id, $cmid);
         if (empty($cm)) {
             $url = new moodle_url('/local/extension/request.php', ['course' => $PAGE->course->id, 'cmid' => $cmid]);
             $label = get_string('nav_request', 'local_extension');
