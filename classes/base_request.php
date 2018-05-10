@@ -29,7 +29,6 @@ use context_course;
 use html_writer;
 use moodle_url;
 use MoodleQuickForm;
-use user_picture;
 
 defined('MOODLE_INTERNAL') || die();
 
@@ -47,6 +46,7 @@ abstract class base_request {
 
     /**
      * A readable name.
+     *
      * @return string Module name
      */
     abstract public function get_name();
@@ -61,6 +61,7 @@ abstract class base_request {
 
     /**
      * Data type name.
+     *
      * @return string Data type name
      */
     abstract public function get_data_type();
@@ -70,8 +71,8 @@ abstract class base_request {
      *
      * Only one calendar event for a given course module should ever return true.
      *
-     * @param event $event A calendar event object
-     * @param coursemodule $cm A course module
+     * @param event        $event A calendar event object
+     * @param coursemodule $cm    A course module
      * @return boolean True if should be handled
      */
     abstract public function is_candidate($event, $cm);
@@ -79,7 +80,7 @@ abstract class base_request {
     /**
      * Define parts of the request for for an event object
      *
-     * @param mod_data $mod Local mod_data object with event details
+     * @param mod_data        $mod   Local mod_data object with event details
      * @param MoodleQuickForm $mform A moodle form object
      */
     abstract public function request_definition($mod, $mform);
@@ -88,8 +89,8 @@ abstract class base_request {
      * Return data to be stored for the request
      *
      * @param MoodleQuickForm $mform A moodle form object
-     * @param mod_data $mod Local mod_data object with event details
-     * @param array $data An array of form data
+     * @param mod_data        $mod   Local mod_data object with event details
+     * @param array           $data  An array of form data
      * @return string The data to be stored
      */
     abstract public function request_data($mform, $mod, $data);
@@ -163,12 +164,12 @@ abstract class base_request {
         $startyear = date('Y');
         $stopyear = date('Y') + 1;
 
-        $dateconfig = array(
+        $dateconfig = [
             'optional'  => $optional,
             'step'      => 1,
             'startyear' => $startyear,
             'stopyear'  => $stopyear,
-        );
+        ];
 
         $formid = 'due' . $lcm->cmid;
         $mform->addElement('date_time_selector', $formid, get_string('requestdue', 'extension_assign'), $dateconfig);
@@ -223,7 +224,9 @@ abstract class base_request {
         $html = html_writer::div($coursestring . ' ' . $dueon . $coursecoordinators,
                                  'content local_extension_title');
 
-        $mform->addElement('html', $html);
+        if (!is_null($mform)) {
+            $mform->addElement('html', $html);
+        }
 
         return $html;
     }
