@@ -23,6 +23,7 @@
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
+use local_extension\access\capability_checker;
 use local_extension\rule;
 use local_extension\state;
 use local_extension\utility;
@@ -49,7 +50,10 @@ if ($USER->id != $request->request->userid) {
 
     // Checking if the current user is not part of the request or does not have the capability to view all requests.
     $context = utility::get_context($requestid, $cmid);
-    if (!has_capability('local/extension:viewallrequests', $context)) {
+    $canview = capability_checker::can_view_all_requests($context);
+    $canmodify = capability_checker::can_force_change_status($courseid);
+
+    if (!$canmodify && !$canview) {
 
         if (array_key_exists($USER->id, $request->users)) {
             // The user is part of the request, lets check their access.
