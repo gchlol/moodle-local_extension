@@ -25,6 +25,7 @@
 
 namespace local_extension\form;
 
+use local_extension\access\capability_checker;
 use local_extension\utility;
 
 if (!defined('MOODLE_INTERNAL')) {
@@ -130,6 +131,11 @@ class state extends \moodleform {
         // Checking for capabilities or admin access.
         $context = utility::get_context($cmid);
         if (has_capability('local/extension:viewallrequests', $context)) {
+            $approved = true;
+        }
+
+        // Checking for capability to modify requests.
+        if (capability_checker::can_force_change_status($data['course'])) {
             $approved = true;
         }
 
