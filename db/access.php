@@ -55,10 +55,4 @@ $capabilities = array(
             'editingteacher' => CAP_ALLOW,
         ),
     ),
-
-    capability_checker::CAPABILITY_EXPORT_REQUESTS_CSV => array(
-        'riskbitmask'  => RISK_PERSONAL,
-        'captype'      => 'read',
-        'contextlevel' => CONTEXT_SYSTEM,
-    ),
 );

@@ -33,9 +33,11 @@ defined('MOODLE_INTERNAL') || die();
  */
 class preferences {
     const MAIL_DIGEST = 'mail_digest';
+    const EXPORT_CSV = 'export_csv';
 
     protected static $defaults = [
         self::MAIL_DIGEST => false,
+        self::EXPORT_CSV => false,
     ];
 
     /** @var int */

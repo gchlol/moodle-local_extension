@@ -49,9 +49,12 @@ if ($form->is_cancelled()) {
 
 echo $OUTPUT->header();
 
+// Save the preferences.
 $data = $form->get_data();
 if (!is_null($data)) {
-    (new preferences())->set(preferences::MAIL_DIGEST, !empty($data->{preferences::MAIL_DIGEST}));
+    $preferences = new preferences();
+    $preferences->set(preferences::MAIL_DIGEST, !empty($data->{preferences::MAIL_DIGEST}));
+    $preferences->set(preferences::EXPORT_CSV, !empty($data->{preferences::EXPORT_CSV}));
     echo $OUTPUT->notification(get_string('preferences_saved', 'local_extension'), 'notifysuccess');
 }
 
