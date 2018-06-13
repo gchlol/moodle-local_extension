@@ -24,6 +24,8 @@
  */
 
 use local_extension\access\capability_checker;
+use local_extension\form\preferences_form;
+use local_extension\preferences;
 
 require_once(__DIR__ . '/../../config.php');
 require_once($CFG->libdir . '/coursecatlib.php');
@@ -104,7 +106,7 @@ if (!$table->is_downloading()) {
     // New filter functionality, searching and listing of requests.
     echo $renderer->render_index_search_controls($context, $categoryid, $courseid, $stateid, $baseurl, $search, $faculty);
 
-    if (capability_checker::can_export_csv()) {
+    if (((new preferences)->get(preferences::EXPORT_CSV)) == '1') {
         $url = clone $baseurl;
         $url->param('download', 'csv');
         echo html_writer::div(

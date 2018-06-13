@@ -33,10 +33,17 @@ require_once("{$CFG->libdir}/formslib.php");
 
 class preferences_form extends moodleform {
     public function definition() {
+        $preferences = new preferences();
+
         $this->_form->addElement('checkbox', preferences::MAIL_DIGEST,
                                  get_string('preference_mail_digest', 'local_extension'),
                                  get_string('preference_mail_digest_help', 'local_extension'));
-        $this->_form->setDefault('mail_digest', (new preferences())->get(preferences::MAIL_DIGEST));
+        $this->_form->setDefault('mail_digest', ($preferences->get(preferences::MAIL_DIGEST)));
+
+        $this->_form->addElement('checkbox', preferences::EXPORT_CSV,
+                                get_string('preference_export_csv', 'local_extension'),
+                                get_string('preference_export_csv_help', 'local_extension'));
+        $this->_form->setDefault('export_csv', ($preferences->get(preferences::EXPORT_CSV)));
 
         $this->add_action_buttons();
     }

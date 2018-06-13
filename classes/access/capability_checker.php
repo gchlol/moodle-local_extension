@@ -39,8 +39,6 @@ class capability_checker {
 
     const CAPABILITY_ACCESS_ALL_COURSE_REQUESTS = 'local/extension:accessallcourserequests';
 
-    const CAPABILITY_EXPORT_REQUESTS_CSV = 'local/extension:exportrequestscsv';
-
     public static function can_view_all_requests($defaultcontext = null) {
         if (is_null($defaultcontext)) {
             $defaultcontext = context_system::instance();
@@ -60,12 +58,6 @@ class capability_checker {
     public static function can_force_change_status($courseid) {
         $context = context_course::instance($courseid);
         $hascapability = has_capability('local/extension:modifyrequeststatus', $context);
-        return $hascapability;
-    }
-
-    public static function can_export_csv() {
-        $context = context_system::instance();
-        $hascapability = has_capability(self::CAPABILITY_EXPORT_REQUESTS_CSV, $context);
         return $hascapability;
     }
 
