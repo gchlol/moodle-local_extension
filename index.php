@@ -58,9 +58,6 @@ $viewallrequests = capability_checker::can_view_all_requests($checkcontext);
 if (!$viewallrequests) {
     // The user cannot view all requests or select the categories.
     $categoryid = 0;
-
-    // Prevent standard user from downloading.
-    $download = false;
 }
 
 $systemcontext = context_system::instance();
