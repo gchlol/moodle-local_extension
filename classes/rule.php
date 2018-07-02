@@ -350,6 +350,46 @@ class rule {
         return true;
     }
 
+
+
+    /**
+     * Returns true if rule passes for the given role and time.
+     *
+     * @param request  $request
+     * @param mod_data $mod
+     * @param int      $currenttime
+     * @return bool
+     */
+    public function rule_should_be_applied(&$request, $mod, $currenttime) {
+
+        // Checks if the trigger for this cm has been activated.
+        if ($this->check_history($mod)) {
+
+            if ($this->check_request_length($mod) === false) {
+                return true;
+            }
+            return false;
+        }
+
+        // If the parent has been triggered then we abort.
+        if ($this->check_parent($mod, $this->parent)) {
+            return false;
+        }
+
+        if ($this->check_request_length($mod)) {
+            return false;
+        }
+
+        if ($this->check_elapsed_length($request, $currenttime)) {
+            return false;
+        }
+
+        $this->write_history($mod);
+
+        return true;
+    }
+
+
     /**
      * Obtains the level of access from the table local_extension_subscription.
      *

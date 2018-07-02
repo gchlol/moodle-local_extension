@@ -409,7 +409,6 @@ class request implements \cache_data_source {
                 $return = $this->process_recursive($mod, $rule, $currenttime);
                 $notifydata = array_merge($notifydata, $return);
             }
-
         }
 
         // We have processed the triggers, lets send some emails!
