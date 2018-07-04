@@ -17,9 +17,6 @@
 /**
  * Event observers used in local_extension.
  *
- * @package    mod_forum
- * @copyright  2013 Rajesh Taneja <rajesh@moodle.com>
- * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
 
@@ -35,9 +32,6 @@ defined('MOODLE_INTERNAL') || die();
  */
 class local_extension_observer {
 
-
-    const CAPABILITY_ACCESS_ALL_COURSE_REQUESTS = 'local/extension:accessallcourserequests';
-
     /**
      * Observer for role_assigned event.
      *
@@ -47,78 +41,40 @@ class local_extension_observer {
     public static function role_assigned(\core\event\role_assigned $event) {
 
         global $DB;
+
         $roleid         = $event->objectid;
-        $contextid      = $event->contextid;
-        $contextlevel   = $event->contextlevel;
         $userid         = $event->relateduserid;
         $courseid       = (int)$event->courseid;
 
         // The rules/triggers for this roleid.
         $triggers = $DB->get_records('local_extension_triggers', array('role' => $roleid));
 
+        // Do not need to write new subscriptions if there are no rules for this role.
+        if (!$triggers) {
+            return;
+        }
+
         // Grab all the requestid and cmid for this course.
         $requests = $DB->get_records('local_extension_cm', array('course' => $courseid));
 
-        // Get subs for this user.
-        $params = [
-            'userid' => $userid,
-        ];
+        $currenttime = time();
 
-        $subs = $DB->get_records('local_extension_subscription', $params, 'id ASC');
-        $currenttime = 1501760000;
-
-        // Process the rule for each request.
+        // Process the rule for each request and module.
         foreach ($requests as $request) {
 
-            $requestobject = utility::cache_get_request($request->id);
+            $requestobject = utility::cache_get_request($request->request);
             $mods = $requestobject->mods;
 
             foreach ($mods as $mod) {
 
                 foreach ($triggers as $trigger) {
 
-                    $rule = new rule($trigger->id);
-                    $rule->context = $trigger->context;
-                    $rule->name = $trigger->name;
-                    $rule->action = $trigger->action;
-                    $rule->role = $trigger->role;
-                    $rule->priority = $trigger->priority;
-                    $rule->parent = $trigger->parent;
-                    $rule->lengthfromduedate = $trigger->lengthfromduedate;
-                    $rule->lengthtype = $trigger->lengthtype;
-                    $rule->elapsedfromrequest = $trigger->elapsedfromrequest;
-                    $rule->elapsedtype = $trigger->elapsedfromrequest;
-                    $rule->data = $trigger->data;
-                    $rule->datatype = $trigger->datatype;
+                    $rule = rule::load_rule_from_trigger($trigger);
 
-                    // Subscription should only be written when it passes rules.
-                    if ($rule->rule_should_be_applied($requestobject, $mod, $currenttime)) {
-
-                        if (empty($subs)) {
-                            // Create a new record if it does not exist.
-                            $sub = new stdClass();
-                        } else {
-                            // We now call get_records which returns an array, so pop the last value.
-                            $sub = array_pop($records);
-                        }
-
-                        $sub->userid = $userid;
-                        $sub->localcmid = $request->id;
-                        $sub->requestid = $request->request;
-                        $sub->lastmod = time();
-                        $sub->trig = $trigger->id;
-                        $sub->access = $trigger->action;
-
-                        if (empty($sub->id)) {
-                            $DB->insert_record('local_extension_subscription', $sub);
-                        } else {
-                            $DB->update_record('local_extension_subscription', $sub);
-                        }
-                    }
+                    $rule->process_for_one_user($requestobject, $mod, $currenttime, $userid);
                 }
             }
         }
         return;
     }
 }
-

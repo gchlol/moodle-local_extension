@@ -138,6 +138,23 @@ class rule {
     }
 
     /**
+     * Load a rule from a trigger object.
+     * @param $trigger
+     */
+    public static function load_rule_from_trigger($trigger) {
+
+        $rule = new rule;
+        $trigger = get_object_vars($trigger);
+
+        foreach ($trigger as $key => $item) {
+            if (property_exists($rule, $key)) {
+                $rule->$key = $item;
+            }
+        }
+        return $rule;
+    }
+
+    /**
      * Unserialises and base64_decodes the saved custom data.
      *
      * @return bool
@@ -350,23 +367,34 @@ class rule {
         return true;
     }
 
-
-
     /**
-     * Returns true if rule passes for the given role and time.
+     * Checks rules for one specific request and module, and writes the subscriptions for the given user if valid.
      *
-     * @param request  $request
-     * @param mod_data $mod
-     * @param int      $currenttime
+     * @param request $request
+     * @param $mod
+     * @param int  $currenttime
+     * @param  $userid
      * @return bool
      */
-    public function rule_should_be_applied(&$request, $mod, $currenttime) {
+    public function process_for_one_user(&$request, $mod, $currenttime, $userid) {
 
         // Checks if the trigger for this cm has been activated.
         if ($this->check_history($mod)) {
+            // There are times when the request length has been modified, and triggers have already been fired.
 
+            // The result is true, the trigger has been fired.
+
+            /* We only need to check when the request length has changed, this can be changed via:
+
+               modify.php
+               additional_request.php
+
+               When the length has been modified we may need to reset the subscribers when processing ruleset.
+            */
+
+            // We are matching the rules request length checks. eg. Request lt/gt than 14 days.
             if ($this->check_request_length($mod) === false) {
-                return true;
+                $this->setup_subscription_one_user($request, $mod->localcm, $userid);
             }
             return false;
         }
@@ -383,6 +411,8 @@ class rule {
         if ($this->check_elapsed_length($request, $currenttime)) {
             return false;
         }
+
+        $this->setup_subscription_one_user($request, $mod->localcm, $userid);
 
         $this->write_history($mod);
 
@@ -491,6 +521,60 @@ class rule {
     }
 
     /**
+     * Write the subscription for one user.
+     *
+     * @param request $request
+     * @param
+     * @param $userid
+     */
+    public function setup_subscription_one_user(&$request, $localcm, $userid) {
+
+        global $DB;
+
+        $params = [
+            'userid' => $userid,
+            'localcmid' => $localcm->cm->id,
+        ];
+
+        // Earlier code had duplicate subscription records hence the call to obtain many.
+        $records = $DB->get_records('local_extension_subscription', $params, 'id ASC');
+
+        if (empty($records)) {
+            // Create a new record if it does not exist.
+            $sub = new stdClass();
+            $sub->access = self::RULE_ACTION_DEFAULT;
+        } else {
+            // We now call get_records which returns an array, so pop the last value.
+            $sub = array_pop($records);
+        }
+
+        // If the action is the same we are to assume that they have been setup already.
+        if ($this->action == $sub->access) {
+            return;
+        }
+
+        $sub->userid = $userid;
+        $sub->localcmid = $localcm->cm->id;
+        $sub->requestid = $localcm->requestid;
+        $sub->lastmod = time();
+        $sub->trig = $this->id;
+        $sub->access = $this->action;
+
+        if (empty($sub->id)) {
+            $DB->insert_record('local_extension_subscription', $sub);
+        } else {
+            $DB->update_record('local_extension_subscription', $sub);
+        }
+
+        // Append the user to the subscribed list.
+        $request->subscribedids[] = $sub->userid;
+
+        if (!empty($this->parentrule)) {
+            $this->downgrade_status($localcm, $this->parentrule);
+        }
+    }
+
+    /**
      * Using the current rule configuration, this will setup the users with specific roles to have view/modification
      * access to the localcm item.
      *
@@ -498,58 +582,18 @@ class rule {
      * @param mod_data $mod
      */
     private function setup_subscription(&$request, $mod) {
-        global $DB;
 
         $localcm = $mod->localcm;
-        $course = $mod->course;
 
+        $course = $mod->course;
         $role = $this->role;
 
         $users = $this->rule_get_role_users($course, $role);
 
         // Iterate over all users in the cm's course that have the roleid $role.
         foreach ($users as $user) {
-            $params = [
-                'userid' => $user->id,
-                'localcmid' => $localcm->cm->id,
-            ];
 
-            // Earlier code had duplicate subscription records hence the call to obtain many.
-            $records = $DB->get_records('local_extension_subscription', $params, 'id ASC');
-
-            if (empty($records)) {
-                // Create a new record if it does not exist.
-                $sub = new stdClass();
-                $sub->access = self::RULE_ACTION_DEFAULT;
-            } else {
-                // We now call get_records which returns an array, so pop the last value.
-                $sub = array_pop($records);
-            }
-
-            // If the action is the same we are to assume that they have been setup already.
-            if ($this->action == $sub->access) {
-                break;
-            }
-
-            $sub->userid = $user->id;
-            $sub->localcmid = $localcm->cm->id;
-            $sub->requestid = $localcm->requestid;
-            $sub->lastmod = time();
-            $sub->trig = $this->id;
-            $sub->access = $this->action;
-
-            if (empty($sub->id)) {
-                $DB->insert_record('local_extension_subscription', $sub);
-            } else {
-                $DB->update_record('local_extension_subscription', $sub);
-            }
-
-            // Append the user to the subscribed list.
-            $request->subscribedids[] = $sub->userid;
-        }
-
-        if (!empty($this->parentrule)) {
-            $this->downgrade_status($mod, $this->parentrule);
+            $this->setup_subscription_one_user($request, $localcm, $user->id);
         }
     }
 
@@ -559,12 +603,12 @@ class rule {
      *
      * @param mod_data $mod
      * @param rule $rule
+     * @param $localcm
      */
-    private function downgrade_status($mod, $rule) {
+    private function downgrade_status($localcm, $rule) {
         global $DB;
 
-        $localcm = $mod->localcm;
-        $course = $mod->course;
+        $course = $localcm->course;
 
         // If the rule has specified that the roles will be forced to approve, we skip downgrading the access.
         if ($rule->action != self::RULE_ACTION_FORCEAPPROVE) {
@@ -591,7 +635,7 @@ class rule {
         }
 
         if (!empty($rule->parentrule)) {
-            $this->downgrade_status($mod, $rule->parentrule);
+            $this->downgrade_status($localcm, $rule->parentrule);
         }
 
     }
