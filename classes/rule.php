@@ -347,6 +347,7 @@ class rule {
 
         $this->write_history($mod);
 
+        // Send a notification about this rule.
         return true;
     }
 
@@ -782,7 +783,7 @@ class rule {
     }
 
     /**
-     * Checks the rule for request list.
+     * Checks the rule for request length.
      *
      * @param mod_data $mod
      * @return boolean
@@ -815,7 +816,7 @@ class rule {
             }
         }
 
-        // The delta check against the rule type passes.
+        // The delta check against the rule type passes (no notification sent).
         return true;
     }
 
@@ -827,8 +828,28 @@ class rule {
      * @return boolean
      */
     private function check_elapsed_length($request, $currenttime) {
-        $delta = utility::calculate_weekdays_elapsed($request->request->timestamp, $currenttime);
 
+        // If this request has been reopened, check against the reopened date, not the original request date.
+        global $DB;
+
+        $params = [
+            'reopened' => state::STATE_REOPENED,
+            'requestid' => $request->requestid,
+        ];
+
+        $lastreopeneddate = $DB->get_field_select('local_extension_hist_state',
+                                                  "MAX(timestamp)", 'state = :reopened AND requestid = :requestid',
+                                                  $params);
+
+        if ($lastreopeneddate) {
+            $checkdate = (int)($lastreopeneddate);
+        } else {
+            $checkdate = (int)$request->request->timestamp;
+        }
+
+        $delta = utility::calculate_weekdays_elapsed($checkdate, $currenttime);
+
+        // This is the rule for how many days we check against.
         $days = (int)$this->elapsedfromrequest;
 
         if ($this->elapsedtype == self::RULE_CONDITION_ANY) {
@@ -846,7 +867,7 @@ class rule {
             }
         }
 
-        // The delta check against the rule type passes.
+        // The delta check against the rule type passes (no notification sent).
         return true;
     }
 
