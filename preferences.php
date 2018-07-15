@@ -47,16 +47,16 @@ if ($form->is_cancelled()) {
     redirect('/local/extension/index.php');
 }
 
-echo $OUTPUT->header();
-
 // Save the preferences.
 $data = $form->get_data();
 if (!is_null($data)) {
     $preferences = new preferences();
     $preferences->set(preferences::MAIL_DIGEST, !empty($data->{preferences::MAIL_DIGEST}));
     $preferences->set(preferences::EXPORT_CSV, !empty($data->{preferences::EXPORT_CSV}));
-    echo $OUTPUT->notification(get_string('preferences_saved', 'local_extension'), 'notifysuccess');
+    redirect("$CFG->wwwroot/local/extension", get_string('preferences_saved', 'local_extension'));
 }
+
+echo $OUTPUT->header();
 
 echo $OUTPUT->heading(get_string('preferences_title', 'local_extension'));
 $form->display();
