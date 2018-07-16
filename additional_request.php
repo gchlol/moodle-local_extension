@@ -23,6 +23,8 @@
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
+use local_extension\attachment_processor;
+
 require_once(__DIR__ . '/../../config.php');
 global $CFG, $PAGE;
 
@@ -101,6 +103,8 @@ if ($requestform->is_cancelled()) {
 }
 
 $reviewform = new \local_extension\form\additional_review(null, $params);
+$reviewdata = $reviewform->get_data();
+
 if ($reviewform->is_cancelled()) {
     redirect($PAGE->url);
 
@@ -139,6 +143,9 @@ if ($reviewform->is_cancelled()) {
     $fs = get_file_storage();
     $draftfiles = $fs->get_area_files($draftcontext->id, 'user', 'draft', $draftitemid, 'id');
     $oldfiles = $fs->get_area_files($usercontext->id, 'local_extension', 'attachments', $itemid, 'id');
+
+    $processor = new attachment_processor($oldfiles);
+    $draftfiles = $processor->rename_new_files($draftfiles);
 
     // File count must be greater that 1, as an item is the directory '.'.
     if (count($draftfiles) > 1) {

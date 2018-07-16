@@ -111,7 +111,6 @@ class additional_request extends moodleform {
      * @return array of error messages
      */
     public function validation($data, $files) {
-        global $USER;
 
         $errors = parent::validation($data, $files);
 
@@ -121,60 +120,12 @@ class additional_request extends moodleform {
         $mod = $request->mods[$cmid];
 
         $formid = 'due' . $cmid;
-        $due[$formid] = $data[$formid];
 
         $handler = $mod->handler;
         $event = $mod->event;
 
         // Default request_validation checks for dates within one day of the request.
         $errors += $handler->request_validation($mform, $mod, $data);
-
-        // Validate any duplicate attachments, prevent submission.
-        if (!empty($data['attachments'])) {
-            $itemid = $data['id'];
-            $draftitemid = $data['attachments'];
-
-            $draftcontext = \context_user::instance($USER->id);
-            $usercontext = \context_user::instance($this->_customdata['request']->request->userid);
-
-            $fs = get_file_storage();
-            $draftfiles = $fs->get_area_files($draftcontext->id, 'user', 'draft', $draftitemid, 'id');
-            $oldfiles = $fs->get_area_files($usercontext->id, 'local_extension', 'attachments', $itemid, 'id');
-
-            if (count($draftfiles) > 1) {
-                $oldnames = array();
-
-                foreach ($oldfiles as $file) {
-                    $oldnames[] = $file->get_filename();
-                }
-
-                $duplicates = array();
-
-                foreach ($draftfiles as $file) {
-                    if (in_array($file->get_filename(), $oldnames) && !$file->is_directory()) {
-                        $duplicates[] = $file->get_filename();
-                    }
-                }
-
-                if (!empty($duplicates)) {
-                    $res = null;
-
-                    $wrapped = array_map(function($str) {
-                        return sprintf("\"%s\"", $str);
-                    }, $duplicates);
-
-                    if (count($wrapped) > 1) {
-                        $last = array_pop($wrapped);
-                        $and = get_string('and', 'local_extension');
-                        $res = implode($wrapped, ', ') . ' ' . $and . ' ' . $last;
-                    } else {
-                        $res = $wrapped[0];
-                    }
-
-                    $errors['attachments'] = get_string('form_rule_validate_duplicate_files', 'local_extension' , $res);
-                }
-            }
-        }
 
         // Validation checking for maximum request length.
         $extensionlimit = get_config('local_extension', 'extensionlimit');
@@ -185,7 +136,6 @@ class additional_request extends moodleform {
             $requestlength = $requestuntil - $timestart;
 
             $days = $requestlength / (3600 * 24);
-            $hours = ($requestlength / 3600) % 24;
 
             if ($days > $extensionlimit) {
 
@@ -210,9 +160,7 @@ class additional_request extends moodleform {
                 $errors[$formid] = $resultstr;
             }
         }
-
         return $errors;
     }
-
 }
 
