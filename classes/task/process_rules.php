@@ -72,5 +72,4 @@ class process_rules extends \core\task\scheduled_task {
             $request->process_triggers();
         }
     }
-
 }
