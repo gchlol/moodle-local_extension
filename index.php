@@ -103,7 +103,13 @@ if (!$table->is_downloading()) {
     // New filter functionality, searching and listing of requests.
     echo $renderer->render_index_search_controls($context, $categoryid, $courseid, $stateid, $baseurl, $search, $faculty);
 
-    if (((new preferences)->get(preferences::EXPORT_CSV)) == '1') {
+    // Query database here to see whether to display the download csv button.
+    // We perform two queries rather than override the out() function in the administrator and student classes.
+    $table->setup();
+    $table->query_db(30, false);
+
+    // Only display export csv button if there is data.
+    if (((new preferences)->get(preferences::EXPORT_CSV)) == '1' && count($table->rawdata) > 0) {
         $url = clone $baseurl;
         $url->param('download', 'csv');
         echo html_writer::div(
