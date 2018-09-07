@@ -125,7 +125,7 @@ class request extends \local_extension\base_request {
         }
 
         $html = html_writer::start_div('content');
-        $coursestring = html_writer::tag('b', $course->fullname . ' > ' . $event->name, array('class' => 'mod'));
+        $coursestring = html_writer::tag('b', $course->fullname . ' <br> ' . $event->name, array('class' => 'mod'));
         $html .= html_writer::tag('p', $coursestring);
         $html .= html_writer::end_div(); // End .content.
 
