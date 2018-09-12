@@ -35,23 +35,23 @@
 }
 
 .local_extension span.statusnew {
-    background-color: #39CCCC;
+    background-color: #39cccc;
 }
 
 .local_extension span.statusdenied {
-    background-color: #FF4136;
+    background-color: #ff4136;
 }
 
 .local_extension span.statusapproved {
-    background-color: #2ECC40;
+    background-color: #2ecc40;
 }
 
 .local_extension span.statusreopened {
-    background-color: #FF851B;
+    background-color: #ff851b;
 }
 
 .local_extension span.statuscancel {
-    background-color: #0074D9;
+    background-color: #0074d9;
 }
 
 .local_extension .mform .fitem_actionbuttons {
@@ -166,10 +166,39 @@
     margin-bottom: 20px;
 }
 
+#page-local-extension-request .local_extension_title > .mod {
+    line-height: 30px;
+}
+
+.mform > .content {
+    line-height: 30px;
+}
+
+.content > p > .mod {
+    line-height: 30px;
+    margin-top: 30px;
+}
+
+#page-local-extension-request .extension_category {
+    font-weight: bold;
+    font-size: 150%;
+    margin-bottom: 15px;
+}
+
+#page-local-extension-request .content {
+    margin-top: 30px;
+}
+
 .local_extension_option_buttons {
     float: right;
 }
 
 .local_extension_coordinators {
     margin-top: 15px;
+}
+
+#page-local-extension-request hr {
+    border: none;
+    height: 2px;
+    background-color: #0074d9;
 }

@@ -28,7 +28,9 @@ use local_extension\form\preferences_form;
 use local_extension\preferences;
 
 require_once(__DIR__ . '/../../config.php');
-require_once($CFG->libdir . '/coursecatlib.php');
+if ($CFG->branch < 35) {
+    require_once($CFG->libdir . '/coursecatlib.php');
+}
 
 $defaultcategoryid = get_config('local_extension', 'defaultcategory');
 
