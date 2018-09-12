@@ -562,7 +562,7 @@ class local_extension_renderer extends plugin_renderer_base {
      * @return string
      */
     public function render_index_search_controls($context, $categoryid, $courseid, $stateid, $baseurl, $search, $faculty) {
-        global $PAGE;
+        global $PAGE, $CFG;
 
         // $courseid = empty($courseid) ? 1 : $courseid;
         $courselist = [];
@@ -576,11 +576,20 @@ class local_extension_renderer extends plugin_renderer_base {
             $hascapability = true;
         }
 
-        $categorylist = coursecat::make_categories_list('local/extension:viewallrequests');
-        if (!empty($categoryid)) {
-            $courselist = coursecat::get($categoryid)->get_courses();
+        if ($CFG->branch < 35) {
+            $categorylist = coursecat::make_categories_list('local/extension:viewallrequests');
+            if (!empty($categoryid)) {
+                $courselist = coursecat::get($categoryid)->get_courses();
+            } else {
+                $courselist = coursecat::get(0)->get_courses(['recursive' => true]);
+            }
         } else {
-            $courselist = coursecat::get(0)->get_courses(['recursive' => true]);
+            $categorylist = \core_course_category::make_categories_list('local/extension:viewallrequests');
+            if (!empty($categoryid)) {
+                $courselist = \core_course_category::get($categoryid)->get_courses();
+            } else {
+                $courselist = \core_course_category::get(0)->get_courses(['recursive' => true]);
+            }
         }
 
         $mycourses = enrol_get_my_courses();
@@ -665,9 +674,14 @@ class local_extension_renderer extends plugin_renderer_base {
         if (!empty($categorylist) || $hascapability) {
 
             $cats = [];
+            global $CFG;
 
             // Add the top level 'Top' element.
-            $cats[0] = coursecat::get(0)->get_formatted_name();
+            if ($CFG->branch < 35) {
+                $cats[0] = coursecat::get(0)->get_formatted_name();
+            } else {
+                $cats[0] = \core_course_category::get(0)->get_formatted_name();
+            }
 
             $cats += $categorylist;
 
