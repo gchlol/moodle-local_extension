@@ -426,11 +426,14 @@ class utility {
      * @return array
      */
     public static function find_module_requests($courseid, $moduleid) {
-        global $USER;
+        global $USER, $DB;
 
-        $requests = self::cache_get_requests($USER->id);
+        $conditions = array('cmid' => $moduleid, 'userid' => $USER->id);
+        $record = $DB->get_record('local_extension_cm', $conditions, 'request');
 
-        foreach ($requests as $request) {
+        if (!empty($record)) {
+            $request = self::cache_get_request($record->request);
+
             foreach ($request->cms as $cm) {
                 if ($courseid == $cm->get_courseid() && $moduleid == $cm->cmid) {
                     return [$request, $cm];
