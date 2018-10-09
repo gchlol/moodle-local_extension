@@ -166,7 +166,7 @@
     margin-bottom: 20px;
 }
 
-#page-local-extension-request .local_extension_title > .mod {
+.local_extension_title > .mod {
     line-height: 30px;
 }
 
@@ -179,16 +179,15 @@
     margin-top: 30px;
 }
 
-#page-local-extension-request .extension_category {
+.extension_category {
     font-weight: bold;
     font-size: 150%;
     margin-bottom: 15px;
 }
 
-#page-local-extension-request .content {
+.content {
     margin-top: 30px;
 }
-
 .local_extension_option_buttons {
     float: right;
 }
@@ -197,7 +196,7 @@
     margin-top: 15px;
 }
 
-#page-local-extension-request hr {
+hr {
     border: none;
     height: 2px;
     background-color: #0074d9;
