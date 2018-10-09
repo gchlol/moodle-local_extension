@@ -211,7 +211,7 @@ abstract class base_request {
             $eventlink = html_writer::link($eventlink, $event->name);
         }
 
-        $coursestring = html_writer::tag('b', $courselink . ' <br> ' . $eventlink);
+        $coursestring = html_writer::tag('b', $courselink . ' > ' . $eventlink);
         $coursestring = html_writer::div($coursestring, 'mod');
 
         if (!is_null($dueon)) {
