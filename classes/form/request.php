@@ -64,9 +64,7 @@ class request extends \moodleform {
         $mform->setType('forward', PARAM_INT);
 
         if (!empty($inprogress)) {
-            $mform->addElement('html', '<div class="extension_category">');
             $mform->addElement('html', get_string('form_request_requestsinprogress', 'local_extension'));
-            $mform->addElement('html', '</div>');
 
             // Iterate over the current request items.
             foreach ($inprogress as $id => $mod) {
@@ -92,9 +90,7 @@ class request extends \moodleform {
         }
 
         if (!empty($available)) {
-            $mform->addElement('html', '<div class="extension_category">');
             $mform->addElement('html', get_string('form_request_availablerequests', 'local_extension'));
-            $mform->addElement('html', '</div>');
 
             // Iterate over remaining available request items.
             foreach ($available as $id => $mod) {

@@ -87,7 +87,7 @@ class request extends \local_extension\base_request {
         $course = $mod->course;
 
         $html = html_writer::start_div('content');
-        $coursestring = html_writer::tag('b', $course->fullname . ' <br> ' . $event->name, array('class' => 'mod'));
+        $coursestring = html_writer::tag('b', $course->fullname . ' > ' . $event->name, array('class' => 'mod'));
         $str = get_string('dueon', 'extension_assign', userdate($event->timestart));
         $html .= html_writer::tag('p', $coursestring . ' ' . $str);
 

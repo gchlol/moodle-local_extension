@@ -272,28 +272,24 @@ foreach ($contextlevels as $contextlevel => $cfg) {
 
         } else {
 
-            if (!empty($inprogress)) {
-                echo html_writer::div(get_string('form_request_requestsinprogress', 'local_extension'), 'extension_category');
-                // If the configuration contexts are disabled then provide links to make individual requests.
-                foreach ($inprogress as $mod) {
-                    echo $mod->handler->status_definition($mod);
+            // If the configuration contexts are disabled then provide links to make individual requests.
+            foreach ($inprogress as $mod) {
+                echo $mod->handler->status_definition($mod);
 
-                    $requestid = $mod->localcm->requestid;
+                $requestid = $mod->localcm->requestid;
 
-                    $params = array('id' => $requestid);
-                    $url = new moodle_url('/local/extension/status.php', $params);
+                $params = array('id' => $requestid);
+                $url = new moodle_url('/local/extension/status.php', $params);
 
-                    $name = $mod->event->name;
-                    $text = get_string('page_request_requeststatuslink', 'local_extension', $name);
-                    $link = html_writer::link($url, $text);
+                $name = $mod->event->name;
+                $text = get_string('page_request_requeststatuslink', 'local_extension', $name);
+                $link = html_writer::link($url, $text);
 
-                    echo html_writer::tag('p', $link);
-                }
+                echo html_writer::tag('p', $link);
             }
 
             if (!empty($available)) {
                 echo html_writer::empty_tag('hr');
-                echo html_writer::div(get_string('form_request_availablerequests', 'local_extension'), 'extension_category');
             }
 
             foreach ($available as $mod) {
