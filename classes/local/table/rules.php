@@ -130,7 +130,7 @@ class rules extends flexible_table {
             ));
 
             $edithtml = html_writer::empty_tag('img', array(
-                'src' => $renderer->pix_icon('t/edit', ''),
+                'src' => $renderer->image_url('t/edit'),
                 'alt' => get_string('edit'),
                 'class' => 'iconsmall'
             ));
@@ -141,7 +141,7 @@ class rules extends flexible_table {
             ));
 
             $deletehtml = html_writer::empty_tag('img', array(
-                'src' => $renderer->pix_icon('t/delete', ''),
+                'src' => $renderer->image_url('t/delete'),
                 'alt' => get_string('delete'),
                 'class' => 'iconsmall'
             ));
