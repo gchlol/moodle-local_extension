@@ -208,7 +208,7 @@ abstract class base_request {
             $eventlink = html_writer::span($mod->cm->name);
         } else {
             $eventlink = new moodle_url('/mod/' . $event->modulename . '/view.php', ['id' => $cmid]);
-            $eventlink = html_writer::link($eventlink, $event->name);
+            $eventlink = html_writer::link($eventlink, $mod->cm->name);
         }
 
         $coursestring = html_writer::tag('b', $courselink . ' > ' . $eventlink);
