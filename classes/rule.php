@@ -745,7 +745,7 @@ class rule {
             '/{{extensionlength}}/' => $this->get_request_time($mod),
             '/{{rulename}}/' => $this->name,
             '/{{rolename}}/' => $this->rolenames[$this->role],
-            '/{{eventname}}/' => $event->name,
+            '/{{eventname}}/' => isset($cm->name) ? $cm->name : $event->name,
             '/{{eventdescription}}/' => $event->description,
             '/{{attachments}}/' => $renderer->render_extension_attachments($request),
             '/{{fullhistory}}/' => $renderer->render_extension_comments($request, true),

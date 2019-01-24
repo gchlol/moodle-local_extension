@@ -767,7 +767,7 @@ class state {
         $log = new stdClass();
         $log->status = $status;
         $log->course = $course->fullname;
-        $log->event = is_null($event) ? $mod->cm->name : $event->name;
+        $log->event = isset($mod->cm->name) ? $mod->cm->name : $event->name;
 
         $history->message = get_string('request_state_history_log', 'local_extension', $log);
 
@@ -856,7 +856,7 @@ class state {
         $log = new stdClass();
         $log->status = $status;
         $log->course = $course->fullname;
-        $log->event = $event->name;
+        $log->event = isset($mod->cm->name) ? $mod->cm->name : $event->name;
 
         $history->message = get_string('request_state_history_log', 'local_extension', $log);
 

@@ -170,7 +170,7 @@ if ($mform->is_cancelled()) {
             'userid' => $USER->id,
             'course' => $course->id,
             'timestamp' => $now,
-            'name' => $event->name,
+            'name' => isset($mod->cm->name) ? $mod->cm->name : $event->name,
             'cmid' => $cmid,
             'state' => state::STATE_NEW,
             'data' => $data,
