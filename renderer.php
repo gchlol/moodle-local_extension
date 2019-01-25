@@ -576,7 +576,9 @@ class local_extension_renderer extends plugin_renderer_base {
             $hascapability = true;
         }
 
-        if ($CFG->branch < 35) {
+        if ($CFG->branch < 36) {
+            include_once($CFG->libdir . '/coursecatlib.php');
+
             $categorylist = coursecat::make_categories_list('local/extension:viewallrequests');
             if (!empty($categoryid)) {
                 $courselist = coursecat::get($categoryid)->get_courses();
