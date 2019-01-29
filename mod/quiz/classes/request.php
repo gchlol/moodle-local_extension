@@ -109,7 +109,7 @@ class request extends \local_extension\base_request {
         $course = $mod->course;
 
         $html = html_writer::start_div('content');
-        $coursestring = html_writer::tag('b', $course->fullname . ' > ' . $event->name, array('class' => 'mod'));
+        $coursestring = html_writer::tag('b', $course->fullname . ' > ' . $mod->cm->name, array('class' => 'mod'));
         $str = get_string('dueon', 'extension_assign', userdate($event->timeclose));
         $html .= html_writer::tag('p', $coursestring . ' ' . $str);
 
@@ -148,7 +148,7 @@ class request extends \local_extension\base_request {
         $user = $customdata['user'];
 
         $html = html_writer::start_div('content');
-        $coursestring = html_writer::tag('b', $course->fullname . ' > ' . $event->name, array('class' => 'mod'));
+        $coursestring = html_writer::tag('b', $course->fullname . ' > ' . $mod->cm->name, array('class' => 'mod'));
         $html .= html_writer::tag('p', $coursestring);
         $html .= html_writer::end_div(); // End .content.
 
@@ -199,7 +199,7 @@ class request extends \local_extension\base_request {
         $quiz = $DB->get_record('quiz', ['id' => $cm->instance], 'timeclose');
 
         $html = html_writer::start_div('content');
-        $coursestring = html_writer::tag('b', $course->fullname . ' > ' . $event->name, array('class' => 'mod'));
+        $coursestring = html_writer::tag('b', $course->fullname . ' > ' . $mod->cm->name, array('class' => 'mod'));
         $html .= html_writer::tag('p', $coursestring);
         $html .= html_writer::end_div(); // End .content.
 

@@ -118,7 +118,7 @@ if ($mform->is_cancelled()) {
     $sign = $delta < 0 ? '-' : '+';
     $obj = new stdClass();
     $obj->course = $course->fullname;
-    $obj->event = $event->name;
+    $obj->event = isset($mod->cm->name) ? $mod->cm->name : $event->name;
     $obj->original = userdate($originaldate);
     $obj->new = userdate($newdate);
     $obj->diff = $sign . utility::calculate_length($delta);
