@@ -76,7 +76,7 @@ class request extends \moodleform {
                 $params = array('id' => $requestid);
                 $url = new \moodle_url('/local/extension/status.php', $params);
 
-                $name = $mod->event->name;
+                $name = isset($mod->cm->name) ? $mod->cm->name : $mod->event->name;
                 $text = get_string('page_request_requeststatuslink', 'local_extension', $name);
                 $link = \html_writer::link($url, $text);
 

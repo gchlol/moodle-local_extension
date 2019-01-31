@@ -281,7 +281,7 @@ foreach ($contextlevels as $contextlevel => $cfg) {
                 $params = array('id' => $requestid);
                 $url = new moodle_url('/local/extension/status.php', $params);
 
-                $name = $mod->event->name;
+                $name = isset($mod->cm->name) ? $mod->cm->name : $mod->event->name;
                 $text = get_string('page_request_requeststatuslink', 'local_extension', $name);
                 $link = html_writer::link($url, $text);
 
@@ -301,7 +301,7 @@ foreach ($contextlevels as $contextlevel => $cfg) {
                 $params = array('course' => $course, 'cmid' => $cmid);
                 $url = new moodle_url('/local/extension/request.php', $params);
 
-                $name = $mod->event->name;
+                $name = isset($mod->cm->name) ? $mod->cm->name : $mod->event->name;
                 $text = get_string('page_request_requestnewlink', 'local_extension', $name);
                 $link = html_writer::link($url, $text);
 

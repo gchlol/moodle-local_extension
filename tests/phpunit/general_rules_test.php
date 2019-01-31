@@ -274,7 +274,7 @@ class local_extension_general_rules_testcase extends extension_testcase {
                 'userid' => $user->id,
                 'course' => $course->id,
                 'timestamp' => $now,
-                'name' => $mod->event->name,
+                'name' => isset($mod->cm->name) ? $mod->cm->name : $mod->event->name,
                 'cmid' => $cmid,
                 'state' => 0,
                 'data' => $data,
