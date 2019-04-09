@@ -493,7 +493,7 @@ class local_extension_renderer extends plugin_renderer_base {
             }
         }
 
-        $select = new single_select($popupurl, 'back', $backwardlist, $searchback, null, 'requestform');
+        $select = new single_select($popupurl, 'back', $backwardlist, $searchback, null, 'backform');
         $select->set_label(get_string('page_request_searchbackward', 'local_extension'));
 
         $html = $this->render($select);
@@ -534,7 +534,7 @@ class local_extension_renderer extends plugin_renderer_base {
             }
         }
 
-        $select = new single_select($popupurl, 'forward', $forwardlist, $searchforward, null, 'requestform');
+        $select = new single_select($popupurl, 'forward', $forwardlist, $searchforward, null, 'forwardform');
         $select->set_label(get_string('page_request_searchforward', 'local_extension'));
 
         $html = $this->render($select);
