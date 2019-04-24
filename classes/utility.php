@@ -81,7 +81,7 @@ class utility {
         $courses = enrol_get_users_courses($userid);
 
         // Get the events matching our criteria.
-        list($courses, $group, $user2) = calendar_set_filters($courses);
+        list($courses, $group, $user2) = calendar_set_filters($courses, true);
 
         $allevents = calendar_get_events($start, $end, [$userid], $groups, $courses);
 
