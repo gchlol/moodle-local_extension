@@ -161,7 +161,7 @@ abstract class base_request {
             $defaultdate = $lcmdate;
         }
 
-        $startyear = date('Y');
+        $startyear = date('Y') - 1; // Allow students to request assignment extensions in the past
         $stopyear = date('Y') + 1;
 
         $dateconfig = [
