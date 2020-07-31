@@ -190,8 +190,6 @@ class local_extension_renderer extends plugin_renderer_base {
      * @return string $out The html output.
      */
     public function render_extension_attachments(\local_extension\request $req) {
-        global $OUTPUT;
-
         list($fs, $files) = $req->fetch_attachments();
 
         $out  = html_writer::start_tag('div', ['class' => 'attachments']);
@@ -226,7 +224,7 @@ class local_extension_renderer extends plugin_renderer_base {
             $user = core_user::get_user($file->get_userid());
 
             $obj = new stdClass();
-            $obj->file = $OUTPUT->pix_icon(file_file_icon($file, 16), get_mimetype_description($file)) .
+            $obj->file = $this->output->pix_icon(file_file_icon($file, 16), get_mimetype_description($file)) .
                 ' ' . html_writer::link($fileurl, $f->get_filename());
             $obj->user = fullname($user);
             $obj->date = userdate($file->get_timecreated());
@@ -562,7 +560,7 @@ class local_extension_renderer extends plugin_renderer_base {
      * @return string
      */
     public function render_index_search_controls($context, $categoryid, $courseid, $stateid, $baseurl, $search, $faculty) {
-        global $PAGE, $CFG;
+        global $CFG;
 
         // $courseid = empty($courseid) ? 1 : $courseid;
         $courselist = [];
@@ -579,11 +577,11 @@ class local_extension_renderer extends plugin_renderer_base {
         if ($CFG->branch < 36) {
             include_once($CFG->libdir . '/coursecatlib.php');
 
-            $categorylist = coursecat::make_categories_list('local/extension:viewallrequests');
+            $categorylist = \core_course_category::make_categories_list('local/extension:viewallrequests');
             if (!empty($categoryid)) {
-                $courselist = coursecat::get($categoryid)->get_courses();
+                $courselist = \core_course_category::get($categoryid)->get_courses();
             } else {
-                $courselist = coursecat::get(0)->get_courses(['recursive' => true]);
+                $courselist = \core_course_category::get(0)->get_courses(['recursive' => true]);
             }
         } else {
             $categorylist = \core_course_category::make_categories_list('local/extension:viewallrequests');
@@ -599,7 +597,7 @@ class local_extension_renderer extends plugin_renderer_base {
         // Check if the courseid exists in the list of options, we may have changed the faculty filter.
         if (!array_key_exists($courseid, $courselist)) {
             $baseurl->remove_params('id');
-            $PAGE->set_url($baseurl);
+            $this->page->set_url($baseurl);
         }
 
         $searchelements = [];
@@ -680,7 +678,7 @@ class local_extension_renderer extends plugin_renderer_base {
 
             // Add the top level 'Top' element.
             if ($CFG->branch < 35) {
-                $cats[0] = coursecat::get(0)->get_formatted_name();
+                $cats[0] = \core_course_category::get(0)->get_formatted_name();
             } else {
                 $cats[0] = \core_course_category::get(0)->get_formatted_name();
             }
