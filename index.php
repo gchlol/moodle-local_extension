@@ -48,6 +48,7 @@ $PAGE->set_url('/local/extension/index.php', []);
 if ($courseid) {
     $course = $DB->get_record('course', array('id' => $courseid), '*', MUST_EXIST);
     $context = context_course::instance($course->id, MUST_EXIST);
+    $categoryid = $course->category;
 } else {
     $courseid = SITEID;
     $course = $DB->get_record('course', array('id' => $courseid), '*', MUST_EXIST);
