@@ -47,8 +47,7 @@ if (!capability_checker::can_view_request($request)) {
 $url = new moodle_url('/local/extension/status.php', array('id' => $requestid));
 $PAGE->set_url($url);
 
-// TODO context could be user, course or module.
-$context = context_user::instance($USER->id);
+$context = context_system::instance();
 $PAGE->set_context($context);
 $PAGE->set_pagelayout('standard');
 $PAGE->set_title(get_string('pluginname', 'local_extension'));

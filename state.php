@@ -78,8 +78,7 @@ $params = array('id' => $requestid, 'course' => $courseid, 'cmid' => $cmid, 's' 
 $url = new moodle_url('/local/extension/state.php', $params);
 $PAGE->set_url($url);
 
-// TODO context could be user, course or module.
-$context = context_user::instance($USER->id);
+$context = context_system::instance();
 $PAGE->set_context($context);
 $PAGE->set_pagelayout('standard');
 $PAGE->set_title(get_string('pluginname', 'local_extension'));

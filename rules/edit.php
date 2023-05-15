@@ -40,9 +40,7 @@ if (empty($datatype)) {
 
 $PAGE->set_url(new moodle_url('/local/extension/rules/edit.php'));
 
-$context = context_system::instance();
-
-$PAGE->set_context($context);
+$PAGE->set_context(context_system::instance());
 $PAGE->set_pagelayout('standard');
 $PAGE->set_title(get_string('pluginname', 'local_extension'));
 $PAGE->set_heading(get_string('rules_page_heading', 'local_extension'));

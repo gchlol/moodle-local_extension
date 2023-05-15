@@ -66,8 +66,9 @@ class student extends request_list {
     public function generate_query($categoryid, $courseid, $stateid, $search, $faculty) {
         global $USER;
 
-        $ufields = ['username', 'email', 'city', 'country', 'lang', 'timezone', 'maildisplay', 'idnumber'];
-        $mainuserfields = user_picture::fields('u', $ufields);
+        $userfieldsapi = \core_user\fields::for_userpic()->including(
+            'username', 'email', 'city', 'country', 'lang', 'timezone', 'maildisplay', 'idnumber');
+        $userfields = $userfieldsapi->get_sql('u', false, '', '', false)->selects;
 
         // This query obtains ALL local cm requests, that the $USER has a subscription to with the possible filters:
         // coursename, username, activityname, status.
@@ -84,7 +85,7 @@ class student extends request_list {
                          u.idnumber,
                          c.fullname AS coursename,
                          c.id AS courseid,
-                         $mainuserfields";
+                         $userfields";
 
         $this->params = [];
         $this->joins = [];

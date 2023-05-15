@@ -40,12 +40,11 @@ $PAGE->set_url(new moodle_url('/local/extension/additional_request.php'), [
 $selfurl = $PAGE->url;
 
 $cm = get_fast_modinfo($courseid)->get_cm($cmid);
-require_login($courseid, false, $cm);
+require_login(null, false);
 
 $request = \local_extension\request::from_id($requestid);
 
-$context = context_module::instance($cmid);
-$PAGE->set_context($context);
+$PAGE->set_context(context_system::instance());
 
 $PAGE->set_pagelayout('standard');
 $PAGE->set_title(get_string('pluginname', 'local_extension'));
@@ -53,6 +52,9 @@ $PAGE->set_heading(get_string('page_heading_additional_request', 'local_extensio
 
 $PAGE->requires->css('/local/extension/styles.css');
 $PAGE->add_body_class('local_extension');
+
+$PAGE->set_secondary_navigation(false);
+$PAGE->activityheader->disable();
 
 $requestuser = core_user::get_user($request->request->userid);
 $pageurl = new moodle_url('/local/extension/status.php', ['id' => $request->requestid]);

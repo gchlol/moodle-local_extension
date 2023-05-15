@@ -63,11 +63,10 @@ if (!$viewallrequests) {
     $categoryid = 0;
 }
 
-$systemcontext = context_system::instance();
 $isfrontpage = ($course->id == SITEID);
 $frontpagectx = context_course::instance(SITEID);
 
-$PAGE->set_context($systemcontext);
+$PAGE->set_context(context_system::instance());
 $PAGE->set_pagelayout('standard');
 $PAGE->set_title(get_string('pluginname', 'local_extension'));
 $PAGE->set_heading(get_string('page_heading_index', 'local_extension'));

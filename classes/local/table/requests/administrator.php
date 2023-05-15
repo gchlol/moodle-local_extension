@@ -63,8 +63,9 @@ class administrator extends request_list {
      * @param string $faculty
      */
     public function generate_query($categoryid, $courseid, $stateid, $search, $faculty) {
-        $ufields = ['username', 'email', 'city', 'country', 'lang', 'timezone', 'maildisplay', 'idnumber'];
-        $mainuserfields = user_picture::fields('u', $ufields);
+        $userfieldsapi = \core_user\fields::for_userpic()->including(
+            'username', 'email', 'city', 'country', 'lang', 'timezone', 'maildisplay', 'idnumber');
+        $userfields = $userfieldsapi->get_sql('u', false, '', '', false)->selects;
 
         // This query obtains ALL local cm requests, with the possible filters: coursename, username, activityname, status.
         $this->select = "lcm.id AS lcmid,
@@ -80,7 +81,7 @@ class administrator extends request_list {
                          u.idnumber,
                          c.fullname AS coursename,
                          c.id AS courseid,
-                         $mainuserfields";
+                         $userfields";
 
         $this->params = [];
         $this->joins = [];

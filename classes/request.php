@@ -60,7 +60,7 @@ class request implements \cache_data_source {
     /** @var array An array of file attachment objects from the request id */
     public $attachments = array();
 
-    /** @var array An array of user objects with the available fields user_picture::fields  */
+    /** @var array An array of user objects with the available fields \core_user\fields::for_userpic()  */
     public $users = array();
 
     /** @var array An array of attached files that exist for this request id */
@@ -131,7 +131,8 @@ class request implements \cache_data_source {
 
         // Fetch the users.
         list($uids, $params) = $DB->get_in_or_equal($userids);
-        $userfields = \user_picture::fields('', ['idnumber']);
+        $userfieldsapi = \core_user\fields::for_userpic()->including('idnumber');
+        $userfields = $userfieldsapi->get_sql('', false, '', '', false)->selects;
         $sql = "SELECT $userfields
                   FROM {user}
                  WHERE id $uids";

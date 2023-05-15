@@ -37,9 +37,7 @@ $confirm = optional_param('confirm', '', PARAM_ALPHANUM);   // MD5 confirmation 
 $url = new moodle_url('/local/extension/rules/delete.php');
 $PAGE->set_url($url);
 
-$context = context_system::instance();
-
-$PAGE->set_context($context);
+$PAGE->set_context(context_system::instance());
 $PAGE->set_pagelayout('standard');
 $PAGE->set_title(get_string('pluginname', 'local_extension'));
 $PAGE->set_heading(get_string('rules_page_heading', 'local_extension'));

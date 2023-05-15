@@ -63,9 +63,7 @@ if (!has_capability('local/extension:viewallrequests', $context)) {
 $url = new moodle_url('/local/extension/modify.php', array('id' => $requestid, 'courseid' => $courseid, 'cmid' => $cmid));
 $PAGE->set_url($url);
 
-// TODO context could be user, course or module.
-$context = context_user::instance($USER->id);
-$PAGE->set_context($context);
+$PAGE->set_context(context_system::instance());
 $PAGE->set_pagelayout('standard');
 $PAGE->set_title(get_string('pluginname', 'local_extension'));
 $PAGE->set_heading(get_string('page_heading_index', 'local_extension'));
