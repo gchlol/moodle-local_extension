@@ -189,6 +189,7 @@ $string['modulecontexthelp'] = 'Allow individual requests to be made in the modu
 $string['na'] = 'N/A';
 $string['nav_course_request'] = 'extension request';
 $string['nav_course_request_plural'] = 'extension requests';
+$string['nav_index'] = 'Extension Status';
 $string['nav_request'] = 'Request Extension';
 $string['nav_status'] = '{$a} Extension';
 $string['notification_footer'] = '{$a->content}<hr /><p>Notification update for extension request #{$a->id}: {$a->fullname}.

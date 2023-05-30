@@ -26,21 +26,36 @@
 defined('MOODLE_INTERNAL') || die;
 
 /**
- * Add the link to start a request, Moodle 2.9+
+ * This function extends the course navigation with an activity extension link.
  *
- * @param global_navigation $nav Navigation
+ * @param navigation_node $navigation The navigation node to extend
+ * @param stdClass $course The course to object for the report
+ * @param context $context The context of the course
+ * @throws coding_exception
+ * @throws moodle_exception
  */
-function local_extension_extend_navigation(global_navigation $nav) {
-    \local_extension\navigation\extension_navigation::apply($nav);
-}
+function local_extension_extend_navigation_course(\navigation_node $navigation, \stdClass $course, \context $context) {
+    global $PAGE, $USER;
 
-/**
- * Add the link to start a request, Moodle 2.7
- *
- * @param global_navigation $nav Navigation
- */
-function local_extension_extends_navigation(global_navigation $nav) {
-    \local_extension\navigation\extension_navigation::apply($nav);
+    if (!is_enrolled($PAGE->context, $USER->id)) {
+        return;
+    }
+
+    $label = get_string('nav_request', 'local_extension');
+    $url = new moodle_url('/local/extension/index.php', []);
+
+    if (has_capability('local/extension:viewallrequests', $context)) {
+        $label = get_string('nav_index', 'local_extension');
+    }
+
+    $navigation->add(
+        $label,
+        $url,
+        navigation_node::TYPE_SETTING,
+        null,
+        null,
+        new pix_icon('i/edit', '')
+    );
 }
 
 /**
