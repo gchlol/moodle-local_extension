@@ -44,7 +44,7 @@ class local_extension_attachment_processor_test extends advanced_testcase {
     /** @var context_user */
     private $usercontext;
 
-    protected function setUp() {
+    protected function setUp(): void {
         global $USER;
 
         self::setAdminUser();
