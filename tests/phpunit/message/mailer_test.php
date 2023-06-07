@@ -43,7 +43,7 @@ class local_extension_mailer_test extends extension_testcase {
     /** @var stdClass */
     private $recipient;
 
-    protected function setUp() {
+    protected function setUp(): void {
         parent::setUp();
         $this->resetAfterTest();
         self::setAdminUser();

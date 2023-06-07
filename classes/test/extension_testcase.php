@@ -49,7 +49,7 @@ abstract class extension_testcase extends advanced_testcase {
         }
     }
 
-    protected function tearDown() {
+    protected function tearDown(): void {
         parent::tearDown();
         base_request::$rules = null;
     }

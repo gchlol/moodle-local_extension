@@ -68,7 +68,7 @@ class local_extension_general_rules_testcase extends extension_testcase {
     /**
      * Initial set up.
      */
-    protected function setUp() {
+    protected function setUp(): void {
         global $DB, $CFG;
 
         parent::setUp();
