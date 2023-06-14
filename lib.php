@@ -42,15 +42,17 @@ function local_extension_extend_navigation_course(\navigation_node $navigation, 
         return;
     }
 
-    if (!is_enrolled($PAGE->context, $USER->id)) {
-        return;
-    }
-
     $label = get_string('nav_request', 'local_extension');
     $url = new moodle_url('/local/extension/index.php', []);
 
-    if (has_capability('local/extension:viewallrequests', $context)) {
+    $caps = ['local/extension:viewallrequests', 'local/extension:accessallcourserequests'];
+    $hascap = has_any_capability($caps, $context);
+    if ($hascap) {
         $label = get_string('nav_index', 'local_extension');
+    }
+
+    if (!is_enrolled($PAGE->context, $USER->id) && !$hascap) {
+        return;
     }
 
     $navigation->add(
