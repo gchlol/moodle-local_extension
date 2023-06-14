@@ -37,6 +37,11 @@ defined('MOODLE_INTERNAL') || die;
 function local_extension_extend_navigation_course(\navigation_node $navigation, \stdClass $course, \context $context) {
     global $PAGE, $USER;
 
+    // Only add this settings item on non-site course pages.
+    if (!$PAGE->course or $PAGE->course->id == 1) {
+        return;
+    }
+
     $label = get_string('nav_request', 'local_extension');
     $url = new moodle_url('/local/extension/index.php', []);
 

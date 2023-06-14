@@ -70,7 +70,7 @@ class local_extension_email_test extends extension_testcase {
 
         self::assertCount(2, $sink->get_messages());
         foreach ($sink->get_messages() as $key => $message) {
-            self::assertContains('XYZ_TEST', $message->subject, "Message #[{$key}]");
+            self::assertStringContainsString('XYZ_TEST', $message->subject, "Message #[{$key}]");
         }
     }
 }
